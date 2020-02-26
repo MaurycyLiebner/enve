@@ -18,9 +18,9 @@
 #include <QMenu>
 #include "qrealpoint.h"
 #include "qrealkey.h"
-#include "Expressions/expressionvalue.h"
-#include "Expressions/expressionparser.h"
-#include "simpletask.h"
+#include "../Expressions/expressionvalue.h"
+#include "../Expressions/expressionparser.h"
+#include "../simpletask.h"
 
 QrealAnimator::QrealAnimator(const qreal iniVal,
                              const qreal minVal,
@@ -55,7 +55,7 @@ void QrealAnimator::prp_readProperty(eReadStream& src) {
         if(!expression.isEmpty()) {
             SimpleTask::sSchedule([this, expression]() {
                 const auto exp = ExpressionParser::parse(
-                            expression, this, ExpressionType::noPlainVariables);
+                            expression, this, ExpressionType::noManualVariables);
                 setExpression(exp);
             });
         }

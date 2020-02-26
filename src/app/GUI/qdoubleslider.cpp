@@ -20,7 +20,7 @@
 #include "pointhelpers.h"
 #include "mainwindow.h"
 #include "GUI/global.h"
-#include "Animators/Expressions/expressionparser.h"
+#include "Expressions/expressionparser.h"
 
 QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
                              const qreal prefferedStep,

@@ -71,22 +71,22 @@ QMAKE_CXXFLAGS += -fopenmp
 LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 
 SOURCES += \
-    Animators/Expressions/expressioncomplex.cpp \
-    Animators/Expressions/expressionfunction.cpp \
-    Animators/Expressions/expressionfunctionbase.cpp \
-    Animators/Expressions/expressionmanualvariable.cpp \
-    Animators/Expressions/expressionnegatefunction.cpp \
-    Animators/Expressions/expressionoperator.cpp \
-    Animators/Expressions/expressionparser.cpp \
-    Animators/Expressions/expressionplainvalue.cpp \
-    Animators/Expressions/expressionrandomfunction.cpp \
-    Animators/Expressions/expressionsinglechild.cpp \
-    Animators/Expressions/expressionsource.cpp \
-    Animators/Expressions/expressionsourcebase.cpp \
-    Animators/Expressions/expressionsourceframe.cpp \
-    Animators/Expressions/expressionsourcevalue.cpp \
-    Animators/Expressions/expressionvalue.cpp \
-    Animators/Expressions/expressionvariable.cpp \
+    Expressions/expressioncomplex.cpp \
+    Expressions/expressionfunction.cpp \
+    Expressions/expressionfunctionbase.cpp \
+    Expressions/expressionmanualvariable.cpp \
+    Expressions/expressionnegatefunction.cpp \
+    Expressions/expressionoperator.cpp \
+    Expressions/expressionparser.cpp \
+    Expressions/expressionplainvalue.cpp \
+    Expressions/expressionrandomfunction.cpp \
+    Expressions/expressionsinglechild.cpp \
+    Expressions/expressionsource.cpp \
+    Expressions/expressionsourcebase.cpp \
+    Expressions/expressionsourceframe.cpp \
+    Expressions/expressionsourcevalue.cpp \
+    Expressions/expressionvalue.cpp \
+    Expressions/expressionvariable.cpp \
     Animators/SculptPath/sculptbrush.cpp \
     Animators/SculptPath/sculptnode.cpp \
     Animators/SculptPath/sculptnodebase.cpp \
@@ -375,22 +375,22 @@ SOURCES += \
     zipfilesaver.cpp
 
 HEADERS += \
-    Animators/Expressions/expressioncomplex.h \
-    Animators/Expressions/expressionfunction.h \
-    Animators/Expressions/expressionfunctionbase.h \
-    Animators/Expressions/expressionmanualvariable.h \
-    Animators/Expressions/expressionnegatefunction.h \
-    Animators/Expressions/expressionoperator.h \
-    Animators/Expressions/expressionparser.h \
-    Animators/Expressions/expressionplainvalue.h \
-    Animators/Expressions/expressionrandomfunction.h \
-    Animators/Expressions/expressionsinglechild.h \
-    Animators/Expressions/expressionsource.h \
-    Animators/Expressions/expressionsourcebase.h \
-    Animators/Expressions/expressionsourceframe.h \
-    Animators/Expressions/expressionsourcevalue.h \
-    Animators/Expressions/expressionvalue.h \
-    Animators/Expressions/expressionvariable.h \
+    Expressions/expressioncomplex.h \
+    Expressions/expressionfunction.h \
+    Expressions/expressionfunctionbase.h \
+    Expressions/expressionmanualvariable.h \
+    Expressions/expressionnegatefunction.h \
+    Expressions/expressionoperator.h \
+    Expressions/expressionparser.h \
+    Expressions/expressionplainvalue.h \
+    Expressions/expressionrandomfunction.h \
+    Expressions/expressionsinglechild.h \
+    Expressions/expressionsource.h \
+    Expressions/expressionsourcebase.h \
+    Expressions/expressionsourceframe.h \
+    Expressions/expressionsourcevalue.h \
+    Expressions/expressionvalue.h \
+    Expressions/expressionvariable.h \
     Animators/SculptPath/sculptbrush.h \
     Animators/SculptPath/sculptnode.h \
     Animators/SculptPath/sculptnodebase.h \

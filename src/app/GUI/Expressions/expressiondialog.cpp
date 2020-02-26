@@ -22,7 +22,7 @@
 #include <QStatusBar>
 #include <QApplication>
 
-#include "Animators/Expressions/expressionparser.h"
+#include "Expressions/expressionparser.h"
 #include "Boxes/boundingbox.h"
 #include "Private/document.h"
 #include "expressioneditor.h"
