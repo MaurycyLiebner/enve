@@ -565,14 +565,15 @@ HEADERS += \
     ReadWrite/ereadstream.h \
     ReadWrite/ewritestream.h \
     ReadWrite/filefooter.h \
-    ShaderEffects/intanimatorcreator.h \
-    ShaderEffects/qpointfanimatorcreator.h \
-    ShaderEffects/qrealanimatorcreator.h \
+    ShaderEffects/PropertyCreators/coloranimatorcreator.h \
+    ShaderEffects/PropertyCreators/intanimatorcreator.h \
+    ShaderEffects/PropertyCreators/qpointfanimatorcreator.h \
+    ShaderEffects/PropertyCreators/qrealanimatorcreator.h \
+    ShaderEffects/PropertyCreators/shaderpropertycreator.h \
     ShaderEffects/shadereffect.h \
     ShaderEffects/shadereffectcaller.h \
     ShaderEffects/shadereffectcreator.h \
     ShaderEffects/shadereffectprogram.h \
-    ShaderEffects/shaderpropertycreator.h \
     ShaderEffects/shadervaluehandler.h \
     ShaderEffects/uniformspecifiercreator.h \
     Sound/eindependentsound.h \

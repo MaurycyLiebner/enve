@@ -14,33 +14,34 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef INTANIMATORCREATOR_H
-#define INTANIMATORCREATOR_H
-#include "Animators/intanimator.h"
-#include "shaderpropertycreator.h"
-#include "glhelpers.h"
+#ifndef QREALANIMATORCREATOR_H
+#define QREALANIMATORCREATOR_H
 
-struct IntAnimatorCreator : public ShaderPropertyCreator {
+#include "Animators/qrealanimator.h"
+#include "shaderpropertycreator.h"
+
+struct QrealAnimatorCreator : public ShaderPropertyCreator {
     e_OBJECT
-    IntAnimatorCreator(const int iniVal,
-                       const int minVal,
-                       const int maxVal,
-                       const int step,
-                       const bool glValue,
-                       const QString& name,
-                       const QString& nameUI) :
+    QrealAnimatorCreator(const qreal iniVal,
+                         const qreal minVal,
+                         const qreal maxVal,
+                         const qreal step,
+                         const bool glValue,
+                         const QString& name,
+                         const QString& nameUI) :
         ShaderPropertyCreator(glValue, name, nameUI),
         fIniVal(iniVal), fMinVal(minVal),
         fMaxVal(maxVal), fStep(step) {}
 
-    const int fIniVal;
-    const int fMinVal;
-    const int fMaxVal;
-    const int fStep;
+    const qreal fIniVal;
+    const qreal fMinVal;
+    const qreal fMaxVal;
+    const qreal fStep;
 
     qsptr<Property> create() const {
-        return enve::make_shared<IntAnimator>(
+        return enve::make_shared<QrealAnimator>(
                     fIniVal, fMinVal, fMaxVal, fStep, fNameUI);
     }
 };
-#endif // INTANIMATORCREATOR_H
+
+#endif // QREALANIMATORCREATOR_H

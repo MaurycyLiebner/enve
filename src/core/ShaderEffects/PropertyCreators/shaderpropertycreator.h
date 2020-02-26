@@ -16,9 +16,9 @@
 
 #ifndef SHADERPROPERTYCREATOR_H
 #define SHADERPROPERTYCREATOR_H
+
 #include "Properties/property.h"
 #include "smartPointers/stdselfref.h"
-#include "glhelpers.h"
 
 struct ShaderPropertyCreator : public StdSelfRef {
     ShaderPropertyCreator(const bool glValue,

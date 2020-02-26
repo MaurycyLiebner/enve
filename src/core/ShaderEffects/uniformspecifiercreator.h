@@ -16,15 +16,17 @@
 
 #ifndef UNIFORMSPECIFIERCREATOR_H
 #define UNIFORMSPECIFIERCREATOR_H
-#include "qrealanimatorcreator.h"
-#include "intanimatorcreator.h"
-#include "qpointfanimatorcreator.h"
+#include "PropertyCreators/qrealanimatorcreator.h"
+#include "PropertyCreators/intanimatorcreator.h"
+#include "PropertyCreators/qpointfanimatorcreator.h"
+#include "glhelpers.h"
 #include <QJSEngine>
 
 enum class ShaderPropertyType {
     floatProperty,
     intProperty,
     vec2Property,
+    colorProperty,
     invalid
 };
 

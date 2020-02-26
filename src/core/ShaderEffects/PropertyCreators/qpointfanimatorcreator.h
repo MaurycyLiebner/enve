@@ -19,7 +19,6 @@
 
 #include "Animators/qpointfanimator.h"
 #include "shaderpropertycreator.h"
-#include "glhelpers.h"
 
 class QPointFAnimatorCreator : public ShaderPropertyCreator {
     e_OBJECT
