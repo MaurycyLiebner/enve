@@ -29,6 +29,8 @@ public:
     { return name(); }
 
     QString definitionString() const;
+
+    using ExpressionSingleChild::name;
 };
 
 #endif // EXPRESSIONVARIABLE_H

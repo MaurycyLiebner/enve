@@ -97,7 +97,8 @@ bool ExpressionDialog::apply(const bool action) {
     ExpressionValue::sptr expr;
     const auto text = mLine->toPlainText();
     try {
-        expr = ExpressionParser::parse(text, mTarget);
+        expr = ExpressionParser::parse(
+                    text, mTarget, ExpressionType::noPlainVariables);
         if(expr && !expr->isValid()) expr = nullptr;
         if(action) {
             mTarget->setExpressionAction(expr);

@@ -17,15 +17,18 @@
 #include "expressioncomplex.h"
 
 ExpressionComplex::ExpressionComplex(
+        const QList<PlainVarSPtr>& plainVars,
         const QList<ExpressionVarSPtr> &vars,
         const sptr &value) :
     ExpressionSingleChild("Complex", value),
+    mPlainVariables(plainVars),
     mVariables(vars) {}
 
 ExpressionValue::sptr ExpressionComplex::sCreate(
+        const QList<PlainVarSPtr>& plainVars,
         const QList<ExpressionVarSPtr>& vars,
-        const ExpressionValue::sptr &value) {
-    const auto result = new ExpressionComplex(vars, value);
+        const ExpressionValue::sptr& value) {
+    const auto result = new ExpressionComplex(plainVars, vars, value);
     result->updateValue();
     return sptr(result);
 }
@@ -46,4 +49,21 @@ QString ExpressionComplex::toString() const {
         result += var->definitionString();
     result += innerString();
     return result;
+}
+
+ExpressionPlainVariableId ExpressionComplex::getUndefinedVariableId(
+        const QString &name) {
+    const int iMax = mPlainVariables.count();
+    for(int i = 0; i < iMax; i++) {
+        const auto& var = mPlainVariables.at(i);
+        if(var->name() == name) return ExpressionPlainVariableId{i};
+    }
+    return ExpressionPlainVariableId{-1};
+}
+
+void ExpressionComplex::setUndefinedVariableValue(
+        const ExpressionPlainVariableId &variableId, const qreal value) {
+    const int id = variableId.fId;
+    if(id < 0 || id > mPlainVariables.count()) return;
+    mPlainVariables.at(id)->setValue(value);
 }

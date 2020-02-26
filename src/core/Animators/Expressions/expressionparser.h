@@ -20,9 +20,18 @@
 
 class QrealAnimator;
 
+enum class ExpressionType {
+    noPlainNoSource, // thread-safe
+    noSourceVariables, // thread-safe
+                       // use ExpressionPlainVariables to control values
+    noPlainVariables,
+    allFeatures
+};
+
 namespace ExpressionParser {
     QSharedPointer<ExpressionValue> parse(
-            QString exp, QrealAnimator* const parent);
+            QString exp, QrealAnimator* const parent,
+            const ExpressionType type);
 };
 
 #endif // EXPRESSIONPARSER_H

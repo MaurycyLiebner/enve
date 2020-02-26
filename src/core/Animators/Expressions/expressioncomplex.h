@@ -19,21 +19,35 @@
 
 #include "expressionsinglechild.h"
 #include "expressionvariable.h"
+#include "expressionplainvariable.h"
+
+class ExpressionPlainVariableId {
+    friend class ExpressionComplex;
+    ExpressionPlainVariableId(const int id) : fId(id) {}
+    int fId;
+};
 
 using ExpressionVarSPtr = QSharedPointer<ExpressionVariable>;
+using PlainVarSPtr = QSharedPointer<ExpressionPlainVariable>;
 
-class ExpressionComplex : public ExpressionSingleChild {
-public:
-    ExpressionComplex(const QList<ExpressionVarSPtr> &vars,
+class ExpressionComplex : public ExpressionSingleChild {  
+    ExpressionComplex(const QList<PlainVarSPtr>& plainVars,
+                      const QList<ExpressionVarSPtr> &vars,
                       const sptr& value);
-
-    static sptr sCreate(const QList<ExpressionVarSPtr>& vars,
-                        const ExpressionValue::sptr &value);
+public:
+    static sptr sCreate(const QList<PlainVarSPtr>& plainVars,
+                        const QList<ExpressionVarSPtr>& vars,
+                        const ExpressionValue::sptr& value);
 
     qreal calculateValue(const qreal relFrame) const override;
     void collapse() override;
     QString toString() const override;
+
+    ExpressionPlainVariableId getUndefinedVariableId(const QString& name);
+    void setUndefinedVariableValue(const ExpressionPlainVariableId& variableId,
+                                   const qreal value);
 private:
+    QList<PlainVarSPtr> mPlainVariables;
     QList<ExpressionVarSPtr> mVariables;
 };
 

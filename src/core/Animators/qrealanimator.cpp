@@ -54,7 +54,8 @@ void QrealAnimator::prp_readProperty(eReadStream& src) {
         QString expression; src >> expression;
         if(!expression.isEmpty()) {
             SimpleTask::sSchedule([this, expression]() {
-                const auto exp = ExpressionParser::parse(expression, this);
+                const auto exp = ExpressionParser::parse(
+                            expression, this, ExpressionType::noPlainVariables);
                 setExpression(exp);
             });
         }

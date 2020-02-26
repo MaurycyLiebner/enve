@@ -78,6 +78,7 @@ SOURCES += \
     Animators/Expressions/expressionoperator.cpp \
     Animators/Expressions/expressionparser.cpp \
     Animators/Expressions/expressionplainvalue.cpp \
+    Animators/Expressions/expressionplainvariable.cpp \
     Animators/Expressions/expressionrandomfunction.cpp \
     Animators/Expressions/expressionsinglechild.cpp \
     Animators/Expressions/expressionsource.cpp \
@@ -381,6 +382,7 @@ HEADERS += \
     Animators/Expressions/expressionoperator.h \
     Animators/Expressions/expressionparser.h \
     Animators/Expressions/expressionplainvalue.h \
+    Animators/Expressions/expressionplainvariable.h \
     Animators/Expressions/expressionrandomfunction.h \
     Animators/Expressions/expressionsinglechild.h \
     Animators/Expressions/expressionsource.h \

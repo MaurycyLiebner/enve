@@ -29,12 +29,17 @@
 #include "expressioncomplex.h"
 
 using ExprSPtr = QSharedPointer<ExpressionValue>;
+using VarSPtr = QSharedPointer<ExpressionVariable>;
+using PlainVarSPtr = QSharedPointer<ExpressionPlainVariable>;
+
 using VariableMap = std::map<QString, ExprSPtr>;
+using PlainVarMap = std::map<QString, PlainVarSPtr>;
 
 ExprSPtr parse(const QString& exp, int& i,
                QrealAnimator* const parent,
                VariableMap& variables,
-               const bool stopAtBreak);
+               const bool stopAtBreak,
+               const ExpressionType type);
 
 void skipSpaces(const QString& exp, int& position) {
     while(position < exp.count() && exp.at(position) == ' ') {
@@ -125,6 +130,26 @@ bool parseSettingSpecial(const QString& exp, int& position,
     if(newPosition < exp.count()) {
         const auto& character = exp.at(newPosition++);
         if(character != '=') return false;
+    } else return false;
+    position = newPosition;
+    return true;
+}
+
+bool parsePlainVariable(const QString& exp, int& position,
+                         QString& parsed) {
+    if(exp.at(position) != '$') return false;
+    int newPosition = position + 1;
+    parsed = "$";
+    while(newPosition < exp.count()) {
+        const auto& character = exp.at(newPosition++);
+        if(!character.isLetter() && !character.isDigit()
+           && character != '_') break;
+        parsed.append(character);
+    }
+    skipSpaces(exp, newPosition);
+    if(newPosition < exp.count()) {
+        const auto& character = exp.at(newPosition++);
+        if(character != ';') return false;
     } else return false;
     position = newPosition;
     return true;
@@ -286,12 +311,13 @@ ExprSPtr createOperator(const Operator oper,
 ExprSPtr createFunction(const QString& exp, int& position,
                         QrealAnimator * const parent,
                         VariableMap& variables,
-                        const Function function) {
+                        const Function function,
+                        const ExpressionType type) {
     QString parsed;
     if(position >= exp.count() || !parseBrackets(exp, position, parsed))
         RuntimeThrow("Missing Function parameter.");
     int pos = 0;
-    const auto inner = parse(parsed, pos, parent, variables, false);
+    const auto inner = parse(parsed, pos, parent, variables, false, type);
     if(!inner) RuntimeThrow("Missing Function parameter.");
     std::function<qreal(qreal)> func;
     QString name;
@@ -342,7 +368,8 @@ ExprSPtr createFunction(const QString& exp, int& position,
 ExprSPtr parse(const QString& exp, int& i,
                QrealAnimator* const parent,
                VariableMap& variables,
-               const bool stopAtBreak) {
+               const bool stopAtBreak,
+               const ExpressionType type) {
     QString parsed;
     Operator oper = Operator::notOperator;
     Function func;
@@ -350,6 +377,8 @@ ExprSPtr parse(const QString& exp, int& i,
     ExprSPtr opValue1;
     ExprSPtr opValue2;
     bool negate = false;
+    const bool sourceVarsAllowed = type == ExpressionType::allFeatures ||
+                                   type == ExpressionType::noPlainVariables;
 
     const auto setValue = [&opValue1, &opValue2](const ExprSPtr& value) {
         if(opValue1) opValue2 = value;
@@ -362,7 +391,7 @@ ExprSPtr parse(const QString& exp, int& i,
         if(i >= exp.count()) break;
         ExprSPtr lastValue;
         if(parseBrackets(exp, i, parsed)) {
-            lastValue = ExpressionParser::parse(parsed, parent);
+            lastValue = ExpressionParser::parse(parsed, parent, type);
         } else if(parsePlainValue(exp, i, value, parsed)) {
             lastValue = ExpressionPlainValue::sCreate(parsed, value);
         } else if(parseOperator(exp, i, operTmp)) {
@@ -388,7 +417,7 @@ ExprSPtr parse(const QString& exp, int& i,
                         i--;
                         return opValue1;
                     } else {
-                        opValue2 = parse(exp, i, parent, variables, true);
+                        opValue2 = parse(exp, i, parent, variables, true, type);
                     }
                 } else {
                     continue;
@@ -396,13 +425,13 @@ ExprSPtr parse(const QString& exp, int& i,
             }
 
         } else if(parseFunction(exp, i, func)) {
-            lastValue = createFunction(exp, i, parent, variables, func);
+            lastValue = createFunction(exp, i, parent, variables, func, type);
         } else if(parseSpecial(exp, i, parsed)) {
             const auto it = variables.find(parsed);
             if(it != variables.end()) {
                 lastValue = it->second;
             } else RuntimeThrow("Invalid variable.");
-        } else if(parseExpression(exp, i, parsed)) {
+        } else if(sourceVarsAllowed && parseExpression(exp, i, parsed)) {
             if(parent) {
                 lastValue = ExpressionSource::sCreate(parsed, parent);
             } else RuntimeThrow("No context to look for objects in.");
@@ -429,13 +458,20 @@ ExprSPtr parse(const QString& exp, int& i,
     return opValue1;
 }
 
-ExprSPtr ExpressionParser::parse(QString exp, QrealAnimator* const parent) {
+ExprSPtr ExpressionParser::parse(QString exp, QrealAnimator* const parent,
+                                 const ExpressionType type) {
+    const bool plainVarsAllowed = type == ExpressionType::allFeatures ||
+                                  type == ExpressionType::noSourceVariables;
+    const bool sourceVarsAllowed = type == ExpressionType::allFeatures ||
+                                   type == ExpressionType::noPlainVariables;
+
     exp.remove(QRegExp("\n|\r\n|\r"));
     const auto lines = exp.split(';', QString::SkipEmptyParts);
+    PlainVarMap plainVariables;
     VariableMap variables;
     ExprSPtr frame;
     ExprSPtr value;
-    if(parent) {
+    if(sourceVarsAllowed && parent) {
         frame = ExpressionSourceFrame::sCreate(parent);
         value = ExpressionSourceValue::sCreate(parent);
         variables["$frame"] = frame;
@@ -445,21 +481,30 @@ ExprSPtr ExpressionParser::parse(QString exp, QrealAnimator* const parent) {
     for(const auto& line : lines) {
         int pos = 0;
         QString varName;
-        if(parseSettingSpecial(line, pos, varName)) {
-            const auto definition = parse(line, pos, parent, variables, false);
+        if(plainVarsAllowed && parsePlainVariable(line, pos, varName)) {
+            const auto var = ExpressionPlainVariable::sCreate(varName);
+            plainVariables[varName] = var;
+        } else if(parseSettingSpecial(line, pos, varName)) {
+            const auto definition = parse(line, pos, parent, variables, false, type);
             if(!definition) RuntimeThrow("Missing function definition.");
             const auto var = ExpressionVariable::sCreate(varName, definition);
             variables[varName] = var;
-        } else lastValue = parse(line, pos, parent, variables, false);
+        } else lastValue = parse(line, pos, parent, variables, false, type);
     }
     if(!lastValue) RuntimeThrow("No return value.");
-    QList<QSharedPointer<ExpressionVariable>> varList;
-    {
-        for(auto it = variables.begin(); it != variables.end(); it++) {
-            const auto& expr = it->second;
-            if(expr == frame || expr == value) continue;
-            varList << qSharedPointerCast<ExpressionVariable>(expr);
+    QList<VarSPtr> sourceVarList;
+    for(auto it = variables.begin(); it != variables.end(); it++) {
+        const auto& var = it->second;
+        if(var == frame || var == value) continue;
+        sourceVarList << qSharedPointerCast<ExpressionVariable>(var);
+    }
+
+    QList<PlainVarSPtr> plainVarList;
+    if(plainVarsAllowed) {
+        for(auto it = plainVariables.begin(); it != plainVariables.end(); it++) {
+            plainVarList << it->second;
         }
     }
-    return ExpressionComplex::sCreate(varList, lastValue);
+
+    return ExpressionComplex::sCreate(plainVarList, sourceVarList, lastValue);
 }
