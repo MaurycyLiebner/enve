@@ -14,15 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EXPRESSIONPLAINVARIABLE_H
-#define EXPRESSIONPLAINVARIABLE_H
+#ifndef EXPRESSIONMANUALVARIABLE_H
+#define EXPRESSIONMANUALVARIABLE_H
 
 #include "expressionvalue.h"
 
-class ExpressionPlainVariable : public ExpressionValue {
-    ExpressionPlainVariable(const QString& name);
+class ExpressionManualVariable : public ExpressionValue {
+    ExpressionManualVariable(const QString& name);
 public:
-    using sptr = QSharedPointer<ExpressionPlainVariable>;
+    using sptr = QSharedPointer<ExpressionManualVariable>;
     static sptr sCreate(const QString& name);
 
     qreal calculateValue(const qreal relFrame) const;
@@ -42,4 +42,4 @@ private:
     const QString mName;
 };
 
-#endif // EXPRESSIONPLAINVARIABLE_H
+#endif // EXPRESSIONMANUALVARIABLE_H

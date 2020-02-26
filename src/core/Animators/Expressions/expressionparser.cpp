@@ -30,7 +30,7 @@
 
 using ExprSPtr = QSharedPointer<ExpressionValue>;
 using VarSPtr = QSharedPointer<ExpressionVariable>;
-using PlainVarSPtr = QSharedPointer<ExpressionPlainVariable>;
+using PlainVarSPtr = QSharedPointer<ExpressionManualVariable>;
 
 using VariableMap = std::map<QString, ExprSPtr>;
 using PlainVarMap = std::map<QString, PlainVarSPtr>;
@@ -135,7 +135,7 @@ bool parseSettingSpecial(const QString& exp, int& position,
     return true;
 }
 
-bool parsePlainVariable(const QString& exp, int& position,
+bool parseManualVariable(const QString& exp, int& position,
                          QString& parsed) {
     if(exp.at(position) != '$') return false;
     int newPosition = position + 1;
@@ -378,7 +378,7 @@ ExprSPtr parse(const QString& exp, int& i,
     ExprSPtr opValue2;
     bool negate = false;
     const bool sourceVarsAllowed = type == ExpressionType::allFeatures ||
-                                   type == ExpressionType::noPlainVariables;
+                                   type == ExpressionType::noManualVariables;
 
     const auto setValue = [&opValue1, &opValue2](const ExprSPtr& value) {
         if(opValue1) opValue2 = value;
@@ -460,14 +460,14 @@ ExprSPtr parse(const QString& exp, int& i,
 
 ExprSPtr ExpressionParser::parse(QString exp, QrealAnimator* const parent,
                                  const ExpressionType type) {
-    const bool plainVarsAllowed = type == ExpressionType::allFeatures ||
-                                  type == ExpressionType::noSourceVariables;
+    const bool manualVarsAllowed = type == ExpressionType::allFeatures ||
+                                   type == ExpressionType::noSourceVariables;
     const bool sourceVarsAllowed = type == ExpressionType::allFeatures ||
-                                   type == ExpressionType::noPlainVariables;
+                                   type == ExpressionType::noManualVariables;
 
     exp.remove(QRegExp("\n|\r\n|\r"));
     const auto lines = exp.split(';', QString::SkipEmptyParts);
-    PlainVarMap plainVariables;
+    PlainVarMap manualVariables;
     VariableMap variables;
     ExprSPtr frame;
     ExprSPtr value;
@@ -482,9 +482,9 @@ ExprSPtr ExpressionParser::parse(QString exp, QrealAnimator* const parent,
         int pos = 0;
         QString varName;
         skipSpaces(line, pos);
-        if(plainVarsAllowed && parsePlainVariable(line, pos, varName)) {
-            const auto var = ExpressionPlainVariable::sCreate(varName);
-            plainVariables[varName] = var;
+        if(manualVarsAllowed && parseManualVariable(line, pos, varName)) {
+            const auto var = ExpressionManualVariable::sCreate(varName);
+            manualVariables[varName] = var;
         } else if(parseSettingSpecial(line, pos, varName)) {
             const auto definition = parse(line, pos, parent, variables, false, type);
             if(!definition) RuntimeThrow("Missing function definition.");
@@ -501,8 +501,8 @@ ExprSPtr ExpressionParser::parse(QString exp, QrealAnimator* const parent,
     }
 
     QList<PlainVarSPtr> plainVarList;
-    if(plainVarsAllowed) {
-        for(auto it = plainVariables.begin(); it != plainVariables.end(); it++) {
+    if(manualVarsAllowed) {
+        for(auto it = manualVariables.begin(); it != manualVariables.end(); it++) {
             plainVarList << it->second;
         }
     }

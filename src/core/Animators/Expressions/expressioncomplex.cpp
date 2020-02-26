@@ -21,7 +21,7 @@ ExpressionComplex::ExpressionComplex(
         const QList<ExpressionVarSPtr> &vars,
         const sptr &value) :
     ExpressionSingleChild("Complex", value),
-    mPlainVariables(plainVars),
+    mManualVariables(plainVars),
     mVariables(vars) {}
 
 ExpressionValue::sptr ExpressionComplex::sCreate(
@@ -51,19 +51,38 @@ QString ExpressionComplex::toString() const {
     return result;
 }
 
-ExpressionPlainVariableId ExpressionComplex::getUndefinedVariableId(
+ExpressionManualVariableId ExpressionComplex::getManualVariableId(
         const QString &name) {
-    const int iMax = mPlainVariables.count();
+    const int iMax = mManualVariables.count();
     for(int i = 0; i < iMax; i++) {
-        const auto& var = mPlainVariables.at(i);
-        if(var->name() == name) return ExpressionPlainVariableId{i};
+        const auto& var = mManualVariables.at(i);
+        if(var->name() == name) return ExpressionManualVariableId{i};
     }
-    return ExpressionPlainVariableId{-1};
+    return ExpressionManualVariableId{-1};
 }
 
-void ExpressionComplex::setUndefinedVariableValue(
-        const ExpressionPlainVariableId &variableId, const qreal value) {
+void ExpressionComplex::setManualVariableValue(
+        const ExpressionManualVariableId &variableId, const qreal value) {
     const int id = variableId.fId;
-    if(id < 0 || id > mPlainVariables.count()) return;
-    mPlainVariables.at(id)->setValue(value);
+    if(id < 0 || id > mManualVariables.count()) return;
+    mManualVariables.at(id)->setValue(value);
+}
+
+ExpressionVariableId ExpressionComplex::getVariableId(const QString &name) {
+    const auto manualVar = getManualVariableId(name);
+    if(manualVar.isValid()) return manualVar;
+    const int iMax = mVariables.count();
+    for(int i = 0; i < iMax; i++) {
+        const auto& var = mVariables.at(i);
+        if(var->name() == name) return ExpressionVariableId{false, i};
+    }
+    return ExpressionVariableId{false, -1};
+}
+
+qreal ExpressionComplex::getVariableValue(const ExpressionVariableId &id) {
+    if(id.isManual()) {
+        return mManualVariables.at(id.fId)->currentValue();
+    } else {
+        return mVariables.at(id.fId)->currentValue();
+    }
 }

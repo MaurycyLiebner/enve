@@ -423,7 +423,7 @@ void QDoubleSlider::lineEditingFinished() {
     const QString text = mLineEdit->text();
     ExpressionValue::sptr expr;
     try {
-        expr = ExpressionParser::parse(text, nullptr, ExpressionType::noPlainNoSource);
+        expr = ExpressionParser::parse(text, nullptr, ExpressionType::noManualNoSource);
     } catch(const std::exception& e) {}
     if(!expr || !expr->isValid()) return;
     const qreal newValue = clamped(expr->calculateValue(0));

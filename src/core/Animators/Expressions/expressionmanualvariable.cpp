@@ -14,31 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "expressionplainvariable.h"
+#include "expressionmanualvariable.h"
 
-ExpressionPlainVariable::ExpressionPlainVariable(const QString &name) :
+ExpressionManualVariable::ExpressionManualVariable(const QString &name) :
     ExpressionValue(false), mName(name) {}
 
-ExpressionPlainVariable::sptr ExpressionPlainVariable::sCreate(const QString &name) {
-    return sptr(new ExpressionPlainVariable(name));
+ExpressionManualVariable::sptr ExpressionManualVariable::sCreate(const QString &name) {
+    return sptr(new ExpressionManualVariable(name));
 }
 
-qreal ExpressionPlainVariable::calculateValue(const qreal relFrame) const {
+qreal ExpressionManualVariable::calculateValue(const qreal relFrame) const {
     Q_UNUSED(relFrame)
     return mValue;
 }
 
-FrameRange ExpressionPlainVariable::identicalRange(const qreal relFrame) const {
+FrameRange ExpressionManualVariable::identicalRange(const qreal relFrame) const {
     Q_UNUSED(relFrame)
     return FrameRange::EMINMAX;
 }
 
-bool ExpressionPlainVariable::setRelFrame(const qreal relFrame) {
+bool ExpressionManualVariable::setRelFrame(const qreal relFrame) {
     Q_UNUSED(relFrame)
     return false;
 }
 
-void ExpressionPlainVariable::setValue(const qreal value) {
+void ExpressionManualVariable::setValue(const qreal value) {
     mValue = value;
     updateValue();
 }

@@ -21,10 +21,10 @@
 class QrealAnimator;
 
 enum class ExpressionType {
-    noPlainNoSource, // thread-safe
+    noManualNoSource, // thread-safe
     noSourceVariables, // thread-safe
-                       // use ExpressionPlainVariables to control values
-    noPlainVariables,
+                       // use ExpressionManualVariables to control values
+    noManualVariables,
     allFeatures
 };
 

@@ -74,11 +74,11 @@ SOURCES += \
     Animators/Expressions/expressioncomplex.cpp \
     Animators/Expressions/expressionfunction.cpp \
     Animators/Expressions/expressionfunctionbase.cpp \
+    Animators/Expressions/expressionmanualvariable.cpp \
     Animators/Expressions/expressionnegatefunction.cpp \
     Animators/Expressions/expressionoperator.cpp \
     Animators/Expressions/expressionparser.cpp \
     Animators/Expressions/expressionplainvalue.cpp \
-    Animators/Expressions/expressionplainvariable.cpp \
     Animators/Expressions/expressionrandomfunction.cpp \
     Animators/Expressions/expressionsinglechild.cpp \
     Animators/Expressions/expressionsource.cpp \
@@ -378,11 +378,11 @@ HEADERS += \
     Animators/Expressions/expressioncomplex.h \
     Animators/Expressions/expressionfunction.h \
     Animators/Expressions/expressionfunctionbase.h \
+    Animators/Expressions/expressionmanualvariable.h \
     Animators/Expressions/expressionnegatefunction.h \
     Animators/Expressions/expressionoperator.h \
     Animators/Expressions/expressionparser.h \
     Animators/Expressions/expressionplainvalue.h \
-    Animators/Expressions/expressionplainvariable.h \
     Animators/Expressions/expressionrandomfunction.h \
     Animators/Expressions/expressionsinglechild.h \
     Animators/Expressions/expressionsource.h \

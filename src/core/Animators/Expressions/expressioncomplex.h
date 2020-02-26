@@ -19,16 +19,36 @@
 
 #include "expressionsinglechild.h"
 #include "expressionvariable.h"
-#include "expressionplainvariable.h"
+#include "expressionmanualvariable.h"
 
-class ExpressionPlainVariableId {
+class ExpressionManualVariableId {
     friend class ExpressionComplex;
-    ExpressionPlainVariableId(const int id) : fId(id) {}
+    friend class ExpressionVariableId;
+    ExpressionManualVariableId(const int id) : fId(id) {}
     int fId;
+public:
+    bool isValid() const { return fId >= 0; }
+};
+
+class ExpressionVariableId {
+    friend class ExpressionComplex;
+    ExpressionVariableId(const bool isManual, const int id) :
+        fIsManual(isManual), fId(id) {}
+    ExpressionVariableId(const ExpressionManualVariableId& id) :
+        fIsManual(true), fId(id.fId) {}
+    bool fIsManual;
+    int fId;
+public:
+    ExpressionManualVariableId toManualVariableId() {
+        if(!fIsManual) return ExpressionManualVariableId{-1};
+        return ExpressionManualVariableId{fId};
+    }
+    bool isManual() const { return fIsManual; }
+    bool isValid() const { return fId >= 0; }
 };
 
 using ExpressionVarSPtr = QSharedPointer<ExpressionVariable>;
-using PlainVarSPtr = QSharedPointer<ExpressionPlainVariable>;
+using PlainVarSPtr = QSharedPointer<ExpressionManualVariable>;
 
 class ExpressionComplex : public ExpressionSingleChild {  
     ExpressionComplex(const QList<PlainVarSPtr>& plainVars,
@@ -43,11 +63,14 @@ public:
     void collapse() override;
     QString toString() const override;
 
-    ExpressionPlainVariableId getUndefinedVariableId(const QString& name);
-    void setUndefinedVariableValue(const ExpressionPlainVariableId& variableId,
+    ExpressionManualVariableId getManualVariableId(const QString& name);
+    void setManualVariableValue(const ExpressionManualVariableId& variableId,
                                    const qreal value);
+
+    ExpressionVariableId getVariableId(const QString& name);
+    qreal getVariableValue(const ExpressionVariableId& id);
 private:
-    QList<PlainVarSPtr> mPlainVariables;
+    QList<PlainVarSPtr> mManualVariables;
     QList<ExpressionVarSPtr> mVariables;
 };
 
