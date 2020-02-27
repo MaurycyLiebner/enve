@@ -22,7 +22,7 @@
 
 ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
                                    QWidget * const parent) :
-    ExpressionEditor(target, target->expressionText(), parent) {}
+    ExpressionEditor(target, target->getExpressionBindingsString(), parent) {}
 
 ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
                                    const QString &text,
@@ -45,9 +45,6 @@ ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
     connect(mCompleter,
             qOverload<const QString&>(&QCompleter::activated),
             this, &ExpressionEditor::insertCompletion);
-    mVariableDefinition = QRegularExpression("\\$[A-Za-z_][A-Za-z0-9_]* *=");
-    connect(doc, &QTextDocument::contentsChange,
-            this, &ExpressionEditor::updateVariables);
     setText(text);
 }
 
@@ -68,6 +65,8 @@ void ExpressionEditor::keyPressEvent(QKeyEvent *e) {
         return QWidget::keyPressEvent(e);
     } else if(isShortcut) {
         showCompleter();
+    } else if(key == Qt::Key_Tab) {
+        return QWidget::keyPressEvent(e);
     } else QTextEdit::keyPressEvent(e);
     const bool input = e->text().contains(QRegExp("[A-Za-z0-9_ \\.\\$]"));
     const bool deletion = key == Qt::Key_Delete ||
@@ -80,44 +79,10 @@ void ExpressionEditor::keyPressEvent(QKeyEvent *e) {
     }
 }
 
-void ExpressionEditor::updateVariables(const int from,
-                                       const int charsRemoved,
-                                       const int charsAdded) {
-    const auto doc = document();
-    QTextBlock block = doc->findBlock(from);
-    if(!block.isValid()) return;
-
-    QTextBlock lastBlock = doc->findBlock(from + charsAdded + (charsRemoved > 0 ? 1 : 0));
-    if(!lastBlock.isValid()) lastBlock = doc->lastBlock();
-    const int endPosition = lastBlock.position() + lastBlock.length();
-
-    bool changed = false;
-    while(block.isValid() && (block.position() < endPosition)) {
-        const int blockId = block.blockNumber();
-        auto& variables = mVariables[blockId];
-        const auto oldVariables = variables;
-        variables.clear();
-        {
-            auto matchIterator = mVariableDefinition.globalMatch(block.text());
-            while(matchIterator.hasNext()) {
-                const auto match = matchIterator.next();
-                auto def = match.captured();
-                variables << def.remove('$').remove('=').trimmed();
-            }
-        }
-        for(const auto& var : variables) {
-            if(oldVariables.contains(var)) continue;
-            mHighlighter->addVariable(var);
-            changed = true;
-        }
-        for(const auto& var : oldVariables) {
-            if(variables.contains(var)) continue;
-            mHighlighter->removeVariable(var);
-            changed = true;
-        }
-        block = block.next();
-    }
-    if(changed) mHighlighter->updateVariablesRule();
+void ExpressionEditor::focusOutEvent(QFocusEvent* e) {
+    Q_UNUSED(e)
+    QTextEdit::focusOutEvent(e);
+    emit focusLost();
 }
 
 void ExpressionEditor::showCompleter() {

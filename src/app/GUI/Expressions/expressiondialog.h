@@ -21,8 +21,14 @@
 #include <QPushButton>
 #include <QLabel>
 
+#include <Qsci/qsciscintilla.h>
+
 class QrealAnimator;
 class ExpressionEditor;
+class PropertyBinding;
+class QsciLexerJavaScript;
+
+class QsciAPIs;
 
 class ExpressionDialog : public QDialog {
 public:
@@ -30,12 +36,29 @@ public:
                      QWidget * const parent = nullptr);
 
 private:
+    using PropertyBindingMap = std::map<QString, QSharedPointer<PropertyBinding>>;
+    bool getBindings(PropertyBindingMap& bindings);
+    void updateBindingsAutocomplete();
+
     bool apply(const bool action);
 
     QrealAnimator* const mTarget;
 
-    ExpressionEditor* mLine;
-    QLabel* mErrorLabel;
+    ExpressionEditor* mBindings;
+    QLabel* mBindingsError;
+
+    QsciLexerJavaScript* mDefsLexer;
+    QsciScintilla* mDefinitions;
+    QsciAPIs* mDefinitionsApi;
+    QLabel* mDefinitionsError;
+
+    QsciLexerJavaScript* mScriptLexer;
+    QStringList mDefinitionList;
+    QStringList mBindingsList;
+    QLabel* mScriptLabel;
+    QsciScintilla* mScript;
+    QsciAPIs* mScriptApi;
+    QLabel* mScriptError;
 };
 
 #endif // EXPRESSIONDIALOG_H

@@ -18,8 +18,7 @@
 #include <QMenu>
 #include "qrealpoint.h"
 #include "qrealkey.h"
-#include "../Expressions/expressionvalue.h"
-#include "../Expressions/expressionparser.h"
+#include "../Expressions/expression.h"
 #include "../simpletask.h"
 
 QrealAnimator::QrealAnimator(const qreal iniVal,
@@ -39,7 +38,12 @@ QrealAnimator::QrealAnimator(const QString &name) : GraphAnimator(name) {}
 void QrealAnimator::prp_writeProperty(eWriteStream& dst) const {
     anim_writeKeys(dst);
     dst << mCurrentBaseValue;
-    dst << (mExpression ? mExpression->toString() : "");
+    dst << !!mExpression;
+    if(mExpression) {
+        dst << mExpression->bindingsString();
+        dst << mExpression->definitionsString();
+        dst << mExpression->scriptString();
+    }
 }
 
 stdsptr<Key> QrealAnimator::anim_createKey() {
@@ -50,13 +54,20 @@ void QrealAnimator::prp_readProperty(eReadStream& src) {
     anim_readKeys(src);
 
     qreal val; src >> val;
-    if(src.evFileVersion() > 8) {
+    const auto evVersion = src.evFileVersion();
+    if(evVersion > 8 && evVersion < 15) {
         QString expression; src >> expression;
-        if(!expression.isEmpty()) {
-            SimpleTask::sSchedule([this, expression]() {
-                const auto exp = ExpressionParser::parse(
-                            expression, this, ExpressionType::noManualVariables);
-                setExpression(exp);
+    } else if(evVersion >= 15) {
+        bool hasExpr; src >> hasExpr;
+        if(hasExpr) {
+            QString bindingsStr; src >> bindingsStr;
+            QString definitionsStr; src >> definitionsStr;
+            QString scriptStr; src >> scriptStr;
+            SimpleTask::sScheduleContexted(this,
+            [this, bindingsStr, definitionsStr, scriptStr]() {
+                setExpression(Expression::sCreate(bindingsStr,
+                                                  definitionsStr,
+                                                  scriptStr, this));
             });
         }
     }
@@ -198,20 +209,32 @@ qreal QrealAnimator::getBaseValueAtAbsFrame(const qreal frame) const {
     return getBaseValue(prp_absFrameToRelFrameF(frame));
 }
 
-bool QrealAnimator::expressionDependsOn(QrealAnimator * const source) const {
+bool QrealAnimator::prp_dependsOn(const Property* const prop) const {
+    if(Property::prp_dependsOn(prop)) return true;
     if(!mExpression) return false;
-    return mExpression->dependsOn(source);
+    return mExpression->dependsOn(prop);
 }
 
 bool QrealAnimator::hasValidExpression() const {
     return mExpression ? mExpression->isValid() : false;
 }
 
-QString QrealAnimator::expressionText() const {
-    return mExpression ? mExpression->toString() : "";
+QString QrealAnimator::getExpressionBindingsString() const {
+    if(!mExpression) return "";
+    return mExpression->bindingsString();
 }
 
-void QrealAnimator::setExpressionAction(const qsptr<ExpressionValue> &expression) {
+QString QrealAnimator::getExpressionDefinitionsString() const {
+    if(!mExpression) return "";
+    return mExpression->definitionsString();
+}
+
+QString QrealAnimator::getExpressionScriptString() const {
+    if(!mExpression) return "";
+    return mExpression->scriptString();
+}
+
+void QrealAnimator::setExpressionAction(const qsptr<Expression> &expression) {
     {
         prp_pushUndoRedoName("Change Expression");
         UndoRedo ur;
@@ -228,13 +251,15 @@ void QrealAnimator::setExpressionAction(const qsptr<ExpressionValue> &expression
     setExpression(expression);
 }
 
-void QrealAnimator::setExpression(const qsptr<ExpressionValue> &expression) {
+void QrealAnimator::setExpression(const qsptr<Expression>& expression) {
     auto& conn = mExpression.assign(expression);
     if(expression) {
-        expression->setRelFrame(anim_getCurrentRelFrame());
-        conn << connect(expression.get(), &ExpressionValue::currentValueChanged,
-                        this, &QrealAnimator::effectiveValueChanged);
-        conn << connect(expression.get(), &ExpressionValue::relRangeChanged,
+        expression->setAbsFrame(anim_getCurrentRelFrame());
+        conn << connect(expression.get(), &Expression::currentValueChanged,
+                        this, [this]() {
+            emit effectiveValueChanged(getEffectiveValue());
+        });
+        conn << connect(expression.get(), &Expression::relRangeChanged,
                         this, [this](const FrameRange& range) {
             prp_afterChangedRelRange(range);
         });
@@ -284,8 +309,11 @@ qreal QrealAnimator::getBaseValue(const qreal relFrame) const {
 }
 
 qreal QrealAnimator::getEffectiveValue(const qreal relFrame) const {
-    if(mExpression) return clamped(mExpression->value(relFrame));
-    else return getBaseValue(relFrame);
+    if(mExpression) {
+        const auto ret = mExpression->evaluate(relFrame);
+        if(ret.isNumber()) return clamped(ret.toNumber());
+    }
+    return getBaseValue(relFrame);
 }
 
 qreal QrealAnimator::getCurrentBaseValue() const {
@@ -293,8 +321,11 @@ qreal QrealAnimator::getCurrentBaseValue() const {
 }
 
 qreal QrealAnimator::getEffectiveValue() const {
-    if(mExpression) return clamped(mExpression->currentValue());
-    else return mCurrentBaseValue;
+    if(mExpression) {
+        const auto ret = mExpression->evaluate();
+        if(ret.isNumber()) return clamped(ret.toNumber());
+    }
+    return mCurrentBaseValue;
 }
 
 void QrealAnimator::setCurrentBaseValue(qreal newValue) {
@@ -335,7 +366,7 @@ void QrealAnimator::saveValueToKey(const int frame, const qreal value) {
 bool QrealAnimator::updateExpressionRelFrame() {
     if(!mExpression) return false;
     const qreal relFrame = anim_getCurrentRelFrame();
-    return mExpression->setRelFrame(relFrame);
+    return mExpression->setAbsFrame(relFrame);
 }
 
 void QrealAnimator::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,

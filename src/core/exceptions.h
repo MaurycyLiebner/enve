@@ -23,24 +23,23 @@
 #define FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #ifdef QT_DEBUG
-// Breakpoint for QT_DEBUG
-    #define RuntimeThrow(msg) \
-    std::throw_with_nested(\
-        std::runtime_error(\
-            (std::raise(SIGTRAP) ? "" : "") + \
-            std::to_string(__LINE__) + "  :  " + \
-            FILENAME + "  :  " + __func__ + "()\n  " + msg\
-        )\
-    )
+    #define BREAKPOINT (std::raise(SIGTRAP) ? "" : "") +
 #else
-    #define RuntimeThrow(msg) \
+    #define BREAKPOINT
+#endif
+
+#define PrettyRuntimeThrow(msg) \
+    std::throw_with_nested( \
+        std::runtime_error(std::string("") + msg) \
+    )
+
+#define RuntimeThrow(msg) \
     std::throw_with_nested(\
-        std::runtime_error(\
+        std::runtime_error(BREAKPOINT \
             std::to_string(__LINE__) + "  :  " + \
             FILENAME + "  :  " + __func__ + "()\n  " + msg\
         )\
     )
-#endif
 
 #define CheckInvalidLocation(vLoc, name) \
     if(vLoc < 0) { \

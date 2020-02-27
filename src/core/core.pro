@@ -71,22 +71,8 @@ QMAKE_CXXFLAGS += -fopenmp
 LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 
 SOURCES += \
-    Expressions/expressioncomplex.cpp \
-    Expressions/expressionfunction.cpp \
-    Expressions/expressionfunctionbase.cpp \
-    Expressions/expressionmanualvariable.cpp \
-    Expressions/expressionnegatefunction.cpp \
-    Expressions/expressionoperator.cpp \
-    Expressions/expressionparser.cpp \
-    Expressions/expressionplainvalue.cpp \
-    Expressions/expressionrandomfunction.cpp \
-    Expressions/expressionsinglechild.cpp \
-    Expressions/expressionsource.cpp \
-    Expressions/expressionsourcebase.cpp \
-    Expressions/expressionsourceframe.cpp \
-    Expressions/expressionsourcevalue.cpp \
-    Expressions/expressionvalue.cpp \
-    Expressions/expressionvariable.cpp \
+    Expressions/expression.cpp \
+    Expressions/propertybinding.cpp \
     Animators/SculptPath/sculptbrush.cpp \
     Animators/SculptPath/sculptnode.cpp \
     Animators/SculptPath/sculptnodebase.cpp \
@@ -169,6 +155,9 @@ SOURCES += \
     CacheHandlers/tmploader.cpp \
     CacheHandlers/tmpsaver.cpp \
     CacheHandlers/usedrange.cpp \
+    Expressions/propertybindingparser.cpp \
+    Expressions/qpointfanimatorbinding.cpp \
+    Expressions/qrealanimatorbinding.cpp \
     FileCacheHandlers/animationcachehandler.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/filecachehandler.cpp \
@@ -375,22 +364,8 @@ SOURCES += \
     zipfilesaver.cpp
 
 HEADERS += \
-    Expressions/expressioncomplex.h \
-    Expressions/expressionfunction.h \
-    Expressions/expressionfunctionbase.h \
-    Expressions/expressionmanualvariable.h \
-    Expressions/expressionnegatefunction.h \
-    Expressions/expressionoperator.h \
-    Expressions/expressionparser.h \
-    Expressions/expressionplainvalue.h \
-    Expressions/expressionrandomfunction.h \
-    Expressions/expressionsinglechild.h \
-    Expressions/expressionsource.h \
-    Expressions/expressionsourcebase.h \
-    Expressions/expressionsourceframe.h \
-    Expressions/expressionsourcevalue.h \
-    Expressions/expressionvalue.h \
-    Expressions/expressionvariable.h \
+    Expressions/expression.h \
+    Expressions/propertybinding.h \
     Animators/SculptPath/sculptbrush.h \
     Animators/SculptPath/sculptnode.h \
     Animators/SculptPath/sculptnodebase.h \
@@ -478,7 +453,9 @@ HEADERS += \
     CacheHandlers/tmpsaver.h \
     CacheHandlers/usedrange.h \
     CacheHandlers/usepointer.h \
-    Expressions/expressionvariableid.h \
+    Expressions/propertybindingparser.h \
+    Expressions/qpointfanimatorbinding.h \
+    Expressions/qrealanimatorbinding.h \
     FileCacheHandlers/animationcachehandler.h \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/filecachehandler.h \

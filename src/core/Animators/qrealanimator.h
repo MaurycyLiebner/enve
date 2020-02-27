@@ -19,8 +19,9 @@
 #include "graphanimator.h"
 #include "qrealsnapshot.h"
 #include "../conncontextptr.h"
+
 class QrealKey;
-class ExpressionValue;
+class Expression;
 
 class QrealAnimator :  public GraphAnimator {
     Q_OBJECT
@@ -120,13 +121,17 @@ public:
         return anim;
     }
 
-    bool expressionDependsOn(QrealAnimator* const source) const;
+    bool prp_dependsOn(const Property* const prop) const;
     bool hasValidExpression() const;
     bool hasExpression() const { return mExpression; }
     void clearExpressionAction() { setExpressionAction(nullptr); }
-    QString expressionText() const;
-    void setExpression(const qsptr<ExpressionValue>& expression);
-    void setExpressionAction(const qsptr<ExpressionValue>& expression);
+
+    QString getExpressionBindingsString() const;
+    QString getExpressionDefinitionsString() const;
+    QString getExpressionScriptString() const;
+
+    void setExpression(const qsptr<Expression>& expression);
+    void setExpressionAction(const qsptr<Expression>& expression);
 private:
     qreal calculateBaseValueAtRelFrame(const qreal frame) const;
     void startBaseValueTransform();
@@ -145,7 +150,7 @@ private:
     qreal mCurrentBaseValue = 0;
     qreal mSavedCurrentValue = 0;
 
-    ConnContextQSPtr<ExpressionValue> mExpression;
+    ConnContextQSPtr<Expression> mExpression;
 
     qreal mPrefferedValueStep = 1;
 signals:

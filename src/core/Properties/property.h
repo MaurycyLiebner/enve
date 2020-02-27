@@ -111,6 +111,9 @@ public:
 
     virtual void prp_afterChangedAbsRange(const FrameRange &range,
                                           const bool clip = true);
+
+    virtual bool prp_dependsOn(const Property* const prop) const
+    { return prop == this; }
 public:
     QMatrix getTransform() const;
 

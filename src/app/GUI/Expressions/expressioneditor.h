@@ -29,6 +29,7 @@
 class ExpressionHighlighter;
 
 class ExpressionEditor : public QTextEdit {
+    Q_OBJECT
 public:
     ExpressionEditor(QrealAnimator* const target,
                      QWidget* const parent);
@@ -37,21 +38,18 @@ public:
                      const QString& text, QWidget* const parent);
 
     void setCompleterList(const QStringList& values);
+signals:
+    void focusLost();
 protected:
     void keyPressEvent(QKeyEvent *e) override;
+    void focusOutEvent(QFocusEvent *e) override;
 private:
-    void updateVariables(const int from,
-                         const int charsRemoved,
-                         const int charsAdded);
     void showCompleter();
     void insertCompletion(const QString &completion);
     QString textUnderCursor() const;
 
     ExpressionHighlighter* mHighlighter;
     QCompleter* mCompleter;
-
-    QRegularExpression mVariableDefinition;
-    std::map<int, QStringList> mVariables;
 };
 
 #endif // EXPRESSIONEDITOR_H

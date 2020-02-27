@@ -22,10 +22,17 @@
 #include <QStatusBar>
 #include <QApplication>
 
-#include "Expressions/expressionparser.h"
+#include <Qsci/qscilexerjavascript.h>
+#include <Qsci/qsciapis.h>
+
+#include "Expressions/expression.h"
 #include "Boxes/boundingbox.h"
 #include "Private/document.h"
 #include "expressioneditor.h"
+
+class eEditor : public QsciScintilla {
+
+};
 
 ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
                                    QWidget * const parent) :
@@ -38,14 +45,61 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
 
     const auto mainLayout = new QVBoxLayout;
 
-    mLine = new ExpressionEditor(target, this);
+    mBindings = new ExpressionEditor(target, this);
+    connect(mBindings, &ExpressionEditor::focusLost,
+            this, &ExpressionDialog::updateBindingsAutocomplete);
 
-    mainLayout->addWidget(new QLabel("Expression: "));
-    mainLayout->addWidget(mLine);
+    mainLayout->addWidget(new QLabel("Bindings:"));
+    mainLayout->addWidget(mBindings);
 
-    mErrorLabel = new QLabel(this);
-    mErrorLabel->setStyleSheet("QLabel { color: red; }");
-    mainLayout->addWidget(mErrorLabel);
+    mBindingsError = new QLabel(this);
+    mBindingsError->setObjectName("errorLabel");
+    mainLayout->addWidget(mBindingsError);
+
+    mainLayout->addWidget(new QLabel("Definitions:"));
+    mDefinitions = new QsciScintilla;
+    mDefsLexer = new QsciLexerJavaScript(mDefinitions);
+    mDefinitionsApi = new QsciAPIs(mDefsLexer);
+
+    mDefinitionsApi->add("function");
+    mDefinitionsApi->add("var");
+    mDefinitionsApi->add("return");
+
+    mDefinitionsApi->prepare();
+    mDefinitions->setLexer(mDefsLexer);
+    mDefinitions->setAutoCompletionSource(QsciScintilla::AcsAll);
+    mDefinitions->setText(target->getExpressionDefinitionsString());
+    connect(mDefinitions, &QsciScintilla::textChanged,
+            mDefinitions, &QsciScintilla::autoCompleteFromAll);
+
+    mainLayout->addWidget(mDefinitions);
+
+    mDefinitionsError = new QLabel(this);
+    mDefinitionsError->setObjectName("errorLabel");
+    mainLayout->addWidget(mDefinitionsError);
+
+    mScriptLabel = new QLabel("Script (  ) :");
+    mainLayout->addWidget(mScriptLabel);
+    mScript = new QsciScintilla;
+    mScriptLexer = new QsciLexerJavaScript(mScript);
+
+    mScriptApi = new QsciAPIs(mScriptLexer);
+
+    mScriptApi->add("function");
+    mScriptApi->add("var");
+
+    mScriptApi->prepare();
+
+    mScript->setLexer(mScriptLexer);
+    mScript->setAutoCompletionSource(QsciScintilla::AcsAll);
+    mScript->setText(target->getExpressionScriptString());
+    connect(mScript, &QsciScintilla::textChanged,
+            mScript, &QsciScintilla::autoCompleteFromAll);
+    mainLayout->addWidget(mScript);
+
+    mScriptError = new QLabel(this);
+    mScriptError->setObjectName("errorLabel");
+    mainLayout->addWidget(mScriptError);
 
     const auto buttonsLayout = new QHBoxLayout;
     const auto applyButton = new QPushButton("Apply", this);
@@ -55,10 +109,14 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
     connect(checkBox, &QCheckBox::stateChanged,
             this, [this](const int state) {
         if(state) {
-            connect(mLine, &ExpressionEditor::textChanged,
+            connect(mBindings, &ExpressionEditor::textChanged,
+                    this, [this]() { apply(false); });
+            connect(mDefinitions, &QsciScintilla::textChanged,
+                    this, [this]() { apply(false); });
+            connect(mScript, &QsciScintilla::textChanged,
                     this, [this]() { apply(false); });
         } else {
-            disconnect(mLine, &ExpressionEditor::textChanged,
+            disconnect(mBindings, &ExpressionEditor::textChanged,
                        this, nullptr);
         }
     });
@@ -77,9 +135,6 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
                                    style->pixelMetric(QStyle::PM_LayoutRightMargin),
                                    style->pixelMetric(QStyle::PM_LayoutBottomMargin));
     windowLayout->addLayout(mainLayout);
-    const auto statusBar = new QStatusBar(this);
-    windowLayout->addWidget(statusBar);
-    statusBar->showMessage("Use Ctrl + Space for suggestions", 10000);
 
     connect(applyButton, &QPushButton::released,
             this, [this]() { apply(true); });
@@ -90,29 +145,100 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
     });
     connect(cancelButton, &QPushButton::released,
             this, &ExpressionDialog::reject);
+
+    setTabOrder(mBindings, mDefinitions);
+    setTabOrder(mDefinitions, mScript);
+    setTabOrder(mScript, mBindings);
+
+    connect(mDefinitions, &QsciScintilla::SCN_FOCUSIN,
+            this, [this]() {
+        for(const auto& binding : mBindingsList) {
+            mDefinitionsApi->remove(binding);
+        }
+        mDefinitionsApi->prepare();
+        mDefsLexer->setAPIs(mDefinitionsApi);
+    });
+    connect(mScript, &QsciScintilla::SCN_FOCUSIN,
+            this, [this]() {
+        for(const auto& binding : mBindingsList) {
+            mDefinitionsApi->add(binding);
+        }
+        mDefinitionsApi->prepare();
+        mScriptLexer->setAPIs(mDefinitionsApi);
+    });
+}
+
+bool ExpressionDialog::getBindings(PropertyBindingMap& bindings) {
+    mBindingsError->clear();
+    const auto bindingsStr = mBindings->toPlainText();
+    try {
+        bindings = PropertyBindingParser::parseBindings(
+                       bindingsStr, nullptr, mTarget);
+        return true;
+    } catch(const std::exception& e) {
+        mBindingsError->setText(e.what());
+        return false;
+    }
+}
+
+void ExpressionDialog::updateBindingsAutocomplete() {
+    for(const auto& binding : mBindingsList) {
+        mScriptApi->remove(binding);
+    }
+    mBindingsList.clear();
+    PropertyBindingMap bindings;
+    if(getBindings(bindings)) {
+        for(const auto& binding : bindings) {
+            mBindingsList << binding.first;
+            mScriptApi->add(binding.first);
+        }
+    }
+    mScriptLabel->setText("Script ( <b>" + mBindingsList.join("</b>, <b>") + "</b> ) :");
+    mScriptApi->prepare();
 }
 
 bool ExpressionDialog::apply(const bool action) {
-    mErrorLabel->clear();
-    ExpressionValue::sptr expr;
-    const auto text = mLine->toPlainText();
+    mDefinitionsError->clear();
+    mScriptError->clear();
+
+    const auto definitionsStr = mDefinitions->text();
+    const auto scriptStr = mScript->text();
+
+    PropertyBindingMap bindings;
+    if(!getBindings(bindings)) return false;
+
+    auto engine = std::make_unique<QJSEngine>();
     try {
-        expr = ExpressionParser::parse(
-                    text, mTarget, ExpressionType::noManualVariables);
+        Expression::sAddDefinitionsTo(definitionsStr, *engine);
+    } catch(const std::exception& e) {
+        mDefinitionsError->setText(e.what());
+        return false;
+    }
+
+    QJSValue eEvaluate;
+    try {
+        Expression::sAddScriptTo(scriptStr, bindings, *engine, eEvaluate);
+        Q_ASSERT(eEvaluate.isCallable());
+    } catch(const std::exception& e) {
+        mScriptError->setText(e.what());
+        return false;
+    }
+
+    try {
+        auto expr = Expression::sCreate(definitionsStr,
+                                        scriptStr, std::move(bindings),
+                                        std::move(engine),
+                                        std::move(eEvaluate));
         if(expr && !expr->isValid()) expr = nullptr;
         if(action) {
             mTarget->setExpressionAction(expr);
         } else {
             mTarget->setExpression(expr);
         }
-        Document::sInstance->actionFinished();
-        if(!expr && !text.isEmpty())
-            RuntimeThrow("Invalid expression.");
     } catch(const std::exception& e) {
-        const QString error = e.what();
-        const QString lastLine = error.split(QRegExp("\n|\r\n|\r")).last();
-        mErrorLabel->setText(lastLine);
         return false;
     }
+
+    Document::sInstance->actionFinished();
     return true;
 }

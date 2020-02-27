@@ -29,55 +29,8 @@ ExpressionHighlighter::ExpressionHighlighter(
     mEditor(editor) {
     HighlightingRule rule;
 
-    const QStringList funcs = {
-        QStringLiteral("sin"),
-        QStringLiteral("cos"),
-        QStringLiteral("tan"),
-        QStringLiteral("asin"),
-        QStringLiteral("acos"),
-        QStringLiteral("atan"),
-        QStringLiteral("exp"),
-        QStringLiteral("abs"),
-        QStringLiteral("sqrt"),
-        QStringLiteral("rand")
-    };
-
-    QTextCharFormat funcFormat;
-    funcFormat.setForeground(Qt::white);
-    funcFormat.setFontWeight(QFont::Bold);
-    rule.format = funcFormat;
-    for (const QString &func : funcs) {
-        rule.pattern = QRegularExpression(QString("(\\b|(?<=[0-9]))%1\\(").arg(func));
-        mFuncRules.append(rule);
-        mBaseComplete << func + "()";
-    }
-
-    QTextCharFormat operatorFormat;
-    operatorFormat.setForeground(QColor(155, 255, 255));
-    rule.pattern = QRegularExpression(QStringLiteral("[%/\\-\\^\\+\\*]"));
-    rule.format = operatorFormat;
-    mHighlightingRules.append(rule);
-
-    QTextCharFormat numberFormat;
-    numberFormat.setForeground(QColor(255, 225, 155));
-    rule.pattern = QRegularExpression(
-                QStringLiteral("\\b("
-                               "([0-9]+[\\.]?[0-9]*)|"
-                               "([0-9]*[\\.]?[0-9]+)"
-                               ")"));
-    rule.format = numberFormat;
-    mHighlightingRules.append(rule);
-
-    mErrorFormat.setForeground(Qt::red);
-
-    mBracketsHighlightFormat.setBackground(QColor(0, 125, 200));
-
-    const auto funcExclude = funcs.join(QStringLiteral("\\(|")) + "\\(";
     mObjectsExpression = QRegularExpression(
-                "\\b"
-                "(?!(?<=\\$))"
-                "(?!" + funcExclude + ")"
-                "([A-Za-z_]([A-Za-z0-9_ ]*[A-Za-z0-9_])*\\.?)+");
+                "\\b([A-Za-z_]([A-Za-z0-9_ ]*[A-Za-z0-9_])*\\.?)+");
     QTextCharFormat objectFormat;
     objectFormat.setForeground(QColor(255, 128, 128));
     objectFormat.setBackground(QColor(45, 45, 45));
@@ -86,17 +39,17 @@ ExpressionHighlighter::ExpressionHighlighter(
     mHighlightingRules.append(rule);
 
     const QStringList specs = {
-        QStringLiteral("value"),
-        QStringLiteral("frame")
+        QStringLiteral("$value"),
+        QStringLiteral("$frame")
     };
 
     QTextCharFormat specialFormat;
     specialFormat.setForeground(QColor(185, 255, 155));
     rule.format = specialFormat;
     for (const QString &spec : specs) {
-        rule.pattern = QRegularExpression(QString("\\$%1\\b").arg(spec));
+        rule.pattern = QRegularExpression(QString("\\%1\\b").arg(spec));
         mHighlightingRules.append(rule);
-        mBaseComplete << "$" + spec;
+        mBaseComplete << spec;
     }
     mVariablesRule.format = specialFormat;
 
@@ -120,37 +73,11 @@ void ExpressionHighlighter::removeVariable(const QString &name){
 }
 
 void ExpressionHighlighter::highlightBlock(const QString &text) {
-    QList<int> openBrackets;
-    for(int i = 0; i < text.count(); i++) {
-        const auto& character = text.at(i);
-        if(character == '(') openBrackets << i;
-        else if(character == ')') {
-            if(openBrackets.isEmpty()) setFormat(i, 1, mErrorFormat);
-            else {
-                const int openPos = openBrackets.last();
-                if(i + 1 == mCursorPos || openPos == mCursorPos) {
-                    setFormat(i, 1, mBracketsHighlightFormat);
-                    setFormat(openPos, 1, mBracketsHighlightFormat);
-                }
-                openBrackets.removeLast();
-            }
-        }
-    }
-    for(int i : openBrackets) setFormat(i, 1, mErrorFormat);
-
     for(const auto &rule : qAsConst(mHighlightingRules)) {
         auto matchIterator = rule.pattern.globalMatch(text);
         while(matchIterator.hasNext()) {
             const auto match = matchIterator.next();
             setFormat(match.capturedStart(), match.capturedLength(), rule.format);
-        }
-    }
-
-    for(const auto &rule : qAsConst(mFuncRules)) {
-        auto matchIterator = rule.pattern.globalMatch(text);
-        while(matchIterator.hasNext()) {
-            const auto match = matchIterator.next();
-            setFormat(match.capturedStart(), match.capturedLength() - 1, rule.format);
         }
     }
 
@@ -195,7 +122,7 @@ void ExpressionHighlighter::highlightBlock(const QString &text) {
                 error = obj == mTarget ||
                         (!qra && !enve_cast<ComplexAnimator*>(obj));
                 if(!error && qra) {
-                    error = qra->expressionDependsOn(mTarget);
+                    error = qra->prp_dependsOn(mTarget);
                 }
             }
             if(error) {

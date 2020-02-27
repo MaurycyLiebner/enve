@@ -71,7 +71,14 @@ install:
     - ./autogen.sh
     - ./configure --prefix /usr LIBS=-lpthread
     - make -j 2
-    - cd ../../
+    - cd ..
+    - # build QScintilla
+    - tar xf QScintilla-2.11.4.tar.gz
+    - cd QScintilla-2.11.4/Qt4Qt5
+    - qmake
+    - make -j 2
+    - sudo make install
+    - cd ../../../
 before_script:
     - cd build
     - wget https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage

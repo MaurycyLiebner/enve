@@ -20,7 +20,6 @@
 #include "pointhelpers.h"
 #include "mainwindow.h"
 #include "GUI/global.h"
-#include "Expressions/expressionparser.h"
 
 QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
                              const qreal prefferedStep,
@@ -421,12 +420,10 @@ void QDoubleSlider::lineEditingFinished() {
     setCursor(Qt::ArrowCursor);
     if(mCanceled) return;
     const QString text = mLineEdit->text();
-    ExpressionValue::sptr expr;
-    try {
-        expr = ExpressionParser::parse(text, nullptr, ExpressionType::noManualNoSource);
-    } catch(const std::exception& e) {}
-    if(!expr || !expr->isValid()) return;
-    const qreal newValue = clamped(expr->calculateValue(0));
+    QJSEngine engine;
+    const auto result = engine.evaluate(text);
+    if(!result.isNumber()) return;
+    const qreal newValue = clamped(result.toNumber());
     startTransform(newValue);
     setValue(newValue);
     finishTransform(newValue);
