@@ -10,7 +10,7 @@ PropertyBinding::PropertyBinding(const Validator& validator,
         const auto newSource = sFindPropertyToBind(mPath, mValidator,
                                                    mContext.data());
         if(!newSource) setBindPathValid(false);
-        else if(newSource != oldBind) bindProperty(newSource);
+        else if(newSource != oldBind) bindProperty(mPath, newSource);
         else setBindPathValid(true);
     }), mValidator(validator), mContext(context) {
     connect(context, &Property::prp_pathChanged,
@@ -32,12 +32,10 @@ qsptr<PropertyBinding> PropertyBinding::sCreate(
     PropertyBinding* result = nullptr;
     if(const auto qa = enve_cast<QrealAnimator*>(prop)) {
         result = new QrealAnimatorBinding(validator, context);
-        result->bindProperty(qa);
     } else if(const auto pa = enve_cast<QPointFAnimator*>(prop)) {
         result = new QPointFAnimatorBinding(validator, context);
-        result->bindProperty(pa);
     } else return nullptr;
-    result->bindProperty(prop);
+    result->bindProperty(binding, prop);
     return qsptr<PropertyBinding>(result);
 }
 
@@ -79,7 +77,7 @@ void PropertyBinding::updateValueIfNeeded() {
 
 void PropertyBinding::reloadBindProperty() {
     const auto prop = sFindPropertyToBind(mPath, mValidator, mContext.data());
-    bindProperty(prop);
+    bindProperty(mPath, prop);
 }
 
 Property *PropertyBinding::sFindPropertyToBind(const QString& binding,
@@ -113,8 +111,9 @@ void PropertyBinding::updateBindPath() {
     mPath = srcPath.join('.');
 }
 
-bool PropertyBinding::bindProperty(Property * const newBinding) {
+bool PropertyBinding::bindProperty(const QString& path, Property * const newBinding) {
     if(newBinding && !mValidator(newBinding)) return false;
+    mPath = path;
     auto& conn = mBindProperty.assign(newBinding);
     if(newBinding) {
         setBindPathValid(true);

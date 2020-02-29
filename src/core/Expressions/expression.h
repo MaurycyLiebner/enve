@@ -16,9 +16,11 @@ class Expression : public QObject {
 public:
     static void sAddDefinitionsTo(const QString& definitionsStr,
                                   QJSEngine& e);
+    using ResultTester = std::function<void(const QJSValue&)>;
     static void sAddScriptTo(const QString& scriptStr,
                              const PropertyBindingMap& bindings,
-                             QJSEngine& e, QJSValue& eEvaluate);
+                             QJSEngine& e, QJSValue& eEvaluate,
+                             const ResultTester& resultTester);
     static qsptr<Expression> sCreate(const QString& definitionsStr,
                                      const QString& scriptStr,
                                      PropertyBindingMap&& bindings,
@@ -27,7 +29,10 @@ public:
     static qsptr<Expression> sCreate(const QString& bindingsStr,
                                      const QString& definitionsStr,
                                      const QString& scriptStr,
-                                     const Property* const context);
+                                     const Property* const context,
+                                     const ResultTester& resultTester);
+
+    static ResultTester sQrealAnimatorTester;
 
     bool setAbsFrame(const qreal absFrame);
 

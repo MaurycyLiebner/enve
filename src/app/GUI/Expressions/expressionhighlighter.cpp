@@ -46,12 +46,17 @@ ExpressionHighlighter::ExpressionHighlighter(
     QTextCharFormat specialFormat;
     specialFormat.setForeground(QColor(185, 255, 155));
     rule.format = specialFormat;
-    for (const QString &spec : specs) {
+    for(const QString &spec : specs) {
         rule.pattern = QRegularExpression(QString("\\%1\\b").arg(spec));
         mHighlightingRules.append(rule);
         mBaseComplete << spec;
     }
-    mVariablesRule.format = specialFormat;
+
+    QTextCharFormat commentFormat;
+    commentFormat.setForeground(QColor(125, 125, 125));
+    rule.pattern = QRegularExpression("\\/\\/.*");;
+    rule.format = objectFormat;
+    mHighlightingRules.append(rule);
 
     mBaseVarsComplete = mBaseComplete;
 }
@@ -78,15 +83,6 @@ void ExpressionHighlighter::highlightBlock(const QString &text) {
         while(matchIterator.hasNext()) {
             const auto match = matchIterator.next();
             setFormat(match.capturedStart(), match.capturedLength(), rule.format);
-        }
-    }
-
-    {
-        auto matchIterator = mVariablesRule.pattern.globalMatch(text);
-        while(matchIterator.hasNext()) {
-            const auto match = matchIterator.next();
-            setFormat(match.capturedStart(), match.capturedLength(),
-                      mVariablesRule.format);
         }
     }
 
@@ -142,16 +138,4 @@ void ExpressionHighlighter::highlightBlock(const QString &text) {
         completions = tmp;
     }
     mEditor->setCompleterList(completions);
-}
-
-void ExpressionHighlighter::updateVariablesRule() {
-    mVariablesRule.pattern = QRegularExpression(
-                "\\$(" + mVariables.join('|') +")\\b");
-    mVariablesComplete.clear();
-    for(const auto& var : mVariables) {
-        mVariablesComplete << "$" + var;
-    }
-    mBaseVarsComplete = mBaseComplete;
-    mBaseVarsComplete.append(mVariablesComplete);
-    setDocument(document());
 }

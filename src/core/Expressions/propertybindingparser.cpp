@@ -33,6 +33,25 @@ bool parseBindingName(const QString& exp, int& pos, QString& name) {
     return true;
 }
 
+bool checkComment(const QString& exp, int& pos) {
+    if(pos < exp.count() + 1) {
+        int newPos = pos;
+        if(exp.at(newPos++) == '/' && exp.at(newPos++) == '/') {
+            pos = newPos;
+            return true;
+        }
+    }
+    return false;
+}
+
+void parseBinding(const QString& exp, int& pos, QString& binding) {
+    while(pos < exp.count()) {
+        const auto& c = exp.at(pos++);
+        if(!c.isLetterOrNumber() && c != ' ' && c != '.' && c != '_') break;
+        binding.append(c);
+    }
+}
+
 qsptr<PropertyBinding> PropertyBindingParser::parseBinding(
         QString& name,
         const QString& exp,
@@ -40,14 +59,18 @@ qsptr<PropertyBinding> PropertyBindingParser::parseBinding(
         const Property* const context) {
     int pos = 0;
     skipSpaces(exp, pos);
+    if(checkComment(exp, pos)) return nullptr;
     if(!parseBindingName(exp, pos, name))
-        PrettyRuntimeThrow("Invalid binding definition " + exp);
+        PrettyRuntimeThrow("Invalid binding definition:\n'" + exp + "'");
     skipSpaces(exp, pos);
     if(!parseBindingAssignment(exp, pos))
-        PrettyRuntimeThrow("Invalid binding definition " + exp);
-    const QString binding = exp.mid(pos).trimmed();
-    const auto result = PropertyBinding::sCreate(binding, validator, context);
-    if(!result) PrettyRuntimeThrow("Binding could not be resolved\n'" + binding + "'");
+        PrettyRuntimeThrow("Invalid binding definition:\n'" + exp + "'");
+    QString binding;
+    parseBinding(exp, pos, binding);
+    const auto result = PropertyBinding::sCreate(binding.trimmed(),
+                                                 validator, context);
+    if(!result) PrettyRuntimeThrow("Binding could not be resolved:\n'" +
+                                   binding + "'");
     return result;
 }
 

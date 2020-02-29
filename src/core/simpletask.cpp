@@ -18,6 +18,8 @@
 
 #include <QPointer>
 
+#include "exceptions.h"
+
 QList<SimpleTask*> SimpleTask::sTasks;
 
 SimpleTask::SimpleTask(const Func& func) : mFunc(func) {}
@@ -37,7 +39,11 @@ SimpleTask* SimpleTask::sSchedule(const Func &func) {
 void SimpleTask::sProcessAll() {
     for(int i = 0; i < sTasks.count(); i++) {
         const auto task = sTasks.at(i);
-        task->process();
+        try {
+            task->process();
+        } catch(const std::exception& e) {
+            gPrintExceptionCritical(e);
+        }
         delete task;
     }
     sTasks.clear();

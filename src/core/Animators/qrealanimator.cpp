@@ -65,9 +65,9 @@ void QrealAnimator::prp_readProperty(eReadStream& src) {
             QString scriptStr; src >> scriptStr;
             SimpleTask::sScheduleContexted(this,
             [this, bindingsStr, definitionsStr, scriptStr]() {
-                setExpression(Expression::sCreate(bindingsStr,
-                                                  definitionsStr,
-                                                  scriptStr, this));
+                setExpression(Expression::sCreate(
+                                  bindingsStr, definitionsStr, scriptStr, this,
+                                  Expression::sQrealAnimatorTester));
             });
         }
     }

@@ -33,7 +33,6 @@ public:
 
     void addVariable(const QString& name);
     void removeVariable(const QString& name);
-    void updateVariablesRule();
 protected:
     void highlightBlock(const QString &text) override;
 private:
@@ -49,7 +48,6 @@ private:
     QTextCharFormat mErrorFormat;
 
     QStringList mVariables;
-    HighlightingRule mVariablesRule;
     QVector<HighlightingRule> mHighlightingRules;
     QVector<HighlightingRule> mFuncRules;
 

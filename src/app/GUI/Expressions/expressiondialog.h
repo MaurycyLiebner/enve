@@ -21,12 +21,14 @@
 #include <QPushButton>
 #include <QLabel>
 
-#include <Qsci/qsciscintilla.h>
+#include "conncontext.h"
 
 class QrealAnimator;
 class ExpressionEditor;
 class PropertyBinding;
-class QsciLexerJavaScript;
+
+class JSLexer;
+class JSEditor;
 
 class QsciAPIs;
 
@@ -34,31 +36,42 @@ class ExpressionDialog : public QDialog {
 public:
     ExpressionDialog(QrealAnimator* const target,
                      QWidget * const parent = nullptr);
-
 private:
     using PropertyBindingMap = std::map<QString, QSharedPointer<PropertyBinding>>;
     bool getBindings(PropertyBindingMap& bindings);
-    void updateBindingsAutocomplete();
+    void updateScriptBindings();
+    void updateScriptDefinitions();
+    void updateAllScript();
+    void setCurrentTabId(const int id);
 
     bool apply(const bool action);
 
     QrealAnimator* const mTarget;
 
+    QIcon mRedDotIcon;
+
+    QPushButton* mBindingsButton;
+    QPushButton* mDefinitionsButon;
+
+    QLabel* mBindingsLabel;
     ExpressionEditor* mBindings;
     QLabel* mBindingsError;
 
-    QsciLexerJavaScript* mDefsLexer;
-    QsciScintilla* mDefinitions;
+    QLabel* mDefsLabel;
+    JSLexer* mDefsLexer;
+    JSEditor* mDefinitions;
     QsciAPIs* mDefinitionsApi;
     QLabel* mDefinitionsError;
 
-    QsciLexerJavaScript* mScriptLexer;
-    QStringList mDefinitionList;
-    QStringList mBindingsList;
+    JSLexer* mScriptLexer;
+    bool mBindingsChanged = true;
+    bool mDefinitionsChanged = true;
     QLabel* mScriptLabel;
-    QsciScintilla* mScript;
+    JSEditor* mScript;
     QsciAPIs* mScriptApi;
     QLabel* mScriptError;
+
+    ConnContext mAutoApplyConn;
 };
 
 #endif // EXPRESSIONDIALOG_H

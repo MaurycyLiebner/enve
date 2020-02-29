@@ -54,7 +54,7 @@ private:
                                          const Property* const context);
     void reloadBindProperty();
     void updateBindPath();
-    bool bindProperty(Property * const newBinding);
+    bool bindProperty(const QString& path, Property * const newBinding);
     void setBindPathValid(const bool valid);
     SimpleTaskScheduler pathChanged;
 

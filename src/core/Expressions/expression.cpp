@@ -2,6 +2,11 @@
 
 #include "exceptions.h"
 
+Expression::ResultTester Expression::sQrealAnimatorTester =
+        [](const QJSValue& val) {
+            if(!val.isNumber()) PrettyRuntimeThrow("Invalid return type");
+        };
+
 Expression::Expression(const QString& definitionsStr,
                        const QString& scriptStr,
                        PropertyBindingMap&& bindings,
@@ -30,32 +35,42 @@ void Expression::sAddDefinitionsTo(const QString& definitionsStr,
 
 void Expression::sAddScriptTo(const QString& scriptStr,
                               const PropertyBindingMap& bindings,
-                              QJSEngine& e, QJSValue& eEvaluate) {
+                              QJSEngine& e, QJSValue& eEvaluate,
+                              const ResultTester& resultTester) {
     QStringList bindingVars;
+    QJSValueList testArgs;
     for(const auto& binding : bindings) {
         bindingVars << binding.first;
+        testArgs << binding.second->getJSValue(e);
     }
     const QString evalVars = bindingVars.join(", ");
     const auto scrRet = e.evaluate(
-        "var eEvaluate = function(" + evalVars + ") {\n" +
-            scriptStr +
-        "\n}");
-    throwIfError(scrRet, "eEvaluate Script");
+            "var eEvaluate = function(" + evalVars + ") {" +
+                scriptStr +
+            "}");
+    throwIfError(scrRet, "Script");
     eEvaluate = e.evaluate("eEvaluate");
+    throwIfError(eEvaluate, "Script");
     if(!eEvaluate.isCallable())
-        RuntimeThrow("Uncallable script:\n" + scriptStr);
+        PrettyRuntimeThrow("Uncallable script.");
+    const auto testResult = eEvaluate.call(testArgs);
+    if(testResult.isError()) {
+        PrettyRuntimeThrow("Script test error:\n" +
+                           testResult.toString());
+    } else if(resultTester) resultTester(testResult);
 }
 
 qsptr<Expression> Expression::sCreate(const QString& bindingsStr,
                                       const QString& definitionsStr,
                                       const QString& scriptStr,
-                                      const Property* const context) {
+                                      const Property* const context,
+                                      const ResultTester& resultTester) {
     auto bindings = PropertyBindingParser::parseBindings(
                               bindingsStr, nullptr, context);
     auto engine = std::make_unique<QJSEngine>();
     sAddDefinitionsTo(definitionsStr, *engine);
     QJSValue eEvaluate;
-    sAddScriptTo(scriptStr, bindings, *engine, eEvaluate);
+    sAddScriptTo(scriptStr, bindings, *engine, eEvaluate, resultTester);
     return sCreate(definitionsStr, scriptStr,
                    std::move(bindings),
                    std::move(engine),

@@ -29,7 +29,7 @@ ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
                                    QWidget * const parent) :
     QTextEdit(parent) {
     setFont(QFont("monospace"));
-    setMinimumWidth(400);
+    setMinimumWidth(20*MIN_WIDGET_DIM);
     const auto doc = document();
     setAcceptRichText(false);
     mHighlighter = new ExpressionHighlighter(target, this, doc);
