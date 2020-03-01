@@ -26,17 +26,23 @@ ExpressionHighlighter::ExpressionHighlighter(
     QSyntaxHighlighter(parent),
     mTarget(target),
     mSearchCtxt(target->getParent()),
-    mEditor(editor) {
+    mEditor(editor) {    
     HighlightingRule rule;
 
-    mObjectsExpression = QRegularExpression(
-                "\\b([A-Za-z_]([A-Za-z0-9_ ]*[A-Za-z0-9_])*\\.?)+");
-    QTextCharFormat objectFormat;
-    objectFormat.setForeground(QColor(255, 128, 128));
-    objectFormat.setBackground(QColor(45, 45, 45));
-    rule.pattern = mObjectsExpression;
-    rule.format = objectFormat;
-    mHighlightingRules.append(rule);
+    mErrorFormat.setForeground(Qt::red);
+    mAssignFormat.setForeground(QColor(255, 128, 128));
+
+    const QString propPath = "([a-zA-Z0-9_\\.]+[a-zA-Z0-9_ \\.]*[a-zA-Z0-9_\\.]+)";
+    mPropSetRegex = QRegularExpression("^\\s*"
+                                            "([A-Za-z_][A-Za-z0-9_]*)"
+                                       "\\s*=\\s*" + propPath);
+//    const auto propPathRegex = QRegularExpression(propPath);
+
+    mPropPathFormat.setFontWeight(QFont::Bold);
+    mPropPathFormat.setForeground(Qt::white);
+//    rule.pattern = propPathRegex;
+//    rule.format = mPropPathFormat;
+//    mHighlightingRules.append(rule);
 
     const QStringList specs = {
         QStringLiteral("$value"),
@@ -53,9 +59,9 @@ ExpressionHighlighter::ExpressionHighlighter(
     }
 
     QTextCharFormat commentFormat;
-    commentFormat.setForeground(QColor(125, 125, 125));
+    commentFormat.setForeground(QColor("#666666"));
     rule.pattern = QRegularExpression("\\/\\/.*");;
-    rule.format = objectFormat;
+    rule.format = commentFormat;
     mHighlightingRules.append(rule);
 
     mBaseVarsComplete = mBaseComplete;
@@ -89,14 +95,21 @@ void ExpressionHighlighter::highlightBlock(const QString &text) {
     bool objCompletSetup = false;
     bool addFuncsComplete = true;
     QStringList completions;
-    auto matchIterator = mObjectsExpression.globalMatch(text);
+    auto matchIterator = mPropSetRegex.globalMatch(text);
     while(matchIterator.hasNext()) {
         const auto match = matchIterator.next();
-        const auto path = match.capturedTexts().first();
+        const auto captured = match.capturedTexts();
+        if(captured.count() < 3) continue;
+        {
+            const int min = match.capturedStart(1);
+            const int max = match.capturedEnd(1);
+            setFormat(min, max - min, mAssignFormat);
+        }
+        const auto path = captured[2];
         const auto objs = path.split('.');
         for(int i = objs.count() - 1; i >= 0; i--) {
             const auto subPath = objs.mid(0, objs.count() - i);
-            int min = match.capturedStart();
+            int min = match.capturedStart(2);
             for(int j = 0; j < subPath.count() - 1; j++) {
                 const auto& jObj = subPath.at(j);
                 min += jObj.count() + 1;
@@ -112,19 +125,19 @@ void ExpressionHighlighter::highlightBlock(const QString &text) {
                 objCompletSetup = true;
             }
 
-            bool error = !obj;
-            if(!error) {
-                const auto qra = enve_cast<QrealAnimator*>(obj);
-                error = obj == mTarget ||
-                        (!qra && !enve_cast<ComplexAnimator*>(obj));
-                if(!error && qra) {
-                    error = qra->prp_dependsOn(mTarget);
-                }
-            }
+            bool error = false;
+            const auto qra = enve_cast<QrealAnimator*>(obj);
+            const auto ca = enve_cast<ComplexAnimator*>(obj);
+            if(obj == mTarget) error = true;
+            else if(i == 0 && !qra) error = true;
+            else if(!qra && !ca) error = true;
+            else if(qra) error = qra->prp_dependsOn(mTarget);
             if(error) {
                 const int len = match.capturedEnd() - min;
                 setFormat(min, len, mErrorFormat);
                 break;
+            } else {
+                setFormat(min, max - min, mPropPathFormat);
             }
         }
     }

@@ -28,8 +28,11 @@ ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
                                    const QString &text,
                                    QWidget * const parent) :
     QTextEdit(parent) {
+    setStyleSheet("QWidget { background: #2E2F30; }");
+    setCursorWidth(2);
     setFont(QFont("monospace"));
     setMinimumWidth(20*MIN_WIDGET_DIM);
+    setMaximumHeight(5*MIN_WIDGET_DIM);
     const auto doc = document();
     setAcceptRichText(false);
     mHighlighter = new ExpressionHighlighter(target, this, doc);
@@ -45,11 +48,17 @@ ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
     connect(mCompleter,
             qOverload<const QString&>(&QCompleter::activated),
             this, &ExpressionEditor::insertCompletion);
-    setText(text);
+    if(text.isEmpty()) setFillerText();
+    else setText(text);
 }
 
 void ExpressionEditor::setCompleterList(const QStringList &values) {
     mCompleter->setModel(new QStringListModel(values, mCompleter));
+}
+
+QString ExpressionEditor::text() const {
+    if(mFillerText) return QString();
+    else return toPlainText();
 }
 
 void ExpressionEditor::keyPressEvent(QKeyEvent *e) {
@@ -79,10 +88,35 @@ void ExpressionEditor::keyPressEvent(QKeyEvent *e) {
     }
 }
 
+void ExpressionEditor::focusInEvent(QFocusEvent* e) {
+    clearFillerText();
+    QTextEdit::focusInEvent(e);
+}
+
 void ExpressionEditor::focusOutEvent(QFocusEvent* e) {
     Q_UNUSED(e)
+    if(toPlainText().isEmpty()) setFillerText();
+    else mFillerText = false;
     QTextEdit::focusOutEvent(e);
     emit focusLost();
+}
+
+void ExpressionEditor::setFillerText() {
+    if(mFillerText) return;
+    mFillerText = true;
+    setText("// Here you can bind property values, e.g.:\n"
+            "// varName = transform.rot\n"
+            "// Where 'varName' is the name of the variable you can use\n"
+            "// from the 'Calculate' portion of the script,\n"
+            "// and 'transform.rot' is the property\n"
+            "// the variable will get its value from.");
+}
+
+void ExpressionEditor::clearFillerText() {
+    if(mFillerText) {
+        mFillerText = false;
+        setText("");
+    }
 }
 
 void ExpressionEditor::showCompleter() {

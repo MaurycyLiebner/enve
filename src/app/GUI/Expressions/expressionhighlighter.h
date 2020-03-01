@@ -44,14 +44,15 @@ private:
     int mCursorPos = 0;
     QTextCursor mOldCursor;
 
-    QTextCharFormat mBracketsHighlightFormat;
+    QTextCharFormat mAssignFormat;
+    QTextCharFormat mPropPathFormat;
     QTextCharFormat mErrorFormat;
 
     QStringList mVariables;
     QVector<HighlightingRule> mHighlightingRules;
     QVector<HighlightingRule> mFuncRules;
 
-    QRegularExpression mObjectsExpression;
+    QRegularExpression mPropSetRegex;
 
     QStringList mVariablesComplete;
     QStringList mBaseComplete;

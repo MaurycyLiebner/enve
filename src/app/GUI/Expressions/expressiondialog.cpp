@@ -129,7 +129,7 @@ const char *JSLexer::sKeywordClass1 =
 
 class JSEditor : public QsciScintilla {
 public:
-    JSEditor() {
+    JSEditor(const QString& fillerText) : mFillerTextV(fillerText) {
         setMinimumWidth(20*MIN_WIDGET_DIM);
 
         QFont font(DEFAULT_FONT);
@@ -156,6 +156,14 @@ public:
 
         setScrollWidth(1);
         setScrollWidthTracking(true);
+
+        connect(this, &JSEditor::SCN_FOCUSIN,
+                this, &JSEditor::clearFillerText);
+        connect(this, &JSEditor::SCN_FOCUSOUT,
+                this, [this]() {
+            if(length() == 0) setFillerText();
+            else mFillerText = false;
+        });
     }
 
     void updateLexer() {
@@ -168,6 +176,37 @@ public:
         }
         recolor();
     }
+
+    void setText(const QString &text) override {
+        if(text.isEmpty()) {
+            setFillerText();
+        } else {
+            QsciScintilla::setText(text);
+        }
+    }
+
+    QString text() const {
+        if(mFillerText) return QString();
+        return QsciScintilla::text();
+    }
+private:
+    void setFillerText() {
+        if(mFillerText) return;
+        mFillerText = true;
+        setText(mFillerTextV);
+    }
+
+    void clearFillerText() {
+        if(mFillerText) {
+            mFillerText = false;
+            QsciScintilla::setText("");
+        }
+    }
+
+    bool mFillerText = false;
+    const QString mFillerTextV;
+    using QsciScintilla::setText;
+    using QsciScintilla::text;
 };
 
 void addBasicDefs(QsciAPIs* const target) {
@@ -247,13 +286,11 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
     mBindingsButton = new QPushButton("Bindings && Script", this);
     mBindingsButton->setObjectName("leftButton");
     mBindingsButton->setCheckable(true);
-    mBindingsButton->setFocusPolicy(Qt::NoFocus);
     mBindingsButton->setChecked(true);
 
     mDefinitionsButon = new QPushButton("Definitions", this);
     mDefinitionsButon->setObjectName("rightButton");
     mDefinitionsButon->setCheckable(true);
-    mDefinitionsButon->setFocusPolicy(Qt::NoFocus);
 
     const auto tabGroup = new QButtonGroup(this);
     tabGroup->addButton(mBindingsButton, 0);
@@ -284,7 +321,9 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
 
     mDefsLabel = new QLabel("Definitions:");
     mainLayout->addWidget(mDefsLabel);
-    mDefinitions = new JSEditor;
+    mDefinitions = new JSEditor("// Here you can define JavaScript functions,\n"
+                                "// you can later use in the 'Calculate'\n"
+                                "// portion of the script.");
     mDefsLexer = new JSLexer(mDefinitions);
 
     mDefinitionsApi = new QsciAPIs(mDefsLexer);
@@ -308,7 +347,11 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
 
     mScriptLabel = new QLabel("Calculate (  ) :");
     mainLayout->addWidget(mScriptLabel);
-    mScript = new JSEditor;
+    mScript = new JSEditor("// Here you can define a JavaScript script,\n"
+                           "// that will be evaluated every time any of\n"
+                           "// the bound property values changes.\n"
+                           "// You should return the resulting value\n"
+                           "// at the end of this script.");
     mScriptLexer = new JSLexer(mScript);
 
     mScriptApi = new QsciAPIs(mScriptLexer);
@@ -370,10 +413,6 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
     connect(cancelButton, &QPushButton::released,
             this, &ExpressionDialog::reject);
 
-    setTabOrder(mBindings, mDefinitions);
-    setTabOrder(mDefinitions, mScript);
-    setTabOrder(mScript, mBindings);
-
     connect(mScript, &QsciScintilla::SCN_FOCUSIN,
             this, [this]() {
         if(mBindingsChanged || mDefinitionsChanged) {
@@ -395,6 +434,8 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
     p.drawEllipse(pix.rect().adjusted(1, 1, -1, -1));
     p.end();
     mRedDotIcon = QIcon(pix);
+
+    mBindingsButton->setFocus();
 }
 
 void ExpressionDialog::setCurrentTabId(const int id) {
@@ -487,7 +528,7 @@ void ExpressionDialog::updateScriptDefinitions() {
 
 bool ExpressionDialog::getBindings(PropertyBindingMap& bindings) {
     mBindingsError->clear();
-    const auto bindingsStr = mBindings->toPlainText();
+    const auto bindingsStr = mBindings->text();
     try {
         bindings = PropertyBindingParser::parseBindings(
                        bindingsStr, nullptr, mTarget);

@@ -38,16 +38,25 @@ public:
                      const QString& text, QWidget* const parent);
 
     void setCompleterList(const QStringList& values);
+
+    QString text() const;
 signals:
     void focusLost();
 protected:
     void keyPressEvent(QKeyEvent *e) override;
+    void focusInEvent(QFocusEvent *e) override;
     void focusOutEvent(QFocusEvent *e) override;
 private:
+    using QTextEdit::toHtml;
+    using QTextEdit::toPlainText;
+    using QTextEdit::setText;
     void showCompleter();
     void insertCompletion(const QString &completion);
     QString textUnderCursor() const;
+    void setFillerText();
+    void clearFillerText();
 
+    bool mFillerText = false;
     ExpressionHighlighter* mHighlighter;
     QCompleter* mCompleter;
 };
