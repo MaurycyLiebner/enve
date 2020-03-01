@@ -78,7 +78,7 @@ public:
     void setMinValue(const qreal minVal);
     void setMaxValue(const qreal maxVal);
 
-    void setCurrentBaseValue(qreal newValue);
+    void setCurrentBaseValue(const qreal newValue);
     void setCurrentBaseValueNoUpdate(const qreal newValue);
     void incCurrentBaseValue(const qreal incBy);
     void incCurrentValueNoUpdate(const qreal incBy);
@@ -137,7 +137,9 @@ private:
     void startBaseValueTransform();
     void finishBaseValueTransform();
     bool updateExpressionRelFrame();
-    bool updateBaseValueFromCurrentFrame();
+    bool updateCurrentBaseValue();
+    bool updateCurrentEffectiveValue();
+    bool assignCurrentBaseValue(const qreal newValue);
 
     bool mGraphMinMaxValuesFixed = false;
     bool mTransformed = false;
@@ -147,6 +149,7 @@ private:
     qreal mClampMax = TEN_MIL;
     qreal mClampMin = -TEN_MIL;
 
+    qreal mCurrentEffectiveValue = 0;
     qreal mCurrentBaseValue = 0;
     qreal mSavedCurrentValue = 0;
 

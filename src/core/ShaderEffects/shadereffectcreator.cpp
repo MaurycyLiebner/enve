@@ -175,10 +175,7 @@ QPointF attrToQPointF(const QDomElement &elem,
                       const QString& def,
                       const bool allowSingleValue) {
     const QString valS = elem.attribute(attr, def);
-    const QRegExp rx("\\["
-                         REGEX_FIRST_FLOAT
-                         REGEX_LAST_FLOAT
-                     "\\]");
+    const QRegExp rx("\\[" REGEX_TWO_FLOATS "\\]");
     if(rx.exactMatch(attr)) {
         rx.indexIn(attr);
         const QStringList xy = rx.capturedTexts();
@@ -191,7 +188,6 @@ QPointF attrToQPointF(const QDomElement &elem,
         return {value, value};
     } else RuntimeThrow("Invalid '" + attr + "' value \"" + valS + "\" for '" +
                          elemName + "'.\nExpected \"[x, y]\".");
-
 }
 
 void parseFloatPropertyCreators(const QString& name,
@@ -350,19 +346,19 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
     }
 
     QList<stdsptr<ShaderValueHandler>> values;
-    const QDomNodeList valueNodes = root.elementsByTagName("Value");
+    const QDomNodeList valueNodes = root.elementsByTagName("glValue");
     for(int i = 0; i < valueNodes.count(); i++) {
         const QDomNode& valNode = valueNodes.at(i);
         if(!valNode.isElement()) {
-            RuntimeThrow("Value node " + QString::number(i) +
+            RuntimeThrow("glValue node " + QString::number(i) +
                          " is not an Element.");
         }
         const QDomElement valEle = valNode.toElement();
         try {
             const QString name = valEle.attribute("name");
-            if(name.isEmpty()) RuntimeThrow("Value name not defined.");
+            if(name.isEmpty()) RuntimeThrow("glValue name not defined.");
             const auto typeStr = valEle.attribute("type");
-            if(typeStr.isEmpty()) RuntimeThrow("Value '" + name + "' type not defined.");
+            if(typeStr.isEmpty()) RuntimeThrow("glValue '" + name + "' type not defined.");
             GLValueType type{GLValueType::Float};
             if(typeStr == "float") type = GLValueType::Float;
             else if(typeStr == "vec2") type = GLValueType::Vec2;
@@ -374,8 +370,7 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
             else if(typeStr == "ivec4") type = GLValueType::iVec4;
 
             const QString script = getScript(name, valEle);
-            const bool glValue = attrToBool(valEle, name, "glValue", "false");
-            values << enve::make_shared<ShaderValueHandler>(name, glValue, type, script);
+            values << enve::make_shared<ShaderValueHandler>(name, type, script);
         } catch(...) {
             RuntimeThrow("Value " + QString::number(i) + " is invalid.");
         }

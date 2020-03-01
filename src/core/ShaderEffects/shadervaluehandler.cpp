@@ -17,20 +17,13 @@
 #include "shadervaluehandler.h"
 
 ShaderValueHandler::ShaderValueHandler(const QString &name,
-                                       const bool glValue,
                                        const GLValueType type,
                                        const QString &script):
-    fName(name), fGLValue(glValue), mType(type), mScript(script) {}
+    fName(name), mType(type), mScript(script) {}
 
 UniformSpecifier ShaderValueHandler::create(const GLint loc) const {
     QString name = fName;
     QString script = fName + " = " + mScript;
-    if(!fGLValue) {
-        return [script](QGL33 * const gl, QJSEngine& engine) {
-            Q_UNUSED(gl)
-            engine.evaluate(script);
-        };
-    }
     Q_ASSERT(loc >= 0);
     if(mType == GLValueType::Float) {
         return [loc, name, script](QGL33 * const gl, QJSEngine& engine) {

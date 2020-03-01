@@ -257,14 +257,14 @@ void QrealAnimator::setExpression(const qsptr<Expression>& expression) {
         expression->setAbsFrame(anim_getCurrentRelFrame());
         conn << connect(expression.get(), &Expression::currentValueChanged,
                         this, [this]() {
-            emit effectiveValueChanged(getEffectiveValue());
+            updateCurrentEffectiveValue();
         });
         conn << connect(expression.get(), &Expression::relRangeChanged,
                         this, [this](const FrameRange& range) {
             prp_afterChangedRelRange(range);
         });
     }
-    emit effectiveValueChanged(getEffectiveValue());
+    updateCurrentEffectiveValue();
     prp_afterWholeInfluenceRangeChanged();
     emit expressionChanged();
 }
@@ -309,6 +309,8 @@ qreal QrealAnimator::getBaseValue(const qreal relFrame) const {
 }
 
 qreal QrealAnimator::getEffectiveValue(const qreal relFrame) const {
+    if(isZero4Dec(relFrame - anim_getCurrentRelFrame()))
+        return getEffectiveValue();
     if(mExpression) {
         const auto ret = mExpression->evaluate(relFrame);
         if(ret.isNumber()) return clamped(ret.toNumber());
@@ -321,35 +323,40 @@ qreal QrealAnimator::getCurrentBaseValue() const {
 }
 
 qreal QrealAnimator::getEffectiveValue() const {
-    if(mExpression) {
-        const auto ret = mExpression->evaluate();
-        if(ret.isNumber()) return clamped(ret.toNumber());
-    }
-    return mCurrentBaseValue;
+    if(mExpression) return mCurrentEffectiveValue;
+    else return mCurrentBaseValue;
 }
 
-void QrealAnimator::setCurrentBaseValue(qreal newValue) {
-    newValue = clamped(newValue);
-
-    if(isZero4Dec(newValue - mCurrentBaseValue)) return;
-
-    mCurrentBaseValue = newValue;
-    const auto currKey = anim_getKeyOnCurrentFrame<QrealKey>();
-    if(currKey) currKey->setValue(mCurrentBaseValue);
-    else prp_afterWholeInfluenceRangeChanged();
-
-    emit baseValueChanged(mCurrentBaseValue);
-    emit effectiveValueChanged(getEffectiveValue());
-
-    //anim_updateKeysPath();
-}
-
-bool QrealAnimator::updateBaseValueFromCurrentFrame() {
-    const qreal newValue = calculateBaseValueAtRelFrame(anim_getCurrentRelFrame());
+bool QrealAnimator::assignCurrentBaseValue(const qreal newValue) {
     if(isZero4Dec(newValue - mCurrentBaseValue)) return false;
     mCurrentBaseValue = newValue;
     emit baseValueChanged(mCurrentBaseValue);
-    emit effectiveValueChanged(getEffectiveValue());
+    if(mExpression) updateCurrentEffectiveValue();
+    else emit effectiveValueChanged(mCurrentBaseValue);
+    return true;
+}
+
+void QrealAnimator::setCurrentBaseValue(const qreal newValue) {
+    if(assignCurrentBaseValue(clamped(newValue))) {
+        const auto currKey = anim_getKeyOnCurrentFrame<QrealKey>();
+        if(currKey) currKey->setValue(mCurrentBaseValue);
+        else prp_afterWholeInfluenceRangeChanged();
+    }
+}
+
+bool QrealAnimator::updateCurrentBaseValue() {
+    const qreal newValue = calculateBaseValueAtRelFrame(anim_getCurrentRelFrame());
+    return assignCurrentBaseValue(newValue);
+}
+
+bool QrealAnimator::updateCurrentEffectiveValue() {
+    if(!mExpression) return false;
+    const auto ret = mExpression->evaluate();
+    if(!ret.isNumber()) return false;
+    const qreal newValue = clamped(ret.toNumber());
+    if(isZero4Dec(newValue - mCurrentEffectiveValue)) return false;
+    mCurrentEffectiveValue = newValue;
+    emit effectiveValueChanged(newValue);
     return true;
 }
 
@@ -377,7 +384,7 @@ void QrealAnimator::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
 
 void QrealAnimator::anim_setAbsFrame(const int frame) {
     GraphAnimator::anim_setAbsFrame(frame);
-    const bool baseValChanged = updateBaseValueFromCurrentFrame();
+    const bool baseValChanged = updateCurrentBaseValue();
     const bool exprValChanged = updateExpressionRelFrame();
     const bool changed = baseValChanged || exprValChanged;
     if(changed) prp_afterChangedCurrent(UpdateReason::frameChange);
@@ -496,9 +503,7 @@ void QrealAnimator::multSavedValueToCurrentValue(const qreal multBy) {
 }
 
 void QrealAnimator::setCurrentBaseValueNoUpdate(const qreal newValue) {
-    mCurrentBaseValue = clamped(newValue);
-    emit baseValueChanged(mCurrentBaseValue);
-    emit effectiveValueChanged(getEffectiveValue());
+    assignCurrentBaseValue(clamped(newValue));
 }
 
 void QrealAnimator::incCurrentValueNoUpdate(const qreal incBy) {
@@ -574,7 +579,7 @@ FrameRange QrealAnimator::prp_getIdenticalRelRange(const int relFrame) const {
 void QrealAnimator::prp_afterChangedAbsRange(const FrameRange &range,
                                              const bool clip) {
     if(range.inRange(anim_getCurrentAbsFrame()))
-        updateBaseValueFromCurrentFrame();
+        updateCurrentBaseValue();
     GraphAnimator::prp_afterChangedAbsRange(range, clip);
 }
 

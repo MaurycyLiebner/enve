@@ -16,7 +16,14 @@ Expression::Expression(const QString& definitionsStr,
     mScriptStr(scriptStr),
     mEEvaluate(std::move(eEvaluate)),
     mBindings(std::move(bindings)),
-    mEngine(std::move(engine)) {}
+    mEngine(std::move(engine)) {
+    for(const auto& binding : bindings) {
+        connect(binding.second.get(), &PropertyBinding::currentValueChanged,
+                this, &Expression::currentValueChanged);
+        connect(binding.second.get(), &PropertyBinding::relRangeChanged,
+                this, &Expression::relRangeChanged);
+    }
+}
 
 
 void throwIfError(const QJSValue& value, const QString& name) {
@@ -44,12 +51,11 @@ void Expression::sAddScriptTo(const QString& scriptStr,
         testArgs << binding.second->getJSValue(e);
     }
     const QString evalVars = bindingVars.join(", ");
-    const auto scrRet = e.evaluate(
-            "var eEvaluate = function(" + evalVars + ") {" +
+    eEvaluate = e.evaluate(
+            "var eEvaluate;"
+            "eEvaluate = function(" + evalVars + ") {" +
                 scriptStr +
             "}");
-    throwIfError(scrRet, "Script");
-    eEvaluate = e.evaluate("eEvaluate");
     throwIfError(eEvaluate, "Script");
     if(!eEvaluate.isCallable())
         PrettyRuntimeThrow("Uncallable script.");

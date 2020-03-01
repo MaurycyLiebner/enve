@@ -866,9 +866,8 @@ void loadText(const QDomElement &pathElement,
 }
 
 bool extractTranslation(const QString& str, QMatrix& target) {
-    const QRegExp rx1("translate\\("
-                      REGEX_SINGLE_FLOAT
-                      "\\)", Qt::CaseInsensitive);
+    const QRegExp rx1("translate\\(" REGEX_SINGLE_FLOAT "\\)",
+                      Qt::CaseInsensitive);
     if(rx1.exactMatch(str)) {
         rx1.indexIn(str);
         const QStringList capturedTxt = rx1.capturedTexts();
@@ -876,10 +875,8 @@ bool extractTranslation(const QString& str, QMatrix& target) {
         return true;
     }
 
-    const QRegExp rx2("translate\\("
-                      REGEX_FIRST_FLOAT
-                      REGEX_LAST_FLOAT
-                      "\\)", Qt::CaseInsensitive);
+    const QRegExp rx2("translate\\(" REGEX_TWO_FLOATS "\\)",
+                      Qt::CaseInsensitive);
     if(rx2.exactMatch(str)) {
         rx2.indexIn(str);
         const QStringList capturedTxt = rx2.capturedTexts();
@@ -893,9 +890,8 @@ bool extractTranslation(const QString& str, QMatrix& target) {
 
 
 bool extractScale(const QString& str, QMatrix& target) {
-    const QRegExp rx1("scale\\("
-                      REGEX_SINGLE_FLOAT
-                      "\\)", Qt::CaseInsensitive);
+    const QRegExp rx1("scale\\(" REGEX_SINGLE_FLOAT "\\)",
+                      Qt::CaseInsensitive);
     if(rx1.exactMatch(str)) {
         rx1.indexIn(str);
         const QStringList capturedTxt = rx1.capturedTexts();
@@ -904,10 +900,8 @@ bool extractScale(const QString& str, QMatrix& target) {
         return true;
     }
 
-    const QRegExp rx2("scale\\("
-                      REGEX_FIRST_FLOAT
-                      REGEX_LAST_FLOAT
-                      "\\)", Qt::CaseInsensitive);
+    const QRegExp rx2("scale\\(" REGEX_TWO_FLOATS "\\)",
+                      Qt::CaseInsensitive);
     if(rx2.exactMatch(str)) {
         rx2.indexIn(str);
         const QStringList capturedTxt = rx2.capturedTexts();
@@ -920,9 +914,8 @@ bool extractScale(const QString& str, QMatrix& target) {
 }
 
 bool extractRotate(const QString& str, QMatrix& target) {
-    const QRegExp rx5("rotate\\("
-                      REGEX_SINGLE_FLOAT
-                      "\\)", Qt::CaseInsensitive);
+    const QRegExp rx5("rotate\\(" REGEX_SINGLE_FLOAT "\\)",
+                      Qt::CaseInsensitive);
     if(rx5.exactMatch(str)) {
         rx5.indexIn(str);
         const QStringList capturedTxt = rx5.capturedTexts();
@@ -934,12 +927,12 @@ bool extractRotate(const QString& str, QMatrix& target) {
 
 bool extractWholeMatrix(const QString& str, QMatrix& target) {
     const QRegExp rx("matrix\\("
-                     REGEX_FIRST_FLOAT
-                     REGEX_INNER_FLOAT
-                     REGEX_INNER_FLOAT
-                     REGEX_INNER_FLOAT
-                     REGEX_INNER_FLOAT
-                     REGEX_LAST_FLOAT
+                         REGEX_FIRST_FLOAT
+                         REGEX_INNER_FLOAT
+                         REGEX_INNER_FLOAT
+                         REGEX_INNER_FLOAT
+                         REGEX_INNER_FLOAT
+                         REGEX_LAST_FLOAT
                      "\\)", Qt::CaseInsensitive);
     if(rx.exactMatch(str)) {
         rx.indexIn(str);

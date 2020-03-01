@@ -14,33 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SHADERVALUEHANDLER_H
-#define SHADERVALUEHANDLER_H
-#include <QJSEngine>
+#ifndef COLORANIMATORBINDING_H
+#define COLORANIMATORBINDING_H
 
-#include "glhelpers.h"
-#include "smartPointers/ememory.h"
+#include "propertybinding.h"
 
-typedef std::function<void(QGL33 * const, QJSEngine&)> UniformSpecifier;
+class ColorAnimator;
 
-enum class GLValueType {
-    Float, Vec2, Vec3, Vec4,
-    Int, iVec2, iVec3, iVec4
-};
-
-class ShaderValueHandler : public StdSelfRef {
+class ColorAnimatorBinding : public PropertyBinding {
 public:
-    ShaderValueHandler(const QString& name,
-                       const GLValueType type,
-                       const QString& script);
+    ColorAnimatorBinding(const Validator& validator,
+                         const Property* const context);
 
-    UniformSpecifier create(const GLint loc) const;
-    void evaluate(QJSEngine& engine) const;
+    QJSValue getJSValue(QJSEngine& e);
+    QJSValue getJSValue(QJSEngine& e, const qreal relFrame);
 
-    const QString fName;
+    void updateValue();
+
+    QColor getValue();
+    QColor getValue(const qreal relFrame);
 private:
-    const GLValueType mType;
-    const QString mScript;
+    QColor mCurrentValue;
 };
 
-#endif // SHADERVALUEHANDLER_H
+#endif // COLORANIMATORBINDING_H

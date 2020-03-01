@@ -51,6 +51,7 @@ bool PropertyBinding::setAbsFrame(const qreal absFrame) {
         const auto oldRange = mBindProperty->prp_getIdenticalAbsRange(oldRelFrame);
         if(oldRange.inRange(absFrame)) return false;
         mValueUpToDate = false;
+        emit currentValueChanged();
         return true;
     }
     return false;
@@ -121,11 +122,13 @@ bool PropertyBinding::bindProperty(const QString& path, Property * const newBind
                         this, [this](const FrameRange& absRange) {
             const auto relRange = mContext->prp_absRangeToRelRange(absRange);
             emit relRangeChanged(relRange);
+            if(relRange.inRange(mRelFrame)) emit currentValueChanged();
         });
         conn << connect(newBinding, &Property::prp_pathChanged,
                         this, [this]() { pathChanged(); });
     }
     emit relRangeChanged(FrameRange::EMINMAX);
+    emit currentValueChanged();
     return true;
 }
 
@@ -133,4 +136,5 @@ void PropertyBinding::setBindPathValid(const bool valid) {
     if(mBindPathValid == valid) return;
     mBindPathValid = valid;
     emit relRangeChanged(FrameRange::EMINMAX);
+    emit currentValueChanged();
 }

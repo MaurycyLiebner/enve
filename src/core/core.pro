@@ -71,6 +71,7 @@ QMAKE_CXXFLAGS += -fopenmp
 LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 
 SOURCES += \
+    Expressions/coloranimatorbinding.cpp \
     Expressions/expression.cpp \
     Expressions/propertybinding.cpp \
     Animators/SculptPath/sculptbrush.cpp \
@@ -364,6 +365,7 @@ SOURCES += \
     zipfilesaver.cpp
 
 HEADERS += \
+    Expressions/coloranimatorbinding.h \
     Expressions/expression.h \
     Expressions/propertybinding.h \
     Animators/SculptPath/sculptbrush.h \

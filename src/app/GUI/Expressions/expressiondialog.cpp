@@ -477,8 +477,8 @@ void ExpressionDialog::updateScriptDefinitions() {
                   const auto& var = vars.at(i);
                   if(var.isEmpty()) continue;
                   mScriptApi->add(var);
-                  mScriptLexer->addDefinition(var);
-                  mDefsLexer->addDefinition(var);
+                  mScriptLexer->addBinding(var);
+                  mDefsLexer->addBinding(var);
               }
               pos += varDefs.matchedLength();
         }

@@ -43,16 +43,14 @@ ShaderEffectProgram ShaderEffectProgram::sCreateProgram(
     }
     program.fPropUniCreators = uniCs;
     for(const auto& value : values) {
-        if(value->fGLValue) {
-            const GLint loc = gl->glGetUniformLocation(program.fId,
-                                                       value->fName.toLatin1());
-            if(loc < 0) {
-                gl->glDeleteProgram(program.fId);
-                RuntimeThrow("'" + value->fName +
-                             "' does not correspond to an active uniform variable.");
-            }
-            program.fValueLocs.append(loc);
-        } else program.fValueLocs.append(-1);
+        const GLint loc = gl->glGetUniformLocation(program.fId,
+                                                   value->fName.toLatin1());
+        if(loc < 0) {
+            gl->glDeleteProgram(program.fId);
+            RuntimeThrow("'" + value->fName +
+                         "' does not correspond to an active uniform variable.");
+        }
+        program.fValueLocs.append(loc);
     }
     program.fValueHandlers = values;
 
