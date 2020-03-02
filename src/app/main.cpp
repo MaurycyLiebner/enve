@@ -32,6 +32,14 @@ extern "C" {
     #include <libavformat/avformat.h>
 }
 
+#include <QJSEngine>
+
+#define TIME_BEGIN const auto t1 = std::chrono::high_resolution_clock::now();
+#define TIME_END(name) const auto t2 = std::chrono::high_resolution_clock::now(); \
+                       const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count(); \
+                       qDebug() << name << duration << "us" << endl;
+
+
 int FONT_HEIGHT;
 int MIN_WIDGET_DIM;
 int BUTTON_DIM;
@@ -185,6 +193,98 @@ int main(int argc, char *argv[]) {
     splash->showMessage("Done");
     app.processEvents();
     w.show();
+
+//    QJSEngine e;
+//    e.evaluate("function test() {"
+//               "var z = 1;"
+//               "this.x = 2;"
+//               "var that = this;"
+//               "this.xFunc = function() {"
+//               "return that.x;"
+//               "};"
+//               "this.zFunc = function() {"
+//               "return z;"
+//               "};"
+//               "}"
+//               "var w = 3;"
+//               "function wFunc() { return w; }");
+//    const auto val0 = e.evaluate("var y = new test()");
+//    QJSValue val1;
+//    {TIME_BEGIN
+//        for(int i = 0; i < 10000; i++) {
+//            val1 = e.evaluate("y.x");
+//            val1.toNumber();
+//        }
+//        qDebug() << val1.toNumber();
+//    TIME_END("eval")}
+
+//    auto xFunc = e.evaluate("y.xFunc");
+//    {TIME_BEGIN
+//        for(int i = 0; i < 10000; i++) {
+//            val1 = xFunc.call();
+//            val1.toNumber();
+//        }
+//        qDebug() << val1.toNumber();
+//    TIME_END("xFunc")}
+
+//    auto zFunc = e.evaluate("y.zFunc");
+//    {TIME_BEGIN
+//        for(int i = 0; i < 10000; i++) {
+//            val1 = zFunc.call();
+//            val1.toNumber();
+//        }
+//        qDebug() << val1.toNumber();
+//    TIME_END("zFunc")}
+
+//    auto wFunc = e.evaluate("wFunc");
+//    {TIME_BEGIN
+//        for(int i = 0; i < 10000; i++) {
+//            val1 = wFunc.call();
+//            val1.toNumber();
+//        }
+//        qDebug() << val1.toNumber();
+//    TIME_END("wFunc")}
+
+//    QJSEngine e;
+//    const auto defRet = e.evaluate(
+//               "function _eClass() {"
+//                   // Definitions
+//                   "function examplesDefFunc(x) {"
+//                       "return Math.sin(x) + x*Math.PI;"
+//                   "}"
+//                   "var w;" // because w extern
+//                   "var x;"
+//                   "var y;"
+//                   "var z;"
+//                   "this._eSet = function(_x, _y, _z) {"
+//                       "x = _x;"
+//                       "y = _y;"
+//                       "z = _z;"
+//                   "};"
+//                   "var gl_w;" // glValue name
+//                   "var _eMargin = 0;"
+//                   "this._eEvaluate = function() {"
+//                       "extern w = examplesDefFunc(x*y*z);" // extern w
+//                       "gl_w = w*5;" // glValue script
+//                       "_eMargin = 7*w" // margin script
+//                   "};"
+//                   // Getters for all glValues
+//                   "this._eGet_gl_w() = function() {"
+//                       "return gl_w;"
+//                   "};"
+//                   // Getter for margin
+//                   "this._eGet_eMargin() = function() {"
+//                       "return _eMargin;"
+//                   "};"
+//               "}");
+//    qDebug() << defRet.toString();
+//    const auto obj = e.evaluate("var _eObj; _eObj = new _eClass()");
+//    qDebug() << obj.toString();
+//    auto setter = obj.property("_eSet");
+//    qDebug() << setter.toString();
+//    auto evaluator = obj.property("_eEvaluate");
+//    qDebug() << evaluator.toString();
+
 
     const bool keepSplashVisible = true;
     if(keepSplashVisible) {

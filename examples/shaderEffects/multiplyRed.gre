@@ -15,6 +15,7 @@
 <!-- along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <ShaderEffect name="Multiply Red">
-    <Property name="red" type="float" min="0" max="1"
-              ini="0" step="0.1" glValue="true"/>
+    <Properties>
+        <Property name="red" type="float" min="0" max="1" ini="0" step="0.1" glValue="true"/>
+    </Properties>
 </ShaderEffect>

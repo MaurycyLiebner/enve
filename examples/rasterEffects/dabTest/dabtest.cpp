@@ -112,9 +112,7 @@ void DabTestCaller000::sInitialize(QGL33 * const gl) {
 }
 
 void DabTestCaller000::processGpu(QGL33 * const gl,
-                              GpuRenderTools &renderTools,
-                              GpuRenderData &data) {
-    Q_UNUSED(data)
+                                  GpuRenderTools &renderTools) {
     renderTools.switchToOpenGL(gl);
 
     if(!sInitialized) {

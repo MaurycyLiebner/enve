@@ -70,10 +70,4 @@ struct CpuRenderData {
     uint fHeight;
 };
 
-#include <QJSEngine>
-struct GpuRenderData : public CpuRenderData {
-    //! @brief Used for shader based effects
-    QJSEngine fJSEngine;
-};
-
 #endif // GLHELPERS_H

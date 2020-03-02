@@ -16,11 +16,15 @@
 
 #ifndef UNIFORMSPECIFIERCREATOR_H
 #define UNIFORMSPECIFIERCREATOR_H
+
+#include <QJSValueList>
+
 #include "PropertyCreators/qrealanimatorcreator.h"
 #include "PropertyCreators/intanimatorcreator.h"
 #include "PropertyCreators/qpointfanimatorcreator.h"
 #include "glhelpers.h"
-#include <QJSEngine>
+
+class ShaderEffectJS;
 
 enum class ShaderPropertyType {
     floatProperty,
@@ -30,25 +34,24 @@ enum class ShaderPropertyType {
     invalid
 };
 
-typedef std::function<void(QGL33 * const, QJSEngine&)> UniformSpecifier;
+typedef std::function<void(QGL33 * const)> UniformSpecifier;
 typedef QList<UniformSpecifier> UniformSpecifiers;
 struct UniformSpecifierCreator : public StdSelfRef {
     UniformSpecifierCreator(const ShaderPropertyType type,
                             const bool glValue,
                             const bool resolutionScaled) :
-        mType(type), mGLValue(glValue), mResolutionScaled(resolutionScaled) {}
+        mType(type), fGLValue(glValue), mResolutionScaled(resolutionScaled) {}
 
-    UniformSpecifier create(const GLint loc,
-                            Property * const property,
-                            const qreal relFrame,
-                            const qreal resolution) const;
-    void evaluate(QJSEngine& engine,
-                  Property * const property,
-                  const qreal relFrame,
-                  const qreal resolution) const;
-private:
+    void create(ShaderEffectJS &engine,
+                const GLint loc,
+                Property * const property,
+                const qreal relFrame,
+                const qreal resolution,
+                QJSValueList& setterArgs,
+                UniformSpecifiers& uniSpec) const;
+
     const ShaderPropertyType mType;
-    const bool mGLValue;
+    const bool fGLValue;
     const bool mResolutionScaled;
 };
 

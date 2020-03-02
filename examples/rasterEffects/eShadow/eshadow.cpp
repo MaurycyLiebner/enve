@@ -118,10 +118,8 @@ void eShadowCaller::setupPaint(SkPaint &paint) const {
 }
 
 void eShadowCaller::processGpu(QGL33 * const gl,
-                               GpuRenderTools &renderTools,
-                               GpuRenderData &data) {
+                               GpuRenderTools &renderTools) {
     Q_UNUSED(gl)
-    Q_UNUSED(data)
 
     renderTools.switchToSkia();
     const auto canvas = renderTools.requestTargetCanvas();

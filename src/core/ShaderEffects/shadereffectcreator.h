@@ -25,9 +25,9 @@ struct ShaderEffectCreator : public StdSelfRef {
 public:
     ShaderEffectCreator(const QString& grePath, const QString& name,
                         const QList<stdsptr<ShaderPropertyCreator>>& propCs,
-                        const ShaderEffectProgram& program) :
+                        std::unique_ptr<ShaderEffectProgram>&& program) :
         fName(name), fGrePath(grePath),
-        fProperties(propCs), fProgram(program) {}
+        fProperties(propCs), fProgram(std::move(program)) {}
 
     struct Identifier {
         Identifier(const QString& grePath, const QString& name,
@@ -42,7 +42,7 @@ public:
     const QString fName;
     const QString fGrePath;
     const QList<stdsptr<ShaderPropertyCreator>> fProperties;
-    ShaderEffectProgram fProgram;
+    std::unique_ptr<ShaderEffectProgram> fProgram;
 
     bool compatible(const QList<ShaderPropertyType> &props) const;
 

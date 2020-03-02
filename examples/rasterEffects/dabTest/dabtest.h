@@ -62,8 +62,7 @@ public:
         RasterEffectCaller(HardwareSupport::gpuOnly), mDab(dab) {}
 
     void processGpu(QGL33 * const gl,
-                GpuRenderTools& renderTools,
-                GpuRenderData& data);
+                    GpuRenderTools& renderTools);
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData& data) {
         Q_UNUSED(renderTools)

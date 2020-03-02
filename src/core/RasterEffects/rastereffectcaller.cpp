@@ -25,24 +25,11 @@ RasterEffectCaller::RasterEffectCaller(const HardwareSupport hwSupport,
 RasterEffectCaller::RasterEffectCaller(const HardwareSupport hwSupport) :
     RasterEffectCaller(hwSupport, false, QMargins()) {}
 
-void RasterEffectCaller::processGpu(QGL33 * const gl,
-                                    GpuRenderTools &renderTools,
-                                    GpuRenderData &data) {
-    Q_UNUSED(gl)
-    Q_UNUSED(renderTools)
-    Q_UNUSED(data)
-}
-
-void RasterEffectCaller::processCpu(CpuRenderTools &renderTools,
-                                    const CpuRenderData &data) {
-    Q_UNUSED(renderTools)
-    Q_UNUSED(data)
-}
-
 int RasterEffectCaller::cpuThreads(const int available,
                                    const int area) const {
     return qMin(area/(150*150) + 1, available);
 }
+
 #include "skia/skqtconversions.h"
 void RasterEffectCaller::setSrcRect(const SkIRect &srcRect,
                                     const SkIRect &clampRect) {

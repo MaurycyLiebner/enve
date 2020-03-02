@@ -7,8 +7,7 @@ public:
                      const qreal radius);
 
     void processGpu(QGL33 * const gl,
-                    GpuRenderTools& renderTools,
-                    GpuRenderData& data);
+                    GpuRenderTools& renderTools);
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData &data);
 private:
@@ -47,10 +46,8 @@ BlurEffectCaller::BlurEffectCaller(const HardwareSupport hwSupport,
 
 
 void BlurEffectCaller::processGpu(QGL33 * const gl,
-                                  GpuRenderTools &renderTools,
-                                  GpuRenderData &data) {
+                                  GpuRenderTools &renderTools) {
     Q_UNUSED(gl)
-    Q_UNUSED(data)
 
     const float sigma = mRadius*0.3333333f;
     const auto filter = SkBlurImageFilter::Make(sigma, sigma, nullptr);

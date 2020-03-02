@@ -17,6 +17,8 @@
 #include "qdoubleslider.h"
 #include <QPainter>
 #include <QKeyEvent>
+#include <QJSEngine>
+
 #include "pointhelpers.h"
 #include "mainwindow.h"
 #include "GUI/global.h"

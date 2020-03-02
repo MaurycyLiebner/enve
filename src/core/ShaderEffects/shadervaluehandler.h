@@ -21,26 +21,25 @@
 #include "glhelpers.h"
 #include "smartPointers/ememory.h"
 
-typedef std::function<void(QGL33 * const, QJSEngine&)> UniformSpecifier;
+typedef std::function<void(QGL33 * const)> UniformSpecifier;
 
 enum class GLValueType {
     Float, Vec2, Vec3, Vec4,
-    Int, iVec2, iVec3, iVec4
+    Int, iVec2, iVec3, iVec4,
+    none
 };
 
 class ShaderValueHandler : public StdSelfRef {
 public:
-    ShaderValueHandler(const QString& name,
-                       const GLValueType type,
+    ShaderValueHandler(const QString& name, const GLValueType type,
                        const QString& script);
 
-    UniformSpecifier create(const GLint loc) const;
-    void evaluate(QJSEngine& engine) const;
+    UniformSpecifier create(const GLint loc, QJSValue* getter) const;
 
     const QString fName;
+    const QString fScript;
 private:
     const GLValueType mType;
-    const QString mScript;
 };
 
 #endif // SHADERVALUEHANDLER_H

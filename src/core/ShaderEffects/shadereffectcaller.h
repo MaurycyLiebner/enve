@@ -19,29 +19,28 @@
 #include "RasterEffects/rastereffectcaller.h"
 #include "shadereffectprogram.h"
 #include "../gpurendertools.h"
+#include "shadereffectjs.h"
 
 class ShaderEffectCaller : public RasterEffectCaller {
     e_OBJECT
 public:
-    ShaderEffectCaller(const ShaderEffectProgram& program);
+    ShaderEffectCaller(std::unique_ptr<ShaderEffectJS>&& engine,
+                       const ShaderEffectProgram& program);
 
     void processGpu(QGL33 * const gl,
-                    GpuRenderTools& renderTools,
-                    GpuRenderData& data);
+                    GpuRenderTools& renderTools);
 
-    QJSEngine& getJSEngine()
-    { return mEngine; }
+    ShaderEffectJS& getJSEngine()
+    { return *mEngine; }
 
     UniformSpecifiers mUniformSpecifiers;
 protected:
     QMargins getMargin(const SkIRect &srcRect);
 private:
-    void setupProgram(QGL33 * const gl,
-                      QJSEngine& mEngine,
-                      const GpuRenderData &data);
+    void setupProgram(QGL33 * const gl);
 
-    QJSEngine mEngine;
-    const ShaderEffectProgram mProgram;
+    std::unique_ptr<ShaderEffectJS> mEngine;
+    const GLuint mProgram;
 };
 
 

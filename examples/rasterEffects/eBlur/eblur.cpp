@@ -86,10 +86,8 @@ eBlurCaller::eBlurCaller(const HardwareSupport hwSupport, const qreal radius) :
     mRadius(static_cast<float>(radius)) {}
 
 void eBlurCaller::processGpu(QGL33 * const gl,
-                             GpuRenderTools &renderTools,
-                             GpuRenderData &data) {
+                             GpuRenderTools &renderTools) {
     Q_UNUSED(gl)
-    Q_UNUSED(data)
 
     const float sigma = mRadius*0.3333333f;
     const auto filter = SkBlurImageFilter::Make(sigma, sigma, nullptr);

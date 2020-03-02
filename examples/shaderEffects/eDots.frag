@@ -17,21 +17,22 @@
 #version 330 core
 layout(location = 0) out vec4 fragColor;
 
-uniform float dotDistance;
-uniform float dotRadius;
-uniform float opacity;
-
 in vec2 texCoord;
 layout(pixel_center_integer) in vec4 gl_FragCoord;
 
 uniform sampler2D texture;
-uniform vec2 eGlobalPos;
+
+uniform float dotDistance;
+uniform float dotRadius;
+uniform float opacity;
+
+uniform vec2 scenePos;
 
 void main(void) {
     bool inDot;
     float mixAlpha;
 
-    vec2 transformedCoord = eGlobalPos + gl_FragCoord.xy;
+    vec2 transformedCoord = scenePos + gl_FragCoord.xy;
 
     vec2 dotID = floor(transformedCoord/(2.f*(dotRadius + dotDistance)));
     vec2 posInDot = transformedCoord - dotID*2.f*(dotDistance + dotRadius);

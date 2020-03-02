@@ -1,4 +1,4 @@
-// enve - 2D animations software
+﻿// enve - 2D animations software
 // Copyright (C) 2016-2020 Maurycy Liebner
 
 // This program is free software: you can redistribute it and/or modify
@@ -49,24 +49,24 @@ bool ShaderEffectCreator::compatible(const QList<ShaderPropertyType> &props) con
 }
 
 void ShaderEffectCreator::reloadProgram(QGL33 * const gl, const QString &fragPath) {
-    if(!QFile(fragPath).exists()) return;
-    ShaderEffectProgram program;
+    if(!QFile(fragPath).exists())
+        RuntimeThrow("Failed to open '" + fragPath + "'");
+    const auto oldProgram = fProgram->fId;
     try {
-        program = ShaderEffectProgram::sCreateProgram(
-                    gl, fragPath,
-                    fProgram.fMarginScript, fProperties,
-                    fProgram.fPropUniCreators,
-                    fProgram.fValueHandlers);
+        fProgram = ShaderEffectProgram::sCreateProgram(
+                    gl, fragPath, fProperties,
+                    fProgram->fJSBlueprint,
+                    fProgram->fPropUniCreators,
+                    fProgram->fValueHandlers);
     } catch(...) {
         RuntimeThrow("Failed to load a new version of '" + fragPath + "'");
     }
-    gl->glDeleteProgram(fProgram.fId);
-    fProgram = program;
+    gl->glDeleteProgram(oldProgram);
 }
 
 qsptr<ShaderEffect> ShaderEffectCreator::create() const {
     auto shaderEffect = enve::make_shared<ShaderEffect>(
-                fName, this, &fProgram, fProperties);
+                fName, this, &*fProgram, fProperties);
     return shaderEffect;
 }
 
@@ -198,7 +198,7 @@ void parseFloatPropertyCreators(const QString& name,
     const qreal minVal = attrToDouble(elem, name, "min", "0");
     const qreal maxVal = attrToDouble(elem, name, "max", "100");
     const qreal iniVal = attrToDouble(elem, name, "ini", "0");
-    const qreal stepVal = attrToDouble(elem, name, "step", "1");
+    const qreal stepVal = qMax(0.1, attrToDouble(elem, name, "step", "1"));
     const bool glValue = attrToBool(elem, name, "glValue", "false");
     const bool resolutionScaled = attrToBool(elem, name, "resolutionScaled", "false");
 
@@ -299,6 +299,112 @@ QString getScript(const QString& name, const QDomElement& ele) {
     return value.isEmpty() ? text : value;
 }
 
+void getGlValues(const QDomElement& glValuesNode,
+                 QList<stdsptr<ShaderValueHandler>>& glValues) {
+    const QDomNodeList valueNodes = glValuesNode.elementsByTagName("glValue");
+    for(int i = 0; i < valueNodes.count(); i++) {
+        const QDomNode& valNode = valueNodes.at(i);
+        if(!valNode.isElement()) {
+            RuntimeThrow("glValue node " + QString::number(i) +
+                         " is not an Element.");
+        }
+        const QDomElement valEle = valNode.toElement();
+        try {
+            const QString name = valEle.attribute("name");
+            if(name.isEmpty()) RuntimeThrow("glValue name not defined.");
+            const auto typeStr = valEle.attribute("type");
+            if(typeStr.isEmpty()) RuntimeThrow("glValue '" + name + "' type not defined.");
+            GLValueType type{GLValueType::Float};
+            if(typeStr == "float") type = GLValueType::Float;
+            else if(typeStr == "vec2") type = GLValueType::Vec2;
+            else if(typeStr == "vec3") type = GLValueType::Vec3;
+            else if(typeStr == "vec4") type = GLValueType::Vec4;
+            else if(typeStr == "int") type = GLValueType::Int;
+            else if(typeStr == "ivec2") type = GLValueType::iVec2;
+            else if(typeStr == "ivec3") type = GLValueType::iVec3;
+            else if(typeStr == "ivec4") type = GLValueType::iVec4;
+
+            const QString script = getScript(name, valEle);
+            glValues << enve::make_shared<ShaderValueHandler>(name, type, script);
+        } catch(...) {
+            RuntimeThrow("Value " + QString::number(i) + " is invalid.");
+        }
+    }
+}
+
+void getProperties(const QDomElement& propertiesNode,
+                   QList<stdsptr<ShaderPropertyCreator>>& propCs,
+                   UniformSpecifierCreators& uniCs) {
+    const auto propertyNodes = propertiesNode.elementsByTagName("Property");
+    for(int i = 0; i < propertyNodes.count(); i++) {
+        const QDomNode& animNode = propertyNodes.at(i);
+        if(!animNode.isElement()) {
+            RuntimeThrow("Property node " + QString::number(i) +
+                         " is not an Element.");
+        }
+        QDomElement animEle = animNode.toElement();
+        try {
+            stdsptr<ShaderPropertyCreator> propC;
+            stdsptr<UniformSpecifierCreator> uniC;
+            readPropertyCreators(animEle, propC, uniC);
+            propCs << propC;
+            uniCs << uniC;
+        } catch(...) {
+            RuntimeThrow("Property " + QString::number(i) + " is invalid.");
+        }
+    }
+}
+
+bool extractOptionalFirstOnlyElement(const QDomElement& from,
+                                     const QString& tagName,
+                                     QDomElement& ele) {
+    QList<stdsptr<ShaderValueHandler>> glValues;
+    const auto glValuesNodes = from.elementsByTagName(tagName);
+    if(glValuesNodes.count() == 1) {
+        const QDomNode& node = glValuesNodes.at(0);
+        if(!node.isElement()) RuntimeThrow(tagName + " node is not an Element.");
+        ele = node.toElement();
+        return true;
+    } else if(glValuesNodes.count() > 1)
+        RuntimeThrow("Multiple '" + tagName + "' definitions");
+    return false;
+}
+
+stdsptr<ShaderEffectJS::Blueprint> getJSBlueprint(
+        const QDomElement& root,
+        const QList<stdsptr<ShaderPropertyCreator>>& propCs,
+        const QList<stdsptr<ShaderValueHandler>>& glValues) {
+    QDomElement marEle;
+    const bool mar = extractOptionalFirstOnlyElement(root, "Margin", marEle);
+    const QString marginScript = mar ? getScript("Margin", marEle) : "";
+
+    QDomElement scriptEle;
+    const bool script = extractOptionalFirstOnlyElement(root, "Script", scriptEle);
+    QString defsStr;
+    QString calcStr;
+    if(script) {
+        QDomElement defsEle;
+        const bool defs = extractOptionalFirstOnlyElement(
+                              scriptEle, "Definitions", defsEle);
+        if(defs) defsStr = defsEle.text();
+
+        QDomElement calcEle;
+        const bool calc = extractOptionalFirstOnlyElement(
+                              scriptEle, "Calculate", calcEle);
+        if(calc) calcStr = calcEle.text();
+    }
+    QStringList props;
+    for(const auto& prop : propCs) props << prop->fName;
+
+    QList<ShaderEffectJS::GlValueBlueprint> glValueBPs;
+    for(const auto& glVal : glValues) {
+        glValueBPs.append({glVal->fName, glVal->fScript});
+    }
+
+    return ShaderEffectJS::Blueprint::sCreate(defsStr, calcStr, props,
+                                              glValueBPs, marginScript);
+}
+
 stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
         QGL33 * const gl, const QString &grePath) {
     QFile greFile(grePath);
@@ -326,75 +432,27 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
 
     QList<stdsptr<ShaderPropertyCreator>> propCs;
     UniformSpecifierCreators uniCs;
-    const QDomNodeList propertyNodes = root.elementsByTagName("Property");
-    for(int i = 0; i < propertyNodes.count(); i++) {
-        const QDomNode& animNode = propertyNodes.at(i);
-        if(!animNode.isElement()) {
-            RuntimeThrow("Property node " + QString::number(i) +
-                         " is not an Element.");
-        }
-        QDomElement animEle = animNode.toElement();
-        try {
-            stdsptr<ShaderPropertyCreator> propC;
-            stdsptr<UniformSpecifierCreator> uniC;
-            readPropertyCreators(animEle, propC, uniC);
-            propCs << propC;
-            uniCs << uniC;
-        } catch(...) {
-            RuntimeThrow("Property " + QString::number(i) + " is invalid.");
-        }
-    }
+    QDomElement propsNode;
+    const bool props = extractOptionalFirstOnlyElement(root, "Properties", propsNode);
+    if(props) getProperties(propsNode, propCs, uniCs);
 
-    QList<stdsptr<ShaderValueHandler>> values;
-    const QDomNodeList valueNodes = root.elementsByTagName("glValue");
-    for(int i = 0; i < valueNodes.count(); i++) {
-        const QDomNode& valNode = valueNodes.at(i);
-        if(!valNode.isElement()) {
-            RuntimeThrow("glValue node " + QString::number(i) +
-                         " is not an Element.");
-        }
-        const QDomElement valEle = valNode.toElement();
-        try {
-            const QString name = valEle.attribute("name");
-            if(name.isEmpty()) RuntimeThrow("glValue name not defined.");
-            const auto typeStr = valEle.attribute("type");
-            if(typeStr.isEmpty()) RuntimeThrow("glValue '" + name + "' type not defined.");
-            GLValueType type{GLValueType::Float};
-            if(typeStr == "float") type = GLValueType::Float;
-            else if(typeStr == "vec2") type = GLValueType::Vec2;
-            else if(typeStr == "vec3") type = GLValueType::Vec3;
-            else if(typeStr == "vec4") type = GLValueType::Vec4;
-            else if(typeStr == "int") type = GLValueType::Int;
-            else if(typeStr == "ivec2") type = GLValueType::iVec2;
-            else if(typeStr == "ivec3") type = GLValueType::iVec3;
-            else if(typeStr == "ivec4") type = GLValueType::iVec4;
+    QList<stdsptr<ShaderValueHandler>> glValues;
+    QDomElement glValuesNode;
+    const bool glVals = extractOptionalFirstOnlyElement(root, "glValues", glValuesNode);
+    if(glVals) getGlValues(glValuesNode, glValues);
 
-            const QString script = getScript(name, valEle);
-            values << enve::make_shared<ShaderValueHandler>(name, type, script);
-        } catch(...) {
-            RuntimeThrow("Value " + QString::number(i) + " is invalid.");
-        }
-    }
-    const QDomNodeList marginNode = root.elementsByTagName("Margin");
-    QString marginScript;
-    if(marginNode.count() == 1) {
-        const QDomNode& marNode = marginNode.at(0);
-        if(!marNode.isElement()) RuntimeThrow("Margin node is not an Element.");
-        const QDomElement marEle = marNode.toElement();
-        marginScript = getScript("Margin", marEle);
-    } else if(marginNode.count() > 1) RuntimeThrow("Multiple 'Margin' definitions");
+    const auto blueprint = getJSBlueprint(root, propCs, glValues);
 
-
-    ShaderEffectProgram program;
+    std::unique_ptr<ShaderEffectProgram> program;
     try {
         program = ShaderEffectProgram::sCreateProgram(
-                    gl, fragPath, marginScript, propCs, uniCs, values);
+                    gl, fragPath, propCs, blueprint, uniCs, glValues);
     } catch(...) {
         RuntimeThrow("Could not create a program for ShaderEffect '" +
                      effectName + "'");
     }
     const auto shaderEffectCreator = enve::make_shared<ShaderEffectCreator>(
-                grePath, effectName, propCs, program);
+                grePath, effectName, propCs, std::move(program));
     sEffectCreators << shaderEffectCreator;
 
     return shaderEffectCreator;

@@ -38,24 +38,41 @@ stdsptr<RasterEffectCaller> ShaderEffect::getEffectCaller(
         const qreal relFrame, const qreal resolution,
         const qreal influence) const {
     Q_UNUSED(influence)
-    const auto effect = enve::make_shared<ShaderEffectCaller>(*mProgram);
-    QJSEngine& engine = effect->getJSEngine();
+    std::unique_ptr<ShaderEffectJS> engineUPtr;
+    takeJSEngine(engineUPtr);
+    ShaderEffectJS& engine = *engineUPtr;
+    const auto effect = enve::make_shared<ShaderEffectCaller>(
+                            std::move(engineUPtr), *mProgram);
 
-    UniformSpecifiers& uniformSpecifiers = effect->mUniformSpecifiers;
+    QJSValueList setterArgs;
+    UniformSpecifiers& uniSpecs = effect->mUniformSpecifiers;
     const int argsCount = mProgram->fPropUniLocs.count();
     for(int i = 0; i < argsCount; i++) {
         const GLint loc = mProgram->fPropUniLocs.at(i);
         const auto prop = ca_getChildAt(i);
         const auto& uniformC = mProgram->fPropUniCreators.at(i);
-        uniformC->evaluate(engine, prop, relFrame, resolution);
-        uniformSpecifiers << uniformC->create(loc, prop, relFrame, resolution);
+        uniformC->create(engine, loc, prop, relFrame,
+                         resolution, setterArgs, uniSpecs);
     }
+    engine.setValues(setterArgs);
     const int valsCount = mProgram->fValueHandlers.count();
     for(int i = 0; i < valsCount; i++) {
         const GLint loc = mProgram->fValueLocs.at(i);
         const auto& value = mProgram->fValueHandlers.at(i);
-        value->evaluate(engine);
-        uniformSpecifiers << value->create(loc);
+        uniSpecs << value->create(loc, &engine.getGlValueGetter(i));
     }
     return effect;
+}
+
+void ShaderEffect::giveBackJSEngine(std::unique_ptr<ShaderEffectJS>&& engineUPtr) {
+    mProgram->fEngines.push_back(std::move(engineUPtr));
+}
+
+void ShaderEffect::takeJSEngine(std::unique_ptr<ShaderEffectJS>& engineUPtr) const {
+    if(mProgram->fEngines.empty()) {
+        engineUPtr = std::make_unique<ShaderEffectJS>(*mProgram->fJSBlueprint);
+    } else {
+        engineUPtr = std::move(mProgram->fEngines.back());
+        mProgram->fEngines.pop_back();
+    }
 }

@@ -15,13 +15,25 @@
 <!-- along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <ShaderEffect name="Explode">
-    <Property name="displacement" type="vec2" min="0" max="999" step="1" ini="10" resolutionScaled="true"/>
-    <Property name="steps"        type="int"  min="1" max="99"  step="1" ini="1"  glValue="true"/>
-    <Property name="directions"   type="int"  min="1" max="99"  step="1" ini="6"  glValue="true"/>
+    <Properties>
+        <Property name="displacement" type="vec2" min="0" max="999" step="1" ini="10" resolutionScaled="true"/>
+        <Property name="steps"        type="int"  min="1" max="99"  step="1" ini="1"  glValue="true"/>
+        <Property name="directions"   type="int"  min="1" max="99"  step="1" ini="6"  glValue="true"/>
+    </Properties>
 
-    <Value name="displacementXY"  type="vec2" glValue="true">
-        [displacement[0]/eTexSize[0], displacement[1]/eTexSize[1]]
-    </Value>
+    <Script>
+        <Calculate>
+            var hDispl = displacement[0];
+            var vDispl = displacement[1];
+            var widthWithMargin = 2*hDispl + _eRect[2];
+            var heightWithMargin = 2*vDispl + _eRect[3];
+            extern displScaled = [hDispl/widthWithMargin, vDispl/heightWithMargin];
+        </Calculate>
+    </Script>
+
+    <glValues>
+        <glValue name="displacementXY"  type="vec2" value="displScaled"/>
+    </glValues>
 
     <Margin value="displacement"/>
 </ShaderEffect>

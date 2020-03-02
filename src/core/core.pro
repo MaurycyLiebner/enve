@@ -245,6 +245,7 @@ SOURCES += \
     ShaderEffects/shadereffect.cpp \
     ShaderEffects/shadereffectcaller.cpp \
     ShaderEffects/shadereffectcreator.cpp \
+    ShaderEffects/shadereffectjs.cpp \
     ShaderEffects/shadereffectprogram.cpp \
     ShaderEffects/shadervaluehandler.cpp \
     ShaderEffects/uniformspecifiercreator.cpp \
@@ -555,6 +556,7 @@ HEADERS += \
     ShaderEffects/shadereffect.h \
     ShaderEffects/shadereffectcaller.h \
     ShaderEffects/shadereffectcreator.h \
+    ShaderEffects/shadereffectjs.h \
     ShaderEffects/shadereffectprogram.h \
     ShaderEffects/shadervaluehandler.h \
     ShaderEffects/uniformspecifiercreator.h \

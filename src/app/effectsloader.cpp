@@ -54,7 +54,7 @@ EffectsLoader::~EffectsLoader() {
     glDeleteProgram(DOUBLE_BORDER_PROGRAM.fID);
 
     for(const auto& shaderEffect : ShaderEffectCreator::sEffectCreators)
-        glDeleteProgram(shaderEffect->fProgram.fId);
+        glDeleteProgram(shaderEffect->fProgram->fId);
 
     doneCurrent();
 }
@@ -220,7 +220,7 @@ void EffectsLoader::reloadProgram(ShaderEffectCreator* const loaded,
     try {
         makeCurrent();
         loaded->reloadProgram(this, fragPath);
-        emit programChanged(&loaded->fProgram);
+        emit programChanged(&*loaded->fProgram);
         doneCurrent();
     } catch(const std::exception& e) {
         doneCurrent();

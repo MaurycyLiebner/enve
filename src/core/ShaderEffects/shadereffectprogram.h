@@ -18,23 +18,24 @@
 #define SHADEREFFECTPROGRAM_H
 #include "uniformspecifiercreator.h"
 #include "shadervaluehandler.h"
+#include "shadereffectjs.h"
 
 typedef QList<stdsptr<UniformSpecifierCreator>> UniformSpecifierCreators;
 struct ShaderEffectProgram {
     GLuint fId = 0;
     GLuint fFragShader;
-    GLint fGPosLoc;
     GLint fTexLocation;
     QList<GLint> fPropUniLocs;
     UniformSpecifierCreators fPropUniCreators;
     QList<stdsptr<ShaderValueHandler>> fValueHandlers;
     QList<GLint> fValueLocs;
-    QString fMarginScript;
+    std::shared_ptr<ShaderEffectJS::Blueprint> fJSBlueprint;
+    mutable std::vector<std::unique_ptr<ShaderEffectJS>> fEngines;
 
-    static ShaderEffectProgram sCreateProgram(
+    static std::unique_ptr<ShaderEffectProgram> sCreateProgram(
             QGL33 * const gl, const QString &fragPath,
-            const QString& marginScript,
             const QList<stdsptr<ShaderPropertyCreator>>& propCs,
+            const std::shared_ptr<ShaderEffectJS::Blueprint>& jsBlueprint,
             const UniformSpecifierCreators& uniCs,
             const QList<stdsptr<ShaderValueHandler>>& values);
 };

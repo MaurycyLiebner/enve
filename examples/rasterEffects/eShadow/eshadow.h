@@ -38,8 +38,7 @@ public:
         mOpacity(static_cast<float>(opacity)) {}
 
     void processGpu(QGL33 * const gl,
-                    GpuRenderTools& renderTools,
-                    GpuRenderData& data);
+                    GpuRenderTools& renderTools);
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData &data);
 private:

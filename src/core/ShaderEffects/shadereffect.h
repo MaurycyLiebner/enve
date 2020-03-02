@@ -37,7 +37,11 @@ public:
         if(program == mProgram)
             prp_afterWholeInfluenceRangeChanged();
     }
+
+    void giveBackJSEngine(std::unique_ptr<ShaderEffectJS>&& engineUPtr);
 private:
+    void takeJSEngine(std::unique_ptr<ShaderEffectJS>& engineUPtr) const;
+
     const ShaderEffectProgram * const mProgram;
     const ShaderEffectCreator * const mCreator;
 };

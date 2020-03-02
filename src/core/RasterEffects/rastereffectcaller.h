@@ -35,11 +35,16 @@ public:
     }
 
     virtual void processGpu(QGL33 * const gl,
-                            GpuRenderTools& renderTools,
-                            GpuRenderData& data);
+                            GpuRenderTools& renderTools) {
+        Q_UNUSED(gl)
+        Q_UNUSED(renderTools)
+    }
 
     virtual void processCpu(CpuRenderTools& renderTools,
-                            const CpuRenderData& data);
+                            const CpuRenderData& data){
+        Q_UNUSED(renderTools)
+        Q_UNUSED(data)
+    }
 
     virtual int cpuThreads(const int available, const int area) const;
 

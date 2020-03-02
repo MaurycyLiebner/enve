@@ -16,8 +16,7 @@ public:
         mOpacity(static_cast<float>(opacity)) {}
 
     void processGpu(QGL33 * const gl,
-                    GpuRenderTools& renderTools,
-                    GpuRenderData& data);
+                    GpuRenderTools& renderTools);
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData &data);
 private:
@@ -92,10 +91,8 @@ void ShadowEffectCaller::setupPaint(SkPaint &paint) const {
 }
 
 void ShadowEffectCaller::processGpu(QGL33 * const gl,
-                                    GpuRenderTools &renderTools,
-                                    GpuRenderData &data) {
+                                    GpuRenderTools &renderTools) {
     Q_UNUSED(gl)
-    Q_UNUSED(data)
 
     renderTools.switchToSkia();
     const auto canvas = renderTools.requestTargetCanvas();

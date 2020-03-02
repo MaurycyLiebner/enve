@@ -28,26 +28,14 @@ void EffectsRenderer::processGpu(QGL33 * const gl,
     auto& srcImage = boxData->fRenderedImage;
     const int srcWidth = srcImage->width();
     const int srcHeight = srcImage->height();
-    const QPoint gPos = boxData->fGlobalRect.topLeft();
 
     glViewport(0, 0, srcWidth, srcHeight);
-
-    GpuRenderData renderData;
-    renderData.fPosX = static_cast<int>(gPos.x());
-    renderData.fPosY = static_cast<int>(gPos.y());
-    renderData.fWidth = static_cast<uint>(srcWidth);
-    renderData.fHeight = static_cast<uint>(srcHeight);
-    auto& engine = renderData.fJSEngine;
-    engine.evaluate("eTexSize = [" + QString::number(srcWidth) + "," +
-                                     QString::number(srcHeight) + "]");
-    engine.evaluate("eGlobalPos = [" + QString::number(gPos.x()) + "," +
-                                       QString::number(gPos.y()) + "]");
 
     GpuRenderTools renderTools(gl, context, srcImage);
     while(!mEffects.isEmpty()) {
         const auto& effect = mEffects.first();
         if(effect->hardwareSupport() == HardwareSupport::cpuOnly) break;
-        effect->processGpu(gl, renderTools, renderData);
+        effect->processGpu(gl, renderTools);
         mEffects.removeFirst();
     }
 
