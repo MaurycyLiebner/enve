@@ -518,8 +518,8 @@ void ExpressionDialog::updateScriptDefinitions() {
                   const auto& var = vars.at(i);
                   if(var.isEmpty()) continue;
                   mScriptApi->add(var);
-                  mScriptLexer->addBinding(var);
-                  mDefsLexer->addBinding(var);
+                  mScriptLexer->addDefinition(var);
+                  mDefsLexer->addDefinition(var);
               }
               pos += varDefs.matchedLength();
         }
@@ -551,7 +551,7 @@ void ExpressionDialog::updateScriptBindings() {
         for(const auto& binding : bindings) {
             bindingList << binding.first;
             mScriptApi->add(binding.first);
-            mScriptLexer->addDefinition(binding.first);
+            mScriptLexer->addBinding(binding.first);
         }
     }
     mScriptLabel->setText("Calculate ( " BFC_0 +
