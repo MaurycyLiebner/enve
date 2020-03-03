@@ -32,6 +32,10 @@ matrix:
         - PATH="${QT_BIN}:${PATH}"
         - QT_LIB=${QT_INSTALL_DIR}/${QT_VERSION}/gcc_64/lib
         - LD_LIBRARY_PATH="${QT_LIB}:${LD_LIBRARY_PATH}"
+        - TRAVIS_CACHE_DIR=$TRAVIS_BUILD_DIR/cache
+cache:
+    directories:
+        - $TRAVIS_CACHE_DIR
 before_install:
     - eval "${MATRIX_EVAL}"
     - wget https://raw.githubusercontent.com/qbs/qbs/master/scripts/install-qt.sh
@@ -42,15 +46,22 @@ install:
     - cd third_party
     - # build skia
     - tar xf skia.tar.xz
-    - cd skia
-    - python tools/git-sync-deps
-    - # sudo tools/install_dependencies.sh
-    - wget https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip
-    - unzip ninja-linux.zip
-    - chmod +x ninja
-    - bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] target_os="linux" target_cpu="x64" skia_use_system_expat=false skia_use_system_freetype2=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false skia_use_system_harfbuzz=false cc="gcc-7" cxx="g++-7"'
-    - ./ninja -C out/Release -j 2
-    - cd ..
+    - if ! [ -d $TRAVIS_CACHE_DIR/third_party/skia/out/Release ]; then
+          cd skia
+          python tools/git-sync-deps
+          # sudo tools/install_dependencies.sh
+          wget https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip
+          unzip ninja-linux.zip
+          chmod +x ninja
+          bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] target_os="linux" target_cpu="x64" skia_use_system_expat=false skia_use_system_freetype2=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false skia_use_system_harfbuzz=false cc="gcc-7" cxx="g++-7"'
+          ./ninja -C out/Release -j 2
+          mkdir -p $TRAVIS_CACHE_DIR/third_party/skia/out/Release
+          cp -r ./out/Release $TRAVIS_CACHE_DIR/third_party/skia/out/Release
+          cd ..
+      else
+          mkdir -p ./skia/out/Release
+          cp -r $TRAVIS_CACHE_DIR/third_party/skia/out/Release ./skia/out/Release
+      fi
     - # build libmypaint
     - tar xf libmypaint.tar.xz
     - cd libmypaint-1.5.0
@@ -90,7 +101,6 @@ before_script:
     - mv exec-x86_64.so exec.so
     - cd Release
 script:
-    - # source /opt/qt512/bin/qt512-env.sh
     - # embed commit hash and date
     - LATEST_COMMIT_HASH=\"$(git log --pretty=format:'%h' -n 1)\"
     - enveSplash=../../src/app/GUI/envesplash.h
