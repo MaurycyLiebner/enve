@@ -46,7 +46,8 @@ install:
     - cd third_party
     - # build skia
     - tar xf skia.tar.xz
-    - if ! [ -d $TRAVIS_CACHE_DIR/third_party/skia/out/Release ]; then
+    - |
+      if ! [ -d $TRAVIS_CACHE_DIR/third_party/skia/out/Release ]; then
           cd skia
           python tools/git-sync-deps
           # sudo tools/install_dependencies.sh
