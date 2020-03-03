@@ -22,4 +22,6 @@ DISTFILES += \
     eDots.gre \
     eDots.frag \
     eExplode.gre \
-    eExplode.frag
+    eExplode.frag \
+    multiplyRed.gre \
+    multiplyRed.frag
