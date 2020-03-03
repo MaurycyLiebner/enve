@@ -17,7 +17,7 @@ Expression::Expression(const QString& definitionsStr,
     mEEvaluate(std::move(eEvaluate)),
     mBindings(std::move(bindings)),
     mEngine(std::move(engine)) {
-    for(const auto& binding : bindings) {
+    for(const auto& binding : mBindings) {
         connect(binding.second.get(), &PropertyBinding::currentValueChanged,
                 this, &Expression::currentValueChanged);
         connect(binding.second.get(), &PropertyBinding::relRangeChanged,
