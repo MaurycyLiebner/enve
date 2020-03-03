@@ -60,9 +60,13 @@ public:
     }
 
     const char *keywords(int set) const {
-        if(set == 1) return sKeywordClass1;
-        else if(set == 2) return mDefKeywordsClass2.data();
-        else if(set == 5) return mBindKeywords5.data();
+        if(set == 1) {
+            return sKeywordClass1;
+        } else if(set == 2) {
+            return mDefKeywordsClass2.data();
+        } else if(set == 4) {
+            return mBindKeywords5.data();
+        }
         return 0;
     }
 
