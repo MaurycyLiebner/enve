@@ -23,6 +23,7 @@
 
 #include "GUI/global.h"
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
+#include "buttonslist.h"
 
 WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
                              const std::function<void()>& newFunc,
@@ -53,65 +54,22 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
     buttonLay->addWidget(openButton);
 
     if(recentPaths.isEmpty()) return;
-    const auto recentWidget = new QWidget(this);
-    const auto recentLay = new QVBoxLayout;
-    recentLay->setSpacing(0);
-    recentLay->setAlignment(Qt::AlignTop);
-    recentLay->setContentsMargins(0, 0, 0, 0);
-
-    recentWidget->setLayout(recentLay);
 
     const auto homePath = QDir::homePath();
-    int i = 0;
-    const int buttSize = size - 3*MIN_WIDGET_DIM;
-    for(const auto& path : recentPaths) {
-        QString cutPath = path;
-        if(true) cutPath = cutPath.split("/").last();
-        const auto fm = newButton->fontMetrics();
-        int wholeWidth = fm.width(cutPath);
-        const int dotsW = fm.width("...");
-        bool addDots = false;
-        while(wholeWidth > buttSize) {
-            addDots = true;
-            const int spaceForLetters = int(buttSize - dotsW);
-            const int guessLen = spaceForLetters*cutPath.count()/wholeWidth;
-            cutPath = cutPath.right(guessLen);
-            wholeWidth = fm.width("..." + cutPath);
-        }
-        if(addDots) cutPath = "..." + cutPath;
 
-        const auto pathButton = new QPushButton(cutPath, this);
-        pathButton->setMinimumHeight(5*MIN_WIDGET_DIM/4);
+    const auto textTriggerGetter = [&](const int id) {
+        const auto& path = recentPaths.at(id);
         QString ttPath = path;
         if(ttPath.left(homePath.count()) == homePath) {
             ttPath = "~" + ttPath.mid(homePath.count());
         }
-        pathButton->setToolTip("<p style='white-space:pre'>" + ttPath + "</p>");
-        connect(pathButton, &QPushButton::released, [path, openRecentFunc]() {
+        return ButtonsList::TextTrigger{
+            ttPath, [path, openRecentFunc]() {
             openRecentFunc(path);
-        });
-        recentLay->addWidget(pathButton, 0, Qt::AlignTop);
-        i++;
-        if(i == 1 && i == recentPaths.count()) {
-        } else if(i == 1) {
-            pathButton->setStyleSheet("QPushButton {"
-                "border-bottom-left-radius: 0;"
-                "border-bottom-right-radius: 0;"
-                "border-bottom: 0;"
-            "}");
-        } else if(i == recentPaths.count() || i == 8) {
-            pathButton->setStyleSheet("QPushButton {"
-                "border-top-left-radius: 0;"
-                "border-top-right-radius: 0;"
-            "}");
-            break;
-        } else {
-            pathButton->setStyleSheet("QPushButton {"
-                "border-radius: 0;"
-                "border-bottom: 0;"
-            "}");
-        }
-    }
+        }};
+    };
+    const int count = qMin(recentPaths.count(), 8);
+    const auto recentWidget = new ButtonsList(textTriggerGetter, count, this);
 
     mainLay->addSpacing(MIN_WIDGET_DIM);
 //    const auto recentScroll = new ScrollArea(this);

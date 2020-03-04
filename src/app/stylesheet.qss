@@ -338,6 +338,22 @@ QPushButton#complexTaskCancel:hover {
     color: black;
 }
 
+QPushButton#topButton {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: 0;
+}
+
+QPushButton#vmiddleButton {
+    border-radius: 0;
+    border-bottom: 0;
+}
+
+QPushButton#bottomButton {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
 QComboBox#currentLayoutComboBox {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;

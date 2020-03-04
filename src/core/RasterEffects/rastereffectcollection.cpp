@@ -100,18 +100,19 @@ bool RasterEffectCollection::hasEffects() {
     return ca_hasChildren();
 }
 
+#include "GUI/dialogsinterface.h"
 qsptr<ShaderEffect> readIdCreateShaderEffect(eReadStream& src) {
     const auto id = ShaderEffectCreator::sReadIdentifier(src);
     const auto best = ShaderEffectCreator::sGetBestCompatibleEffects(id);
     if(best.isEmpty()) RuntimeThrow("No compatible ShaderEffect found for " + id.fName);
-    qsptr<ShaderEffect> effect;
+    std::shared_ptr<ShaderEffectCreator> creator;
     if(best.count() == 1) {
-        const auto bestCreator = best.first();
-        effect = bestCreator->create();
-    } else {
-        // exec ask dialog
+        creator = best.first();
+    } else if(!best.isEmpty()) {
+        creator = DialogsInterface::instance().execShaderChooser(id.fName, best);
     }
-    return effect;
+    if(creator) return creator->create();
+    RuntimeThrow("No compatible ShaderEffect found for " + id.fName);
 }
 
 #include "customidentifier.h"

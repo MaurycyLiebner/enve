@@ -174,6 +174,7 @@ SOURCES += \
     GUI/animationboxtopaintobjectdialog.cpp \
     GUI/boxeslistactionbutton.cpp \
     GUI/coloranimatorbutton.cpp \
+    GUI/dialogsinterface.cpp \
     GUI/durationrectsettingsdialog.cpp \
     GUI/edialogs.cpp \
     GUI/ewidgets.cpp \
@@ -474,6 +475,7 @@ HEADERS += \
     GUI/animationboxtopaintobjectdialog.h \
     GUI/boxeslistactionbutton.h \
     GUI/coloranimatorbutton.h \
+    GUI/dialogsinterface.h \
     GUI/durationrectsettingsdialog.h \
     GUI/edialogs.h \
     GUI/ewidgets.h \

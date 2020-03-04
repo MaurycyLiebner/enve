@@ -79,6 +79,7 @@ SOURCES += main.cpp\
     GUI/BrushWidgets/bookmarkedbrushes.cpp \
     GUI/BrushWidgets/brushlabel.cpp \
     GUI/ColorWidgets/bookmarkedcolors.cpp \
+    GUI/Dialogs/dialogsinterfaceimpl.cpp \
     GUI/Expressions/expressiondialog.cpp \
     GUI/Expressions/expressioneditor.cpp \
     GUI/Expressions/expressionhighlighter.cpp \
@@ -93,6 +94,7 @@ SOURCES += main.cpp\
     GUI/audiohandler.cpp \
     GUI/bookmarkedwidget.cpp \
     GUI/buttonbase.cpp \
+    GUI/buttonslist.cpp \
     GUI/canvasbasewrappernode.cpp \
     GUI/canvaswindowevents.cpp \
     GUI/canvaswrappernode.cpp \
@@ -192,6 +194,7 @@ HEADERS  += \
     GUI/BrushWidgets/bookmarkedbrushes.h \
     GUI/BrushWidgets/brushlabel.h \
     GUI/ColorWidgets/bookmarkedcolors.h \
+    GUI/Dialogs/dialogsinterfaceimpl.h \
     GUI/Expressions/expressiondialog.h \
     GUI/Expressions/expressioneditor.h \
     GUI/Expressions/expressionhighlighter.h \
@@ -206,6 +209,7 @@ HEADERS  += \
     GUI/audiohandler.h \
     GUI/bookmarkedwidget.h \
     GUI/buttonbase.h \
+    GUI/buttonslist.h \
     GUI/canvasbasewrappernode.h \
     GUI/canvaswrappernode.h \
     GUI/centralwidget.h \

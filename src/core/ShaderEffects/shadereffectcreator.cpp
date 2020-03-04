@@ -511,6 +511,11 @@ QList<stdsptr<ShaderEffectCreator>>
     const auto pathBased = sWithGrePathAndCompatible(id.fGrePath, id.fTypes);
     if(pathBased) return QList<stdsptr<ShaderEffectCreator>>() << pathBased;
     const auto nameBased = sWithNameAndCompatible(id.fName, id.fTypes);
-    if(!nameBased.isEmpty()) return nameBased;
-    return sWithCompatibleProps(id.fTypes);
+    const auto compBased = sWithCompatibleProps(id.fTypes);
+    auto result = nameBased;
+    for(const auto& comp : compBased) {
+        if(result.contains(comp)) continue;
+        result.append(comp);
+    }
+    return result;
 }
