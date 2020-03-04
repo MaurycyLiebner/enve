@@ -22,6 +22,7 @@ layout(pixel_center_integer) in vec4 gl_FragCoord;
 
 uniform sampler2D texture;
 
+uniform vec2 translate;
 uniform float dotDistance;
 uniform float dotRadius;
 uniform float opacity;
@@ -32,13 +33,12 @@ void main(void) {
     bool inDot;
     float mixAlpha;
 
-    vec2 transformedCoord = scenePos + gl_FragCoord.xy;
+    vec2 transformedCoord = scenePos - translate + gl_FragCoord.xy;
 
-    vec2 dotID = floor(transformedCoord/(2.f*(dotRadius + dotDistance)));
-    vec2 posInDot = transformedCoord - dotID*2.f*(dotDistance + dotRadius);
-    vec2 posRelDotCenter = posInDot - dotRadius;
-    float distToCenter = sqrt(posRelDotCenter.x*posRelDotCenter.x +
-                              posRelDotCenter.y*posRelDotCenter.y);
+    vec2 dotID = floor(transformedCoord/dotDistance + 0.5);
+    vec2 posInDot = transformedCoord - dotID*dotDistance;
+    float distToCenter = sqrt(posInDot.x*posInDot.x +
+                              posInDot.y*posInDot.y);
     float distToEdge = distToCenter - sqrt(dotRadius*dotRadius);
     if(distToEdge > 0.f) {
         inDot = false;
