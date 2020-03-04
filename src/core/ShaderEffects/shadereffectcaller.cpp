@@ -16,10 +16,18 @@
 
 #include "shadereffectcaller.h"
 
+#include "shadereffectprogram.h"
+
 ShaderEffectCaller::ShaderEffectCaller(std::unique_ptr<ShaderEffectJS>&& engine,
                                        const ShaderEffectProgram &program) :
     RasterEffectCaller(HardwareSupport::gpuOnly, false, QMargins()),
-    mEngine(std::move(engine)), mProgram(program.fId) {}
+    mEngine(std::move(engine)), mProgramId(program.fId), mProgram(program) {
+    Q_ASSERT(mEngine.get());
+}
+
+ShaderEffectCaller::~ShaderEffectCaller() {
+    mProgram.fEngines.push_back(std::move(mEngine));
+}
 
 void ShaderEffectCaller::processGpu(QGL33 * const gl,
                                     GpuRenderTools &renderTools) {
@@ -68,6 +76,6 @@ QMargins ShaderEffectCaller::getMargin(const SkIRect &srcRect) {
 }
 
 void ShaderEffectCaller::setupProgram(QGL33 * const gl) {
-    gl->glUseProgram(mProgram);
+    gl->glUseProgram(mProgramId);
     for(const auto& uni : mUniformSpecifiers) uni(gl);
 }

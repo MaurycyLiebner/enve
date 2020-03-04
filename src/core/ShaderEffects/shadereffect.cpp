@@ -64,11 +64,11 @@ stdsptr<RasterEffectCaller> ShaderEffect::getEffectCaller(
     return effect;
 }
 
-void ShaderEffect::giveBackJSEngine(std::unique_ptr<ShaderEffectJS>&& engineUPtr) {
+void ShaderEffect::giveBackJSEngine(stduptr<ShaderEffectJS>&& engineUPtr) {
     mProgram->fEngines.push_back(std::move(engineUPtr));
 }
 
-void ShaderEffect::takeJSEngine(std::unique_ptr<ShaderEffectJS>& engineUPtr) const {
+void ShaderEffect::takeJSEngine(stduptr<ShaderEffectJS>& engineUPtr) const {
     if(mProgram->fEngines.empty()) {
         engineUPtr = std::make_unique<ShaderEffectJS>(*mProgram->fJSBlueprint);
     } else {

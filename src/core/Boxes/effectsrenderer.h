@@ -34,13 +34,14 @@ public:
                     BoxRenderData * const boxData);
     void processCpu(BoxRenderData * const boxData);
 
-    bool isEmpty() const { return mEffects.isEmpty(); }
+    bool isEmpty() const { return mCurrentId >= mEffects.count(); }
 
     void setBaseGlobalRect(SkIRect& currRect,
                            const SkIRect& skMaxBounds) const;
 
     HardwareSupport nextHardwareSupport() const;
 private:
+    int mCurrentId = 0;
     QList<stdsptr<RasterEffectCaller>> mEffects;
 };
 #endif // EFFECTSRENDERER_H

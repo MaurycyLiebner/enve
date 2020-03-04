@@ -23,7 +23,7 @@
 void EffectsRenderer::processGpu(QGL33 * const gl,
                                  SwitchableContext &context,
                                  BoxRenderData * const boxData) {
-    Q_ASSERT(!mEffects.isEmpty());
+    Q_ASSERT(!isEmpty());
 
     auto& srcImage = boxData->fRenderedImage;
     const int srcWidth = srcImage->width();
@@ -32,11 +32,11 @@ void EffectsRenderer::processGpu(QGL33 * const gl,
     glViewport(0, 0, srcWidth, srcHeight);
 
     GpuRenderTools renderTools(gl, context, srcImage);
-    while(!mEffects.isEmpty()) {
-        const auto& effect = mEffects.first();
+    while(mCurrentId < mEffects.count()) {
+        const auto& effect = mEffects.at(mCurrentId);
         if(effect->hardwareSupport() == HardwareSupport::cpuOnly) break;
         effect->processGpu(gl, renderTools);
-        mEffects.removeFirst();
+        mCurrentId++;
     }
 
     boxData->fRenderedImage = renderTools.getSrcTexture().imageSnapshot(gl);
@@ -44,12 +44,11 @@ void EffectsRenderer::processGpu(QGL33 * const gl,
 
 #include "effectsubtaskspawner.h"
 void EffectsRenderer::processCpu(BoxRenderData * const boxData) {
-    Q_ASSERT(!mEffects.isEmpty());
-    const auto& effect = mEffects.first();
+    const auto& effect = mEffects.at(mCurrentId);
 
     Q_ASSERT(effect->hardwareSupport() != HardwareSupport::gpuOnly);
     EffectSubTaskSpawner::sSpawn(effect, boxData->ref<BoxRenderData>());
-    mEffects.removeFirst();
+    mCurrentId++;
 }
 
 void EffectsRenderer::setBaseGlobalRect(SkIRect &currRect,
@@ -65,6 +64,5 @@ void EffectsRenderer::setBaseGlobalRect(SkIRect &currRect,
 }
 
 HardwareSupport EffectsRenderer::nextHardwareSupport() const {
-    Q_ASSERT(!isEmpty());
-    return mEffects.first()->hardwareSupport();
+    return mEffects.at(mCurrentId)->hardwareSupport();
 }

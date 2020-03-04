@@ -26,6 +26,7 @@ class ShaderEffectCaller : public RasterEffectCaller {
 public:
     ShaderEffectCaller(std::unique_ptr<ShaderEffectJS>&& engine,
                        const ShaderEffectProgram& program);
+    ~ShaderEffectCaller();
 
     void processGpu(QGL33 * const gl,
                     GpuRenderTools& renderTools);
@@ -40,7 +41,8 @@ private:
     void setupProgram(QGL33 * const gl);
 
     std::unique_ptr<ShaderEffectJS> mEngine;
-    const GLuint mProgram;
+    const GLuint mProgramId;
+    const ShaderEffectProgram &mProgram;
 };
 
 

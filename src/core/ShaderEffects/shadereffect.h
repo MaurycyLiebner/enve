@@ -20,6 +20,8 @@
 #include "shadereffectcreator.h"
 #include "Tasks/updatable.h"
 
+template <typename T> using stduptr = std::unique_ptr<T>;
+
 class ShaderEffect : public RasterEffect {
     e_OBJECT
     ShaderEffect(const QString &name,
@@ -38,9 +40,9 @@ public:
             prp_afterWholeInfluenceRangeChanged();
     }
 
-    void giveBackJSEngine(std::unique_ptr<ShaderEffectJS>&& engineUPtr);
+    void giveBackJSEngine(stduptr<ShaderEffectJS>&& engineUPtr);
 private:
-    void takeJSEngine(std::unique_ptr<ShaderEffectJS>& engineUPtr) const;
+    void takeJSEngine(stduptr<ShaderEffectJS>& engineUPtr) const;
 
     const ShaderEffectProgram * const mProgram;
     const ShaderEffectCreator * const mCreator;
