@@ -5,15 +5,15 @@
 
 #include "exceptions.h"
 
+class eWriteStream;
+
 class FileFooter {
 public:
-    static bool sWrite(QIODevice * const target);
+    static void sWrite(eWriteStream& dst);
 
     static qint64 sSize(const int evVersion);
 
     static int sReadEvFileVersion(QIODevice * const src);
-
-    static const int sNewestEvRW;
 private:
     static char sEVFormat[15];
     static char sAppName[15];

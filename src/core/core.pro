@@ -548,6 +548,7 @@ HEADERS += \
     ReadWrite/basicreadwrite.h \
     ReadWrite/efuturepos.h \
     ReadWrite/ereadstream.h \
+    ReadWrite/evformat.h \
     ReadWrite/ewritestream.h \
     ReadWrite/filefooter.h \
     ShaderEffects/PropertyCreators/coloranimatorcreator.h \

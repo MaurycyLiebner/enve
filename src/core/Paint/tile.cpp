@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "tile.h"
-
+#include "ReadWrite/evformat.h"
 
 Tile::Tile(const size_t &size) : fSize(size) {}
 
@@ -72,14 +72,21 @@ uint16_t *Tile::data() const { return mData; }
 void Tile::write(eWriteStream &dst) const {
     dst << fSize;
     const bool data = mData; dst << data;
-    if(data) dst.write(mData, fSize*sizeof(uint16_t));
+    if(data) dst.writeCompressed(mData, fSize*sizeof(uint16_t));
 }
 
 stdsptr<Tile> Tile::sRead(eReadStream &src, const TileCreator &tileCreator) {
     size_t size; src >> size;
     bool data; src >> data;
     const auto result = tileCreator(size);
-    if(data) src.read(result->requestData(), size*sizeof(uint16_t));
+    if(data) {
+        const auto data = result->requestData();
+        if(src.evFileVersion() >= EvFormat::dataCompression) {
+            const auto readData = src.readCompressed();
+            Q_ASSERT(size*sizeof(uint16_t) == size_t(readData.size()));
+            memcpy(data, readData.data(), readData.size());
+        } else src.read(data, size*sizeof(uint16_t));
+    }
     return result;
 }
 

@@ -45,6 +45,8 @@ public:
         return mSrc->read(reinterpret_cast<char*>(data), len);
     }
 
+    QByteArray readCompressed();
+
     eReadStream& operator>>(bool &val);
     eReadStream& operator>>(int &val);
     eReadStream& operator>>(uint& val);
@@ -56,6 +58,7 @@ public:
     eReadStream& operator>>(QMatrix &val);
     eReadStream& operator>>(QColor& val);
     eReadStream& operator>>(QString &val);
+    eReadStream& operator>>(QByteArray &val);
     eReadStream& operator>>(SimpleBrushWrapper*& brush);
 
     template <typename T>

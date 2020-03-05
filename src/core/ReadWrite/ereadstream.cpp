@@ -3,6 +3,7 @@
 #include "Paint/brushescontext.h"
 #include "filefooter.h"
 #include "framerange.h"
+#include "evformat.h"
 
 eReadFutureTable::eReadFutureTable(QIODevice * const main) : mMain(main) {}
 
@@ -24,7 +25,7 @@ eReadStream::eReadStream(const int evFileVersion, QIODevice * const src) :
     mEvFileVersion(evFileVersion), mSrc(src), mFutureTable(src) {}
 
 eReadStream::eReadStream(QIODevice * const src) :
-    eReadStream(FileFooter::sNewestEvRW, src) {}
+    eReadStream(EvFormat::version, src) {}
 
 void eReadStream::readFutureTable() { mFutureTable.read(); }
 
@@ -41,6 +42,18 @@ void eReadStream::readCheckpoint(const QString &errMsg) {
         RuntimeThrow("The QIODevice::pos '" + QString::number(sPos) +
                      "' does not match the written QIODevice::pos '" +
                      QString::number(pos) + "'.\n" + errMsg);
+}
+
+QByteArray eReadStream::readCompressed() {
+    QByteArray compressed; *this >> compressed;
+    return qUncompress(compressed);
+}
+
+eReadStream& eReadStream::operator>>(QByteArray& val) {
+    int size; *this >> size;
+    val.resize(size);
+    mSrc->read(val.data(), size);
+    return *this;
 }
 
 eReadStream &eReadStream::operator>>(bool &val) {

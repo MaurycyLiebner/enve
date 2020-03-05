@@ -57,6 +57,8 @@ public:
         return mDst->write(reinterpret_cast<const char*>(data), len);
     }
 
+    qint64 writeCompressed(const void* const data, const qint64 len);
+
     eWriteStream& operator<<(const bool val);
     eWriteStream& operator<<(const int val);
     eWriteStream& operator<<(const uint val);
@@ -68,6 +70,7 @@ public:
     eWriteStream& operator<<(const QMatrix& val);
     eWriteStream& operator<<(const QColor& val);
     eWriteStream& operator<<(const QString& val);
+    eWriteStream& operator<<(const QByteArray& val);
     eWriteStream& operator<<(SimpleBrushWrapper* const brush);
 
     template <typename T>

@@ -53,6 +53,21 @@ qint64 eWriteStream::writeFile(QFile * const file) {
     return size;
 }
 
+qint64 eWriteStream::writeCompressed(const void* const data, const qint64 len) {
+    const auto charData = reinterpret_cast<const char*>(data);
+    const auto ba = QByteArray::fromRawData(charData, len);
+    const auto compressed = qCompress(ba);
+    *this << compressed;
+    return compressed.size();
+}
+
+eWriteStream& eWriteStream::operator<<(const QByteArray& val) {
+    const int size = val.size();
+    *this << size;
+    mDst->write(val.data(), size);
+    return *this;
+}
+
 eWriteStream &eWriteStream::operator<<(const bool val) {
     write(&val, sizeof(bool));
     return *this;

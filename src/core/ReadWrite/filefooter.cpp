@@ -1,15 +1,17 @@
 #include "filefooter.h"
 
+#include "evformat.h"
+#include "ewritestream.h"
+
 char FileFooter::sEVFormat[15] = "enve ev";
 char FileFooter::sAppName[15] = "enve";
 char FileFooter::sAppVersion[15] = "0.0.0c";
-const int FileFooter::sNewestEvRW = 15;
 
-bool FileFooter::sWrite(QIODevice * const target) {
-    return target->write(reinterpret_cast<const char*>(&sNewestEvRW), sizeof(int)) &&
-           target->write(&sEVFormat[0], sizeof(char[15])) &&
-           target->write(&sAppName[0], sizeof(char[15])) &&
-           target->write(&sAppVersion[0], sizeof(char[15]));
+void FileFooter::sWrite(eWriteStream& dst) {
+    dst << EvFormat::version;
+    dst.write(&sEVFormat[0], sizeof(char[15]));
+    dst.write(&sAppName[0], sizeof(char[15]));
+    dst.write(&sAppVersion[0], sizeof(char[15]));
 }
 
 qint64 FileFooter::sSize(const int evVersion) {

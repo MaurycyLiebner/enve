@@ -113,7 +113,7 @@ void MainWindow::saveToFile(const QString &path) {
         writeStream.writeCheckpoint();
 
         writeStream.writeFutureTable();
-        FileFooter::sWrite(&file);
+        FileFooter::sWrite(writeStream);
     } catch(...) {
         file.close();
         RuntimeThrow("Error while writing to file " + path);
