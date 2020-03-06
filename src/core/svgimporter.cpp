@@ -1097,8 +1097,10 @@ bool getGradientFromString(const QString &colorStr,
 }
 
 bool getFlatColorFromString(const QString &colorStr, FillSvgAttributes *target) {
-    QColor color;
-    if(!toColor(colorStr, color)) return false;
+    QColor color(colorStr);
+    if(!color.isValid()) {
+        if(!toColor(colorStr, color)) return false;
+    }
     target->setColor(color);
     target->setPaintType(FLATPAINT);
     return true;
