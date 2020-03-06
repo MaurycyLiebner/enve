@@ -27,6 +27,9 @@ public:
             QrealAnimator* const target, QWidget* const parent) const;
     void showDurationSettingsDialog(
             DurationRectangle* const target, QWidget* const parent) const;
+    bool execAnimationToPaint(const AnimationBox* const src,
+                              int& firstAbsFrame, int& lastAbsFrame,
+                              int& increment, QWidget* const parent) const;
 private:
     static DialogsInterfaceImpl sInstance;
 };

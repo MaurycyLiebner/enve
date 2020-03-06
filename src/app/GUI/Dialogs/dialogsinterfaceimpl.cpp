@@ -26,6 +26,7 @@
 #include "GUI/mainwindow.h"
 #include "GUI/Expressions/expressiondialog.h"
 #include "GUI/Dialogs/durationrectsettingsdialog.h"
+#include "GUI/Dialogs/animationtopaintdialog.h"
 
 DialogsInterfaceImpl DialogsInterfaceImpl::sInstance;
 
@@ -87,4 +88,12 @@ void DialogsInterfaceImpl::showDurationSettingsDialog(
     const auto dialog = new DurationRectSettingsDialog(target, parent);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
+}
+
+bool DialogsInterfaceImpl::execAnimationToPaint(
+        const AnimationBox* const src,
+        int& firstAbsFrame, int& lastAbsFrame,
+        int& increment, QWidget* const parent) const {
+    return AnimationToPaintDialog::sExec(src, firstAbsFrame, lastAbsFrame,
+                                         increment, parent);
 }

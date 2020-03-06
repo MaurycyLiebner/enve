@@ -61,9 +61,10 @@ VideoBox::VideoBox() : AnimationBox("Video", eBoxType::video),
 void VideoBox::fileHandlerConnector(ConnContext &conn, VideoFileHandler *obj) {
     const auto newDataHandler = obj ? obj->getFrameHandler() : nullptr;
     if(newDataHandler) {
-        mSrcFramesCache = enve::make_shared<VideoFrameHandler>(newDataHandler);
-        getAnimationDurationRect()->setRasterCacheHandler(
-                    &newDataHandler->getCacheHandler());
+        const auto frameHandler = enve::make_shared<VideoFrameHandler>(newDataHandler);
+        setAnimationFramesHandler(frameHandler);
+        const auto cacheHandler = &newDataHandler->getCacheHandler();
+        getAnimationDurationRect()->setRasterCacheHandler(cacheHandler);
         conn << connect(obj, &VideoFileHandler::pathChanged,
                         this, &VideoBox::animationDataChanged);
         conn << connect(obj, &VideoFileHandler::pathChanged,
@@ -71,20 +72,20 @@ void VideoBox::fileHandlerConnector(ConnContext &conn, VideoFileHandler *obj) {
         conn << connect(obj, &VideoFileHandler::reloaded,
                         this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
         conn << connect(newDataHandler, &VideoDataHandler::frameCountUpdated,
-                        this, &VideoBox::updateDurationRectangleAnimationRange);
+                        this, &VideoBox::updateAnimationRange);
     }
 }
 
 void VideoBox::fileHandlerAfterAssigned(VideoFileHandler *obj) {
     const auto newDataHandler = obj ? obj->getFrameHandler() : nullptr;
+    qsptr<AnimationFrameHandler> frameHandler;
+    const HddCachableCacheHandler* cacheHandler;
     if(newDataHandler) {
-        mSrcFramesCache = enve::make_shared<VideoFrameHandler>(newDataHandler);
-        getAnimationDurationRect()->setRasterCacheHandler(
-                    &newDataHandler->getCacheHandler());
-    } else {
-        mSrcFramesCache.reset();
-        getAnimationDurationRect()->setRasterCacheHandler(nullptr);
-    }
+        frameHandler = enve::make_shared<VideoFrameHandler>(newDataHandler);
+        cacheHandler = &newDataHandler->getCacheHandler();
+    } else cacheHandler = nullptr;
+    setAnimationFramesHandler(frameHandler);
+    getAnimationDurationRect()->setRasterCacheHandler(cacheHandler);
 
     soundDataChanged();
     animationDataChanged();

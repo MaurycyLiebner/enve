@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "animationboxtopaintobjectdialog.h"
+#include "animationtopaintdialog.h"
 
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QDialogButtonBox>
 
-AnimationBoxToPaintObjectDialog::AnimationBoxToPaintObjectDialog(
+AnimationToPaintDialog::AnimationToPaintDialog(
         const QString &objName, const FrameRange &range,
         QWidget * const parent) :
     QDialog(parent) {
@@ -66,21 +66,22 @@ AnimationBoxToPaintObjectDialog::AnimationBoxToPaintObjectDialog(
     mainLayout->addWidget(buttons);
 }
 
-int AnimationBoxToPaintObjectDialog::firstFrame() const
+int AnimationToPaintDialog::firstFrame() const
 { return mFirstFrame->value(); }
 
-int AnimationBoxToPaintObjectDialog::lastFrame() const
+int AnimationToPaintDialog::lastFrame() const
 { return mLastFrame->value(); }
 
-int AnimationBoxToPaintObjectDialog::increment() const
+int AnimationToPaintDialog::increment() const
 { return mIncrement->value(); }
 
-bool AnimationBoxToPaintObjectDialog::sExec(
-        QWidget * const parent, const AnimationBox * const src,
-        int &firstAbsFrame, int &lastAbsFrame, int &increment) {
+bool AnimationToPaintDialog::sExec(
+        const AnimationBox * const src,
+        int &firstAbsFrame, int &lastAbsFrame,
+        int &increment, QWidget * const parent) {
     const QString& name = src->prp_getName();
     const FrameRange range = src->prp_absInfluenceRange();
-    const auto dialog = new AnimationBoxToPaintObjectDialog(name, range, parent);
+    const auto dialog = new AnimationToPaintDialog(name, range, parent);
     const bool accepted = dialog->exec() == QDialog::Accepted;
     firstAbsFrame = dialog->firstFrame();
     lastAbsFrame = dialog->lastFrame();

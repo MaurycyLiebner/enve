@@ -14,28 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ANIMATIONBOXTOPAINTOBJECTDIALOG_H
-#define ANIMATIONBOXTOPAINTOBJECTDIALOG_H
+#ifndef ANIMATIONTOPAINTDIALOG_H
+#define ANIMATIONTOPAINTDIALOG_H
 
 #include <QDialog>
 #include <QSpinBox>
 
 #include "Boxes/animationbox.h"
 
-class AnimationBoxToPaintObjectDialog : public QDialog {
+class AnimationToPaintDialog : public QDialog {
 public:
-    AnimationBoxToPaintObjectDialog(const QString& objName,
-                                    const FrameRange& range,
-                                    QWidget* const parent);
+    AnimationToPaintDialog(const QString& objName,
+                           const FrameRange& range,
+                           QWidget* const parent);
 
     int firstFrame() const;
     int lastFrame() const;
     int increment() const;
 
-    static bool sExec(QWidget* const parent,
-                      const AnimationBox* const src,
+    static bool sExec(const AnimationBox* const src,
                       int& firstAbsFrame, int& lastAbsFrame,
-                      int& increment);
+                      int& increment, QWidget* const parent);
 
 private:
     QSpinBox* mFirstFrame;
@@ -43,4 +42,4 @@ private:
     QSpinBox* mIncrement;
 };
 
-#endif // ANIMATIONBOXTOPAINTOBJECTDIALOG_H
+#endif // ANIMATIONTOPAINTDIALOG_H

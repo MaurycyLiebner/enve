@@ -16,7 +16,6 @@
 
 #include "fixedlenanimationrect.h"
 #include "Properties/property.h"
-#include "GUI/durationrectsettingsdialog.h"
 
 int FixedLenAnimationRect::getMinAnimRelFrame() const {
     return mMinAnimationFrame;

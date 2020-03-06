@@ -18,7 +18,6 @@
 #include "CacheHandlers/hddcachablecachehandler.h"
 #include "GUI/global.h"
 #include "Boxes/boundingbox.h"
-#include "GUI/durationrectsettingsdialog.h"
 
 TimelineMovable::TimelineMovable(const Type type, Property &parentProp) :
     mType(type), mParentProperty(parentProp) {}

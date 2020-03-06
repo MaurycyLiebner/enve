@@ -16,10 +16,12 @@
 
 #ifndef ANIMATIONBOX_H
 #define ANIMATIONBOX_H
+
 #include "Animators/intanimator.h"
 #include "Timeline/fixedlenanimationrect.h"
 #include "boundingbox.h"
 #include "imagebox.h"
+
 class AnimationFrameHandler;
 class IntFrameRemapping;
 
@@ -43,7 +45,7 @@ public:
     virtual void setStretch(const qreal stretch) {
         mStretch = stretch;
         prp_afterWholeInfluenceRangeChanged();
-        updateDurationRectangleAnimationRange();
+        updateAnimationRange();
     }
 
     void anim_setAbsFrame(const int frame);
@@ -58,7 +60,7 @@ public:
     bool shouldScheduleUpdate();
 
     FixedLenAnimationRect *getAnimationDurationRect() const;
-    void updateDurationRectangleAnimationRange();
+    void updateAnimationRange();
 
     void afterUpdate();
     void beforeAddingScheduler();
@@ -71,12 +73,14 @@ public:
 
     void reload();
 protected:
+    void setAnimationFramesHandler(const qsptr<AnimationFrameHandler>& src);
+private:
+    void createPaintObject(const int firstAbsFrame,
+                           const int lastAbsFrame,
+                           const int increment);
+
     qreal mStretch = 1;
-
     qsptr<AnimationFrameHandler> mSrcFramesCache;
-
-    bool mFrameRemappingEnabled = false;
-
     qsptr<IntFrameRemapping> mFrameRemapping;
 };
 

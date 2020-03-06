@@ -27,14 +27,14 @@
 #include "RasterEffects/rastereffectcollection.h"
 #include "frameremapping.h"
 #include "typemenu.h"
-#include "GUI/animationboxtopaintobjectdialog.h"
 #include "Private/Tasks/complextask.h"
 #include "Private/Tasks/taskscheduler.h"
+#include "GUI/dialogsinterface.h"
 
 AnimationBox::AnimationBox(const QString &name, const eBoxType type) :
     BoundingBox(name, type) {
     connect(this, &eBoxOrSound::parentChanged,
-            this, &AnimationBox::updateDurationRectangleAnimationRange);
+            this, &AnimationBox::updateAnimationRange);
 
     setDurationRectangle(enve::make_shared<FixedLenAnimationRect>(*this), true);
 
@@ -43,14 +43,14 @@ AnimationBox::AnimationBox(const QString &name, const eBoxType type) :
     mFrameRemapping->disableAction();
 
     connect(mFrameRemapping.get(), &IntFrameRemapping::enabledChanged,
-            this, &AnimationBox::updateDurationRectangleAnimationRange);
+            this, &AnimationBox::updateAnimationRange);
 }
 
 FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() const {
     return static_cast<FixedLenAnimationRect*>(getDurationRectangle());
 }
 
-void AnimationBox::updateDurationRectangleAnimationRange() {
+void AnimationBox::updateAnimationRange() {
     const auto durRect = getAnimationDurationRect();
     if(mFrameRemapping->enabled()) {
         const int nFrames = durRect->getFrameDuration();
@@ -66,7 +66,7 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
 }
 
 void AnimationBox::animationDataChanged() {
-    updateDurationRectangleAnimationRange();
+    updateAnimationRange();
     if(mFrameRemapping->enabled()) {
         int frameCount;
         if(mSrcFramesCache) frameCount = mSrcFramesCache->getFrameCount();
@@ -116,6 +116,10 @@ void AnimationBox::disableFrameRemappingAction() {
 
 void AnimationBox::reload() {
     if(mSrcFramesCache) mSrcFramesCache->reload();
+}
+
+void AnimationBox::setAnimationFramesHandler(const qsptr<AnimationFrameHandler>& src) {
+    mSrcFramesCache = src;
 }
 
 void AnimationBox::anim_setAbsFrame(const int frame) {
@@ -252,56 +256,62 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
     menu->addSeparator();
     const PropertyMenu::PlainSelectedOp<AnimationBox> createPaintObj =
     [widget](AnimationBox * box) {
-        const qptr<ContainerBox> parent = box->getParentGroup();
-        if(!parent) return;
         int firstAbsFrame;
         int lastAbsFrame;
         int increment;
-        const bool ok = AnimationBoxToPaintObjectDialog::sExec(
-                    widget, box, firstAbsFrame, lastAbsFrame, increment);
-        if(!ok) return;
-        const auto paintObj = enve::make_shared<PaintBox>();
-        box->copyBoundingBoxDataTo(paintObj.get());
-        const auto surface = paintObj->getSurface();
-        surface->anim_setAbsFrame(firstAbsFrame);
-        surface->anim_setRecording(true);
-        const auto src = box->mSrcFramesCache.get();
-        const auto loader = [src, surface](const int animFrame, const int absFrame) {
-            const auto cont = src->getFrameAtFrame(animFrame);
-            if(!cont) return;
-            surface->anim_setAbsFrame(absFrame);
-            surface->loadPixmap(cont->getImage());
-        };
-        const auto adder = [paintObj, parent]() {
-            if(!parent) return;
-            parent->addContained(paintObj);
-        };
-        const int firstRelFrame = box->prp_absFrameToRelFrame(firstAbsFrame);
-        const int iMax = lastAbsFrame - firstAbsFrame;
-        const auto complexTask = QSharedPointer<ComplexTask>(
-                    new ComplexTask(iMax, "Video to Paint"));
-        const auto cancel = [complexTask]() {
-            complexTask->cancel();
-        };
-
-        const auto taskCreator = new AnimationToPaint(
-                    firstAbsFrame, firstRelFrame, iMax, increment,
-                    box, src, complexTask.get(), loader, cancel,
-                    complexTask.get());
-
-        taskCreator->process();
-
-        if(complexTask->done()) {
-            adder();
-        } else {
-            connect(complexTask.get(), &ComplexTask::finishedAll,
-                    paintObj.get(), adder);
-            TaskScheduler::sInstance->addComplexTask(complexTask);
-        }
+        const auto& instance = DialogsInterface::instance();
+        const bool ok = instance.execAnimationToPaint(
+                    box, firstAbsFrame, lastAbsFrame, increment, widget);
+        if(ok) box->createPaintObject(firstAbsFrame, lastAbsFrame, increment);
     };
     menu->addPlainAction("Create Paint Object...", createPaintObj);
 
     BoundingBox::setupCanvasMenu(menu);
+}
+
+void AnimationBox::createPaintObject(const int firstAbsFrame,
+                                     const int lastAbsFrame,
+                                     const int increment) {
+    const qptr<ContainerBox> parent = getParentGroup();
+    if(!parent) return;
+    const auto paintObj = enve::make_shared<PaintBox>();
+    copyBoundingBoxDataTo(paintObj.get());
+    const auto surface = paintObj->getSurface();
+    surface->anim_setAbsFrame(firstAbsFrame);
+    surface->anim_setRecording(true);
+    const auto src = mSrcFramesCache.get();
+    const auto loader = [src, surface](const int animFrame, const int absFrame) {
+        const auto cont = src->getFrameAtFrame(animFrame);
+        if(!cont) return;
+        surface->anim_setAbsFrame(absFrame);
+        surface->loadPixmap(cont->getImage());
+    };
+    const auto adder = [paintObj, parent]() {
+        if(!parent) return;
+        parent->addContained(paintObj);
+    };
+    const int firstRelFrame = prp_absFrameToRelFrame(firstAbsFrame);
+    const int iMax = lastAbsFrame - firstAbsFrame;
+    const auto complexTask = QSharedPointer<ComplexTask>(
+                new ComplexTask(iMax, "Video to Paint"));
+    const auto cancel = [complexTask]() {
+        complexTask->cancel();
+    };
+
+    const auto taskCreator = new AnimationToPaint(
+                firstAbsFrame, firstRelFrame, iMax, increment,
+                this, src, complexTask.get(), loader, cancel,
+                complexTask.get());
+
+    taskCreator->process();
+
+    if(complexTask->done()) {
+        adder();
+    } else {
+        connect(complexTask.get(), &ComplexTask::finishedAll,
+                paintObj.get(), adder);
+        TaskScheduler::sInstance->addComplexTask(complexTask);
+    }
 }
 
 void AnimationBox::setupRenderData(const qreal relFrame,

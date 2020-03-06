@@ -79,6 +79,7 @@ SOURCES += main.cpp\
     GUI/BrushWidgets/bookmarkedbrushes.cpp \
     GUI/BrushWidgets/brushlabel.cpp \
     GUI/ColorWidgets/bookmarkedcolors.cpp \
+    GUI/Dialogs/animationtopaintdialog.cpp \
     GUI/Dialogs/dialogsinterfaceimpl.cpp \
     GUI/Dialogs/durationrectsettingsdialog.cpp \
     GUI/Expressions/expressiondialog.cpp \
@@ -196,6 +197,7 @@ HEADERS  += \
     GUI/BrushWidgets/bookmarkedbrushes.h \
     GUI/BrushWidgets/brushlabel.h \
     GUI/ColorWidgets/bookmarkedcolors.h \
+    GUI/Dialogs/animationtopaintdialog.h \
     GUI/Dialogs/dialogsinterfaceimpl.h \
     GUI/Dialogs/durationrectsettingsdialog.h \
     GUI/Expressions/expressiondialog.h \

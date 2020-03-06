@@ -20,6 +20,7 @@
 #include "ShaderEffects/shadereffectcreator.h"
 
 class DurationRectangle;
+class AnimationBox;
 
 using ShaderOptions = QList<stdsptr<ShaderEffectCreator>>;
 
@@ -36,6 +37,10 @@ public:
             QrealAnimator* const target, QWidget* const parent) const = 0;
     virtual void showDurationSettingsDialog(
             DurationRectangle* const target, QWidget* const parent) const = 0;
+    virtual bool execAnimationToPaint(
+            const AnimationBox* const src,
+            int& firstAbsFrame, int& lastAbsFrame,
+            int& increment, QWidget* const parent) const = 0;
 };
 
 #endif // DIALOGSINTERFACE_H

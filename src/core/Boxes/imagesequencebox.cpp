@@ -46,9 +46,9 @@ void ImageSequenceBox::fileHandlerConnector(ConnContext &conn,
 }
 
 void ImageSequenceBox::fileHandlerAfterAssigned(ImageSequenceFileHandler *obj) {
-    if(obj) {
-        mSrcFramesCache = enve::make_shared<ImageSequenceCacheHandler>(obj);
-    } else mSrcFramesCache.reset();
+    qsptr<ImageSequenceCacheHandler> frameHandler;
+    if(obj) frameHandler = enve::make_shared<ImageSequenceCacheHandler>(obj);
+    setAnimationFramesHandler(frameHandler);
     animationDataChanged();
 }
 
