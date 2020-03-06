@@ -24,6 +24,7 @@
 #include "../buttonslist.h"
 #include "GUI/global.h"
 #include "GUI/mainwindow.h"
+#include "GUI/Expressions/expressiondialog.h"
 
 DialogsInterfaceImpl DialogsInterfaceImpl::sInstance;
 
@@ -72,4 +73,10 @@ stdsptr<ShaderEffectCreator> DialogsInterfaceImpl::execShaderChooser(
     const bool accepted = dialog.exec() == QDialog::Accepted;
     if(accepted) return dialog.getSelected();
     return nullptr;
+}
+
+void DialogsInterfaceImpl::showExpressionDialog(
+        QrealAnimator* const target, QWidget* const parent) const {
+    const auto dialog = new ExpressionDialog(target, parent);
+    dialog->show();
 }

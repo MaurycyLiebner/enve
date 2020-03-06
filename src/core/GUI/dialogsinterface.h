@@ -30,6 +30,8 @@ public:
 
     virtual stdsptr<ShaderEffectCreator> execShaderChooser(
             const QString& name, const ShaderOptions& options) const = 0;
+    virtual void showExpressionDialog(
+            QrealAnimator* const target, QWidget* const parent) const = 0;
 };
 
 #endif // DIALOGSINTERFACE_H

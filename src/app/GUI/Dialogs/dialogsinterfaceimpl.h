@@ -23,6 +23,8 @@ class DialogsInterfaceImpl : public DialogsInterface {
 public:
     stdsptr<ShaderEffectCreator> execShaderChooser(
             const QString& name, const ShaderOptions& options) const;
+    void showExpressionDialog(
+            QrealAnimator* const target, QWidget* const parent) const;
 private:
     static DialogsInterfaceImpl sInstance;
 };

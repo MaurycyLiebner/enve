@@ -15,11 +15,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "qrealanimator.h"
-#include <QMenu>
+
 #include "qrealpoint.h"
 #include "qrealkey.h"
 #include "../Expressions/expression.h"
 #include "../simpletask.h"
+#include "typemenu.h"
+#include "GUI/dialogsinterface.h"
 
 QrealAnimator::QrealAnimator(const qreal iniVal,
                              const qreal minVal,
@@ -34,6 +36,28 @@ QrealAnimator::QrealAnimator(const qreal iniVal,
 }
 
 QrealAnimator::QrealAnimator(const QString &name) : GraphAnimator(name) {}
+
+void QrealAnimator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<QrealAnimator>()) return;
+    menu->addedActionsForType<QrealAnimator>();
+
+    const auto parentWidget = menu->getParentWidget();
+
+    const PropertyMenu::PlainSelectedOp<QrealAnimator> sOp =
+    [parentWidget](QrealAnimator * aTarget) {
+        const auto& interface = DialogsInterface::instance();
+        interface.showExpressionDialog(aTarget, parentWidget);
+    };
+    menu->addPlainAction("Set Expression", sOp);
+
+    const PropertyMenu::PlainSelectedOp<QrealAnimator> cOp =
+    [](QrealAnimator * aTarget) {
+        aTarget->clearExpressionAction();
+    };
+    menu->addPlainAction("Clear Expression", cOp)->setEnabled(hasExpression());
+    menu->addSeparator();
+    Animator::prp_setupTreeViewMenu(menu);
+}
 
 void QrealAnimator::prp_writeProperty(eWriteStream& dst) const {
     anim_writeKeys(dst);

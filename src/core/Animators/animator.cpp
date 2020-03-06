@@ -518,8 +518,6 @@ void Animator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<Animator>()) return;
     menu->addedActionsForType<Animator>();
 
-    Property::prp_setupTreeViewMenu(menu);
-    menu->addSeparator();
     const PropertyMenu::PlainSelectedOp<Animator> aOp =
     [](Animator * animTarget) {
         animTarget->anim_saveCurrentValueAsKey();
@@ -531,6 +529,9 @@ void Animator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
         animTarget->anim_deleteCurrentKeyAction();
     };
     menu->addPlainAction("Delete Key(s)", dOp)->setEnabled(anim_getKeyOnCurrentFrame());
+
+    menu->addSeparator();
+    Property::prp_setupTreeViewMenu(menu);
 }
 
 void Animator::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,

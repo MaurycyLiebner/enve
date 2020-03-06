@@ -34,6 +34,8 @@ protected:
                   const qreal prefferdStep,
                   const QString& name);
 public:
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
+
     void prp_startTransform();
     void prp_finishTransform();
     void prp_cancelTransform();
