@@ -281,26 +281,24 @@ void DurationRectangle::cancelMaxFramePosTransform() {
     mMaxFrame.cancelPosTransform();
 }
 
-void DurationRectangle::openDurationSettingsDialog(QWidget *parent) {
-    DurationRectSettingsDialog dialog(getRelShift(),
-                                      getMinRelFrame(),
-                                      getMaxRelFrame(),
-                                      parent);
-    if(dialog.exec()) {
-        if(getRelShift() == dialog.getShift() &&
-           getMinRelFrame() == dialog.getMinFrame() &&
-           getMaxRelFrame() == dialog.getMaxFrame()) {
-            return;
-        }
-
-        const auto oldRelRange = getRelFrameRange();
-        mMinFrame.setValueUnClamped(dialog.getMinFrame());
-        mMaxFrame.setValueUnClamped(dialog.getMaxFrame());
-        setRelShift(dialog.getShift());
-        const auto newRelRange = getRelFrameRange();
-
-        mParentProperty.prp_afterChangedRelRange(oldRelRange + newRelRange);
+void DurationRectangle::setValues(const RangeRectValues& values) {
+    if(getRelShift() == values.fShift &&
+       getMinRelFrame() == values.fMin &&
+       getMaxRelFrame() == values.fMax) {
+        return;
     }
+
+    const auto oldRelRange = getRelFrameRange();
+    mMinFrame.setValueUnClamped(values.fMin);
+    mMaxFrame.setValueUnClamped(values.fMax);
+    setRelShift(values.fShift);
+    const auto newRelRange = getRelFrameRange();
+
+    mParentProperty.prp_afterChangedRelRange(oldRelRange + newRelRange);
+}
+
+RangeRectValues DurationRectangle::getValues() const {
+    return {getRelShift(), getMinRelFrame(), getMaxRelFrame()};
 }
 
 void DurationRectangle::finishMaxFramePosTransform() {

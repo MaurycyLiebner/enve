@@ -80,6 +80,7 @@ SOURCES += main.cpp\
     GUI/BrushWidgets/brushlabel.cpp \
     GUI/ColorWidgets/bookmarkedcolors.cpp \
     GUI/Dialogs/dialogsinterfaceimpl.cpp \
+    GUI/Dialogs/durationrectsettingsdialog.cpp \
     GUI/Expressions/expressiondialog.cpp \
     GUI/Expressions/expressioneditor.cpp \
     GUI/Expressions/expressionhighlighter.cpp \
@@ -115,6 +116,7 @@ SOURCES += main.cpp\
     GUI/timelinewidget.cpp \
     GUI/timelinewrappernode.cpp \
     GUI/triggerlabel.cpp \
+    GUI/twocolumnlayout.cpp \
     GUI/welcomedialog.cpp \
     GUI/widgetstack.cpp \
     GUI/ColorWidgets/colorlabel.cpp \
@@ -195,6 +197,7 @@ HEADERS  += \
     GUI/BrushWidgets/brushlabel.h \
     GUI/ColorWidgets/bookmarkedcolors.h \
     GUI/Dialogs/dialogsinterfaceimpl.h \
+    GUI/Dialogs/durationrectsettingsdialog.h \
     GUI/Expressions/expressiondialog.h \
     GUI/Expressions/expressioneditor.h \
     GUI/Expressions/expressionhighlighter.h \
@@ -229,6 +232,7 @@ HEADERS  += \
     GUI/timelinewidget.h \
     GUI/timelinewrappernode.h \
     GUI/triggerlabel.h \
+    GUI/twocolumnlayout.h \
     GUI/welcomedialog.h \
     GUI/widgetstack.h \
     GUI/ColorWidgets/colorlabel.h \

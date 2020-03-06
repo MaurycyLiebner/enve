@@ -175,13 +175,11 @@ SOURCES += \
     GUI/boxeslistactionbutton.cpp \
     GUI/coloranimatorbutton.cpp \
     GUI/dialogsinterface.cpp \
-    GUI/durationrectsettingsdialog.cpp \
     GUI/edialogs.cpp \
     GUI/ewidgets.cpp \
     GUI/global.cpp \
     GUI/newcanvasdialog.cpp \
     GUI/propertynamedialog.cpp \
-    GUI/twocolumnlayout.cpp \
     GUI/valueinput.cpp \
     MovablePoints/gradientpoint.cpp \
     MovablePoints/pathpivot.cpp \
@@ -476,13 +474,11 @@ HEADERS += \
     GUI/boxeslistactionbutton.h \
     GUI/coloranimatorbutton.h \
     GUI/dialogsinterface.h \
-    GUI/durationrectsettingsdialog.h \
     GUI/edialogs.h \
     GUI/ewidgets.h \
     GUI/global.h \
     GUI/newcanvasdialog.h \
     GUI/propertynamedialog.h \
-    GUI/twocolumnlayout.h \
     GUI/valueinput.h \
     MovablePoints/gradientpoint.h \
     MovablePoints/pathpivot.h \

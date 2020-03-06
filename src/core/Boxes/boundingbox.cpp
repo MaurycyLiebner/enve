@@ -40,6 +40,7 @@
 #include "Animators/customproperties.h"
 #include "GUI/propertynamedialog.h"
 #include "BlendEffects/blendeffectcollection.h"
+#include "GUI/dialogsinterface.h"
 
 int BoundingBox::sNextDocumentId = 0;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
@@ -992,7 +993,8 @@ void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
                          [this, parentWidget]() {
         const auto durRect = getDurationRectangle();
         if(!durRect) return;
-        durRect->openDurationSettingsDialog(parentWidget);
+        const auto& instance = DialogsInterface::instance();
+        instance.showDurationSettingsDialog(durRect, parentWidget);
     })->setEnabled(hasDurationRectangle());
     menu->addSeparator();
     setupCanvasMenu(menu->addMenu("Actions"));

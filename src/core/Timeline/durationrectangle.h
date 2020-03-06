@@ -120,6 +120,12 @@ private:
     using TimelineMovable::getValue;
 };
 
+struct RangeRectValues {
+    int fShift;
+    int fMin;
+    int fMax;
+};
+
 class DurationRectangle : public TimelineMovable {
     Q_OBJECT
 public:
@@ -138,8 +144,6 @@ public:
     virtual bool hasAnimationFrameRange() { return false; }
     virtual void writeDurationRectangle(eWriteStream& dst);
     virtual void readDurationRectangle(eReadStream &src);
-
-    void openDurationSettingsDialog(QWidget *parent = nullptr);
 
     void pressed(const bool shiftPressed);
 
@@ -209,6 +213,8 @@ public:
     void setRelShift(const int shift) { setValue(shift); }
 
     int getRelShift() const { return getValue(); }
+    void setValues(const RangeRectValues& values);
+    RangeRectValues getValues() const;
 private:
     using TimelineMovable::setValue;
     using TimelineMovable::getValue;

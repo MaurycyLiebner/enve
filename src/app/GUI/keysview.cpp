@@ -32,6 +32,7 @@
 #include "clipboardcontainer.h"
 #include "Animators/qrealpoint.h"
 #include "timelinehighlightwidget.h"
+#include "GUI/dialogsinterface.h"
 
 KeysView::KeysView(BoxScrollWidget *boxesListVisible,
                    QWidget *parent) :
@@ -302,7 +303,9 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                 const auto selectedAction = menu.exec(e->globalPos());
                 if(selectedAction) {
                     const auto durRect = static_cast<DurationRectangle*>(movable);
-                    durRect->openDurationSettingsDialog(this);
+                    if(!durRect) return;
+                    const auto& instance = DialogsInterface::instance();
+                    instance.showDurationSettingsDialog(durRect, this);
                 }
             }
         }
