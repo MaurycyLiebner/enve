@@ -31,7 +31,7 @@ enum class GpuVendor {
     unrecognized
 };
 
-enum class AccPreference {
+enum class AccPreference : int {
     cpuStrongPreference,
     cpuSoftPreference,
     defaultPreference,
