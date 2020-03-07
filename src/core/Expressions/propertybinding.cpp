@@ -44,14 +44,18 @@ void PropertyBinding::setPath(const QString& path) {
     reloadBindProperty();
 }
 
+void PropertyBinding::afterValueChange() {
+    mValueUpToDate = false;
+    emit currentValueChanged();
+}
+
 bool PropertyBinding::setAbsFrame(const qreal absFrame) {
     if(mBindPathValid && mBindProperty && mContext) {
         const qreal oldRelFrame = mRelFrame;
         mRelFrame = mBindProperty->prp_absFrameToRelFrameF(absFrame);
         const auto oldRange = mBindProperty->prp_getIdenticalAbsRange(oldRelFrame);
         if(oldRange.inRange(absFrame)) return false;
-        mValueUpToDate = false;
-        emit currentValueChanged();
+        afterValueChange();
         return true;
     }
     return false;
@@ -121,20 +125,20 @@ bool PropertyBinding::bindProperty(const QString& path, Property * const newBind
         conn << connect(newBinding, &Property::prp_absFrameRangeChanged,
                         this, [this](const FrameRange& absRange) {
             const auto relRange = mContext->prp_absRangeToRelRange(absRange);
+            if(relRange.inRange(mRelFrame)) afterValueChange();
             emit relRangeChanged(relRange);
-            if(relRange.inRange(mRelFrame)) emit currentValueChanged();
         });
         conn << connect(newBinding, &Property::prp_pathChanged,
                         this, [this]() { pathChanged(); });
     }
+    afterValueChange();
     emit relRangeChanged(FrameRange::EMINMAX);
-    emit currentValueChanged();
     return true;
 }
 
 void PropertyBinding::setBindPathValid(const bool valid) {
     if(mBindPathValid == valid) return;
     mBindPathValid = valid;
+    afterValueChange();
     emit relRangeChanged(FrameRange::EMINMAX);
-    emit currentValueChanged();
 }
