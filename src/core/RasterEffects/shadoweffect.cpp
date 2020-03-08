@@ -19,8 +19,14 @@ public:
                     GpuRenderTools& renderTools);
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData &data);
+
+    int cpuThreads(const int available, const int area) const {
+        if(mTranslation.isZero()) {
+            return RasterEffectCaller::cpuThreads(available, area);
+        } else return 1;
+    }
 private:
-    void setupPaint(SkPaint& paint) const;
+    void setupPaint(SkPaint& paint, const int sign) const;
 
     const float mRadius;
     const SkColor mColor;
@@ -74,10 +80,10 @@ ShadowEffect::getEffectCaller(const qreal relFrame, const qreal resolution,
                 QMargins(iL, iT, iR, iB));
 }
 
-void ShadowEffectCaller::setupPaint(SkPaint &paint) const {
+void ShadowEffectCaller::setupPaint(SkPaint &paint, const int sign) const {
     const float sigma = mRadius*0.3333333f;
     const auto filter = SkDropShadowImageFilter::Make(
-                mTranslation.x(), mTranslation.y(),
+                mTranslation.x(), sign*mTranslation.y(),
                 sigma, sigma, toSkColor(mColor),
                 SkDropShadowImageFilter::kDrawShadowAndForeground_ShadowMode,
                 nullptr);
@@ -102,7 +108,7 @@ void ShadowEffectCaller::processGpu(QGL33 * const gl,
     canvas->drawImage(srcTex, 0, 0);
 
     SkPaint paint;
-    setupPaint(paint);
+    setupPaint(paint, -1);
     canvas->drawImage(srcTex, 0, 0, &paint);
     canvas->flush();
 
@@ -129,7 +135,7 @@ void ShadowEffectCaller::processCpu(CpuRenderTools &renderTools,
         canvas.drawBitmap(tileSrc, drawX, drawY);
 
         SkPaint paint;
-        setupPaint(paint);
+        setupPaint(paint, 1);
         canvas.drawBitmap(tileSrc, drawX, drawY, &paint);
     }
 

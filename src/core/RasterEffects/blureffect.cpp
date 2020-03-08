@@ -87,9 +87,9 @@ void BlurEffectCaller::processCpu(CpuRenderTools &renderTools,
     if(srcRect.intersect(srcRect, srcBtmp.bounds())) {
         SkBitmap tileSrc;
         srcBtmp.extractSubset(&tileSrc, srcRect);
-        canvas.drawBitmap(tileSrc,
-                          srcRect.left() - texTile.left(),
-                          srcRect.top() - texTile.top(), &paint);
+        const int drawX = srcRect.left() - texTile.left();
+        const int drawY = srcRect.top() - texTile.top();
+        canvas.drawBitmap(tileSrc, drawX, drawY, &paint);
     }
 
     renderTools.swap();
