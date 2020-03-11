@@ -32,20 +32,31 @@ class MotionBlurCaller : public RasterEffectCaller {
         mOpacity(opacity),
         mSamples(samples) {}
 public:
-//    void processGpu(QGL33 * const gl,
-//                    GpuRenderTools& renderTools);
+    void processGpu(QGL33 * const gl,
+                    GpuRenderTools& renderTools);
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData &data);
 
     bool srcDstSeparation() const { return false; }
 private:
+    static void sDrawSample(const stdsptr<BoxRenderData>& sample,
+                            const qreal sampleOpacity,
+                            GpuRenderTools &renderTools,
+                            QGL33 * const gl);
+    static void sInitialize(QGL33 * const gl);
+    static bool sInitialized;
+
+    static GLuint sProgramId;
+    static GLint sOpacity2Loc;
+    static GLint sRect2Loc;
+
     const qreal mSampleCount;
     const qreal mOpacity;
     const QList<stdsptr<BoxRenderData>> mSamples;
 };
 
 MotionBlurEffect::MotionBlurEffect() :
-    RasterEffect("motion blur", HardwareSupport::cpuOnly,
+    RasterEffect("motion blur", HardwareSupport::gpuPreffered,
                  false, RasterEffectType::MOTION_BLUR) {
     mOpacity = enve::make_shared<QrealAnimator>("opacity");
     mOpacity->setValueRange(0, 999);
@@ -109,6 +120,7 @@ stdsptr<RasterEffectCaller> MotionBlurEffect::getEffectCaller(
 
         sampleRelFrame += frameStep;
     }
+    if(samples.isEmpty()) return nullptr;
     return enve::make_shared<MotionBlurCaller>(
                 instanceHwSupport(), sampleCount, opacity, samples);
 }
@@ -176,6 +188,104 @@ void replaceIfHigherAlpha(const int x0, const int y0,
         }
         dstId += iDstYInc;
         srcId += iSrcYInc;
+    }
+}
+
+bool MotionBlurCaller::sInitialized = false;
+
+GLuint MotionBlurCaller::sProgramId = 0;
+GLint MotionBlurCaller::sOpacity2Loc = 0;
+GLint MotionBlurCaller::sRect2Loc = 0;
+
+void MotionBlurCaller::sInitialize(QGL33 * const gl) {
+    try {
+        iniProgram(gl, sProgramId, GL_TEXTURED_VERT,
+                   ":/shaders/maxalpha.frag");
+    } catch(...) {
+        RuntimeThrow("Could not initialize a program for MotionBlurCaller");
+    }
+
+    gl->glUseProgram(sProgramId);
+
+    const GLint texture1 = gl->glGetUniformLocation(sProgramId, "texture1");
+    CheckInvalidLocation(texture1, "texture1");
+    gl->glUniform1i(texture1, 0);
+
+    const GLint texture2 = gl->glGetUniformLocation(sProgramId, "texture2");
+    CheckInvalidLocation(texture2, "texture2");
+    gl->glUniform1i(texture2, 1);
+
+    sOpacity2Loc = gl->glGetUniformLocation(sProgramId, "opacity2");
+    CheckInvalidLocation(sOpacity2Loc, "opacity2");
+
+    sRect2Loc = gl->glGetUniformLocation(sProgramId, "rect2");
+    CheckInvalidLocation(sRect2Loc, "rect2");
+}
+
+void MotionBlurCaller::sDrawSample(const stdsptr<BoxRenderData>& sample,
+                                   const qreal sampleOpacity,
+                                   GpuRenderTools &renderTools,
+                                   QGL33 * const gl) {
+    const auto& sampleImg = sample->fRenderedImage;
+    eTexture texture2;
+    renderTools.imageToTexture(sampleImg, texture2);
+    renderTools.switchToOpenGL(gl);
+
+    gl->glActiveTexture(GL_TEXTURE1);
+    texture2.bind(gl);
+
+    gl->glUniform1f(sOpacity2Loc, sampleOpacity);
+    {
+        const auto& srcGlobalRect = sample->fGlobalRect;
+        const auto& dstGlobalRect = renderTools.fGlobalRect;
+
+        const float left = srcGlobalRect.left() - dstGlobalRect.left();
+        const float right = srcGlobalRect.right() - dstGlobalRect.left();
+        const float top = srcGlobalRect.top() - dstGlobalRect.top();
+        const float bottom = srcGlobalRect.bottom() - dstGlobalRect.top();
+
+        const float width = dstGlobalRect.width();
+        const float height = dstGlobalRect.height();
+
+        gl->glUniform4f(sRect2Loc, left/width, top/height,
+                        (right + 1)/width, (bottom + 1)/height);
+    }
+
+    gl->glBindVertexArray(renderTools.getSquareVAO());
+    gl->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+void MotionBlurCaller::processGpu(QGL33 * const gl,
+                                  GpuRenderTools &renderTools) {
+    renderTools.switchToOpenGL(gl);
+
+    if(!sInitialized) {
+        sInitialize(gl);
+        sInitialized = true;
+    }
+
+//    renderTools.requestTargetFbo();
+//    renderTools.swapTextures();
+
+
+    gl->glUseProgram(sProgramId);
+
+
+
+    const qreal opacityStep = 1/(mSampleCount + 1);
+    qreal sampleOpacity = opacityStep*(1 - qCeil(mSampleCount) + mSampleCount);
+    for(const auto& sample : mSamples) {
+        renderTools.requestTargetFbo().bind(gl);
+        gl->glClear(GL_COLOR_BUFFER_BIT);
+
+        gl->glActiveTexture(GL_TEXTURE0);
+        renderTools.getSrcTexture().bind(gl);
+
+        const qreal sampleAlpha = qBound(0., sampleOpacity*sampleOpacity*mOpacity, 1.);
+        sampleOpacity += opacityStep;
+        sDrawSample(sample, sampleAlpha, renderTools, gl);
+
+        renderTools.swapTextures();
     }
 }
 

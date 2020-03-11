@@ -16,6 +16,9 @@
 
 #ifndef GPURENDERTOOLS_H
 #define GPURENDERTOOLS_H
+
+#include <QRect>
+
 #include "glhelpers.h"
 #include "switchablecontext.h"
 #include "etextureframebuffer.h"
@@ -26,7 +29,8 @@ class GpuRenderTools {
 public:
     GpuRenderTools(QGL33* const gl,
                    SwitchableContext& context,
-                   sk_sp<SkImage> img);
+                   sk_sp<SkImage> img,
+                   const QRect& globalRect);
 
     ~GpuRenderTools();
 
@@ -50,6 +54,8 @@ public:
     //!  but has to be valid.
     eTexture& getSrcTexture();
 
+    bool imageToTexture(sk_sp<SkImage> img, eTexture& texture);
+
     //! @brief Returns TextureFrameBuffer associated with the target texture.
     //! If there is no SkCanvas new SkCanvas is created.
     eTextureFrameBuffer& requestTargetFbo();
@@ -57,6 +63,8 @@ public:
 
     bool validTargetCanvas() const;
     bool validTargetFbo() const;
+
+    const QRect fGlobalRect;
 private:
     GrBackendTexture sourceBackedTexture();
 
@@ -69,6 +77,5 @@ private:
     sk_sp<SkSurface> mSurface;
     SkCanvas* mCanvas = nullptr;
 };
-
 
 #endif // GPURENDERTOOLS_H

@@ -2,5 +2,6 @@
     <qresource prefix="/shaders">
         <file alias="plain.vert">shaders/plain.vert</file>
         <file alias="textured.vert">shaders/textured.vert</file>
+        <file alias="maxalpha.frag">shaders/maxalpha.frag</file>
     </qresource>
 </RCC>

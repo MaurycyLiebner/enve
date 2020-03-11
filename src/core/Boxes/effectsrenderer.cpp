@@ -31,7 +31,7 @@ void EffectsRenderer::processGpu(QGL33 * const gl,
 
     glViewport(0, 0, srcWidth, srcHeight);
 
-    GpuRenderTools renderTools(gl, context, srcImage);
+    GpuRenderTools renderTools(gl, context, srcImage, boxData->fGlobalRect);
     while(mCurrentId < mEffects.count()) {
         const auto& effect = mEffects.at(mCurrentId);
         if(effect->hardwareSupport() == HardwareSupport::cpuOnly) break;

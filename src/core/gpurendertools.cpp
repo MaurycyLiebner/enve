@@ -22,17 +22,10 @@
 
 GpuRenderTools::GpuRenderTools(QGL33 * const gl,
                                SwitchableContext &context,
-                               sk_sp<SkImage> img) :
-    mGL(gl), mContext(context) {
-    mContext.switchToSkia();
-    if(!img->isTextureBacked())
-        img = img->makeTextureImage(context.grContext(), GrMipMapped::kNo);
-    const auto grTex = img->getBackendTexture(true);
-    GrGLTextureInfo texInfo;
-    grTex.getGLTextureInfo(&texInfo);
-    mSrcTexture.fId = texInfo.fID;
-    mSrcTexture.fWidth = grTex.width();
-    mSrcTexture.fHeight = grTex.height();
+                               sk_sp<SkImage> img,
+                               const QRect& globalRect) :
+    fGlobalRect(globalRect), mGL(gl), mContext(context) {
+    imageToTexture(img, mSrcTexture);
 }
 
 GpuRenderTools::~GpuRenderTools() {
@@ -84,6 +77,19 @@ SkCanvas *GpuRenderTools::requestTargetCanvas() {
 
 eTexture &GpuRenderTools::getSrcTexture() {
     return mSrcTexture;
+}
+
+bool GpuRenderTools::imageToTexture(sk_sp<SkImage> img, eTexture& texture) {
+    mContext.switchToSkia();
+    if(!img->isTextureBacked())
+        img = img->makeTextureImage(mContext.grContext(), GrMipMapped::kNo);
+    const auto grTex = img->getBackendTexture(true);
+    GrGLTextureInfo texInfo;
+    grTex.getGLTextureInfo(&texInfo);
+    texture.fId = texInfo.fID;
+    texture.fWidth = grTex.width();
+    texture.fHeight = grTex.height();
+    return true;
 }
 
 eTextureFrameBuffer &GpuRenderTools::requestTargetFbo() {
