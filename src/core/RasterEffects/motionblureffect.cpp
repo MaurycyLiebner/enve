@@ -37,12 +37,6 @@ public:
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData &data);
 
-    int cpuThreads(const int available, const int area) const {
-        Q_UNUSED(available)
-        Q_UNUSED(area)
-        return 1;
-    }
-
     bool srcDstSeparation() const { return false; }
 private:
     const qreal mSampleCount;
@@ -75,12 +69,20 @@ MotionBlurEffect::MotionBlurEffect() :
     });
 }
 
+class MotionBlurEffectBlock {
+public:
+    MotionBlurEffectBlock(bool& block) : mBlock(block) { mBlock = true; }
+    ~MotionBlurEffectBlock() { mBlock = false; }
+private:
+    bool& mBlock;
+};
+
 stdsptr<RasterEffectCaller> MotionBlurEffect::getEffectCaller(
             const qreal relFrame, const qreal resolution,
             const qreal influence, BoxRenderData * const data) const {
-    if(mBlocked) return nullptr;
     Q_UNUSED(resolution)
-    mBlocked = true;
+    if(mBlocked) return nullptr;
+    const MotionBlurEffectBlock block(mBlocked);
     const auto idRange = mParentBox->prp_getIdenticalRelRange(relFrame);
     qreal sampleCount = mNumberSamples->getEffectiveValue(relFrame)*influence;
     const qreal opacity = mOpacity->getEffectiveValue(relFrame)*0.01*influence;
@@ -107,7 +109,6 @@ stdsptr<RasterEffectCaller> MotionBlurEffect::getEffectCaller(
 
         sampleRelFrame += frameStep;
     }
-    mBlocked = false;
     return enve::make_shared<MotionBlurCaller>(
                 instanceHwSupport(), sampleCount, opacity, samples);
 }
@@ -158,9 +159,9 @@ void replaceIfHigherAlpha(const int x0, const int y0,
     const int iSrcYInc = qMax(0, srcRowWidth - xMax)*4;
     for(int y = 0; y < yMax; y++) {
         for(int x = 0; x < xMax; x++) {
-            const int maxSrcId = src.width()*src.height()*4;
+            const int maxSrcId = srcRowWidth*src.height()*4;
             Q_ASSERT(srcId + 3 < maxSrcId);
-            const int maxDstId = dst.width()*dst.height()*4;
+            const int maxDstId = dstRowWidth*dst.height()*4;
             Q_ASSERT(dstId + 3 < maxDstId);
             uchar& dstAlpha = dstD[dstId + 3];
             const uchar srcAlpha = static_cast<uchar>(qRound(srcD[srcId + 3]*alpha));
@@ -180,7 +181,7 @@ void replaceIfHigherAlpha(const int x0, const int y0,
 
 void MotionBlurCaller::processCpu(CpuRenderTools& renderTools,
                                    const CpuRenderData &data) {
-    const auto& bitmap = renderTools.fSrcBtmp;
+    const auto& bitmap = renderTools.fDstBtmp;
     SkPixmap pixmap;
     if(!bitmap.peekPixels(&pixmap)) return;
     const qreal opacityStep = 1/(mSampleCount + 1);
@@ -194,8 +195,12 @@ void MotionBlurCaller::processCpu(CpuRenderTools& renderTools,
         if(!rasterImg) continue;
         SkPixmap samplePixmap;
         if(!rasterImg->peekPixels(&samplePixmap)) continue;
-        const QPoint drawPos = sample->fGlobalRect.topLeft() - data.fPos;
-        replaceIfHigherAlpha(qMax(0, drawPos.x()), qMax(0, drawPos.y()),
-                             pixmap, samplePixmap, sampleAlpha);
+        QPoint offset = sample->fGlobalRect.topLeft() - data.fPos;
+        SkPixmap samplePart;
+        const auto sampleTile = data.fTexTile.makeOffset(-offset.x(), -offset.y());
+        if(!samplePixmap.extractSubset(&samplePart, sampleTile)) continue;
+        const int drawX = sampleTile.x() < 0 ? offset.x() - data.fTexTile.x() : 0;
+        const int drawY = sampleTile.y() < 0 ? offset.y() - data.fTexTile.y() : 0;
+        replaceIfHigherAlpha(drawX, drawY, pixmap, samplePart, sampleAlpha);
     }
 }

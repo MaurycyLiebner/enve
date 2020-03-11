@@ -77,9 +77,7 @@ void BlurEffectCaller::processCpu(CpuRenderTools &renderTools,
     SkPaint paint;
     paint.setImageFilter(filter);
 
-    SkBitmap tile;
-    renderTools.fDstBtmp.extractSubset(&tile, data.fTexTile);
-    SkCanvas canvas(tile);
+    SkCanvas canvas(renderTools.fDstBtmp);
     canvas.clear(SK_ColorTRANSPARENT);
 
     const int radCeil = static_cast<int>(ceil(mRadius));

@@ -65,8 +65,13 @@ void EffectSubTaskSpawner_priv::splitSpawn(CpuRenderData& data,
         const auto decRemaining = [this]() { decRemaining_k(); };
         const auto subTask = enve::make_shared<eCustomCpuTask>(nullptr,
             [this, data]() {
-                auto tools = mUseDst ? CpuRenderTools{mSrcBitmap, mDstBitmap}
-                                     : CpuRenderTools{mSrcBitmap, mSrcBitmap};
+                SkBitmap dstBitmap;
+                if(mUseDst) {
+                    mDstBitmap.extractSubset(&dstBitmap, data.fTexTile);
+                } else {
+                    mSrcBitmap.extractSubset(&dstBitmap, data.fTexTile);
+                }
+                CpuRenderTools tools{mSrcBitmap, dstBitmap};
                 mEffectCaller->processCpu(tools, data);
             }, decRemaining, decRemaining);
         subTask->queTask();

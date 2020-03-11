@@ -120,9 +120,7 @@ void ShadowEffectCaller::processGpu(QGL33 * const gl,
 void ShadowEffectCaller::processCpu(CpuRenderTools &renderTools,
                                     const CpuRenderData &data) {
     Q_UNUSED(data)
-    SkBitmap tile;
-    renderTools.fDstBtmp.extractSubset(&tile, data.fTexTile);
-    SkCanvas canvas(tile);
+    SkCanvas canvas(renderTools.fDstBtmp);
     canvas.clear(SK_ColorTRANSPARENT);
 
     const int radCeil = static_cast<int>(ceil(mRadius));
