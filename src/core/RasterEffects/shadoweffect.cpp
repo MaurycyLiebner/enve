@@ -62,8 +62,10 @@ ShadowEffect::ShadowEffect() :
 
 
 stdsptr<RasterEffectCaller>
-ShadowEffect::getEffectCaller(const qreal relFrame, const qreal resolution,
-                              const qreal influence) const {
+ShadowEffect::getEffectCaller(
+        const qreal relFrame, const qreal resolution,
+        const qreal influence, BoxRenderData * const data) const {
+    Q_UNUSED(data)
     const qreal blur = mBlurRadius->getEffectiveValue(relFrame)*resolution;
     const QColor color = mColor->getColor(relFrame);
     const QPointF trans = mTranslation->getEffectiveValue(relFrame)*resolution;
@@ -119,12 +121,12 @@ void ShadowEffectCaller::processCpu(CpuRenderTools &renderTools,
                                     const CpuRenderData &data) {
     Q_UNUSED(data)
     SkBitmap tile;
-    renderTools.requestBackupBitmap().extractSubset(&tile, data.fTexTile);
+    renderTools.fDstBtmp.extractSubset(&tile, data.fTexTile);
     SkCanvas canvas(tile);
     canvas.clear(SK_ColorTRANSPARENT);
 
     const int radCeil = static_cast<int>(ceil(mRadius));
-    const auto& srcBtmp = renderTools.fSrcDst;
+    const auto& srcBtmp = renderTools.fSrcBtmp;
     const auto& texTile = data.fTexTile;
     auto srcRect = texTile.makeOutset(radCeil, radCeil);
     if(srcRect.intersect(srcRect, srcBtmp.bounds())) {
@@ -138,6 +140,4 @@ void ShadowEffectCaller::processCpu(CpuRenderTools &renderTools,
         setupPaint(paint, 1);
         canvas.drawBitmap(tileSrc, drawX, drawY, &paint);
     }
-
-    renderTools.swap();
 }

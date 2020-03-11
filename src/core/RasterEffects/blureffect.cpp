@@ -25,7 +25,9 @@ BlurEffect::BlurEffect() :
 }
 
 stdsptr<RasterEffectCaller> BlurEffect::getEffectCaller(
-        const qreal relFrame, const qreal resolution, const qreal influence) const {
+        const qreal relFrame, const qreal resolution,
+        const qreal influence, BoxRenderData * const data) const {
+    Q_UNUSED(data)
     const qreal radius = mRadius->getEffectiveValue(relFrame)*resolution*influence;
     if(isZero4Dec(radius)) return nullptr;
     return enve::make_shared<BlurEffectCaller>(instanceHwSupport(), radius);
@@ -76,12 +78,12 @@ void BlurEffectCaller::processCpu(CpuRenderTools &renderTools,
     paint.setImageFilter(filter);
 
     SkBitmap tile;
-    renderTools.requestBackupBitmap().extractSubset(&tile, data.fTexTile);
+    renderTools.fDstBtmp.extractSubset(&tile, data.fTexTile);
     SkCanvas canvas(tile);
     canvas.clear(SK_ColorTRANSPARENT);
 
     const int radCeil = static_cast<int>(ceil(mRadius));
-    const auto& srcBtmp = renderTools.fSrcDst;
+    const auto& srcBtmp = renderTools.fSrcBtmp;
     const auto& texTile = data.fTexTile;
     auto srcRect = texTile.makeOutset(radCeil, radCeil);
     if(srcRect.intersect(srcRect, srcBtmp.bounds())) {
@@ -91,6 +93,4 @@ void BlurEffectCaller::processCpu(CpuRenderTools &renderTools,
         const int drawY = srcRect.top() - texTile.top();
         canvas.drawBitmap(tileSrc, drawX, drawY, &paint);
     }
-
-    renderTools.swap();
 }

@@ -36,8 +36,9 @@ void ShaderEffect::writeIdentifier(eWriteStream& dst) const {
 
 stdsptr<RasterEffectCaller> ShaderEffect::getEffectCaller(
         const qreal relFrame, const qreal resolution,
-        const qreal influence) const {
+        const qreal influence, BoxRenderData * const data) const {
     Q_UNUSED(influence)
+    Q_UNUSED(data)
     std::unique_ptr<ShaderEffectJS> engineUPtr;
     takeJSEngine(engineUPtr);
     ShaderEffectJS& engine = *engineUPtr;

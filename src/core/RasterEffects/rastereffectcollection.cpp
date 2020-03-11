@@ -80,9 +80,8 @@ void RasterEffectCollection::addEffects(const qreal relFrame,
         if(!rEffect->isVisible()) continue;
         if(zeroInfluence && rEffect->skipZeroInfluence(relFrame)) continue;
         const auto effectRenderData = rEffect->getEffectCaller(
-                    relFrame, data->fResolution, influence);
-        if(!effectRenderData) continue;
-        data->addEffect(effectRenderData);
+                    relFrame, data->fResolution, influence, data);
+        if(effectRenderData) data->addEffect(effectRenderData);
     }
 }
 
@@ -119,6 +118,7 @@ qsptr<ShaderEffect> readIdCreateShaderEffect(eReadStream& src) {
 #include "RasterEffects/customrastereffectcreator.h"
 #include "RasterEffects/blureffect.h"
 #include "RasterEffects/shadoweffect.h"
+#include "RasterEffects/motionblureffect.h"
 
 qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream &src) {
     RasterEffectType type;
@@ -128,6 +128,8 @@ qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream &src) {
             return enve::make_shared<BlurEffect>();
         case(RasterEffectType::SHADOW):
             return enve::make_shared<ShadowEffect>();
+        case(RasterEffectType::MOTION_BLUR):
+            return enve::make_shared<MotionBlurEffect>();
         case(RasterEffectType::CUSTOM): {
             const auto id = CustomIdentifier::sRead(src);
             const auto eff = CustomRasterEffectCreator::sCreateForIdentifier(id);

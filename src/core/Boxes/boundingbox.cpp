@@ -468,13 +468,23 @@ void BoundingBox::planUpdate(const UpdateReason reason) {
     }
 }
 
+
+stdsptr<BoxRenderData> BoundingBox::queExternalRender(const qreal relFrame) {
+    const auto renderData = createRenderData(relFrame);
+    if(!renderData) return nullptr;
+    renderData->fParentIsTarget = false;
+    setupRenderData(relFrame, renderData.get(), getParentScene());
+    renderData->queTask();
+    return renderData;
+}
+
 stdsptr<BoxRenderData> BoundingBox::queRender(const qreal relFrame) {
-    const auto currentRenderData = updateCurrentRenderData(relFrame);
-    if(!currentRenderData) return nullptr;
-    setupRenderData(relFrame, currentRenderData, getParentScene());
-    const auto currentSPtr = enve::shared(currentRenderData);
-    currentSPtr->queTask();
-    return currentSPtr;
+    const auto renderData = updateCurrentRenderData(relFrame);
+    if(!renderData) return nullptr;
+    setupRenderData(relFrame, renderData, getParentScene());
+    const auto renderDataSPtr = enve::shared(renderData);
+    renderDataSPtr->queTask();
+    return renderDataSPtr;
 }
 
 void BoundingBox::queTasks() {
@@ -486,10 +496,15 @@ void BoundingBox::queTasks() {
     queRender(relFrame);
 }
 
-BoxRenderData *BoundingBox::updateCurrentRenderData(const qreal relFrame) {
+stdsptr<BoxRenderData> BoundingBox::createRenderData(const qreal relFrame) {
     const auto renderData = createRenderData();
     if(!renderData) return nullptr;
     renderData->fRelFrame = relFrame;
+    return renderData;
+}
+
+BoxRenderData *BoundingBox::updateCurrentRenderData(const qreal relFrame) {
+    const auto renderData = createRenderData(relFrame);
     mRenderDataHandler.addItemAtRelFrame(renderData);
     return renderData.get();
 }
@@ -835,13 +850,6 @@ void BoundingBox::requestGlobalPivotUpdateIfSelected() {
     if(isSelected()) emit globalPivotInfluenced();
 }
 
-void BoundingBox::getMotionBlurProperties(QList<Property*> &list) const {
-    list.append(mTransformAnimator->getScaleAnimator());
-    list.append(mTransformAnimator->getPosAnimator());
-    list.append(mTransformAnimator->getPivotAnimator());
-    list.append(mTransformAnimator->getRotAnimator());
-}
-
 void BoundingBox::applyParentTransform() {
     if(!mParentTransform) return;
     const auto parentTransform = mParentTransform->getRelativeTransform();
@@ -1000,15 +1008,23 @@ void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     setupCanvasMenu(menu->addMenu("Actions"));
 }
 
-FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
-        const int relFrame, const bool takeAncestorsIntoAccount) {
-    FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
+void BoundingBox::getMotionBlurProperties(QList<Property*> &list) const {
+    list.append(mTransformAnimator->getScaleAnimator());
+    list.append(mTransformAnimator->getPosAnimator());
+    list.append(mTransformAnimator->getPivotAnimator());
+    list.append(mTransformAnimator->getRotAnimator());
+    list.append(mTransformAnimator->getShearAnimator());
+}
+
+FrameRange BoundingBox::getMotionBlurIdenticalRange(
+        const qreal relFrame, const bool inheritedTransform) {
+    FrameRange range(FrameRange::EMINMAX);
     if(isVisible()) {
         const auto durRect = getDurationRectangle();
-        if(isFrameInDurationRect(relFrame)) {
-            QList<Property*> propertiesT;
-            getMotionBlurProperties(propertiesT);
-            for(const auto& child : propertiesT) {
+        if(isFrameFInDurationRect(relFrame)) {
+            QList<Property*> props;
+            getMotionBlurProperties(props);
+            for(const auto& child : props) {
                 if(range.isUnary()) break;
                 auto childRange = child->prp_getIdenticalRelRange(relFrame);
                 range *= childRange;
@@ -1023,13 +1039,15 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
             }
         }
     } else {
-        return {FrameRange::EMIN, FrameRange::EMAX};
+        return FrameRange::EMINMAX;
     }
     const auto parent = getParentGroup();
-    if(!parent || takeAncestorsIntoAccount) return range;
+    if(!parent || !inheritedTransform) return range;
     if(range.isUnary()) return range;
-    const int parentRel = parent->prp_absFrameToRelFrame(prp_relFrameToAbsFrame(relFrame));
-    auto parentRange = parent->BoundingBox::getFirstAndLastIdenticalForMotionBlur(parentRel);
+    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+    const qreal parentRel = parent->prp_absFrameToRelFrameF(absFrame);
+    auto parentRange = parent->BoundingBox::getMotionBlurIdenticalRange(
+                           parentRel, inheritedTransform);
 
     return range*parentRange;
 }

@@ -44,11 +44,10 @@ void EffectsRenderer::processGpu(QGL33 * const gl,
 
 #include "effectsubtaskspawner.h"
 void EffectsRenderer::processCpu(BoxRenderData * const boxData) {
-    const auto& effect = mEffects.at(mCurrentId);
+    const auto& effect = mEffects.at(mCurrentId++);
 
     Q_ASSERT(effect->hardwareSupport() != HardwareSupport::gpuOnly);
     EffectSubTaskSpawner::sSpawn(effect, boxData->ref<BoxRenderData>());
-    mCurrentId++;
 }
 
 void EffectsRenderer::setBaseGlobalRect(SkIRect &currRect,

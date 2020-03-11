@@ -16,8 +16,11 @@
 
 #ifndef GLHELPERS_H
 #define GLHELPERS_H
+
 #include <QOpenGLFunctions_3_3_Core>
+#include <QPoint>
 #include "skia/skiaincludes.h"
+
 #include "exceptions.h"
 
 typedef QOpenGLFunctions_3_3_Core QGL33;
@@ -62,8 +65,7 @@ struct CpuRenderData {
     SkIRect fTexTile;
 
     //! @brief Pixel {0, 0} position in scene coordinates
-    int fPosX;
-    int fPosY;
+    QPoint fPos;
 
     //! @brief Texture size
     uint fWidth;

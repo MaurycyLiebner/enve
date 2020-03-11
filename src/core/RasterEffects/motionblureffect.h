@@ -14,38 +14,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EBLUR_H
-#define EBLUR_H
+#ifndef MOTIONBLUREFFECT_H
+#define MOTIONBLUREFFECT_H
 
-#include "eblur_global.h"
-#include "enveCore/gpurendertools.h"
+#include "rastereffect.h"
 
-class eBlurCaller : public RasterEffectCaller {
+class BoundingBox;
+
+class MotionBlurEffect : public RasterEffect {
+    friend class SelfRef;
+    MotionBlurEffect();
 public:
-    eBlurCaller(const HardwareSupport hwSupport,
-                const qreal radius);
-
-    void processGpu(QGL33 * const gl,
-                    GpuRenderTools& renderTools);
-    void processCpu(CpuRenderTools& renderTools,
-                    const CpuRenderData &data);
-private:
-    const float mRadius;
-};
-
-class eBlur : public CustomRasterEffect {
-public:
-    eBlur();
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
     stdsptr<RasterEffectCaller> getEffectCaller(
             const qreal relFrame, const qreal resolution,
-            const qreal influence, BoxRenderData * const data) const;
-    QMargins getMargin() const;
-    bool forceMargin() const { return true; }
-
-    CustomIdentifier getIdentifier() const;
+            const qreal influence, BoxRenderData* const data) const;
 private:
-    qsptr<QrealAnimator> mRadius;
+    FrameRange getMotionBlurPropsIdenticalRange(const int relFrame) const;
+
+    mutable bool mBlocked = false;
+    qptr<BoundingBox> mParentBox;
+    qsptr<QrealAnimator> mOpacity;
+    qsptr<QrealAnimator> mNumberSamples;
+    qsptr<QrealAnimator> mFrameStep;
 };
 
-#endif // EBLUR_H
+#endif // MOTIONBLUREFFECT_H

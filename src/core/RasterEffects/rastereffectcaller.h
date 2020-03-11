@@ -30,10 +30,6 @@ public:
     RasterEffectCaller(const HardwareSupport hwSupport,
                        const bool forceMargin, const QMargins& margin);
 
-    HardwareSupport hardwareSupport() const {
-        return fHwSupport;
-    }
-
     virtual void processGpu(QGL33 * const gl,
                             GpuRenderTools& renderTools) {
         Q_UNUSED(gl)
@@ -47,6 +43,12 @@ public:
     }
 
     virtual int cpuThreads(const int available, const int area) const;
+
+    virtual bool srcDstSeparation() const { return true; }
+
+    HardwareSupport hardwareSupport() const {
+        return fHwSupport;
+    }
 
     bool interchangeable() const {
         return fHwSupport != HardwareSupport::cpuOnly &&

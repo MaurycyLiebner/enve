@@ -25,8 +25,10 @@ enum class RasterEffectType : short {
     SHADOW,
     CUSTOM, // C++
     CUSTOM_SHADER, // xml, GLSL
-    TYPE_COUNT
+    MOTION_BLUR
 };
+
+class BoxRenderData;
 
 class RasterEffect : public eEffect {
     e_OBJECT
@@ -38,8 +40,10 @@ protected:
                  const RasterEffectType type);
 public:
     virtual stdsptr<RasterEffectCaller> getEffectCaller(
-            const qreal relFrame, const qreal resolution,
-            const qreal influence) const = 0;
+            const qreal relFrame,
+            const qreal resolution,
+            const qreal influence,
+            BoxRenderData * const data) const = 0;
 
     virtual bool forceMargin() const { return false; }
     virtual QMargins getMargin() const { return QMargins(); }

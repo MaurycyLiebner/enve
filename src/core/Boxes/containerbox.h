@@ -81,8 +81,8 @@ public:
     void setupCanvasMenu(PropertyMenu * const menu);
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
-    FrameRange getFirstAndLastIdenticalForMotionBlur(
-            const int relFrame, const bool takeAncestorsIntoAccount = true);
+    FrameRange getMotionBlurIdenticalRange(
+            const qreal relFrame, const bool inheritedTransform);
 
     void prp_afterFrameShiftChanged(const FrameRange& oldAbsRange,
                                     const FrameRange& newAbsRange);

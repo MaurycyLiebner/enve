@@ -18,21 +18,9 @@
 #define CPURENDERTOOLS_H
 
 #include "skia/skiahelpers.h"
-class CpuRenderTools {
-public:
-    CpuRenderTools(const SkBitmap& srcBtmp);
-    CpuRenderTools(const SkBitmap& srcBtmp,
-                   const SkBitmap& backupBtmp);
-
-    const SkBitmap fSrcDst;
-
-    bool hasBackupBitmap() const { return !fBackupBtmp.isNull(); }
-
-    SkBitmap requestBackupBitmap();
-
-    void swap();
-private:
-    SkBitmap fBackupBtmp;
+struct CpuRenderTools {
+    const SkBitmap fSrcBtmp;
+    SkBitmap fDstBtmp;
 };
 
 #endif // CPURENDERTOOLS_H

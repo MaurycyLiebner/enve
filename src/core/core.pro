@@ -231,6 +231,7 @@ SOURCES += \
     Properties/emimedata.cpp \
     RasterEffects/blureffect.cpp \
     RasterEffects/customrastereffect.cpp \
+    RasterEffects/motionblureffect.cpp \
     RasterEffects/rastereffect.cpp \
     RasterEffects/rastereffectcaller.cpp \
     RasterEffects/rastereffectcollection.cpp \
@@ -532,6 +533,7 @@ HEADERS += \
     Properties/namedproperty.h \
     RasterEffects/blureffect.h \
     RasterEffects/customrastereffect.h \
+    RasterEffects/motionblureffect.h \
     RasterEffects/rastereffect.h \
     RasterEffects/customrastereffectcreator.h \
     RasterEffects/rastereffectcaller.h \

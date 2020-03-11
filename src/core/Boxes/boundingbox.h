@@ -208,8 +208,8 @@ public:
     virtual void updateCurrentPreviewDataFromRenderData(
             BoxRenderData* renderData);
 
-    virtual FrameRange getFirstAndLastIdenticalForMotionBlur(
-            const int relFrame, const bool takeAncestorsIntoAccount = true);
+    virtual FrameRange getMotionBlurIdenticalRange(
+            const qreal relFrame, const bool inheritedTransform);
 
     virtual HardwareSupport hardwareSupport() const {
         return HardwareSupport::cpuPreffered;
@@ -250,7 +250,9 @@ public:
 
     BasicTransformAnimator *getTransformAnimator() const;
 
+    stdsptr<BoxRenderData> createRenderData(const qreal relFrame);
     stdsptr<BoxRenderData> queRender(const qreal relFrame);
+    stdsptr<BoxRenderData> queExternalRender(const qreal relFrame);
 
     void setupWithoutRasterEffects(const qreal relFrame,
                                    BoxRenderData * const data,

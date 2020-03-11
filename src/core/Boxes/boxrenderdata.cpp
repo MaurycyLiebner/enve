@@ -105,6 +105,7 @@ void BoxRenderData::processGpu(QGL33 * const gl,
                 fGlobalRect.width(), fGlobalRect.height(),
                 kRGBA_8888_SkColorType, GrMipMapped::kNo,
                 GrRenderable::kYes);
+    if(!grTex.isValid()) return;
     const auto surf = SkSurface::MakeFromBackendTexture(
                 grContext, grTex, kTopLeft_GrSurfaceOrigin, 0,
                 kRGBA_8888_SkColorType, nullptr, nullptr);
@@ -121,6 +122,11 @@ void BoxRenderData::processGpu(QGL33 * const gl,
        mEffectsRenderer.nextHardwareSupport() == HardwareSupport::cpuOnly)
         fRenderedImage = fRenderedImage->makeRasterImage();
     else mEffectsRenderer.processGpu(gl, context, this);
+//    if(mEffectsRenderer.isEmpty()) return;
+//    const auto nextEffectHw = mEffectsRenderer.nextHardwareSupport();
+//    if(nextEffectHw != HardwareSupport::cpuOnly) {
+//        mEffectsRenderer.processGpu(gl, context, this);
+//    }
 }
 #include "textboxrenderdata.h"
 void BoxRenderData::process() {

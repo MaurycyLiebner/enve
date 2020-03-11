@@ -24,7 +24,11 @@
 class EffectSubTaskSpawner_priv {
 public:
     EffectSubTaskSpawner_priv(const stdsptr<RasterEffectCaller>& effect,
-                              const stdsptr<BoxRenderData>& data);
+                              const stdsptr<BoxRenderData>& data) :
+        mUseDst(effect->srcDstSeparation()),
+        mEffectCaller(effect), mData(data) {}
+
+    void initialize();
 private:
     void decRemaining_k();
     void spawn();
@@ -32,21 +36,23 @@ private:
                     const SkIRect& rect,
                     const int nSplits);
 
+    const bool mUseDst;
     int mRemaining = 0;
     const stdsptr<RasterEffectCaller> mEffectCaller;
     const stdsptr<BoxRenderData> mData;
     SkBitmap mSrcBitmap;
     SkBitmap mDstBitmap;
+
+    sk_sp<SkImage> mSrcRasterImg;
 };
 
-EffectSubTaskSpawner_priv::EffectSubTaskSpawner_priv(
-        const stdsptr<RasterEffectCaller> &effect,
-        const stdsptr<BoxRenderData> &data) :
-    mEffectCaller(effect), mData(data) {
+void EffectSubTaskSpawner_priv::initialize() {
     SkPixmap pixmap;
-    data->fRenderedImage->peekPixels(&pixmap);
+    const auto& srcImg = mData->fRenderedImage;
+    mSrcRasterImg = srcImg->makeRasterImage();
+    mSrcRasterImg->peekPixels(&pixmap);
     mSrcBitmap.installPixels(pixmap);
-    mDstBitmap.allocPixels(mSrcBitmap.info());
+    if(mUseDst) mDstBitmap.allocPixels(mSrcBitmap.info());
     spawn();
 }
 
@@ -56,11 +62,13 @@ void EffectSubTaskSpawner_priv::splitSpawn(CpuRenderData& data,
     if(nSplits == 0) return;
     if(nSplits == 1) {
         data.fTexTile = rect;
+        const auto decRemaining = [this]() { decRemaining_k(); };
         const auto subTask = enve::make_shared<eCustomCpuTask>(nullptr,
             [this, data]() {
-                CpuRenderTools tools(mSrcBitmap, mDstBitmap);
+                auto tools = mUseDst ? CpuRenderTools{mSrcBitmap, mDstBitmap}
+                                     : CpuRenderTools{mSrcBitmap, mSrcBitmap};
                 mEffectCaller->processCpu(tools, data);
-            }, [this]() { decRemaining_k(); }, nullptr);
+            }, decRemaining, decRemaining);
         subTask->queTask();
         return;
     }
@@ -102,10 +110,8 @@ void EffectSubTaskSpawner_priv::spawn() {
     auto& srcImage = mData->fRenderedImage;
     const int srcWidth = srcImage->width();
     const int srcHeight = srcImage->height();
-    const QPoint gPos = mData->fGlobalRect.topLeft();
     CpuRenderData data;
-    data.fPosX = static_cast<int>(gPos.x());
-    data.fPosY = static_cast<int>(gPos.y());
+    data.fPos = mData->fGlobalRect.topLeft();
     data.fWidth = static_cast<uint>(srcWidth);
     data.fHeight = static_cast<uint>(srcHeight);
 
@@ -115,9 +121,17 @@ void EffectSubTaskSpawner_priv::spawn() {
 void EffectSubTaskSpawner_priv::decRemaining_k() {
     if(--mRemaining > 0) return;
     if(mData->getState() != eTaskState::canceled) {
-        mData->fRenderedImage = SkiaHelpers::transferDataToSkImage(mDstBitmap);
-        if(mData->nextStep()) mData->queTask();
-        else mData->finishedProcessing();
+        if(mUseDst) {
+            mData->fRenderedImage = SkiaHelpers::transferDataToSkImage(
+                                        mDstBitmap);
+        } else {
+            mData->fRenderedImage = mSrcRasterImg;
+        }
+        if(mData->nextStep()) {
+            mData->queTask();
+        } else {
+            mData->finishedProcessing();
+        }
     }
     delete this;
 }
@@ -125,5 +139,6 @@ void EffectSubTaskSpawner_priv::decRemaining_k() {
 
 void EffectSubTaskSpawner::sSpawn(const stdsptr<RasterEffectCaller> &effect,
                                   const stdsptr<BoxRenderData> &data) {
-    new EffectSubTaskSpawner_priv(effect, data);
+    const auto spawner = new EffectSubTaskSpawner_priv(effect, data);
+    spawner->initialize();
 }

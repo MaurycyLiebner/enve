@@ -15,24 +15,3 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "cpurendertools.h"
-
-CpuRenderTools::CpuRenderTools(const SkBitmap &srcBtmp) :
-    fSrcDst(srcBtmp) {}
-
-CpuRenderTools::CpuRenderTools(const SkBitmap &srcBtmp,
-                               const SkBitmap &backupBtmp) :
-    fSrcDst(srcBtmp), fBackupBtmp(backupBtmp) {
-    Q_ASSERT(srcBtmp.width() == backupBtmp.width() &&
-             srcBtmp.height() == backupBtmp.height());
-}
-
-SkBitmap CpuRenderTools::requestBackupBitmap() {
-    if(fBackupBtmp.isNull())
-        fBackupBtmp.allocPixels(fSrcDst.info());
-    return fBackupBtmp;
-}
-
-void CpuRenderTools::swap() {
-    if(fBackupBtmp.isNull()) return;
-    fBackupBtmp.swap(*const_cast<SkBitmap*>(&fSrcDst));
-}

@@ -23,6 +23,7 @@
 void RasterEffectMenuCreator::forEveryEffect(const EffectAdder& add) {
     add("Blur", []() { return enve::make_shared<BlurEffect>(); });
     add("Shadow", []() { return enve::make_shared<ShadowEffect>(); });
+    add("Motion Blur", []() { return enve::make_shared<MotionBlurEffect>(); });
     CustomRasterEffectCreator::sForEveryEffect(add);
     ShaderEffectCreator::sForEveryEffect(add);
 }

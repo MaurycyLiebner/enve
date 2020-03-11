@@ -481,43 +481,20 @@ FrameRange ContainerBox::prp_getIdenticalRelRange(const int relFrame) const {
     return range;
 }
 
-FrameRange ContainerBox::getFirstAndLastIdenticalForMotionBlur(
-        const int relFrame, const bool takeAncestorsIntoAccount) {
-    FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
-    if(isVisible()) {
-        const auto durRect = getDurationRectangle();
-        if(isFrameInDurationRect(relFrame)) {
-            QList<Property*> propertiesT;
-            getMotionBlurProperties(propertiesT);
-            for(const auto& child : propertiesT) {
-                if(range.isUnary()) return range;
-                auto childRange = child->prp_getIdenticalRelRange(relFrame);
-                range *= childRange;
-            }
-
-            for(const auto &child : mContainedBoxes) {
-                if(range.isUnary()) return range;
-                auto childRange = child->getFirstAndLastIdenticalForMotionBlur(
-                            relFrame, false);
-                range *= childRange;
-            }
-
-            if(durRect) range *= durRect->getRelFrameRange();
-        } else {
-            if(relFrame > durRect->getMaxRelFrame()) {
-                range = durRect->getRelFrameRangeToTheRight();
-            } else if(relFrame < durRect->getMinRelFrame()) {
-                range = durRect->getRelFrameRangeToTheLeft();
-            }
+FrameRange ContainerBox::getMotionBlurIdenticalRange(
+        const qreal relFrame, const bool inheritedTransform) {
+    FrameRange range = BoundingBox::getMotionBlurIdenticalRange(
+                           relFrame, inheritedTransform);
+    if(isVisible() && isFrameInDurationRect(relFrame)) {
+        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+        for(const auto &child : mContainedBoxes) {
+            if(range.isUnary()) return range;
+            const qreal childRel = child->prp_absFrameToRelFrameF(absFrame);
+            auto childRange = child->getMotionBlurIdenticalRange(childRel, false);
+            range *= childRange;
         }
     }
-    const auto parent = getParentGroup();
-    if(!parent || takeAncestorsIntoAccount) return range;
-    if(range.isUnary()) return range;
-    int parentRel = parent->prp_absFrameToRelFrame(
-                prp_relFrameToAbsFrame(relFrame));
-    auto parentRange = parent->BoundingBox::getFirstAndLastIdenticalForMotionBlur(parentRel);
-    return range*parentRange;
+    return range;
 }
 
 

@@ -63,7 +63,9 @@ eBlur::eBlur() : CustomRasterEffect(eName().toLower(),
 }
 
 stdsptr<RasterEffectCaller> eBlur::getEffectCaller(
-        const qreal relFrame, const qreal resolution, const qreal influence) const {
+        const qreal relFrame, const qreal resolution,
+        const qreal influence, BoxRenderData * const data) const {
+    Q_UNUSED(data)
     const qreal radius = mRadius->getEffectiveValue(relFrame)*resolution*influence;
     if(isZero4Dec(radius)) return nullptr;
     return enve::make_shared<eBlurCaller>(instanceHwSupport(), radius);
@@ -116,12 +118,12 @@ void eBlurCaller::processCpu(CpuRenderTools &renderTools,
     paint.setImageFilter(filter);
 
     SkBitmap tile;
-    renderTools.requestBackupBitmap().extractSubset(&tile, data.fTexTile);
+    renderTools.fDstBtmp.extractSubset(&tile, data.fTexTile);
     SkCanvas canvas(tile);
     canvas.clear(SK_ColorTRANSPARENT);
 
     const int radCeil = static_cast<int>(ceil(mRadius));
-    const auto& srcBtmp = renderTools.fSrcDst;
+    const auto& srcBtmp = renderTools.fSrcBtmp;
     const auto& texTile = data.fTexTile;
     auto srcRect = texTile.makeOutset(radCeil, radCeil);
     if(srcRect.intersect(srcRect, srcBtmp.bounds())) {
@@ -131,6 +133,4 @@ void eBlurCaller::processCpu(CpuRenderTools &renderTools,
                           srcRect.left() - texTile.left(),
                           srcRect.top() - texTile.top(), &paint);
     }
-
-    renderTools.swap();
 }

@@ -13,7 +13,7 @@ public:
 
     stdsptr<RasterEffectCaller> getEffectCaller(
             const qreal relFrame, const qreal resolution,
-            const qreal influence) const;
+            const qreal influence, BoxRenderData* const data) const;
     bool forceMargin() const { return true; }
 private:
     qsptr<QrealAnimator> mBlurRadius;
