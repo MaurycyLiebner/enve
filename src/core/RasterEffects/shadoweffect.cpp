@@ -1,6 +1,5 @@
 #include "shadoweffect.h"
 
-
 class ShadowEffectCaller : public RasterEffectCaller {
 public:
     ShadowEffectCaller(const HardwareSupport hwSupport,
@@ -19,12 +18,6 @@ public:
                     GpuRenderTools& renderTools);
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData &data);
-
-    int cpuThreads(const int available, const int area) const {
-        if(mTranslation.isZero()) {
-            return RasterEffectCaller::cpuThreads(available, area);
-        } else return 1;
-    }
 private:
     void setupPaint(SkPaint& paint, const int sign) const;
 
@@ -127,6 +120,11 @@ void ShadowEffectCaller::processCpu(CpuRenderTools &renderTools,
     const auto& srcBtmp = renderTools.fSrcBtmp;
     const auto& texTile = data.fTexTile;
     auto srcRect = texTile.makeOutset(radCeil, radCeil);
+    const SkScalar dx = mTranslation.x();
+    const SkScalar dy = mTranslation.y();
+    const int ceilDX = isZero4Dec(dx) ? 0 : (dx > 0 ? qCeil(dx) : qFloor(dx));
+    const int ceilDY = isZero4Dec(dy) ? 0 : (dy > 0 ? qCeil(dy) : qFloor(dy));
+    srcRect.adjust(-ceilDX, -ceilDY, 0, 0);
     if(srcRect.intersect(srcRect, srcBtmp.bounds())) {
         SkBitmap tileSrc;
         srcBtmp.extractSubset(&tileSrc, srcRect);
