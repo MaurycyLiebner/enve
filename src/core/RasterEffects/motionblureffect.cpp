@@ -177,11 +177,12 @@ void replaceIfHigherAlpha(const int x0, const int y0,
             Q_ASSERT(dstId + 3 < maxDstId);
             uchar& dstAlpha = dstD[dstId + 3];
             const uchar srcAlpha = static_cast<uchar>(qRound(srcD[srcId + 3]*alpha));
-            if(dstAlpha < srcAlpha) {
-                dstD[dstId] = static_cast<uint8_t>(qRound(srcD[srcId]*alpha));
-                dstD[dstId + 1] = static_cast<uint8_t>(qRound(srcD[srcId + 1]*alpha));
-                dstD[dstId + 2] = static_cast<uint8_t>(qRound(srcD[srcId + 2]*alpha));
-                dstAlpha = srcAlpha;
+            if(srcAlpha > dstAlpha) {
+                const qreal m2 = alpha*(1 - qreal(dstAlpha)/srcAlpha);
+                dstD[dstId] += static_cast<uint8_t>(qRound(srcD[srcId]*m2));
+                dstD[dstId + 1] += static_cast<uint8_t>(qRound(srcD[srcId + 1]*m2));
+                dstD[dstId + 2] += static_cast<uint8_t>(qRound(srcD[srcId + 2]*m2));
+                dstAlpha += static_cast<uint8_t>(qRound(srcD[srcId + 3]*m2));
             }
             dstId += 4;
             srcId += 4;

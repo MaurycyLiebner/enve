@@ -34,7 +34,8 @@ void main(void) {
     if(inRect2) {
         vec4 color2 = opacity2*texture2D(texture2, (texCoord - rect2.xy)/(rect2.zw - rect2.xy));
         if(color2.a > color1.a) {
-            fragColor = color2;
+            float m2 = 1 - color1.a/color2.a;
+            fragColor = color1 + color2*m2;
         } else {
             fragColor = color1;
         }
