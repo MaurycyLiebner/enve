@@ -149,6 +149,7 @@ void BoxRenderData::process() {
 
 void BoxRenderData::beforeProcessing(const Hardware hw) {
     if(mStep == Step::EFFECTS) {
+        Q_ASSERT(!mEffectsRenderer.isEmpty());
         if(!fRenderedImage) {
             finishedProcessing();
             return;
@@ -196,7 +197,8 @@ void BoxRenderData::queTaskNow() {
 }
 
 bool BoxRenderData::nextStep() {
-    if(mState == eTaskState::waiting) mState = eTaskState::processing;
+    if(mState == eTaskState::waiting)
+        mState = eTaskState::processing;
     const bool result = !mEffectsRenderer.isEmpty() &&
                         fRenderedImage;
     if(result) mStep = Step::EFFECTS;
