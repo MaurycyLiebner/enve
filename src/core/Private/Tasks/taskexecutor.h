@@ -25,9 +25,9 @@ class TaskExecutor : public QObject {
     Q_OBJECT
 public:
     explicit TaskExecutor() {}
-    void processTask(eTask* task);
+    void processTask(const stdsptr<eTask>* task);
 signals:
-    void finishedTask(eTask*);
+    void finishedTask(const stdsptr<eTask>*);
 };
 
 class HddTaskExecutor : public TaskExecutor {
@@ -38,64 +38,41 @@ signals:
     void hddPartFinished();
 };
 
-class ExecController : public QObject {
+class ExecController : public QThread {
     Q_OBJECT
 protected:
     ExecController(TaskExecutor * const executor,
-                   QObject * const parent = nullptr) : QObject(parent),
-        mExecutor(executor),
-        mExecutorThread(new QThread(this)) {
+                   QObject * const parent = nullptr) : QThread(parent),
+        mExecutor(executor) {
         connect(this, &ExecController::processTaskSignal,
-                mExecutor, &TaskExecutor::processTask);
+                mExecutor, &TaskExecutor::processTask,
+                Qt::QueuedConnection);
         connect(mExecutor, &TaskExecutor::finishedTask,
-                this, &ExecController::finishedTask);
-        mExecutor->moveToThread(mExecutorThread);
-        mExecutorThread->start();
+                this, &ExecController::finishedTask,
+                Qt::QueuedConnection);
+        mExecutor->moveToThread(this);
+        start();
     }
 public:
     void processTask(const stdsptr<eTask>& task) {
-        //if(mCurrentTask) RuntimeThrow("Previous task did not finish yet");
-        //mCurrentTask = task;
-        mTasks << task;//
-        emit processTaskSignal(task.get());
+        mProcessing++;
+        emit processTaskSignal(new stdsptr<eTask>(task));
     }
 
-    void quit() {
-        mExecutorThread->quit();
-    }
-
-    void wait() {
-        mExecutorThread->wait();
-//        {
-//            QEventLoop loop;
-//            QObject::connect(mExecutor, &TaskExecutor::finishedTask,
-//                             &loop, &QEventLoop::quit);
-//            loop.exec();
-//        }
-    }
+    bool finished() const { return mProcessing == 0; }
 signals:
-    void processTaskSignal(eTask*);
-    void finishedTaskSignal(stdsptr<eTask>, ExecController*);
+    void processTaskSignal(const stdsptr<eTask>*);
+    void finishedTaskSignal(const stdsptr<eTask>&, ExecController*);
 protected:
     TaskExecutor * const mExecutor;
 private:
-    void finishedTask(eTask* const task) {
-        for(int i = 0; i < mTasks.count(); i++) {//
-            const auto& iTask = mTasks[i];//
-            if(task == iTask.get()) {//
-                emit finishedTaskSignal(iTask, this);//
-                mTasks.removeAt(i);//
-                break;
-            }//
-        }//
-//        stdsptr<eTask> task;
-//        task.swap(mCurrentTask);
-//        emit finishedTaskSignal(task, this);
+    void finishedTask(const stdsptr<eTask>* task) {
+        mProcessing--;
+        emit finishedTaskSignal(*task, this);
+        delete task;
     }
 
-    QList<stdsptr<eTask>> mTasks;
-//    stdsptr<eTask> mCurrentTask;
-    QThread * const mExecutorThread;
+    int mProcessing = 0;
 };
 
 class CpuExecController : public ExecController {
@@ -111,7 +88,8 @@ public:
         ExecController(new HddTaskExecutor, parent) {
         connect(static_cast<HddTaskExecutor*>(mExecutor),
                 &HddTaskExecutor::hddPartFinished,
-                this, &HddExecController::hddPartFinished);
+                this, &HddExecController::hddPartFinished,
+                Qt::QueuedConnection);
     }
 signals:
     void hddPartFinished();

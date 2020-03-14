@@ -225,7 +225,9 @@ bool TaskScheduler::processNextQuedGpuTask() {
 
 void TaskScheduler::afterCpuTaskFinished(const stdsptr<eTask>& task,
                                          ExecController * const controller) {
-    mFreeCpuExecs << static_cast<CpuExecController*>(controller);
+    if(controller->finished()) {
+        mFreeCpuExecs << static_cast<CpuExecController*>(controller);
+    }
     const bool nextStep = !task->waitingToCancel() && task->nextStep();
     if(nextStep) queCpuTask(task);
     else task->finishedProcessing();
@@ -263,25 +265,25 @@ void TaskScheduler::finishCriticalMemoryState() {
 }
 
 void TaskScheduler::processNextQuedCpuTask() {
-    const int additional = mQuedCpuTasks.taskCount()/mCpuExecutors.count();
+    const int count =  + mQuedCpuTasks.taskCount()/mCpuExecutors.count();
+    bool finished = false;
     while(availableCpuThreads() > 0 && !mQuedCpuTasks.isEmpty()) {
-        const auto task = mQuedCpuTasks.takeQuedForCpuProcessing();
-        if(task) {
+        const auto executor = mFreeCpuExecs.takeLast();
+        for(int i = 0; i < count; i++) {
+            const auto task = mQuedCpuTasks.takeQuedForCpuProcessing();
+            if(!task) break;
             task->aboutToProcess(Hardware::cpu);
             if(task->getState() > eTaskState::processing) {
-                return processNextTasks();
+                finished = true;
+                i--; continue;
             }
-            const auto executor = mFreeCpuExecs.takeLast();
             executor->processTask(task);
-            for(int i = 0; i < additional; i++) {
-                const auto iTask = mQuedCpuTasks.takeQuedForCpuProcessing();
-                if(!iTask) break;
-                iTask->aboutToProcess(Hardware::cpu);
-                if(iTask->getState() > eTaskState::processing) continue;
-                executor->processTask(iTask);
-            }
-        } else break;
+        }
+        if(executor->finished()) {
+            mFreeCpuExecs << executor;
+            break;
+        }
     }
-
+    if(finished) processNextTasks();
     emit cpuUsageChanged(busyCpuThreads());
 }

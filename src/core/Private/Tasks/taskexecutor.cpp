@@ -16,11 +16,12 @@
 
 #include "taskexecutor.h"
 
-void TaskExecutor::processTask(eTask* task) {
+void TaskExecutor::processTask(const stdsptr<eTask>* task) {
     try {
-        task->process();
+        (*task)->process();
     } catch(...) {
-        task->setException(std::current_exception());
+        (*task)->setException(std::current_exception());
     }
+
     emit finishedTask(task);
 }

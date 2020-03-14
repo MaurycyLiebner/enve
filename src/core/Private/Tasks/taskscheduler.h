@@ -152,8 +152,7 @@ public:
 
     int availableCpuThreads() const {
         const int cap = eSettings::sInstance->fCpuThreadsCap;
-        if(cap > 0) return qMin(mFreeCpuExecs.count(),
-                                cap - mCpuExecutors.count());
+        if(cap > 0) return qMin(mFreeCpuExecs.count(), cap);
         return mFreeCpuExecs.count();
     }
 
