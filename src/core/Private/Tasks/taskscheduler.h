@@ -100,8 +100,7 @@ public:
     void afterHddTaskFinished(const stdsptr<eTask>& finishedTask,
                               ExecController * const controller);
 
-    void afterCpuTaskFinished(const stdsptr<eTask>& task,
-                              ExecController * const controller);
+    void afterCpuTaskFinished(const stdsptr<eTask>& task);
 
     void setFreeThreadsForCpuTasksAvailableFunc(
             const std::function<void(void)>& func) {
@@ -146,14 +145,13 @@ public:
         return totalThreads - freeBackup - freeMain;
     }
 
-    int busyCpuThreads() const {
-        return mCpuExecutors.count() - mFreeCpuExecs.count();
-    }
+    int busyCpuThreads() const;
 
     int availableCpuThreads() const {
         const int cap = eSettings::sInstance->fCpuThreadsCap;
-        if(cap > 0) return qMin(mFreeCpuExecs.count(), cap);
-        return mFreeCpuExecs.count();
+        const int free = mCpuExecutors.count() - busyCpuThreads();
+        if(cap > 0) return qMin(free, cap);
+        return free;
     }
 
     void afterCpuGpuTaskFinished();
@@ -220,7 +218,6 @@ private:
     QList<HddExecController*> mFreeBackupHddExecs;
     QList<HddExecController*> mHddExecs;
 
-    QList<CpuExecController*> mFreeCpuExecs;
     QList<CpuExecController*> mCpuExecutors;
 
     std::function<void(void)> mFreeThreadsForCpuTasksAvailableFunc;

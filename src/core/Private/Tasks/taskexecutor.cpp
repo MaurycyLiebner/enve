@@ -16,12 +16,33 @@
 
 #include "taskexecutor.h"
 
-void TaskExecutor::processTask(const stdsptr<eTask>* task) {
+void TaskExecutor::processTask(const stdsptr<eTask>& task) {
     try {
-        (*task)->process();
+        task->process();
     } catch(...) {
-        (*task)->setException(std::current_exception());
+        task->setException(std::current_exception());
     }
 
     emit finishedTask(task);
+}
+
+QAtomicList<stdsptr<eTask>> CpuTaskExecutor::sReadyToProcess;
+QAtomicInt CpuTaskExecutor::sProcessingCount;
+
+void CpuTaskExecutor::sAddReadyToProcess(const QList<stdsptr<eTask>>& ready) {
+    sReadyToProcess.appendAndNotifyAll(ready);
+}
+
+int CpuTaskExecutor::sUsedCount() {
+    return sProcessingCount;
+}
+
+void CpuTaskExecutor::start() {
+    while(true) {
+        stdsptr<eTask> task;
+        sReadyToProcess.waitTakeFirst(task);
+        sProcessingCount++;
+        processTask(task);
+        sProcessingCount--;
+    }
 }

@@ -29,6 +29,7 @@ TaskScheduler *TaskScheduler::sInstance = nullptr;
 TaskScheduler::TaskScheduler() {
     Q_ASSERT(!sInstance);
     sInstance = this;
+    qRegisterMetaType<stdsptr<eTask>>();
     const int numberThreads = qMax(1, QThread::idealThreadCount());
     for(int i = 0; i < numberThreads; i++) {
         const auto taskExecutor = new CpuExecController(this);
@@ -36,7 +37,6 @@ TaskScheduler::TaskScheduler() {
                 this, &TaskScheduler::afterCpuTaskFinished);
 
         mCpuExecutors << taskExecutor;
-        mFreeCpuExecs << taskExecutor;
     }
 
     mHddExecutor = new HddExecController;
@@ -223,15 +223,15 @@ bool TaskScheduler::processNextQuedGpuTask() {
     return task.get();
 }
 
-void TaskScheduler::afterCpuTaskFinished(const stdsptr<eTask>& task,
-                                         ExecController * const controller) {
-    if(controller->finished()) {
-        mFreeCpuExecs << static_cast<CpuExecController*>(controller);
-    }
+void TaskScheduler::afterCpuTaskFinished(const stdsptr<eTask>& task) {
     const bool nextStep = !task->waitingToCancel() && task->nextStep();
     if(nextStep) queCpuTask(task);
     else task->finishedProcessing();
     afterCpuGpuTaskFinished();
+}
+
+int TaskScheduler::busyCpuThreads() const {
+    return CpuTaskExecutor::sUsedCount();
 }
 
 void TaskScheduler::afterCpuGpuTaskFinished() {
@@ -265,25 +265,20 @@ void TaskScheduler::finishCriticalMemoryState() {
 }
 
 void TaskScheduler::processNextQuedCpuTask() {
-    const int count =  + mQuedCpuTasks.taskCount()/mCpuExecutors.count();
     bool finished = false;
-    while(availableCpuThreads() > 0 && !mQuedCpuTasks.isEmpty()) {
-        const auto executor = mFreeCpuExecs.takeLast();
-        for(int i = 0; i < count; i++) {
-            const auto task = mQuedCpuTasks.takeQuedForCpuProcessing();
-            if(!task) break;
-            task->aboutToProcess(Hardware::cpu);
-            if(task->getState() > eTaskState::processing) {
-                finished = true;
-                i--; continue;
-            }
-            executor->processTask(task);
+    QList<stdsptr<eTask>> tasks;
+    const int count = 3*mCpuExecutors.count();
+    for(int i = 0; i < count; i++) {
+        const auto task = mQuedCpuTasks.takeQuedForCpuProcessing();
+        if(!task) break;
+        task->aboutToProcess(Hardware::cpu);
+        if(task->getState() > eTaskState::processing) {
+            finished = true;
+            i--; continue;
         }
-        if(executor->finished()) {
-            mFreeCpuExecs << executor;
-            break;
-        }
+        tasks << task;
     }
+    if(!tasks.isEmpty()) CpuTaskExecutor::sAddReadyToProcess(tasks);
     if(finished) processNextTasks();
     emit cpuUsageChanged(busyCpuThreads());
 }

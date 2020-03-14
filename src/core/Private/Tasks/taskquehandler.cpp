@@ -63,6 +63,7 @@ void TaskQueHandler::beginQue() {
 void TaskQueHandler::addTask(const stdsptr<eTask> &task) {
     if(mCurrentQue) {
         mCurrentQue->addTask(task);
+        mTaskCount++;
     } else {
         if(mQues.isEmpty()) {
             beginQue();
@@ -80,7 +81,6 @@ void TaskQueHandler::endQue() {
     if(!mCurrentQue) return;
     const int count = mCurrentQue->countQued();
     if(count == 0) mQues.removeLast();
-    else mTaskCount += count;
     mCurrentQue = nullptr;
 }
 

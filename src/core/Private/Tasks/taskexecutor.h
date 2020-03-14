@@ -16,18 +16,30 @@
 
 #ifndef TASKEXECUTOR_H
 #define TASKEXECUTOR_H
-#include <QObject>
-#include <QTimer>
+
 #include <QThread>
+
 #include "Tasks/updatable.h"
+#include "../qatomiclist.h"
 
 class TaskExecutor : public QObject {
     Q_OBJECT
 public:
     explicit TaskExecutor() {}
-    void processTask(const stdsptr<eTask>* task);
+    void processTask(const stdsptr<eTask>& task);
 signals:
-    void finishedTask(const stdsptr<eTask>*);
+    void finishedTask(const stdsptr<eTask>&);
+};
+
+class CpuTaskExecutor : public TaskExecutor {
+public:
+    static void sAddReadyToProcess(const QList<stdsptr<eTask>>& ready);
+    static int sUsedCount();
+
+    void start();
+private:
+    static QAtomicInt sProcessingCount;
+    static QAtomicList<stdsptr<eTask>> sReadyToProcess;
 };
 
 class HddTaskExecutor : public TaskExecutor {
@@ -56,20 +68,19 @@ protected:
 public:
     void processTask(const stdsptr<eTask>& task) {
         mProcessing++;
-        emit processTaskSignal(new stdsptr<eTask>(task));
+        emit processTaskSignal(task);
     }
 
     bool finished() const { return mProcessing == 0; }
 signals:
-    void processTaskSignal(const stdsptr<eTask>*);
+    void processTaskSignal(const stdsptr<eTask>&);
     void finishedTaskSignal(const stdsptr<eTask>&, ExecController*);
 protected:
     TaskExecutor * const mExecutor;
 private:
-    void finishedTask(const stdsptr<eTask>* task) {
+    void finishedTask(const stdsptr<eTask>& task) {
         mProcessing--;
-        emit finishedTaskSignal(*task, this);
-        delete task;
+        emit finishedTaskSignal(task, this);
     }
 
     int mProcessing = 0;
@@ -78,7 +89,11 @@ private:
 class CpuExecController : public ExecController {
 public:
     CpuExecController(QObject * const parent = nullptr) :
-        ExecController(new TaskExecutor, parent) {}
+        ExecController(new CpuTaskExecutor, parent) {
+        QMetaObject::invokeMethod(static_cast<CpuTaskExecutor*>(mExecutor),
+                                  &CpuTaskExecutor::start,
+                                  Qt::QueuedConnection);
+    }
 };
 
 class HddExecController : public ExecController {

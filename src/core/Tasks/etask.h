@@ -77,9 +77,6 @@ public:
     bool finished();
     eTaskState getState() const { return mState; }
 
-    void decDependencies();
-    void incDependencies();
-
     bool waitingToCancel() const { return mCancel; }
     void cancel();
 
@@ -89,6 +86,8 @@ public:
 protected:
     eTaskState mState = eTaskState::created;
 private:
+    void decDependencies();
+    void incDependencies();
     void tellDependentThatFinished();
     void cancelDependent();
 
@@ -98,5 +97,7 @@ private:
     QList<Dependent> mDependentF;
     std::exception_ptr mUpdateException;
 };
+
+Q_DECLARE_METATYPE(stdsptr<eTask>);
 
 #endif // ETASK_H
