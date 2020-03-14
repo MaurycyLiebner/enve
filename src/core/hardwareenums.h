@@ -14,18 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "Tasks/updatable.h"
-#include "Private/Tasks/taskscheduler.h"
-#include "Private/Tasks/taskexecutor.h"
+#ifndef HARDWAREENUMS_H
+#define HARDWAREENUMS_H
 
-void eCpuTask::queTaskNow() {
-    TaskScheduler::sGetInstance()->queCpuTask(ref<eTask>());
-}
+enum class HardwareSupport : short {
+    cpuOnly,
+    cpuPreffered,
+    gpuPreffered,
+    gpuOnly
+};
 
-void eHddTask::queTaskNow() {
-    TaskScheduler::sGetInstance()->queHddTask(ref<eTask>());
-}
+enum class Hardware : short {
+    cpu, gpu, hdd
+};
 
-void eHddTask::hddPartFinished() {
-    if(mController) emit mController->hddPartFinished();
-}
+#endif // HARDWAREENUMS_H

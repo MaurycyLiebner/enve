@@ -16,10 +16,13 @@
 
 #ifndef HddCACHABLECACHEHANDLER_H
 #define HddCACHABLECACHEHANDLER_H
+
 #include "hddcachablerangecont.h"
 #include "rangemap.h"
 #include "usepointer.h"
 #include "usedrange.h"
+
+#include <QPainter>
 
 class HddCachableCacheHandler {
     friend class UsedRange;

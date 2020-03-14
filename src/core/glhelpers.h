@@ -49,17 +49,6 @@ extern GLuint GL_PLAIN_SQUARE_VBO;
 extern QString GL_TEXTURED_VERT;
 extern GLuint GL_TEXTURED_SQUARE_VBO;
 
-enum class HardwareSupport : short {
-    cpuOnly,
-    cpuPreffered,
-    gpuPreffered,
-    gpuOnly
-};
-
-enum class Hardware : short {
-    cpu, gpu, hdd
-};
-
 struct CpuRenderData {
     //! @brief Tile rect in texture coordinates
     SkIRect fTexTile;

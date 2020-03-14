@@ -20,6 +20,7 @@
 #include "../glhelpers.h"
 #include "../gpurendertools.h"
 #include "../cpurendertools.h"
+#include "../hardwareenums.h"
 
 enum class HardwareSupport : short;
 

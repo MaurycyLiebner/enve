@@ -256,6 +256,7 @@ SOURCES += \
     Sound/evideosound.cpp \
     Sound/soundcomposition.cpp \
     Sound/soundmerger.cpp \
+    Tasks/etask.cpp \
     Tasks/updatable.cpp \
     Timeline/animationrect.cpp \
     Timeline/durationrectangle.cpp \
@@ -527,6 +528,7 @@ HEADERS += \
     Private/document.h \
     Private/esettings.h \
     Private/memorystructs.h \
+    Private/qatomiclist.h \
     Properties/boolpropertycontainer.h \
     Properties/boxtargetproperty.h \
     Properties/emimedata.h \
@@ -567,6 +569,7 @@ HEADERS += \
     Sound/evideosound.h \
     Sound/soundcomposition.h \
     Sound/soundmerger.h \
+    Tasks/etask.h \
     Tasks/updatable.h \
     Timeline/animationrect.h \
     Timeline/durationrectangle.h \
@@ -590,6 +593,7 @@ HEADERS += \
     fileshandler.h \
     filesourcescache.h \
     gpurendertools.h \
+    hardwareenums.h \
     importhandler.h \
     kraimporter.h \
     matrixdecomposition.h \
