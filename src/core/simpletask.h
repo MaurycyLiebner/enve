@@ -16,12 +16,17 @@
 
 #ifndef SIMPLETASK_H
 #define SIMPLETASK_H
+
 #include <QObject>
+
 #include <functional>
+#include <memory>
 
 class SimpleTask : public QObject {
     Q_OBJECT
     typedef std::function<void(void)> Func;
+
+    SimpleTask(const Func& func);
 public:
     static SimpleTask *sScheduleContexted(
             const QPointer<QObject>& ctxt,
@@ -29,14 +34,10 @@ public:
     static SimpleTask *sSchedule(const Func& func);
     static void sProcessAll();
 private:
-    SimpleTask(const Func& func);
-    void process() {
-        mFunc();
-        emit finished();
-    }
+    void process();
 
     const Func mFunc;
-    static QList<SimpleTask*> sTasks;
+    static QList<std::shared_ptr<SimpleTask>> sTasks;
 signals:
     void finished();
 };

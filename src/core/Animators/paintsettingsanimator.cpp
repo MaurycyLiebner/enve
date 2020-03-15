@@ -54,11 +54,6 @@ void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
     src.read(&mGradientType, sizeof(GradientType));
     int gradRWId; src >> gradRWId;
     int gradDocId; src >> gradDocId;
-    mGradientPoints->prp_readProperty(src);
-    if(src.evFileVersion() > 7) {
-        mGradientTransform->prp_readProperty(src);
-    }
-    setPaintType(paintType);
     SimpleTask::sSchedule([this, gradRWId, gradDocId]() {
         const auto parentScene = getParentScene();
         if(!parentScene) return;
@@ -69,6 +64,12 @@ void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
             gradient = parentScene->getGradientWithDocumentId(gradDocId);
         setGradientVar(gradient);
     });
+
+    mGradientPoints->prp_readProperty(src);
+    if(src.evFileVersion() > 7) {
+        mGradientTransform->prp_readProperty(src);
+    }
+    setPaintType(paintType);
 }
 
 void PaintSettingsAnimator::updateGradientPoint() {

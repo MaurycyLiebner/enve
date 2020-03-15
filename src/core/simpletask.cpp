@@ -20,7 +20,7 @@
 
 #include "exceptions.h"
 
-QList<SimpleTask*> SimpleTask::sTasks;
+QList<std::shared_ptr<SimpleTask>> SimpleTask::sTasks;
 
 SimpleTask::SimpleTask(const Func& func) : mFunc(func) {}
 
@@ -32,21 +32,27 @@ SimpleTask *SimpleTask::sScheduleContexted(
 
 SimpleTask* SimpleTask::sSchedule(const Func &func) {
     const auto task = new SimpleTask(func);
-    sTasks << task;
+    sTasks << std::shared_ptr<SimpleTask>(task);
     return task;
 }
 
 void SimpleTask::sProcessAll() {
-    for(int i = 0; i < sTasks.count(); i++) {
-        const auto task = sTasks.at(i);
+    auto tasks = sTasks;
+    sTasks.clear();
+    for(auto& task : tasks) {
         try {
             task->process();
         } catch(const std::exception& e) {
             gPrintExceptionCritical(e);
         }
-        delete task;
+        task.reset();
     }
-    sTasks.clear();
+    if(!sTasks.isEmpty()) sProcessAll();
+}
+
+void SimpleTask::process() {
+    mFunc();
+    emit finished();
 }
 
 SimpleTaskScheduler::SimpleTaskScheduler(const Func &func) :
