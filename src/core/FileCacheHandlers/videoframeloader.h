@@ -42,6 +42,7 @@ public:
     ~VideoFrameLoader();
 
     void process();
+    bool nextStep();
 protected:
     void afterProcessing();
     void afterCanceled();

@@ -19,7 +19,7 @@
 #include "glhelpers.h"
 
 class SwitchableContext {
-    friend class GpuPostProcessor;
+    friend class GpuTaskExecutor;
     enum class Mode { OpenGL, Skia };
 public:
     //! @brief Returns the handled GrContext,

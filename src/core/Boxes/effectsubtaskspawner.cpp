@@ -20,6 +20,7 @@
 #include "skia/skiaincludes.h"
 #include "RasterEffects/rastereffect.h"
 #include "RasterEffects/rastereffectcaller.h"
+#include "Private/Tasks/taskexecutor.h"
 
 class EffectSubTaskSpawner_priv {
 public:
@@ -74,7 +75,7 @@ void EffectSubTaskSpawner_priv::splitSpawn(CpuRenderData& data,
                 CpuRenderTools tools{mSrcBitmap, dstBitmap};
                 mEffectCaller->processCpu(tools, data);
             }, decRemaining, decRemaining);
-        subTask->queTask();
+        CpuTaskExecutor::sAddTask(subTask);
         return;
     }
 

@@ -21,7 +21,7 @@
 
 #include "etask.h"
 
-class HddExecController;
+class ExecController;
 
 class eCpuTask : public eTask {
     e_OBJECT
@@ -53,13 +53,6 @@ public:
     }
 protected:
     void queTaskNow();
-    void hddPartFinished();
-public:
-    void setController(HddExecController * const contr) {
-        mController = contr;
-    }
-private:
-    HddExecController * mController = nullptr;
 };
 
 class eCustomCpuTask : public eCpuTask {

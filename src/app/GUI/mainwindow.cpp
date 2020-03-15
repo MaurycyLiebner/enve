@@ -1204,7 +1204,7 @@ bool MainWindow::isEnabled() {
 }
 
 void MainWindow::clearAll() {
-    TaskScheduler::sInstance->clearTasks();
+    TaskScheduler::instance()->clearTasks();
     setFileChangedSinceSaving(false);
     mObjectSettingsWidget->setMainTarget(nullptr);
 

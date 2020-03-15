@@ -216,7 +216,8 @@ SOURCES += \
     PathEffects/sumpatheffect.cpp \
     PathEffects/zigzagpatheffect.cpp \
     Private/Tasks/complextask.cpp \
-    Private/Tasks/gpupostprocessor.cpp \
+    Private/Tasks/execcontroller.cpp \
+    Private/Tasks/gputaskexecutor.cpp \
     Private/Tasks/offscreenqgl33c.cpp \
     Private/Tasks/taskexecutor.cpp \
     Private/Tasks/taskque.cpp \
@@ -519,7 +520,8 @@ HEADERS += \
     PathEffects/sumpatheffect.h \
     PathEffects/zigzagpatheffect.h \
     Private/Tasks/complextask.h \
-    Private/Tasks/gpupostprocessor.h \
+    Private/Tasks/execcontroller.h \
+    Private/Tasks/gputaskexecutor.h \
     Private/Tasks/offscreenqgl33c.h \
     Private/Tasks/taskexecutor.h \
     Private/Tasks/taskque.h \

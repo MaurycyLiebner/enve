@@ -19,6 +19,7 @@
 #include "GUI/global.h"
 #include "Private/Tasks/taskscheduler.h"
 #include "Private/Tasks/complextask.h"
+#include "conncontextptr.h"
 
 #include <QTimer>
 #include <QLocale>
@@ -155,13 +156,13 @@ UsageWidget::UsageWidget(QWidget * const parent) : QStatusBar(parent) {
 
     setThreadsTotal(QThread::idealThreadCount());
 
-    connect(TaskScheduler::sInstance, &TaskScheduler::hddUsageChanged,
+    connect(TaskScheduler::instance(), &TaskScheduler::hddUsageChanged,
             this, &UsageWidget::setHddUsage);
-    connect(TaskScheduler::sInstance, &TaskScheduler::gpuUsageChanged,
+    connect(TaskScheduler::instance(), &TaskScheduler::gpuUsageChanged,
             this, &UsageWidget::setGpuUsage);
-    connect(TaskScheduler::sInstance, &TaskScheduler::cpuUsageChanged,
+    connect(TaskScheduler::instance(), &TaskScheduler::cpuUsageChanged,
             this, &UsageWidget::setThreadsUsage);
-    connect(TaskScheduler::sInstance, &TaskScheduler::complexTaskAdded,
+    connect(TaskScheduler::instance(), &TaskScheduler::complexTaskAdded,
             this, &UsageWidget::addComplexTask);
 }
 

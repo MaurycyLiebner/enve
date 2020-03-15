@@ -19,6 +19,7 @@
 #include "skia/skiahelpers.h"
 #include "efiltersettings.h"
 #include "Private/Tasks/taskscheduler.h"
+#include "Private/Tasks/gputaskexecutor.h"
 
 BoxRenderData::BoxRenderData(BoundingBox * const parent) :
     fFilterQuality(eFilterSettings::sRender()) {
@@ -148,18 +149,8 @@ void BoxRenderData::process() {
 }
 
 void BoxRenderData::beforeProcessing(const Hardware hw) {
-    if(mStep == Step::EFFECTS) {
-        Q_ASSERT(!mEffectsRenderer.isEmpty());
-        if(!fRenderedImage) {
-            finishedProcessing();
-            return;
-        }
-        if(hw == Hardware::cpu) {
-            mState = eTaskState::waiting;
-            mEffectsRenderer.processCpu(this);
-        }
-        return;
-    }
+    Q_UNUSED(hw)
+    Q_ASSERT(mStep != Step::EFFECTS);
     setupRenderData();
     if(!mDataSet) dataSet();
     if(isZero4Dec(fOpacity)) finishedProcessing();
@@ -193,15 +184,20 @@ HardwareSupport BoxRenderData::hardwareSupport() const {
 }
 
 void BoxRenderData::queTaskNow() {
-    TaskScheduler::sGetInstance()->queCpuTask(ref<eTask>());
+    TaskScheduler::instance()->queCpuTask(ref<eTask>());
 }
 
 bool BoxRenderData::nextStep() {
-    if(mState == eTaskState::waiting)
-        mState = eTaskState::processing;
     const bool result = !mEffectsRenderer.isEmpty() &&
                         fRenderedImage;
-    if(result) mStep = Step::EFFECTS;
+    if(result) {
+        mStep = Step::EFFECTS;
+        if(hardwareSupport() == HardwareSupport::cpuOnly) {
+            mEffectsRenderer.processCpu(this);
+        } else {
+            GpuTaskExecutor::sAddTask(ref<eTask>());
+        }
+    }
     return result;
 }
 

@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "effectsrenderer.h"
-#include "Private/Tasks/gpupostprocessor.h"
 #include "boxrenderdata.h"
 #include "RasterEffects/rastereffectcaller.h"
 #include "gpurendertools.h"

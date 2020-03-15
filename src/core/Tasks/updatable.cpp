@@ -19,13 +19,9 @@
 #include "Private/Tasks/taskexecutor.h"
 
 void eCpuTask::queTaskNow() {
-    TaskScheduler::sGetInstance()->queCpuTask(ref<eTask>());
+    TaskScheduler::instance()->queCpuTask(ref<eTask>());
 }
 
 void eHddTask::queTaskNow() {
-    TaskScheduler::sGetInstance()->queHddTask(ref<eTask>());
-}
-
-void eHddTask::hddPartFinished() {
-    if(mController) emit mController->hddPartFinished();
+    TaskScheduler::instance()->queHddTask(ref<eTask>());
 }

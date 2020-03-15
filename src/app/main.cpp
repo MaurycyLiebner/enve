@@ -131,11 +131,7 @@ int main(int argc, char *argv[]) {
                      &taskScheduler, &TaskScheduler::enterCriticalMemoryState);
     QObject::connect(&memoryHandler, &MemoryHandler::finishedCriticalState,
                      &taskScheduler, &TaskScheduler::finishCriticalMemoryState);
-    try {
-        taskScheduler.initializeGpu();
-    } catch(const std::exception& e) {
-        gPrintExceptionFatal(e);
-    }
+
     Document document(taskScheduler);
     Actions actions(document);
 
@@ -143,6 +139,11 @@ int main(int argc, char *argv[]) {
     app.processEvents();
     EffectsLoader effectsLoader;
     effectsLoader.initializeGpu();
+    try {
+        taskScheduler.initializeGpu();
+    } catch(const std::exception& e) {
+        gPrintExceptionFatal(e);
+    }
 
     splash->showMessage("Initialize custom path effects...");
     app.processEvents();

@@ -25,89 +25,49 @@
 class TaskExecutor : public QObject {
     Q_OBJECT
 public:
-    explicit TaskExecutor() {}
-    void processTask(const stdsptr<eTask>& task);
+    TaskExecutor(QAtomicInt& count,
+                 QAtomicList<stdsptr<eTask>>& tasks) :
+        mUseCount(count), mTasks(tasks) {}
+
+    virtual void start();
+    void stop();
 signals:
     void finishedTask(const stdsptr<eTask>&);
+protected:
+    void processLoop();
+private:
+    virtual void processTask(eTask& task);
+
+    std::atomic<bool> mStop;
+
+    QAtomicInt& mUseCount;
+    QAtomicList<stdsptr<eTask>>& mTasks;
 };
 
 class CpuTaskExecutor : public TaskExecutor {
 public:
-    static void sAddReadyToProcess(const QList<stdsptr<eTask>>& ready);
-    static int sUsedCount();
+    CpuTaskExecutor() : TaskExecutor(sUseCount, sTasks) {}
 
-    void start();
+    static void sAddTask(const stdsptr<eTask>& ready);
+    static void sAddTasks(const QList<stdsptr<eTask>>& ready);
+    static int sUsageCount();
+    static int sWaitingTasks();
 private:
-    static QAtomicInt sProcessingCount;
-    static QAtomicList<stdsptr<eTask>> sReadyToProcess;
+    static QAtomicInt sUseCount;
+    static QAtomicList<stdsptr<eTask>> sTasks;
 };
 
 class HddTaskExecutor : public TaskExecutor {
-    Q_OBJECT
 public:
-    explicit HddTaskExecutor() {}
-signals:
-    void hddPartFinished();
-};
+    HddTaskExecutor() : TaskExecutor(sUseCount, sTasks) {}
 
-class ExecController : public QThread {
-    Q_OBJECT
-protected:
-    ExecController(TaskExecutor * const executor,
-                   QObject * const parent = nullptr) : QThread(parent),
-        mExecutor(executor) {
-        connect(this, &ExecController::processTaskSignal,
-                mExecutor, &TaskExecutor::processTask,
-                Qt::QueuedConnection);
-        connect(mExecutor, &TaskExecutor::finishedTask,
-                this, &ExecController::finishedTask,
-                Qt::QueuedConnection);
-        mExecutor->moveToThread(this);
-        start();
-    }
-public:
-    void processTask(const stdsptr<eTask>& task) {
-        mProcessing++;
-        emit processTaskSignal(task);
-    }
-
-    bool finished() const { return mProcessing == 0; }
-signals:
-    void processTaskSignal(const stdsptr<eTask>&);
-    void finishedTaskSignal(const stdsptr<eTask>&, ExecController*);
-protected:
-    TaskExecutor * const mExecutor;
+    static void sAddTask(const stdsptr<eTask>& ready);
+    static void sAddTasks(const QList<stdsptr<eTask>>& ready);
+    static int sUsageCount();
+    static int sWaitingTasks();
 private:
-    void finishedTask(const stdsptr<eTask>& task) {
-        mProcessing--;
-        emit finishedTaskSignal(task, this);
-    }
-
-    int mProcessing = 0;
-};
-
-class CpuExecController : public ExecController {
-public:
-    CpuExecController(QObject * const parent = nullptr) :
-        ExecController(new CpuTaskExecutor, parent) {
-        QMetaObject::invokeMethod(static_cast<CpuTaskExecutor*>(mExecutor),
-                                  &CpuTaskExecutor::start,
-                                  Qt::QueuedConnection);
-    }
-};
-
-class HddExecController : public ExecController {
-    Q_OBJECT
-public:
-    HddExecController(QObject * const parent = nullptr) :
-        ExecController(new HddTaskExecutor, parent) {
-        connect(static_cast<HddTaskExecutor*>(mExecutor),
-                &HddTaskExecutor::hddPartFinished,
-                this, &HddExecController::hddPartFinished,
-                Qt::QueuedConnection);
-    }
-signals:
-    void hddPartFinished();
+    static QAtomicInt sUseCount;
+    static QAtomicList<stdsptr<eTask>> sTasks;
 };
 
 #endif // TASKEXECUTOR_H

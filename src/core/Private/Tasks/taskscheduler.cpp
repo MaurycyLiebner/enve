@@ -15,14 +15,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "taskscheduler.h"
-#include "Boxes/boxrenderdata.h"
-#include "gpupostprocessor.h"
-#include "canvas.h"
-#include "taskexecutor.h"
-#include "../document.h"
-#include <QThread>
 
-#include "Private/Tasks/complextask.h"
+#include "canvas.h"
+#include "execcontroller.h"
+#include "gputaskexecutor.h"
+#include "taskexecutor.h"
+#include "complextask.h"
+#include "Private/document.h"
+#include "Boxes/boxrenderdata.h"
 
 TaskScheduler *TaskScheduler::sInstance = nullptr;
 
@@ -32,49 +32,78 @@ TaskScheduler::TaskScheduler() {
     qRegisterMetaType<stdsptr<eTask>>();
     const int numberThreads = qMax(1, QThread::idealThreadCount());
     for(int i = 0; i < numberThreads; i++) {
-        const auto taskExecutor = new CpuExecController(this);
-        connect(taskExecutor, &ExecController::finishedTaskSignal,
-                this, &TaskScheduler::afterCpuTaskFinished);
+        const auto taskExecutor = std::make_shared<CpuExecController>(this);
+        connect(taskExecutor.get(), &ExecController::finishedTaskSignal,
+                this, &TaskScheduler::afterCpuGpuTaskFinished);
 
-        mCpuExecutors << taskExecutor;
+        mCpuExecs << taskExecutor;
     }
 
-    mHddExecutor = new HddExecController;
-    mHddExecs << mHddExecutor;
-    connect(mHddExecutor, &ExecController::finishedTaskSignal,
+    mHddExec = std::make_shared<HddExecController>(this);
+    connect(mHddExec.get(), &ExecController::finishedTaskSignal,
             this, &TaskScheduler::afterHddTaskFinished);
-    connect(mHddExecutor, &HddExecController::hddPartFinished,
-            this, &TaskScheduler::switchToBackupHddExecutor);
 
-    mFreeBackupHddExecs << createNewBackupHddExecutor();
+    mGpuExec = std::make_shared<GpuExecController>(this);
+    connect(mGpuExec.get(), &ExecController::finishedTaskSignal,
+            this, &TaskScheduler::afterCpuGpuTaskFinished);
 }
 
 TaskScheduler::~TaskScheduler() {
-    for(const auto& exec : mCpuExecutors) {
-        exec->quit();
-        exec->wait();
+    for(const auto& exec : mCpuExecs) {
+        exec->stopAndWait();
     }
-    for(const auto& exec : mHddExecs) {
-        exec->quit();
-        exec->wait();
-    }
+    mHddExec->stopAndWait();
+    mGpuExec->stopAndWait();
+}
+
+void TaskScheduler::sSetTaskUnderflowFunc(const Func& func) {
+    sInstance->setTaskUnderflowFunc(func);
+}
+
+void TaskScheduler::sSetAllTasksFinishedFunc(const Func& func) {
+    sInstance->setAllTasksFinishedFunc(func);
+}
+
+void TaskScheduler::sClearAllFinishedFuncs() {
+    sSetTaskUnderflowFunc(nullptr);
+    sSetAllTasksFinishedFunc(nullptr);
+}
+
+bool TaskScheduler::sAllTasksFinished() {
+    return sInstance->allQuedTasksFinished();
+}
+
+bool TaskScheduler::sAllQuedCpuTasksFinished() {
+    return sInstance->allQuedCpuTasksFinished();
+}
+
+bool TaskScheduler::sCpuTasksBeingProcessed() {
+    return sInstance->cpuTasksBeingProcessed();
+}
+
+bool TaskScheduler::sHddTasksBeingProcessed() {
+    return sInstance->hddTaskBeingProcessed();
+}
+
+bool TaskScheduler::sAllQuedHddTasksFinished() {
+    return sInstance->allQuedHddTasksFinished();
+}
+
+void TaskScheduler::sClearTasks() {
+    sInstance->clearTasks();
 }
 
 void TaskScheduler::initializeGpu() {
     try {
-        mGpuPostProcessor.initialize();
+        mGpuExec->initialize();
     } catch(...) {
         RuntimeThrow("Failed to initialize gpu for post-processing.");
     }
 }
 
-void TaskScheduler::scheduleGpuTask(const stdsptr<eTask> &task) {
-    mGpuPostProcessor.addToProcess(task);
-}
-
 void TaskScheduler::queHddTask(const stdsptr<eTask>& task) {
     mQuedHddTasks << task;
-    tryProcessingNextQuedHddTask();
+    processNextQuedHddTask();
 }
 
 void TaskScheduler::queCpuTask(const stdsptr<eTask>& task) {
@@ -87,32 +116,42 @@ void TaskScheduler::queCpuTask(const stdsptr<eTask>& task) {
     }
 }
 
+void TaskScheduler::clearTasks() {
+    mQuedCpuTasks.clear();
+
+    for(const auto& hddTask : mQuedHddTasks)
+        hddTask->cancel();
+    mQuedHddTasks.clear();
+
+    callAllTasksFinishedFunc();
+}
+
 bool TaskScheduler::overflowed() const {
     const int nQues = mQuedCpuTasks.countQues();
-    const int maxQues = mAlwaysQue ? mCpuExecutors.count() : 1;
+    const int maxQues = mAlwaysQue ? mCpuExecs.count() : 1;
     return nQues >= maxQues;
 }
 
+void TaskScheduler::callAllTasksFinishedFunc() const {
+    if(allQuedTasksFinished()) {
+        if(mAllTasksFinishedFunc) mAllTasksFinishedFunc();
+        emit finishedAllQuedTasks();
+    }
+}
+
 bool TaskScheduler::shouldQueMoreCpuTasks() const {
-    return availableCpuThreads() > 0 && !mCpuQueing && !overflowed();
+    return availableCpuThreads() > 0 &&
+           !mCpuQueing && !overflowed();
 }
 
 bool TaskScheduler::shouldQueMoreHddTasks() const {
     return mQuedHddTasks.count() < 2 && !mCpuQueing &&
-            mHddThreadBusy && !overflowed();
-}
-
-HddExecController* TaskScheduler::createNewBackupHddExecutor() {
-    const auto newExec = new HddExecController;
-    connect(newExec, &ExecController::finishedTaskSignal,
-            this, &TaskScheduler::afterHddTaskFinished);
-    mHddExecs << newExec;
-    return newExec;
+           mHddThreadBusy && !overflowed();
 }
 
 void TaskScheduler::queTasks() {
     queScheduledCpuTasks();
-    queScheduledHddTasks();
+    processNextQuedHddTask();
 }
 
 void TaskScheduler::queScheduledCpuTasks() {
@@ -129,40 +168,7 @@ void TaskScheduler::queScheduledCpuTasks() {
     if(!mQuedCpuTasks.isEmpty()) processNextTasks();
 }
 
-void TaskScheduler::queScheduledHddTasks() {
-    if(mHddThreadBusy) return;
-    tryProcessingNextQuedHddTask();
-}
-
-void TaskScheduler::switchToBackupHddExecutor() {
-    if(!mHddThreadBusy) return;
-    disconnect(mHddExecutor, &HddExecController::hddPartFinished,
-               this, &TaskScheduler::switchToBackupHddExecutor);
-
-    if(mFreeBackupHddExecs.isEmpty()) {
-        mHddExecutor = createNewBackupHddExecutor();
-    } else {
-        mHddExecutor = mFreeBackupHddExecs.takeFirst();
-    }
-    mHddThreadBusy = false;
-
-    connect(mHddExecutor, &HddExecController::hddPartFinished,
-            this, &TaskScheduler::switchToBackupHddExecutor);
-    processNextQuedHddTask();
-}
-
-void TaskScheduler::tryProcessingNextQuedHddTask() {
-    if(!mHddThreadBusy) processNextQuedHddTask();
-}
-
-void TaskScheduler::afterHddTaskFinished(const stdsptr<eTask>& finishedTask,
-                                         ExecController * const controller) {
-    if(controller == mHddExecutor)
-        mHddThreadBusy = false;
-    else {
-        const auto hddExec = static_cast<HddExecController*>(controller);
-        mFreeBackupHddExecs << hddExec;
-    }
+void TaskScheduler::afterHddTaskFinished(const stdsptr<eTask>& finishedTask) {
     finishedTask->finishedProcessing();
     processNextTasks();
     if(!hddTaskBeingProcessed()) queTasks();
@@ -170,25 +176,21 @@ void TaskScheduler::afterHddTaskFinished(const stdsptr<eTask>& finishedTask,
 }
 
 void TaskScheduler::processNextQuedHddTask() {
-    if(!mHddThreadBusy) {
-        for(int i = 0; i < mQuedHddTasks.count(); i++) {
-            const auto task = mQuedHddTasks.at(i);
-            if(task->readyToBeProcessed()) {
-                task->aboutToProcess(Hardware::hdd);
-                if(task->getState() > eTaskState::processing) {
-                    return processNextTasks();
-                }
-                const auto hddTask = enve_cast<eHddTask*>(task.get());
-                if(hddTask) hddTask->setController(mHddExecutor);
-                mQuedHddTasks.removeAt(i--);
-                mHddThreadBusy = true;
-                mHddExecutor->processTask(task);
-                break;
-            }
-        }
+    bool finished = false;
+    QList<stdsptr<eTask>> tasks;
+    for(int i = 0; i < mQuedHddTasks.count(); i++) {
+        const auto task = mQuedHddTasks.at(i);
+        if(!task->readyToBeProcessed()) continue;
+        task->aboutToProcess(Hardware::hdd);
+        if(task->getState() > eTaskState::processing)
+            finished = true;
+        mQuedHddTasks.removeAt(i--);
+        tasks << task;
     }
+    if(!tasks.isEmpty()) HddTaskExecutor::sAddTasks(tasks);
+    if(finished) processNextTasks();
 
-    emit hddUsageChanged(mHddThreadBusy);
+    emit hddUsageChanged(busyHddThreads());
 }
 
 void TaskScheduler::processNextTasks() {
@@ -196,48 +198,92 @@ void TaskScheduler::processNextTasks() {
     processNextQuedHddTask();
     processNextQuedGpuTask();
     processNextQuedCpuTask();
-    if(shouldQueMoreCpuTasks() || shouldQueMoreHddTasks())
-        callFreeThreadsForCpuTasksAvailableFunc();
+    if(mTaskUnderflowFunc) {
+        if(shouldQueMoreCpuTasks() || shouldQueMoreHddTasks()) {
+            mTaskUnderflowFunc();
+        }
+    }
 }
 
 bool TaskScheduler::processNextQuedGpuTask() {
-    if(!mGpuPostProcessor.allDone()) return false;
-    const auto task = mQuedCpuTasks.takeQuedForGpuProcessing();
-    if(task) {
+    bool finished = false;
+    QList<stdsptr<eTask>> tasks;
+    const int count = 3 - GpuTaskExecutor::sWaitingTasks();
+    for(int i = 0; i < count; i++) {
+        const auto task = mQuedCpuTasks.takeQuedForGpuProcessing();
+        if(!task) break;
         task->aboutToProcess(Hardware::gpu);
         if(task->getState() > eTaskState::processing) {
-            processNextTasks();
-            return true;
+            finished = true;
+            i--; continue;
         }
-        const int additional = mQuedCpuTasks.taskCount()/mCpuExecutors.count();
-        scheduleGpuTask(task);
-        for(int i = 0; i < additional; i++) {
-            const auto iTask = mQuedCpuTasks.takeQuedForGpuProcessing();
-            if(!iTask) break;
-            iTask->aboutToProcess(Hardware::gpu);
-            if(iTask->getState() > eTaskState::processing) continue;
-            scheduleGpuTask(iTask);
-        }
+        tasks << task;
     }
-    emit gpuUsageChanged(!mGpuPostProcessor.allDone());
-    return task.get();
+    if(!tasks.isEmpty()) GpuTaskExecutor::sAddTasks(tasks);
+    if(finished) processNextTasks();
+
+    emit gpuUsageChanged(!allQuedGpuTasksFinished());
+    return !tasks.isEmpty();
 }
 
-void TaskScheduler::afterCpuTaskFinished(const stdsptr<eTask>& task) {
-    const bool nextStep = !task->waitingToCancel() && task->nextStep();
-    if(nextStep) queCpuTask(task);
-    else task->finishedProcessing();
-    afterCpuGpuTaskFinished();
-}
-
-int TaskScheduler::busyCpuThreads() const {
-    return CpuTaskExecutor::sUsedCount();
-}
-
-void TaskScheduler::afterCpuGpuTaskFinished() {
+void TaskScheduler::afterCpuGpuTaskFinished(const stdsptr<eTask>& task) {
+    task->finishedProcessing();
     processNextTasks();
     if(!cpuTasksBeingProcessed()) queTasks();
     callAllTasksFinishedFunc();
+}
+
+void TaskScheduler::setTaskUnderflowFunc(const Func& func) {
+    mTaskUnderflowFunc = func;
+}
+
+void TaskScheduler::setAllTasksFinishedFunc(const Func& func) {
+    mAllTasksFinishedFunc = func;
+}
+
+bool TaskScheduler::allQuedTasksFinished() const {
+    return allQuedCpuTasksFinished() &&
+           allQuedHddTasksFinished() &&
+           allQuedGpuTasksFinished();
+}
+
+bool TaskScheduler::allQuedGpuTasksFinished() const {
+    return GpuTaskExecutor::sUsageCount() == 0 && mQuedCpuTasks.isEmpty();
+}
+
+bool TaskScheduler::allQuedCpuTasksFinished() const {
+    return !cpuTasksBeingProcessed() && mQuedCpuTasks.isEmpty();
+}
+
+bool TaskScheduler::allQuedHddTasksFinished() const {
+    return !hddTaskBeingProcessed() && mQuedHddTasks.isEmpty();
+}
+
+bool TaskScheduler::cpuTasksBeingProcessed() const {
+    return busyCpuThreads() > 0;
+}
+
+bool TaskScheduler::hddTaskBeingProcessed() const {
+    return busyHddThreads() > 0;
+}
+
+int TaskScheduler::busyHddThreads() const {
+    return HddTaskExecutor::sUsageCount();
+}
+
+int TaskScheduler::busyCpuThreads() const {
+    return CpuTaskExecutor::sUsageCount();
+}
+
+int TaskScheduler::availableCpuThreads() const {
+    const int cap = eSettings::sInstance->fCpuThreadsCap;
+    const int free = mCpuExecs.count() - busyCpuThreads();
+    if(cap > 0) return qMin(free, cap);
+    return free;
+}
+
+void TaskScheduler::setAlwaysQue(const bool alwaysQue) {
+    mAlwaysQue = alwaysQue;
 }
 
 void TaskScheduler::addComplexTask(const qsptr<ComplexTask> &task) {
@@ -267,7 +313,7 @@ void TaskScheduler::finishCriticalMemoryState() {
 void TaskScheduler::processNextQuedCpuTask() {
     bool finished = false;
     QList<stdsptr<eTask>> tasks;
-    const int count = 3*mCpuExecutors.count();
+    const int count = 3*mCpuExecs.count() - CpuTaskExecutor::sWaitingTasks();
     for(int i = 0; i < count; i++) {
         const auto task = mQuedCpuTasks.takeQuedForCpuProcessing();
         if(!task) break;
@@ -278,7 +324,7 @@ void TaskScheduler::processNextQuedCpuTask() {
         }
         tasks << task;
     }
-    if(!tasks.isEmpty()) CpuTaskExecutor::sAddReadyToProcess(tasks);
+    if(!tasks.isEmpty()) CpuTaskExecutor::sAddTasks(tasks);
     if(finished) processNextTasks();
     emit cpuUsageChanged(busyCpuThreads());
 }

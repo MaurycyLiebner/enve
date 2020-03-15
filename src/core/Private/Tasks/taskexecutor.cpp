@@ -16,33 +16,71 @@
 
 #include "taskexecutor.h"
 
-void TaskExecutor::processTask(const stdsptr<eTask>& task) {
-    try {
-        task->process();
-    } catch(...) {
-        task->setException(std::current_exception());
-    }
-
-    emit finishedTask(task);
+void TaskExecutor::processTask(eTask& task) {
+    task.process();
 }
 
-QAtomicList<stdsptr<eTask>> CpuTaskExecutor::sReadyToProcess;
-QAtomicInt CpuTaskExecutor::sProcessingCount;
+QAtomicList<stdsptr<eTask>> CpuTaskExecutor::sTasks;
+QAtomicInt CpuTaskExecutor::sUseCount;
 
-void CpuTaskExecutor::sAddReadyToProcess(const QList<stdsptr<eTask>>& ready) {
-    sReadyToProcess.appendAndNotifyAll(ready);
+void CpuTaskExecutor::sAddTask(const stdsptr<eTask>& ready) {
+    sTasks.appendAndNotifyAll(ready);
 }
 
-int CpuTaskExecutor::sUsedCount() {
-    return sProcessingCount;
+void CpuTaskExecutor::sAddTasks(const QList<stdsptr<eTask>>& ready) {
+    sTasks.appendAndNotifyAll(ready);
 }
 
-void CpuTaskExecutor::start() {
-    while(true) {
+int CpuTaskExecutor::sUsageCount() {
+    return sUseCount;
+}
+
+int CpuTaskExecutor::sWaitingTasks() {
+    return sTasks.count();
+}
+
+void TaskExecutor::start() {
+    processLoop();
+}
+
+void TaskExecutor::stop() {
+    mStop = true;
+}
+
+void TaskExecutor::processLoop() {
+    mStop = false;
+    while(!mStop) {
         stdsptr<eTask> task;
-        sReadyToProcess.waitTakeFirst(task);
-        sProcessingCount++;
-        processTask(task);
-        sProcessingCount--;
+        if(!mTasks.waitTakeFirst(task, mStop)) break;
+        mUseCount++;
+        try {
+            processTask(*task);
+        } catch(...) {
+            task->setException(std::current_exception());
+        }
+
+        const bool nextStep = !task->waitingToCancel() &&
+                              task->nextStep();
+        if(!nextStep) emit finishedTask(task);
+        mUseCount--;
     }
+}
+
+QAtomicList<stdsptr<eTask>> HddTaskExecutor::sTasks;
+QAtomicInt HddTaskExecutor::sUseCount;
+
+void HddTaskExecutor::sAddTask(const stdsptr<eTask>& ready) {
+    sTasks.appendAndNotifyAll(ready);
+}
+
+void HddTaskExecutor::sAddTasks(const QList<stdsptr<eTask>>& ready) {
+    sTasks.appendAndNotifyAll(ready);
+}
+
+int HddTaskExecutor::sUsageCount() {
+    return sUseCount;
+}
+
+int HddTaskExecutor::sWaitingTasks() {
+    return sTasks.count();
 }

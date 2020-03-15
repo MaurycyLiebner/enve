@@ -30,7 +30,7 @@ Document::Document(TaskScheduler& taskScheduler) {
 
 void Document::updateScenes() {
     SimpleTask::sProcessAll();
-    TaskScheduler::sInstance->queTasks();
+    TaskScheduler::instance()->queTasks();
 
     for(const auto& scene : fVisibleScenes) {
         emit scene.first->requestUpdate();

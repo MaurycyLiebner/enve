@@ -79,7 +79,7 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
         const auto nextFrameFunc = [this]() {
             nextSaveOutputFrame();
         };
-        TaskScheduler::sSetFreeThreadsForCpuTasksAvailableFunc(nextFrameFunc);
+        TaskScheduler::sSetTaskUnderflowFunc(nextFrameFunc);
         TaskScheduler::sSetAllTasksFinishedFunc(nextFrameFunc);
 
         mCurrentRenderFrame = renderSettings.fMinFrame;
@@ -96,7 +96,7 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
                                                       mCurrentRenderFrame});
         mCurrentScene->anim_setAbsFrame(mCurrentRenderFrame);
         mCurrentScene->setOutputRendering(true);
-        TaskScheduler::sInstance->setAlwaysQue(true);
+        TaskScheduler::instance()->setAlwaysQue(true);
         //fitSceneToSize();
         if(!isZero6Dec(mSavedResolutionFraction - resolutionFraction)) {
             mCurrentScene->setResolutionFraction(resolutionFraction);
@@ -158,7 +158,7 @@ void RenderHandler::renderPreview() {
     const auto nextFrameFunc = [this]() {
         nextPreviewRenderFrame();
     };
-    TaskScheduler::sSetFreeThreadsForCpuTasksAvailableFunc(nextFrameFunc);
+    TaskScheduler::sSetTaskUnderflowFunc(nextFrameFunc);
     TaskScheduler::sSetAllTasksFinishedFunc(nextFrameFunc);
 
     mSavedCurrentFrame = mCurrentScene->getCurrentFrame();
@@ -193,7 +193,7 @@ void RenderHandler::outOfMemory() {
 void RenderHandler::setRenderingPreview(const bool rendering) {
     mRenderingPreview = rendering;
     if(mCurrentScene) mCurrentScene->setRenderingPreview(rendering);
-    TaskScheduler::sInstance->setAlwaysQue(rendering);
+    TaskScheduler::instance()->setAlwaysQue(rendering);
 }
 
 void RenderHandler::setPreviewing(const bool previewing) {
@@ -208,7 +208,7 @@ void RenderHandler::interruptPreviewRendering() {
 
 void RenderHandler::interruptOutputRendering() {
     if(mCurrentScene) mCurrentScene->setOutputRendering(false);
-    TaskScheduler::sInstance->setAlwaysQue(false);
+    TaskScheduler::instance()->setAlwaysQue(false);
     TaskScheduler::sClearAllFinishedFuncs();
     stopPreview();
 }
@@ -248,7 +248,7 @@ void RenderHandler::resumePreview() {
 
 void RenderHandler::playPreviewAfterAllTasksCompleted() {
     if(mRenderingPreview) {
-        TaskScheduler::sSetFreeThreadsForCpuTasksAvailableFunc(nullptr);
+        TaskScheduler::sSetTaskUnderflowFunc(nullptr);
         Document::sInstance->actionFinished();
         if(TaskScheduler::sAllTasksFinished()) {
             playPreview();
@@ -311,7 +311,7 @@ void RenderHandler::finishEncoding() {
     TaskScheduler::sClearAllFinishedFuncs();
     mCurrentRenderSettings = nullptr;
     mCurrentScene->setOutputRendering(false);
-    TaskScheduler::sInstance->setAlwaysQue(false);
+    TaskScheduler::instance()->setAlwaysQue(false);
     setFrameAction(mSavedCurrentFrame);
     if(!isZero4Dec(mSavedResolutionFraction - mCurrentScene->getResolutionFraction())) {
         mCurrentScene->setResolutionFraction(mSavedResolutionFraction);
@@ -354,7 +354,7 @@ void RenderHandler::nextSaveOutputFrame() {
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
         if(mCurrentEncodeSoundSecond <= mMaxSoundSec) return;
         if(mCurrentEncodeFrame <= mMaxRenderFrame) return;
-        TaskScheduler::sSetFreeThreadsForCpuTasksAvailableFunc(nullptr);
+        TaskScheduler::sSetTaskUnderflowFunc(nullptr);
         Document::sInstance->actionFinished();
         if(TaskScheduler::sAllTasksFinished()) {
             finishEncoding();

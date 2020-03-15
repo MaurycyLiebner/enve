@@ -17,6 +17,7 @@
 #include "videoframeloader.h"
 #include "videocachehandler.h"
 #include "Private/Tasks/taskscheduler.h"
+#include "Private/Tasks/taskexecutor.h"
 
 VideoFrameLoader::VideoFrameLoader(VideoFrameHandler * const cacheHandler,
                                    const stdsptr<VideoStreamsData> &openedVideo,
@@ -217,9 +218,9 @@ void VideoFrameLoader::handleException() {
 
 void VideoFrameLoader::queTaskNow() {
     if(mFrameToConvert) {
-        TaskScheduler::sGetInstance()->queCpuTask(ref<eTask>());
+        TaskScheduler::instance()->queCpuTask(ref<eTask>());
     } else {
-        TaskScheduler::sGetInstance()->queHddTask(ref<eTask>());
+        TaskScheduler::instance()->queHddTask(ref<eTask>());
     }
 }
 
@@ -238,11 +239,19 @@ void VideoFrameLoader::setFrameToConvert(
 }
 
 void VideoFrameLoader::process() {
-    if(!mFrameToConvert) readFrame();
     if(mFrameToConvert) {
-        hddPartFinished();
         convertFrame();
+    } else {
+        readFrame();
     }
+}
+
+bool VideoFrameLoader::nextStep() {
+    if(mFrameToConvert) {
+        CpuTaskExecutor::sAddTask(ref<eTask>());
+        return true;
+    }
+    return false;
 }
 
 void VideoFrameLoader::cleanUp() {

@@ -310,7 +310,7 @@ void AnimationBox::createPaintObject(const int firstAbsFrame,
     } else {
         connect(complexTask.get(), &ComplexTask::finishedAll,
                 paintObj.get(), adder);
-        TaskScheduler::sInstance->addComplexTask(complexTask);
+        TaskScheduler::instance()->addComplexTask(complexTask);
     }
 }
 

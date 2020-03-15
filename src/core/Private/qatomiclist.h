@@ -5,6 +5,8 @@
 #include <mutex>
 #include <condition_variable>
 
+using namespace std::chrono_literals;
+
 template <typename T>
 class QAtomicList : private QList<T> {
 public:
@@ -47,6 +49,12 @@ public:
         return true;
     }
 
+    void appendAndNotifyAll(const T& t) {
+        std::lock_guard<std::mutex> lk(mMutex);
+        QList<T>::append(t);
+        mCv.notify_all();
+    }
+
     void appendAndNotifyAll(const QList<T>& list) {
         std::lock_guard<std::mutex> lk(mMutex);
         QList<T>::append(list);
@@ -74,10 +82,14 @@ public:
         while(QList<T>::isEmpty()) mCv.wait(lk);
     }
 
-    void waitTakeFirst(T& t) {
+    bool waitTakeFirst(T& t, const std::atomic<bool>& stop) {
         std::unique_lock<std::mutex> lk(mMutex);
-        while(QList<T>::isEmpty()) mCv.wait(lk);
+        while(QList<T>::isEmpty()) {
+            mCv.wait_for(lk, std::chrono::seconds(1));
+            if(stop) return false;
+        }
         t = QList<T>::takeFirst();
+        return true;
     }
 private:
     std::mutex mMutex;
