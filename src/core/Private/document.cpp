@@ -129,17 +129,14 @@ bool Document::removeVisibleScene(Canvas * const scene) {
 
 void Document::setActiveScene(Canvas * const scene) {
     if(scene == fActiveScene) return;
+    auto& conn = fActiveScene.assign(scene);
     if(fActiveScene) {
-        disconnect(fActiveScene, nullptr, this, nullptr);
-    }
-    fActiveScene = scene;
-    if(fActiveScene) {
-        connect(fActiveScene, &Canvas::currentBoxChanged,
-                this, &Document::currentBoxChanged);
-        connect(fActiveScene, &Canvas::selectedPaintSettingsChanged,
-                this, &Document::selectedPaintSettingsChanged);
-        connect(fActiveScene, &Canvas::destroyed,
-                this, &Document::clearActiveScene);
+        conn << connect(fActiveScene, &Canvas::currentBoxChanged,
+                        this, &Document::currentBoxChanged);
+        conn << connect(fActiveScene, &Canvas::selectedPaintSettingsChanged,
+                        this, &Document::selectedPaintSettingsChanged);
+        conn << connect(fActiveScene, &Canvas::destroyed,
+                        this, &Document::clearActiveScene);
         emit currentBoxChanged(fActiveScene->getCurrentBox());
         emit selectedPaintSettingsChanged();
     }

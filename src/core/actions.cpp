@@ -26,8 +26,7 @@
 
 Actions* Actions::sInstance = nullptr;
 
-Actions::Actions(Document &document) : mDocument(document),
-    mActiveScene(mDocument.fActiveScene) {
+Actions::Actions(Document &document) : mDocument(document) {
     Q_ASSERT(!sInstance);
     sInstance = this;
 
@@ -789,9 +788,8 @@ void Actions::finishSmoothChange() {
     //    mDocument.actionFinished();
 }
 
-void Actions::connectToActiveScene() {
-    auto& conn = mActiveSceneConnections;
-    conn.clear();
+void Actions::connectToActiveScene(Canvas* const scene) {
+    auto& conn = mActiveScene.assign(scene);
 
     deleteSceneAction->raiseCanExecuteChanged();
     deleteSceneAction->raiseTextChanged();

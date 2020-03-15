@@ -31,16 +31,13 @@ eBoxOrSound::eBoxOrSound(const QString &name) :
 void eBoxOrSound::setParentGroup(ContainerBox * const parent) {
     if(parent == mParentGroup) return;
     emit aboutToChangeAncestor();
-    if(mParentGroup) {
-        disconnect(mParentGroup, &eBoxOrSound::aboutToChangeAncestor,
-                   this, &eBoxOrSound::aboutToChangeAncestor);
-    }
+
     prp_afterWholeInfluenceRangeChanged();
-    mParentGroup = parent;
+    auto& conn = mParentGroup.assign(parent);
     if(mParentGroup) {
         anim_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
-        connect(mParentGroup, &eBoxOrSound::aboutToChangeAncestor,
-                this, &eBoxOrSound::aboutToChangeAncestor);
+        conn << connect(mParentGroup, &eBoxOrSound::aboutToChangeAncestor,
+                        this, &eBoxOrSound::aboutToChangeAncestor);
     }
 
     setParent(mParentGroup);

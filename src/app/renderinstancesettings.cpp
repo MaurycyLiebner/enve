@@ -46,9 +46,10 @@ const QString &RenderInstanceSettings::getOutputDestination() const {
 
 void RenderInstanceSettings::setTargetCanvas(
         Canvas *canvas, const bool copySceneSettings) {
-    if(mTargetCanvas) disconnect(mTargetCanvas, nullptr, this, nullptr);
+    const auto oldCanvas = *mTargetCanvas;
+    auto& conn = mTargetCanvas.assign(canvas);
     if(canvas) {
-        if(!mTargetCanvas && copySceneSettings) {
+        if(!oldCanvas && copySceneSettings) {
             const auto frameRange = canvas->getFrameRange();
             mRenderSettings.fMinFrame = frameRange.fMin;
             mRenderSettings.fMaxFrame = frameRange.fMax;
@@ -61,8 +62,8 @@ void RenderInstanceSettings::setTargetCanvas(
             mRenderSettings.fBaseFps = canvas->getFps();
             mRenderSettings.fFps = mRenderSettings.fBaseFps;
         }
-        connect(canvas, &Canvas::dimensionsChanged,
-                this, [this](const int width, const int height) {
+        conn << connect(canvas, &Canvas::dimensionsChanged,
+                        this, [this](const int width, const int height) {
             mRenderSettings.fBaseWidth = width;
             mRenderSettings.fBaseHeight = height;
             mRenderSettings.fVideoWidth = qRound(mRenderSettings.fBaseWidth*
@@ -70,13 +71,12 @@ void RenderInstanceSettings::setTargetCanvas(
             mRenderSettings.fVideoHeight = qRound(mRenderSettings.fBaseHeight*
                                                   mRenderSettings.fResolution);
         });
-        connect(canvas, &Canvas::fpsChanged,
-                this, [this](const qreal fps) {
+        conn << connect(canvas, &Canvas::fpsChanged,
+                        this, [this](const qreal fps) {
             mRenderSettings.fBaseFps = fps;
             mRenderSettings.fFps = mRenderSettings.fBaseFps;
         });
     }
-    mTargetCanvas = canvas;
 }
 
 Canvas *RenderInstanceSettings::getTargetCanvas() const {
@@ -136,13 +136,10 @@ RenderState RenderInstanceSettings::getCurrentState() const {
 
 void RenderInstanceSettings::setOutputSettingsProfile(
         OutputSettingsProfile *profile) {
-    if(mOutputSettingsProfile) {
-        disconnect(mOutputSettingsProfile, nullptr, this, nullptr);
-    }
-    mOutputSettingsProfile = profile;
+    auto& conn = mOutputSettingsProfile.assign(profile);
     if(profile) {
-        connect(profile, &OutputSettingsProfile::changed,
-                this, [this, profile]() {
+        conn << connect(profile, &OutputSettingsProfile::changed,
+                        this, [this, profile]() {
             mOutputSettings = profile->getSettings();
         });
         mOutputSettings = profile->getSettings();
@@ -199,7 +196,7 @@ void RenderInstanceSettings::read(eReadStream &src) {
              if(const auto scene = enve_cast<Canvas*>(box))
                  setTargetCanvas(scene, false);
         };
-        mTargetCanvas.clear();
+        mTargetCanvas.assign(nullptr);
         canvasSetter();
         if(!mTargetCanvas) SimpleTask::sSchedule(canvasSetter);
     }

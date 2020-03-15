@@ -246,13 +246,11 @@ const QMatrix &BasicTransformAnimator::getRelativeTransform() const {
 
 void BasicTransformAnimator::setParentTransformAnimator(
         BasicTransformAnimator* parent) {
-    if(mParentTransform)
-        disconnect(mParentTransform,
-                   &BasicTransformAnimator::totalTransformChanged,
-                   this, &BasicTransformAnimator::updateInheritedTransform);
-    mParentTransform = parent;
-    if(parent) connect(parent, &BasicTransformAnimator::totalTransformChanged,
-                       this, &BasicTransformAnimator::updateInheritedTransform);
+    auto& conn = mParentTransform.assign(parent);
+    if(parent) {
+        conn << connect(parent, &BasicTransformAnimator::totalTransformChanged,
+                        this, &BasicTransformAnimator::updateInheritedTransform);
+    }
     updateInheritedTransform(UpdateReason::userChange);
 }
 

@@ -27,6 +27,7 @@
 #include "Tasks/taskscheduler.h"
 #include "clipboardcontainer.h"
 #include "Animators/SculptPath/sculptpath.h"
+#include "conncontextptr.h"
 
 class SceneBoundGradient;
 class FileDataCacheHandler;
@@ -86,7 +87,7 @@ public:
 
     QList<qsptr<Canvas>> fScenes;
     std::map<Canvas*, int> fVisibleScenes;
-    Canvas* fActiveScene = nullptr;
+    ConnContextPtr<Canvas> fActiveScene;
     qptr<BoundingBox> fCurrentBox;
 
     void updateScenes();

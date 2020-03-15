@@ -84,7 +84,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
                 gSingleLineTooltip("Play From the Beginning"), this);
     connect(mPlayFromBeginningButton, &ActionButton::pressed,
             this, [this]() {
-        const auto scene = mDocument.fActiveScene;
+        const auto scene = *mDocument.fActiveScene;
         if(!scene) return;
         scene->anim_setAbsFrame(scene->getFrameRange().fMin);
         renderPreview();
@@ -666,17 +666,19 @@ bool TimelineDockWidget::processKeyPress(QKeyEvent *event) {
     } else if(key == Qt::Key_Left && !(mods & Qt::ControlModifier)) {
         mDocument.decActiveSceneFrame();
     } else if(key == Qt::Key_Down && !(mods & Qt::ControlModifier)) {
-        const auto scene = mDocument.fActiveScene;
+        const auto scene = *mDocument.fActiveScene;
         if(!scene) return false;
         int targetFrame;
-        if(scene->anim_prevRelFrameWithKey(mDocument.getActiveSceneFrame(), targetFrame)) {
+        const int frame = mDocument.getActiveSceneFrame();
+        if(scene->anim_prevRelFrameWithKey(frame, targetFrame)) {
             mDocument.setActiveSceneFrame(targetFrame);
         }
     } else if(key == Qt::Key_Up && !(mods & Qt::ControlModifier)) {
-        const auto scene = mDocument.fActiveScene;
+        const auto scene = *mDocument.fActiveScene;
         if(!scene) return false;
         int targetFrame;
-        if(scene->anim_nextRelFrameWithKey(mDocument.getActiveSceneFrame(), targetFrame)) {
+        const int frame = mDocument.getActiveSceneFrame();
+        if(scene->anim_nextRelFrameWithKey(frame, targetFrame)) {
             mDocument.setActiveSceneFrame(targetFrame);
         }
     } else if(key == Qt::Key_P &&

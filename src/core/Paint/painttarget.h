@@ -97,7 +97,7 @@ private:
     QRect mTotalRoi;
     ulong mLastTs;
     int mLastFrame = 0;
-    qptr<PaintBox> mPaintDrawableBox;
+    ConnContextQPtr<PaintBox> mPaintDrawableBox;
     qptr<AnimatedSurface> mPaintAnimSurface;
     OnionSkin mPaintOnion;
     bool mPaintPressedSinceUpdate = false;

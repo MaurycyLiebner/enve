@@ -67,19 +67,18 @@ void CanvasWindow::setCurrentCanvas(const int id) {
 void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     if(mCurrentCanvas == canvas) return;
     if(mCurrentCanvas) {
-        disconnect(mCurrentCanvas, nullptr, this, nullptr);
         if(isVisible()) mDocument.removeVisibleScene(mCurrentCanvas);
     }
-    mCurrentCanvas = canvas;
+    auto& conn = mCurrentCanvas.assign(canvas);
     if(KFT_hasFocus()) mDocument.setActiveScene(mCurrentCanvas);
     if(mCurrentCanvas) {
         if(isVisible()) mDocument.addVisibleScene(mCurrentCanvas);
         emit changeCanvasFrameRange(canvas->getFrameRange());
         updatePivotIfNeeded();
-        connect(mCurrentCanvas, &Canvas::requestUpdate,
-                this, qOverload<>(&CanvasWindow::update));
-        connect(mCurrentCanvas, &Canvas::destroyed,
-                this, [this]() { setCurrentCanvas(nullptr); });
+        conn << connect(mCurrentCanvas, &Canvas::requestUpdate,
+                        this, qOverload<>(&CanvasWindow::update));
+        conn << connect(mCurrentCanvas, &Canvas::destroyed,
+                        this, [this]() { setCurrentCanvas(nullptr); });
     }
 
     if(mCurrentCanvas) fitCanvasToSize();
@@ -314,7 +313,6 @@ void CanvasWindow::openSettingsWindowForCurrentCanvas() {
     const auto dialog = new CanvasSettingsDialog(mCurrentCanvas, this);
     connect(dialog, &QDialog::accepted, this, [dialog, this]() {
         dialog->applySettingsToCanvas(mCurrentCanvas);
-        setCurrentCanvas(mCurrentCanvas);
         dialog->close();
     });
     dialog->show();

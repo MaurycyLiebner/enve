@@ -125,7 +125,7 @@ private:
 
     qsptr<WindowSingleWidgetTarget> mWindowSWTTarget;
 
-    Canvas* mCurrentCanvas = nullptr;
+    ConnContextPtr<Canvas> mCurrentCanvas;
     bool mFitToSizeBlocked = false;
 
     //void paintEvent(QPaintEvent *);

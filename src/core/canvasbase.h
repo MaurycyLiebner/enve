@@ -88,20 +88,19 @@ public:
     }
 
     void addToSelectedProps(Property* const prop) {
-        mSelectedProps << prop;
-        connect(prop, &Property::prp_parentChanged,
-                this, [this, prop]() { removeFromSelectedProps(prop); });
+        auto& conn = mSelectedProps.addObj(prop);
+        conn << connect(prop, &Property::prp_parentChanged,
+                        this, [this, prop]() { removeFromSelectedProps(prop); });
         prop->prp_setSelected(true);
     }
 
     void removeFromSelectedProps(Property* const prop) {
-        mSelectedProps.removeOne(prop);
-        disconnect(prop, &Property::prp_parentChanged, this, nullptr);
+        mSelectedProps.removeObj(prop);
         prop->prp_setSelected(false);
     }
 
     void clearSelectedProps() {
-        const auto selected = mSelectedProps;
+        const auto selected = mSelectedProps.getList();
         for(const auto prop : selected) {
             removeFromSelectedProps(prop);
         }
@@ -112,7 +111,7 @@ protected:
 
     ConnContextObjList<BoundingBox*> mSelectedBoxes;
 
-    QList<Property*> mSelectedProps;
+    ConnContextObjList<Property*> mSelectedProps;
 };
 
 #endif // CANVASBASE_H

@@ -16,11 +16,14 @@
 
 #ifndef RENDERINSTANCESETTINGS_H
 #define RENDERINSTANCESETTINGS_H
-class Canvas;
+
 #include "outputsettings.h"
 #include "rendersettings.h"
 #include "smartPointers/ememory.h"
 #include "Private/esettings.h"
+#include "conncontextptr.h"
+
+class Canvas;
 
 enum class RenderState {
     none,
@@ -68,9 +71,9 @@ private:
     QString mOutputDestination;
     QString mRenderError;
 
-    qptr<OutputSettingsProfile> mOutputSettingsProfile;
+    ConnContextQPtr<OutputSettingsProfile> mOutputSettingsProfile;
 
-    qptr<Canvas> mTargetCanvas;
+    ConnContextQPtr<Canvas> mTargetCanvas;
 
     RenderSettings mRenderSettings;
     OutputSettings mOutputSettings;

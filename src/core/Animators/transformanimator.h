@@ -116,7 +116,7 @@ protected:
     QMatrix mInheritedTransform;
     QMatrix mTotalTransform;
 
-    qptr<BasicTransformAnimator> mParentTransform;
+    ConnContextQPtr<BasicTransformAnimator> mParentTransform;
 
     qsptr<QPointFAnimator> mPosAnimator;
     qsptr<QPointFAnimator> mScaleAnimator;

@@ -26,6 +26,7 @@ public:
     T* operator->() const { return mPtr; }
     operator T*() const { return mPtr; }
     operator bool() const { return mPtr; }
+    T* operator*() const { return mPtr; }
     ConnContext& operator<<(const QMetaObject::Connection& connection)
     { return mConnContext << connection; }
 

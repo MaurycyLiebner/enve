@@ -132,7 +132,7 @@ private:
     bool mDurationRectangleLocked = false;
     ConnContextQSPtr<DurationRectangle> mDurationRectangle;
 
-    ContainerBox* mParentGroup = nullptr;
+    ConnContextPtr<ContainerBox> mParentGroup;
 };
 
 #endif // EBOXORSOUND_H

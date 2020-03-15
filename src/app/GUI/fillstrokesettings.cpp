@@ -466,28 +466,28 @@ void FillStrokeSettingsWidget::setStrokeBrush(
 
 void FillStrokeSettingsWidget::applyBrushSpacingAction(
         const SegAction& action) {
-    const auto scene = mDocument.fActiveScene;
+    const auto scene = *mDocument.fActiveScene;
     if(scene) scene->applyStrokeBrushSpacingActionToSelected(action);
     mDocument.actionFinished();
 }
 
 void FillStrokeSettingsWidget::applyBrushPressureAction(
         const SegAction& action) {
-    const auto scene = mDocument.fActiveScene;
+    const auto scene = *mDocument.fActiveScene;
     if(scene) scene->applyStrokeBrushPressureActionToSelected(action);
     mDocument.actionFinished();
 }
 
 void FillStrokeSettingsWidget::applyBrushWidthAction(
         const SegAction& action) {
-    const auto scene = mDocument.fActiveScene;
+    const auto scene = *mDocument.fActiveScene;
     if(scene) scene->applyStrokeBrushWidthActionToSelected(action);
     mDocument.actionFinished();
 }
 
 void FillStrokeSettingsWidget::applyBrushTimeAction(
         const SegAction& action) {
-    const auto scene = mDocument.fActiveScene;
+    const auto scene = *mDocument.fActiveScene;
     if(scene) scene->applyStrokeBrushTimeActionToSelected(action);
     mDocument.actionFinished();
 }
@@ -538,7 +538,7 @@ void FillStrokeSettingsWidget::setCurrentBox(BoundingBox* const box) {
 }
 
 void FillStrokeSettingsWidget::updateCurrentSettings() {
-    const auto scene = mDocument.fActiveScene;
+    const auto scene = *mDocument.fActiveScene;
     if(scene) {
         const auto currentBox = scene->getCurrentBox();
         setCurrentBox(currentBox);
@@ -600,14 +600,14 @@ void FillStrokeSettingsWidget::paintTypeSet(const PaintType type) {
         paintSetting << std::make_shared<GradientTypePaintSetting>(mTarget, currentGradientType);
     }
     paintSetting << std::make_shared<PaintTypePaintSetting>(mTarget, currentPaintType);
-    const auto scene = mDocument.fActiveScene;
+    const auto scene = *mDocument.fActiveScene;
     if(scene) scene->applyPaintSettingToSelected(paintSetting);
     mDocument.actionFinished();
 }
 
 void FillStrokeSettingsWidget::colorSettingReceived(
         const ColorSetting &colorSetting) {
-    const auto scene = mDocument.fActiveScene;
+    const auto scene = *mDocument.fActiveScene;
     if(getCurrentPaintTypeVal() != PaintType::GRADIENTPAINT && scene) {
         PaintSettingsApplier paintSetting;
         paintSetting << std::make_shared<ColorPaintSetting>(mTarget, colorSetting);
@@ -726,17 +726,17 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
 
 void FillStrokeSettingsWidget::emitStrokeBrushChanged(
         SimpleBrushWrapper* const brush) {
-    const auto scene = mDocument.fActiveScene;
+    const auto scene = *mDocument.fActiveScene;
     if(scene) scene->setSelectedStrokeBrush(brush);
 }
 
 void FillStrokeSettingsWidget::emitCapStyleChanged() {
-    const auto scene = mDocument.fActiveScene;
+    const auto scene = *mDocument.fActiveScene;
     if(scene) scene->setSelectedCapStyle(mCurrentCapStyle);
 }
 
 void FillStrokeSettingsWidget::emitJoinStyleChanged() {
-    const auto scene = mDocument.fActiveScene;
+    const auto scene = *mDocument.fActiveScene;
     if(scene) scene->setSelectedJoinStyle(mCurrentJoinStyle);
 }
 
@@ -755,7 +755,7 @@ void FillStrokeSettingsWidget::applyGradient() {
                std::make_shared<GradientTypePaintSetting>(mTarget, currentGradientType) <<
                std::make_shared<PaintTypePaintSetting>(mTarget, PaintType::GRADIENTPAINT);
 
-    const auto scene = mDocument.fActiveScene;
+    const auto scene = *mDocument.fActiveScene;
     if(scene) scene->applyPaintSettingToSelected(applier);
 }
 

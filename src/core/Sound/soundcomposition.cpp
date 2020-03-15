@@ -41,16 +41,14 @@ void SoundComposition::stop() {
 }
 
 void SoundComposition::addSound(const qsptr<eSound>& sound) {
-    connect(sound.get(), &Property::prp_absFrameRangeChanged,
-            this, &SoundComposition::frameRangeChanged);
-    mSounds.append(sound);
+    auto& conn = mSounds.addObj(sound);
+    conn << connect(sound.get(), &Property::prp_absFrameRangeChanged,
+                    this, &SoundComposition::frameRangeChanged);
     frameRangeChanged(sound->prp_absInfluenceRange());
 }
 
 void SoundComposition::removeSound(const qsptr<eSound>& sound) {
-    disconnect(sound.get(), &Property::prp_absFrameRangeChanged,
-               this, &SoundComposition::frameRangeChanged);
-    mSounds.removeOne(sound);
+    mSounds.removeObj(sound);
     frameRangeChanged(sound->prp_absInfluenceRange());
 }
 

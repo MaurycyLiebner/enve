@@ -78,7 +78,7 @@ private:
     QList<int> mProcessingSeconds;
     const Canvas * const mParent;
     qint64 mPos;
-    QList<qsptr<eSound>> mSounds;
+    ConnContextObjList<qsptr<eSound>> mSounds;
     HddCachableCacheHandler mSecondsCache;
 };
 
