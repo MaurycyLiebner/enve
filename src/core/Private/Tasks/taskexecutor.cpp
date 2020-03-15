@@ -16,12 +16,14 @@
 
 #include "taskexecutor.h"
 
+QAtomicInt TaskExecutor::sTaskFinishSignals = 0;
+
 void TaskExecutor::processTask(eTask& task) {
     task.process();
 }
 
 QAtomicList<stdsptr<eTask>> CpuTaskExecutor::sTasks;
-QAtomicInt CpuTaskExecutor::sUseCount;
+QAtomicInt CpuTaskExecutor::sUseCount = 0;
 
 void CpuTaskExecutor::sAddTask(const stdsptr<eTask>& ready) {
     sTasks.appendAndNotifyAll(ready);
@@ -61,13 +63,16 @@ void TaskExecutor::processLoop() {
 
         const bool nextStep = !task->waitingToCancel() &&
                               task->nextStep();
-        if(!nextStep) emit finishedTask(task);
+        if(!nextStep) {
+            sTaskFinishSignals++;
+            emit finishedTask(task);
+        }
         mUseCount--;
     }
 }
 
 QAtomicList<stdsptr<eTask>> HddTaskExecutor::sTasks;
-QAtomicInt HddTaskExecutor::sUseCount;
+QAtomicInt HddTaskExecutor::sUseCount = 0;
 
 void HddTaskExecutor::sAddTask(const stdsptr<eTask>& ready) {
     sTasks.appendAndNotifyAll(ready);

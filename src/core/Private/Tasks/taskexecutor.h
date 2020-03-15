@@ -29,6 +29,8 @@ public:
                  QAtomicList<stdsptr<eTask>>& tasks) :
         mUseCount(count), mTasks(tasks) {}
 
+    static QAtomicInt sTaskFinishSignals;
+
     virtual void start();
     void stop();
 signals:

@@ -44,10 +44,6 @@ public:
 
     static bool sAllTasksFinished();
     static bool sAllQuedCpuTasksFinished();
-    static bool sAllQuedHddTasksFinished();
-
-    static bool sCpuTasksBeingProcessed();
-    static bool sHddTasksBeingProcessed();
 
     static void sClearTasks();
 
@@ -109,14 +105,12 @@ private:
 
     bool mCriticalMemoryState = false;
 
-    bool mHddThreadBusy = false;
-
     bool mAlwaysQue = false;
     bool mCpuQueing = false;
 
     QList<qsptr<ComplexTask>> mComplexTasks;
 
-    TaskQueHandler mQuedCpuTasks;
+    TaskQueHandler mQuedCGTasks;
     QList<stdsptr<eTask>> mQuedHddTasks;
 
     QList<stdsptr<CpuExecController>> mCpuExecs;

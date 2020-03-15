@@ -17,7 +17,7 @@
 #include "gputaskexecutor.h"
 
 QAtomicList<stdsptr<eTask>> GpuTaskExecutor::sTasks;
-QAtomicInt GpuTaskExecutor::sUseCount;
+QAtomicInt GpuTaskExecutor::sUseCount = 0;
 
 GpuTaskExecutor::GpuTaskExecutor() :
     TaskExecutor(sUseCount, sTasks) {}
