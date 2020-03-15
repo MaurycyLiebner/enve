@@ -224,6 +224,8 @@ void eSettings::loadFromFile() {
     }
     file.close();
 
+    if(fGpuVendor == GpuVendor::nvidia) fPathGpuAcc = false;
+
     if(!invalidLines.isEmpty()) {
         RuntimeThrow("Invalid setting(s) \n" +
                      invalidLines.join("\n") +

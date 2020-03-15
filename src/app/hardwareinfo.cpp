@@ -60,8 +60,8 @@ GpuVendor gpuVendor() {
                version.contains(str, Qt::CaseInsensitive);
     };
 
-    if(checkVendor("nvidia")) return GpuVendor::nvidia;
-    if(checkVendor("intel")) return GpuVendor::nvidia;
+    if(checkVendor("nvidia") || checkVendor("nouveau")) return GpuVendor::nvidia;
+    if(checkVendor("intel")) return GpuVendor::intel;
     if(checkVendor("amd") || checkVendor("ati") ||
        checkVendor("advanced micro devices")) {
         return GpuVendor::amd;
