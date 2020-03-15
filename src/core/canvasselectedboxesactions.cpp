@@ -385,11 +385,11 @@ void Canvas::centerPivotForSelected() {
 }
 
 void Canvas::removeSelectedBoxesAndClearList() {
-    for(const auto &box : mSelectedBoxes) {
-        //box->setSelected(false);
+    while(!mSelectedBoxes.isEmpty()) {
+        const auto &box = mSelectedBoxes.last();
+        removeBoxFromSelection(box);
         box->removeFromParent_k();
     }
-    clearBoxesSelectionList(); schedulePivotUpdate();
 }
 
 void Canvas::setCurrentBox(BoundingBox* const box) {
