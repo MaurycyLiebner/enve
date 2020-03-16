@@ -12,9 +12,11 @@ public:
     PropertyNameDialog(const QString& initialValue,
                        QWidget* const parent = nullptr);
 
-    static bool sRenameBox(BoundingBox * const box,
+    static bool sGetPropertyName(QString& name,
+                                 QWidget* const parent);
+    static void sRenameBox(BoundingBox * const box,
                            QWidget * const parent);
-    static bool sRenameProperty(Property* const prop,
+    static void sRenameProperty(Property* const prop,
                                 QWidget* const parent);
 
     QString name() const

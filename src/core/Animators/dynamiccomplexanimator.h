@@ -192,7 +192,7 @@ public:
     }
 
     QString makeNameUnique(const QString &name,
-                           Property * const skip) {
+                           Property * const skip = nullptr) {
         return NameFixer::makeNameUnique(
                     name, [this, skip](const QString& name) {
             return allNamesStartingWith(name, skip);

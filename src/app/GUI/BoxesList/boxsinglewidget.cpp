@@ -391,6 +391,8 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     if(!prop) return;
     mTargetConn << connect(prop, &SingleWidgetTarget::SWT_changedDisabled,
                            this, qOverload<>(&QWidget::update));
+    mTargetConn << connect(prop, &Property::prp_nameChanged,
+                           this, qOverload<>(&QWidget::update));
 
     const auto boolProperty = enve_cast<BoolProperty*>(prop);
     const auto boolPropertyContainer = enve_cast<BoolPropertyContainer*>(prop);

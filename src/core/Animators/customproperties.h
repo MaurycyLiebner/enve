@@ -36,9 +36,9 @@ public:
 
     void prp_writeProperty(eWriteStream& dst) const override;
     void prp_readProperty(eReadStream& src) override;
-private:
-    void addProperty(const qsptr<Animator>& prop);
 
+    void addProperty(const qsptr<Animator>& prop);
+private:
     using CustomPropertiesBase::addChild;
     using CustomPropertiesBase::insertChild;
 };

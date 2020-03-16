@@ -20,6 +20,7 @@
 #include "qpointfanimator.h"
 
 #include "Properties/namedproperty.h"
+#include "typemenu.h"
 
 enum class PropertyType {
     QrealAnimator, QPointFAnimator
@@ -28,25 +29,35 @@ enum class PropertyType {
 CustomProperties::CustomProperties() :
     CustomPropertiesBase("properties") {}
 
-#include "typemenu.h"
+template <typename T>
+void addPropertyOfType(CustomProperties* const target,
+                       QWidget* const parent) {
+    QString name = target->makeNameUnique("property 0");
+    const bool ret = PropertyNameDialog::sGetPropertyName(name, parent);
+    if(ret) {
+        using PropType = NamedProperty<T>;
+        const auto prop = enve::make_shared<PropType>(name);
+        target->addProperty(prop);
+    }
+}
+
 void CustomProperties::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<CustomProperties>()) return;
     menu->addedActionsForType<CustomProperties>();
+    const auto parent = menu->getParentWidget();
     {
         const PropertyMenu::PlainSelectedOp<CustomProperties> aOp =
-        [](CustomProperties * coll) {
-            coll->addProperty(enve::make_shared<
-                              NamedProperty<QrealAnimator>>(""));
+        [parent](CustomProperties* target) {
+            addPropertyOfType<QrealAnimator>(target, parent);
         };
-        menu->addPlainAction("Add Single Value Property", aOp);
+        menu->addPlainAction("Add Single Value Property...", aOp);
     }
     {
         const PropertyMenu::PlainSelectedOp<CustomProperties> aOp =
-        [](CustomProperties * coll) {
-            coll->addProperty(enve::make_shared<
-                              NamedProperty<QPointFAnimator>>(""));
+        [parent](CustomProperties* target) {
+            addPropertyOfType<QPointFAnimator>(target, parent);
         };
-        menu->addPlainAction("Add Two Value Property", aOp);
+        menu->addPlainAction("Add Two Value Property...", aOp);
     }
     menu->addSeparator();
     CustomPropertiesBase::prp_setupTreeViewMenu(menu);
@@ -65,7 +76,7 @@ void CustomProperties::prp_readProperty(eReadStream &src) {
 }
 
 void CustomProperties::addProperty(const qsptr<Animator> &prop) {
-    const auto name = makeNameUnique("property 0", prop.get());
+    const auto name = makeNameUnique(prop->prp_getName(), prop.get());
     prop->prp_setName(name);
     addChild(prop);
 }

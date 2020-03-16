@@ -41,27 +41,35 @@ PropertyNameDialog::PropertyNameDialog(
     validate();
 }
 
-bool PropertyNameDialog::sRenameBox(BoundingBox * const box,
-                                    QWidget * const parent) {
-    const auto dialog = new PropertyNameDialog(box->prp_getName(),
-                                               parent);
+bool PropertyNameDialog::sGetPropertyName(QString& name,
+                                          QWidget* const parent) {
+    const auto dialog = new PropertyNameDialog(name, parent);
     const auto result = dialog->exec() == QDialog::Accepted;
-    if(result) {
-        const QString inputName = dialog->name();
-        box->rename(inputName);
-    }
+    if(result) name = dialog->name();
     delete dialog;
     return result;
 }
 
-bool PropertyNameDialog::sRenameProperty(Property * const prop,
+void PropertyNameDialog::sRenameBox(BoundingBox * const box,
+                                    QWidget * const parent) {
+    const auto dialog = new PropertyNameDialog(box->prp_getName(),
+                                               parent);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
+    connect(dialog, &QDialog::accepted, box, [box, dialog]() {
+        box->rename(dialog->name());
+    });
+}
+
+void PropertyNameDialog::sRenameProperty(Property * const prop,
                                          QWidget * const parent) {
     const auto dialog = new PropertyNameDialog(prop->prp_getName(),
                                                parent);
-    const auto result = dialog->exec() == QDialog::Accepted;
-    if(result) prop->prp_setNameAction(dialog->name());
-    delete dialog;
-    return result;
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
+    connect(dialog, &QDialog::accepted, prop, [prop, dialog]() {
+        prop->prp_setNameAction(dialog->name());
+    });
 }
 
 bool PropertyNameDialog::validate() {
