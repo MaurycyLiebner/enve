@@ -14,27 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef COLORANIMATORBINDING_H
-#define COLORANIMATORBINDING_H
+#ifndef VALUEBINDING_H
+#define VALUEBINDING_H
 
-#include "propertybinding.h"
+#include "propertybindingbase.h"
 
-class ColorAnimator;
-
-class ColorAnimatorBinding : public PropertyBinding {
+class ValueBinding : public PropertyBindingBase {
+    ValueBinding(const Property* const context);
 public:
-    ColorAnimatorBinding(const Validator& validator,
-                         const Property* const context);
+    static qsptr<ValueBinding> sCreate(const Property* const context);
 
     QJSValue getJSValue(QJSEngine& e);
     QJSValue getJSValue(QJSEngine& e, const qreal relFrame);
 
-    void updateValue();
-
-    QColor getValue();
-    QColor getValue(const qreal relFrame);
-private:
-    QColor mCurrentValue;
+    FrameRange identicalRange(const int absFrame);
+    QString path() const { return "$value"; }
 };
 
-#endif // COLORANIMATORBINDING_H
+#endif // VALUEBINDING_H

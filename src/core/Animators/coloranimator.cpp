@@ -40,6 +40,31 @@ ColorAnimator::ColorAnimator(const QString &name) : StaticComplexAnimator(name) 
             this, emitColorChange);
 }
 
+QJSValue toArray(QJSEngine& e, const QColor& value) {
+    auto array = e.newArray(4);
+    array.setProperty(0, value.redF());
+    array.setProperty(1, value.greenF());
+    array.setProperty(2, value.blueF());
+    array.setProperty(3, value.alphaF());
+    return array;
+}
+
+QJSValue ColorAnimator::prp_getBaseJSValue(QJSEngine& e) const {
+    return toArray(e, getBaseColor());
+}
+
+QJSValue ColorAnimator::prp_getBaseJSValue(QJSEngine& e, const qreal relFrame) const {
+    return toArray(e, getBaseColor(relFrame));
+}
+
+QJSValue ColorAnimator::prp_getEffectiveJSValue(QJSEngine& e) const {
+    return toArray(e, getColor());
+}
+
+QJSValue ColorAnimator::prp_getEffectiveJSValue(QJSEngine& e, const qreal relFrame) const {
+    return toArray(e, getColor(relFrame));
+}
+
 void ColorAnimator::prp_writeProperty(eWriteStream& dst) const {
     StaticComplexAnimator::prp_writeProperty(dst);
     dst.write(&mColorMode, sizeof(ColorMode));
@@ -51,38 +76,58 @@ void ColorAnimator::prp_readProperty(eReadStream& src) {
     setColorMode(mColorMode);
 }
 
-QColor ColorAnimator::getColor() const {
-    qreal val1 = mVal1Animator->getEffectiveValue();
-    qreal val2 = mVal2Animator->getEffectiveValue();
-    qreal val3 = mVal3Animator->getEffectiveValue();
-    qreal alpha = mAlphaAnimator->getEffectiveValue();
-
+QColor valuesToColor(const qreal val1, const qreal val2,
+                     const qreal val3, const qreal alpha,
+                     const ColorMode colorMode) {
     QColor color;
-    if(mColorMode == ColorMode::rgb) {
+    switch(colorMode) {
+    case ColorMode::rgb: {
         color.setRgbF(val1, val2, val3, alpha);
-    } else if(mColorMode == ColorMode::hsv) {
+    } break;
+    case ColorMode::hsv: {
         color.setHsvF(val1, val2, val3, alpha);
-    } else { // HSLMODE
+    } break;
+    case ColorMode::hsl: {
         color.setHslF(val1, val2, val3, alpha);
+    } break;
     }
     return color;
 }
 
-QColor ColorAnimator::getColor(const qreal relFrame) {
+QColor ColorAnimator::getBaseColor() const {
+    const qreal val1 = mVal1Animator->getCurrentBaseValue();
+    const qreal val2 = mVal2Animator->getCurrentBaseValue();
+    const qreal val3 = mVal3Animator->getCurrentBaseValue();
+    const qreal alpha = mAlphaAnimator->getCurrentBaseValue();
+
+    return valuesToColor(val1, val2, val3, alpha, mColorMode);
+}
+
+QColor ColorAnimator::getBaseColor(const qreal relFrame) const {
+    const qreal val1 = mVal1Animator->getBaseValue(relFrame);
+    const qreal val2 = mVal2Animator->getBaseValue(relFrame);
+    const qreal val3 = mVal3Animator->getBaseValue(relFrame);
+    const qreal alpha = mAlphaAnimator->getBaseValue(relFrame);
+
+    return valuesToColor(val1, val2, val3, alpha, mColorMode);
+}
+
+QColor ColorAnimator::getColor() const {
+    const qreal val1 = mVal1Animator->getEffectiveValue();
+    const qreal val2 = mVal2Animator->getEffectiveValue();
+    const qreal val3 = mVal3Animator->getEffectiveValue();
+    const qreal alpha = mAlphaAnimator->getEffectiveValue();
+
+    return valuesToColor(val1, val2, val3, alpha, mColorMode);
+}
+
+QColor ColorAnimator::getColor(const qreal relFrame) const {
     const qreal val1 = mVal1Animator->getEffectiveValue(relFrame);
     const qreal val2 = mVal2Animator->getEffectiveValue(relFrame);
     const qreal val3 = mVal3Animator->getEffectiveValue(relFrame);
     const qreal alpha = mAlphaAnimator->getEffectiveValue(relFrame);
 
-    QColor color;
-    if(mColorMode == ColorMode::rgb) {
-        color.setRgbF(val1, val2, val3, alpha);
-    } else if(mColorMode == ColorMode::hsv) {
-        color.setHsvF(val1, val2, val3, alpha);
-    } else { // HSLMODE
-        color.setHslF(val1, val2, val3, alpha);
-    }
-    return color;
+    return valuesToColor(val1, val2, val3, alpha, mColorMode);
 }
 
 void ColorAnimator::setColor(const QColor &col) {

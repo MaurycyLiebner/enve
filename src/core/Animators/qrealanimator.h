@@ -34,6 +34,26 @@ protected:
                   const qreal prefferdStep,
                   const QString& name);
 public:
+    QJSValue prp_getBaseJSValue(QJSEngine& e) const {
+        Q_UNUSED(e)
+        return getCurrentBaseValue();
+    }
+
+    QJSValue prp_getBaseJSValue(QJSEngine& e, const qreal relFrame) const {
+        Q_UNUSED(e)
+        return getBaseValue(relFrame);
+    }
+
+    QJSValue prp_getEffectiveJSValue(QJSEngine& e) const {
+        Q_UNUSED(e)
+        return getEffectiveValue();
+    }
+
+    QJSValue prp_getEffectiveJSValue(QJSEngine& e, const qreal relFrame) const {
+        Q_UNUSED(e)
+        return getEffectiveValue(relFrame);
+    }
+
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     void prp_startTransform();

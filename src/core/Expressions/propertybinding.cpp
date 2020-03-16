@@ -1,9 +1,26 @@
+// enve - 2D animations software
+// Copyright (C) 2016-2020 Maurycy Liebner
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "propertybinding.h"
 
 #include "Animators/complexanimator.h"
 
 PropertyBinding::PropertyBinding(const Validator& validator,
                                  const Property* const context) :
+    PropertyBindingBase(context),
     pathChanged([this]() {
         const auto oldBind = mBindProperty.get();
         updateBindPath();
@@ -12,15 +29,12 @@ PropertyBinding::PropertyBinding(const Validator& validator,
         if(!newSource) setBindPathValid(false);
         else if(newSource != oldBind) bindProperty(mPath, newSource);
         else setBindPathValid(true);
-    }), mValidator(validator), mContext(context) {
+    }), mValidator(validator) {
     connect(context, &Property::prp_pathChanged,
             this, [this]() { pathChanged(); });
 }
 
-#include "qrealanimatorbinding.h"
 #include "Animators/qrealanimator.h"
-
-#include "qpointfanimatorbinding.h"
 #include "Animators/qpointfanimator.h"
 
 qsptr<PropertyBinding> PropertyBinding::sCreate(
@@ -29,12 +43,10 @@ qsptr<PropertyBinding> PropertyBinding::sCreate(
         const Property* const context) {
     const auto prop = sFindPropertyToBind(binding, validator, context);
     if(!prop) return nullptr;
-    PropertyBinding* result = nullptr;
     if(const auto qa = enve_cast<QrealAnimator*>(prop)) {
-        result = new QrealAnimatorBinding(validator, context);
     } else if(const auto pa = enve_cast<QPointFAnimator*>(prop)) {
-        result = new QPointFAnimatorBinding(validator, context);
     } else return nullptr;
+    const auto result = new PropertyBinding(validator, context);
     result->bindProperty(binding, prop);
     return qsptr<PropertyBinding>(result);
 }
@@ -44,21 +56,14 @@ void PropertyBinding::setPath(const QString& path) {
     reloadBindProperty();
 }
 
-void PropertyBinding::afterValueChange() {
-    mValueUpToDate = false;
-    emit currentValueChanged();
+QJSValue PropertyBinding::getJSValue(QJSEngine& e) {
+    if(mBindProperty) return mBindProperty->prp_getEffectiveJSValue(e);
+    else return QJSValue::NullValue;
 }
 
-bool PropertyBinding::setAbsFrame(const qreal absFrame) {
-    if(mBindPathValid && mBindProperty && mContext) {
-        const qreal oldRelFrame = mRelFrame;
-        mRelFrame = mBindProperty->prp_absFrameToRelFrameF(absFrame);
-        const auto oldRange = mBindProperty->prp_getIdenticalAbsRange(oldRelFrame);
-        if(oldRange.inRange(absFrame)) return false;
-        afterValueChange();
-        return true;
-    }
-    return false;
+QJSValue PropertyBinding::getJSValue(QJSEngine& e, const qreal relFrame) {
+    if(mBindProperty) return mBindProperty->prp_getEffectiveJSValue(e, relFrame);
+    else return QJSValue::NullValue;
 }
 
 bool PropertyBinding::dependsOn(const Property* const prop) {
@@ -66,18 +71,13 @@ bool PropertyBinding::dependsOn(const Property* const prop) {
     return mBindProperty == prop || mBindProperty->prp_dependsOn(prop);
 }
 
-FrameRange PropertyBinding::identicalRange(const qreal absFrame) {
+FrameRange PropertyBinding::identicalRange(const int absFrame) {
     if(mBindPathValid && mBindProperty && mContext) {
-        const qreal relFrame = mBindProperty->prp_absFrameToRelFrame(absFrame);
-        return mBindProperty->prp_getIdenticalRelRange(relFrame);
+        const int relFrame = mBindProperty->prp_absFrameToRelFrame(absFrame);
+        const auto absRange = mBindProperty->prp_getIdenticalAbsRange(relFrame);
+        return mContext->prp_absRangeToRelRange(absRange);
     }
     return FrameRange::EMINMAX;
-}
-
-void PropertyBinding::updateValueIfNeeded() {
-    if(mValueUpToDate) return;
-    updateValue();
-    mValueUpToDate = true;
 }
 
 void PropertyBinding::reloadBindProperty() {
@@ -117,7 +117,7 @@ void PropertyBinding::updateBindPath() {
 }
 
 bool PropertyBinding::bindProperty(const QString& path, Property * const newBinding) {
-    if(newBinding && !mValidator(newBinding)) return false;
+    if(newBinding && mValidator && !mValidator(newBinding)) return false;
     mPath = path;
     auto& conn = mBindProperty.assign(newBinding);
     if(newBinding) {
@@ -125,13 +125,13 @@ bool PropertyBinding::bindProperty(const QString& path, Property * const newBind
         conn << connect(newBinding, &Property::prp_absFrameRangeChanged,
                         this, [this](const FrameRange& absRange) {
             const auto relRange = mContext->prp_absRangeToRelRange(absRange);
-            if(relRange.inRange(mRelFrame)) afterValueChange();
+            if(relRange.inRange(relFrame())) emit currentValueChanged();
             emit relRangeChanged(relRange);
         });
         conn << connect(newBinding, &Property::prp_pathChanged,
                         this, [this]() { pathChanged(); });
     }
-    afterValueChange();
+    emit currentValueChanged();
     emit relRangeChanged(FrameRange::EMINMAX);
     return true;
 }
@@ -139,6 +139,6 @@ bool PropertyBinding::bindProperty(const QString& path, Property * const newBind
 void PropertyBinding::setBindPathValid(const bool valid) {
     if(mBindPathValid == valid) return;
     mBindPathValid = valid;
-    afterValueChange();
+    emit currentValueChanged();
     emit relRangeChanged(FrameRange::EMINMAX);
 }

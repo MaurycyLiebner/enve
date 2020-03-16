@@ -71,8 +71,8 @@ QMAKE_CXXFLAGS += -fopenmp
 LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 
 SOURCES += \
-    Expressions/coloranimatorbinding.cpp \
     Expressions/expression.cpp \
+    Expressions/framebinding.cpp \
     Expressions/propertybinding.cpp \
     Animators/SculptPath/sculptbrush.cpp \
     Animators/SculptPath/sculptnode.cpp \
@@ -156,9 +156,9 @@ SOURCES += \
     CacheHandlers/tmploader.cpp \
     CacheHandlers/tmpsaver.cpp \
     CacheHandlers/usedrange.cpp \
+    Expressions/propertybindingbase.cpp \
     Expressions/propertybindingparser.cpp \
-    Expressions/qpointfanimatorbinding.cpp \
-    Expressions/qrealanimatorbinding.cpp \
+    Expressions/valuebinding.cpp \
     FileCacheHandlers/animationcachehandler.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/filecachehandler.cpp \
@@ -367,8 +367,8 @@ SOURCES += \
     zipfilesaver.cpp
 
 HEADERS += \
-    Expressions/coloranimatorbinding.h \
     Expressions/expression.h \
+    Expressions/framebinding.h \
     Expressions/propertybinding.h \
     Animators/SculptPath/sculptbrush.h \
     Animators/SculptPath/sculptnode.h \
@@ -457,9 +457,9 @@ HEADERS += \
     CacheHandlers/tmpsaver.h \
     CacheHandlers/usedrange.h \
     CacheHandlers/usepointer.h \
+    Expressions/propertybindingbase.h \
     Expressions/propertybindingparser.h \
-    Expressions/qpointfanimatorbinding.h \
-    Expressions/qrealanimatorbinding.h \
+    Expressions/valuebinding.h \
     FileCacheHandlers/animationcachehandler.h \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/filecachehandler.h \

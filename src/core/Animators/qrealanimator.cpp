@@ -278,7 +278,8 @@ void QrealAnimator::setExpressionAction(const qsptr<Expression> &expression) {
 void QrealAnimator::setExpression(const qsptr<Expression>& expression) {
     auto& conn = mExpression.assign(expression);
     if(expression) {
-        expression->setAbsFrame(anim_getCurrentRelFrame());
+        const int absFrame = anim_getCurrentAbsFrame();
+        expression->setAbsFrame(absFrame);
         conn << connect(expression.get(), &Expression::currentValueChanged,
                         this, [this]() {
             updateCurrentEffectiveValue();
@@ -396,8 +397,8 @@ void QrealAnimator::saveValueToKey(const int frame, const qreal value) {
 
 bool QrealAnimator::updateExpressionRelFrame() {
     if(!mExpression) return false;
-    const qreal relFrame = anim_getCurrentRelFrame();
-    return mExpression->setAbsFrame(relFrame);
+    const int absFrame = anim_getCurrentAbsFrame();
+    return mExpression->setAbsFrame(absFrame);
 }
 
 void QrealAnimator::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,

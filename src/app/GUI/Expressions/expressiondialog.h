@@ -25,7 +25,7 @@
 
 class QrealAnimator;
 class ExpressionEditor;
-class PropertyBinding;
+class PropertyBindingBase;
 
 class JSLexer;
 class JSEditor;
@@ -37,7 +37,7 @@ public:
     ExpressionDialog(QrealAnimator* const target,
                      QWidget * const parent = nullptr);
 private:
-    using PropertyBindingMap = std::map<QString, QSharedPointer<PropertyBinding>>;
+    using PropertyBindingMap = std::map<QString, QSharedPointer<PropertyBindingBase>>;
     bool getBindings(PropertyBindingMap& bindings);
     void updateScriptBindings();
     void updateScriptDefinitions();

@@ -14,23 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef PROPERTYBINDINGPARSER_H
-#define PROPERTYBINDINGPARSER_H
+#ifndef FRAMEBINDING_H
+#define FRAMEBINDING_H
 
-#include "propertybinding.h"
+#include "propertybindingbase.h"
 
-using PropertyBindingMap = std::map<QString, qsptr<PropertyBindingBase>>;
+class FrameBinding : public PropertyBindingBase {
+    FrameBinding(const Property* const context);
+public:
+    static qsptr<FrameBinding> sCreate(const Property* const context);
 
-namespace PropertyBindingParser {
-    qsptr<PropertyBindingBase> parseBinding(
-            QString& name,
-            const QString& exp,
-            const PropertyBinding::Validator& validator,
-            const Property* const context);
-    PropertyBindingMap parseBindings(
-            QString exp,
-            const PropertyBinding::Validator& validator,
-            const Property* const context);
+    QJSValue getJSValue(QJSEngine& e);
+    QJSValue getJSValue(QJSEngine& e, const qreal relFrame);
+
+    FrameRange identicalRange(const int absFrame);
+    QString path() const { return "$frame"; }
 };
 
-#endif // PROPERTYBINDINGPARSER_H
+#endif // FRAMEBINDING_H

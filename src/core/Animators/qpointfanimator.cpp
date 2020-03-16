@@ -51,6 +51,29 @@ QPointFAnimator::QPointFAnimator(const QPointF &iniValue,
     mYAnimator->prp_setName(nameY);
 }
 
+QJSValue toArray(QJSEngine& e, const QPointF& value) {
+    auto array = e.newArray(2);
+    array.setProperty(0, value.x());
+    array.setProperty(1, value.y());
+    return array;
+}
+
+QJSValue QPointFAnimator::prp_getBaseJSValue(QJSEngine& e) const {
+    return toArray(e, getBaseValue());
+}
+
+QJSValue QPointFAnimator::prp_getBaseJSValue(QJSEngine& e, const qreal relFrame) const {
+    return toArray(e, getBaseValue(relFrame));
+}
+
+QJSValue QPointFAnimator::prp_getEffectiveJSValue(QJSEngine& e) const {
+    return toArray(e, getEffectiveValue());
+}
+
+QJSValue QPointFAnimator::prp_getEffectiveJSValue(QJSEngine& e, const qreal relFrame) const {
+    return toArray(e, getEffectiveValue(relFrame));
+}
+
 QPointF QPointFAnimator::getBaseValue() const {
     return QPointF(mXAnimator->getCurrentBaseValue(),
                    mYAnimator->getCurrentBaseValue());

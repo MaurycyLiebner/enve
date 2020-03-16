@@ -1,6 +1,25 @@
+// enve - 2D animations software
+// Copyright (C) 2016-2020 Maurycy Liebner
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "propertybindingparser.h"
 
 #include "exceptions.h"
+
+#include "framebinding.h"
+#include "valuebinding.h"
 
 void skipSpaces(const QString& exp, int& position) {
     while(position < exp.count() && exp.at(position) == ' ') {
@@ -44,6 +63,35 @@ bool checkComment(const QString& exp, int& pos) {
     return false;
 }
 
+QString parse(const QString& exp, int& pos, const int n) {
+    QString result;
+    for(int i = 0; i < n && pos < exp.count(); i++) {
+        result.append(exp.at(pos++));
+    }
+    return result;
+}
+
+bool parse(const QString& exp, int& pos, const QString& test) {
+    int newPos = pos;
+    const auto value = parse(exp, newPos, QString("$value").count());
+    if(value == test) {
+        pos = newPos;
+        return true;
+    } else return false;
+}
+
+int remaining(const QString& exp, int& pos) {
+    return exp.count() - pos;
+}
+
+bool parseValue(const QString& exp, int& pos) {
+    return parse(exp, pos, "$value");
+}
+
+bool parseFrame(const QString& exp, int& pos) {
+    return parse(exp, pos, "$frame");
+}
+
 void parseBinding(const QString& exp, int& pos, QString& binding) {
     while(pos < exp.count()) {
         const auto& c = exp.at(pos++);
@@ -52,11 +100,12 @@ void parseBinding(const QString& exp, int& pos, QString& binding) {
     }
 }
 
-qsptr<PropertyBinding> PropertyBindingParser::parseBinding(
+qsptr<PropertyBindingBase> PropertyBindingParser::parseBinding(
         QString& name,
         const QString& exp,
         const PropertyBinding::Validator& validator,
         const Property* const context) {
+    qsptr<PropertyBindingBase> result;
     int pos = 0;
     skipSpaces(exp, pos);
     if(checkComment(exp, pos)) return nullptr;
@@ -65,12 +114,21 @@ qsptr<PropertyBinding> PropertyBindingParser::parseBinding(
     skipSpaces(exp, pos);
     if(!parseBindingAssignment(exp, pos))
         PrettyRuntimeThrow("Invalid binding definition:\n'" + exp + "'");
-    QString binding;
-    parseBinding(exp, pos, binding);
-    const auto result = PropertyBinding::sCreate(binding.trimmed(),
-                                                 validator, context);
+    skipSpaces(exp, pos);
+    if(parseFrame(exp, pos)) {
+        result = FrameBinding::sCreate(context);
+    } else if(parseValue(exp, pos)) {
+        result = ValueBinding::sCreate(context);
+    } else {
+        QString binding;
+        parseBinding(exp, pos, binding);
+        result = PropertyBinding::sCreate(binding.trimmed(),
+                                          validator, context);
+        if(!result) PrettyRuntimeThrow("Binding could not be resolved:\n'" +
+                                       binding + "'");
+    }
     if(!result) PrettyRuntimeThrow("Binding could not be resolved:\n'" +
-                                   binding + "'");
+                                   exp + "'");
     return result;
 }
 

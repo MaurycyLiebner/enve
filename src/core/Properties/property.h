@@ -16,19 +16,25 @@
 
 #ifndef PROPERTY_H
 #define PROPERTY_H
-class Canvas;
+
+
 #include "../singlewidgettarget.h"
+
 #include "../framerange.h"
 #include "../MovablePoints/pointshandler.h"
 #include "../ReadWrite/basicreadwrite.h"
 #include "../conncontextptr.h"
 
+#include <QJSEngine>
+
+class Canvas;
 class ComplexAnimator;
 class Key;
 class QPainter;
 class UndoRedoStack;
 class BasicTransformAnimator;
 class BoxTransformAnimator;
+
 enum class CanvasMode : short {
     boxTransform,
     pointTransform,
@@ -65,6 +71,28 @@ protected:
 
     virtual void prp_updateCanvasProps();
 public:
+    virtual QJSValue prp_getBaseJSValue(QJSEngine& e) const {
+        Q_UNUSED(e)
+        return QJSValue::NullValue;
+    }
+
+    virtual QJSValue prp_getBaseJSValue(QJSEngine& e, const qreal relFrame) const {
+        Q_UNUSED(e)
+        Q_UNUSED(relFrame)
+        return QJSValue::NullValue;
+    }
+
+    virtual QJSValue prp_getEffectiveJSValue(QJSEngine& e) const {
+        Q_UNUSED(e)
+        return QJSValue::NullValue;
+    }
+
+    virtual QJSValue prp_getEffectiveJSValue(QJSEngine& e, const qreal relFrame) const {
+        Q_UNUSED(e)
+        Q_UNUSED(relFrame)
+        return QJSValue::NullValue;
+    }
+
     virtual int prp_getRelFrameShift() const { return 0; }
 
     virtual FrameRange prp_relInfluenceRange() const {

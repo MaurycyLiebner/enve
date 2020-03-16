@@ -27,12 +27,19 @@ class ColorAnimator : public StaticComplexAnimator {
 protected:
     ColorAnimator(const QString& name = "color");
 public:
+    QJSValue prp_getBaseJSValue(QJSEngine& e) const;
+    QJSValue prp_getBaseJSValue(QJSEngine& e, const qreal relFrame) const;
+    QJSValue prp_getEffectiveJSValue(QJSEngine& e) const;
+    QJSValue prp_getEffectiveJSValue(QJSEngine& e, const qreal relFrame) const;
+
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
+    QColor getBaseColor() const;
+    QColor getBaseColor(const qreal relFrame) const;
     QColor getColor() const;
-    QColor getColor(const qreal relFrame);
+    QColor getColor(const qreal relFrame) const;
     void setColor(const QColor& col);
 
     void setColorMode(const ColorMode colorMode);

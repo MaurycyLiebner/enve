@@ -14,23 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef PROPERTYBINDINGPARSER_H
-#define PROPERTYBINDINGPARSER_H
+#include "propertybindingbase.h"
 
-#include "propertybinding.h"
+PropertyBindingBase::PropertyBindingBase(const Property* const context) :
+    mContext(context) {}
 
-using PropertyBindingMap = std::map<QString, qsptr<PropertyBindingBase>>;
-
-namespace PropertyBindingParser {
-    qsptr<PropertyBindingBase> parseBinding(
-            QString& name,
-            const QString& exp,
-            const PropertyBinding::Validator& validator,
-            const Property* const context);
-    PropertyBindingMap parseBindings(
-            QString exp,
-            const PropertyBinding::Validator& validator,
-            const Property* const context);
-};
-
-#endif // PROPERTYBINDINGPARSER_H
+bool PropertyBindingBase::setAbsFrame(const int absFrame) {
+    if(mContext) {
+        const qreal oldRelFrame = mRelFrame;
+        mRelFrame = mContext->prp_absFrameToRelFrameF(absFrame);
+        const auto idRange = identicalRange(absFrame);
+        if(idRange.inRange(oldRelFrame)) return false;
+        emit currentValueChanged();
+        return true;
+    }
+    return false;
+}

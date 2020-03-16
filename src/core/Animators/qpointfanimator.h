@@ -36,6 +36,11 @@ protected:
                     const QString& nameY,
                     const QString& name);
 public:
+    QJSValue prp_getBaseJSValue(QJSEngine& e) const;
+    QJSValue prp_getBaseJSValue(QJSEngine& e, const qreal relFrame) const;
+    QJSValue prp_getEffectiveJSValue(QJSEngine& e) const;
+    QJSValue prp_getEffectiveJSValue(QJSEngine& e, const qreal relFrame) const;
+
     void setBaseValue(const qreal valX, const qreal valY) {
         setBaseValue({valX, valY});
     }

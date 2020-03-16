@@ -1,3 +1,19 @@
+// enve - 2D animations software
+// Copyright (C) 2016-2020 Maurycy Liebner
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "expression.h"
 
 #include "exceptions.h"
@@ -96,7 +112,7 @@ qsptr<Expression> Expression::sCreate(const QString& definitionsStr,
                                             std::move(eEvaluate)));
 }
 
-bool Expression::setAbsFrame(const qreal absFrame) {
+bool Expression::setAbsFrame(const int absFrame) {
     bool changed = false;
     for(const auto& binding : mBindings) {
         changed = changed || binding.second->setAbsFrame(absFrame);
@@ -106,7 +122,7 @@ bool Expression::setAbsFrame(const qreal absFrame) {
 
 bool Expression::isValid() {
     for(const auto& binding : mBindings) {
-        const bool valid = binding.second->isBindPathValid();
+        const bool valid = binding.second->isValid();
         if(!valid) return false;
     }
     return true;
@@ -136,7 +152,7 @@ QJSValue Expression::evaluate(const qreal relFrame) {
     return mEEvaluate.call(values);
 }
 
-FrameRange Expression::identicalRange(const qreal absFrame) {
+FrameRange Expression::identicalRange(const int absFrame) {
     FrameRange result = FrameRange::EMINMAX;
     for(const auto& binding : mBindings) {
         result *= binding.second->identicalRange(absFrame);

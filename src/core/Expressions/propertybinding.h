@@ -1,22 +1,32 @@
+// enve - 2D animations software
+// Copyright (C) 2016-2020 Maurycy Liebner
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef PROPERTYBINDING_H
 #define PROPERTYBINDING_H
 
-#include <QObject>
-#include <QJSValue>
+#include "propertybindingbase.h"
 
-#include "smartPointers/selfref.h"
 #include "conncontextptr.h"
-#include "framerange.h"
 #include "simpletask.h"
 #include "smartPointers/ememory.h"
 
-#include "Properties/property.h"
-
-class PropertyBinding : public QObject {
-    Q_OBJECT
+class PropertyBinding : public PropertyBindingBase {
 public:
     using Validator = std::function<bool(Property*)>;
-protected:
+private:
     PropertyBinding(const Validator& validator,
                     const Property* const context);
 public:
@@ -30,24 +40,17 @@ public:
     template <class T>
     static Validator sWrapValidatorForClass(const Validator& validator);
 
-    virtual QJSValue getJSValue(QJSEngine& e) = 0;
-    virtual QJSValue getJSValue(QJSEngine& e, const qreal relFrame) = 0;
+    QJSValue getJSValue(QJSEngine& e);
+    QJSValue getJSValue(QJSEngine& e, const qreal relFrame);
 
-    virtual void updateValue() = 0;
+    FrameRange identicalRange(const int absFrame);
+    QString path() const { return mPath; }
+
+    bool dependsOn(const Property* const prop);
+    bool isValid() const { return mBindPathValid; }
 
     void setPath(const QString& path);
-    const QString& path() const { return mPath; }
     Property* getBindProperty() const { return mBindProperty.get(); }
-    bool isBindPathValid() const { return mBindPathValid; }
-
-    bool setAbsFrame(const qreal absFrame);
-    bool dependsOn(const Property* const prop);
-    FrameRange identicalRange(const qreal absFrame);
-signals:
-    void relRangeChanged(const FrameRange& range);
-    void currentValueChanged();
-protected:
-    void updateValueIfNeeded();
 private:
     static Property* sFindPropertyToBind(const QString& binding,
                                          const Validator& validator,
@@ -56,17 +59,12 @@ private:
     void updateBindPath();
     bool bindProperty(const QString& path, Property * const newBinding);
     void setBindPathValid(const bool valid);
-    void afterValueChange();
     SimpleTaskScheduler pathChanged;
-
-    bool mValueUpToDate = false;
-    qreal mRelFrame = 123456789.123456789;
 
     bool mBindPathValid = false;
     QString mPath;
     ConnContextQPtr<Property> mBindProperty;
     const Validator mValidator;
-    const qptr<const Property> mContext;
 };
 
 template <class T>
