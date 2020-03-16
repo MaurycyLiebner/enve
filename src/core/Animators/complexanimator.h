@@ -46,6 +46,8 @@ public:
 
     void anim_setAbsFrame(const int frame);
 
+    bool prp_dependsOn(const Property* const prop) const;
+
     void prp_startTransform();
     void prp_finishTransform();
     void prp_cancelTransform();

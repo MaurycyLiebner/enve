@@ -25,6 +25,15 @@ ComplexAnimator::ComplexAnimator(const QString &name) :
     SWT_setEnabled(false);
 }
 
+bool ComplexAnimator::prp_dependsOn(const Property* const prop) const {
+    if(Property::prp_dependsOn(prop)) return true;
+    for(const auto& child : ca_mChildren) {
+        const bool depends = child->prp_dependsOn(prop);
+        if(depends) return true;
+    }
+    return false;
+}
+
 void ComplexAnimator::ca_prependChild(Property *child,
                                       const qsptr<Property> &prependWith) {
     if(!prependWith) return;

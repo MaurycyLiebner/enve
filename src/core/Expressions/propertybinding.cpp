@@ -94,6 +94,7 @@ Property *PropertyBinding::sFindPropertyToBind(const QString& binding,
     const auto objs = binding.split('.');
     const auto found = searchCtxt->ca_findPropertyWithPathRec(0, objs);
     if(!found || found == context) return nullptr;
+    if(found->prp_dependsOn(context)) return nullptr;
     if(validator && !validator(found)) return nullptr;
     return found;
 }

@@ -53,7 +53,7 @@ bool parseBindingName(const QString& exp, int& pos, QString& name) {
 }
 
 bool checkComment(const QString& exp, int& pos) {
-    if(pos < exp.count() + 1) {
+    if(pos + 1 < exp.count()) {
         int newPos = pos;
         if(exp.at(newPos++) == '/' && exp.at(newPos++) == '/') {
             pos = newPos;
