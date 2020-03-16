@@ -53,6 +53,7 @@ private:
     QVector<HighlightingRule> mFuncRules;
 
     QRegularExpression mPropSetRegex;
+    QRegularExpression mFrameValueSetRegex;
 
     QStringList mVariablesComplete;
     QStringList mBaseComplete;

@@ -17,6 +17,9 @@
 #include "expressionhighlighter.h"
 
 #include "Animators/complexanimator.h"
+#include "Animators/qpointfanimator.h"
+#include "Animators/coloranimator.h"
+
 #include "expressioneditor.h"
 
 ExpressionHighlighter::ExpressionHighlighter(
@@ -36,6 +39,9 @@ ExpressionHighlighter::ExpressionHighlighter(
     mPropSetRegex = QRegularExpression("^\\s*"
                                             "([A-Za-z_][A-Za-z0-9_]*)"
                                        "\\s*=\\s*" + propPath);
+    mFrameValueSetRegex = QRegularExpression("^\\s*"
+                                                 "([A-Za-z_][A-Za-z0-9_]*)"
+                                             "\\s*=\\s*(\\$frame|\\$value)");
 //    const auto propPathRegex = QRegularExpression(propPath);
 
     mPropPathFormat.setFontWeight(QFont::Bold);
@@ -92,10 +98,20 @@ void ExpressionHighlighter::highlightBlock(const QString &text) {
         }
     }
 
+    auto matchIterator = mFrameValueSetRegex.globalMatch(text);
+    while(matchIterator.hasNext()) {
+        const auto match = matchIterator.next();
+        const auto captured = match.capturedTexts();
+        if(captured.count() < 3) continue;
+        const int min = match.capturedStart(1);
+        const int max = match.capturedEnd(1);
+        setFormat(min, max - min, mAssignFormat);
+    }
+
     bool objCompletSetup = false;
     bool addFuncsComplete = true;
     QStringList completions;
-    auto matchIterator = mPropSetRegex.globalMatch(text);
+    matchIterator = mPropSetRegex.globalMatch(text);
     while(matchIterator.hasNext()) {
         const auto match = matchIterator.next();
         const auto captured = match.capturedTexts();
@@ -128,10 +144,14 @@ void ExpressionHighlighter::highlightBlock(const QString &text) {
             bool error = false;
             const auto qra = enve_cast<QrealAnimator*>(obj);
             const auto ca = enve_cast<ComplexAnimator*>(obj);
+            const auto pa = enve_cast<QPointFAnimator*>(obj);
+            const auto co = enve_cast<ColorAnimator*>(obj);
+
+            const bool validFinal = qra || pa || co;
+
             if(obj == mTarget) error = true;
-            else if(i == 0 && !qra) error = true;
-            else if(!qra && !ca) error = true;
-            else if(qra) error = qra->prp_dependsOn(mTarget);
+            else if(!ca && !validFinal) error = true;
+            else if(i == 0) error = !validFinal || obj->prp_dependsOn(mTarget);
             if(error) {
                 const int len = match.capturedEnd() - min;
                 setFormat(min, len, mErrorFormat);
