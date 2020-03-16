@@ -212,8 +212,30 @@ SkFont toSkFont(const QFont &qfont, const int qPPI, const int skPPI) {
         slant = SkFontStyle::kUpright_Slant;
         break;
     }
-    const SkFontStyle style(qfont.weight(),
-                            SkFontStyle::kNormal_Width, slant);
+    SkFontStyle::Width width{SkFontStyle::kNormal_Width};
+    const int qStretch = qfont.stretch();
+
+    if(qStretch <= 56) {
+        width = SkFontStyle::kUltraCondensed_Width;
+    } else if(qStretch <= 68) {
+        width = SkFontStyle::kExtraCondensed_Width;
+    } else if(qStretch <= 81) {
+        width = SkFontStyle::kCondensed_Width;
+    } else if(qStretch <= 94) {
+        width = SkFontStyle::kSemiCondensed_Width;
+    } else if(qStretch <= 106) {
+        width = SkFontStyle::kNormal_Width;
+    } else if(qStretch <= 118) {
+        width = SkFontStyle::kSemiExpanded_Width;
+    } else if(qStretch <= 137) {
+        width = SkFontStyle::kExpanded_Width;
+    } else if(qStretch <= 175) {
+        width = SkFontStyle::kExtraExpanded_Width;
+    } else {
+        width = SkFontStyle::kUltraExpanded_Width;
+    }
+
+    const SkFontStyle style(qfont.weight(), width, slant);
 
     SkFont skFont;
     const auto fmlStdStr = qfont.family().toStdString();

@@ -29,35 +29,23 @@ public:
     FontsWidget(QWidget *parent = nullptr);
 
     qreal getCurrentFontSize() const;
-    QString getCurrentFontStyle() const;
     QString getCurrentFontFamily() const;
 
     void setCurrentFontSize(const qreal size);
     void setCurrentFontFamily(const QString &family);
-    void setCurrentFontStyle(const QString &style);
-    void setCurrentSettings(const qreal size,
-                            const QString &family,
-                            const QString &style);
+    void setCurrentSettings(const qreal size, const QString &family);
 signals:
-    void fontFamilyAndStyleChanged(QString family, QString style);
+    void fontFamilyChanged(const QString& family);
     void fontSizeChanged(qreal size);
     void textAlignmentChanged(Qt::Alignment alignment);
     void textVAlignmentChanged(Qt::Alignment alignment);
 private:
-    void updateStylesFromCurrentFamilyAndEmit(const QString &family);
-    void updateStylesFromCurrentFamilyAndEmit();
-    void updateSizesFromCurrentFamilyAndStylesAndEmit();
-
-    void emitFamilyAndStyleChanged();
+    void emitFamilyChanged();
     void emitSizeChanged();
-
-    void updateStylesFromCurrentFamily(const QString &family);
-    void updateSizesFromCurrentFamilyAndStyles();
 
     QHBoxLayout *mMainLayout;
 
     QComboBox *mFontFamilyCombo;
-    QComboBox *mFontStyleCombo;
     QComboBox *mFontSizeCombo;
 
     ActionButton *mAlignLeft;

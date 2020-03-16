@@ -41,15 +41,27 @@ public:
 
     void setFontFamily(const QString &family);
     void setFontSize(const int size);
-    void setFontStyle(const QFont::Style &style);
+    void setFontSlant(const SkFontStyle::Slant &slant);
     void setFontWeight(const int weight);
 
     void setFontAlignment(const Qt::Alignment &alignment);
 
-    const QFont &getFont() const { return mFont; }
+    SkFont getFont() const {
+        const SkFontStyle style(mWeight, SkFontStyle::kNormal_Width, mSlant);
+
+        SkFont skFont;
+        const auto fmlStdStr = mFamily.toStdString();
+        const auto typeface = SkTypeface::MakeFromName(fmlStdStr.c_str(), style);
+        skFont.setTypeface(typeface);
+        skFont.setSize(mSize);
+        return skFont;
+    }
 private:
     Qt::Alignment mAlignment = Qt::AlignLeft;
-    QFont mFont;
+    SkScalar mSize = 1;
+    SkFontStyle::Slant mSlant = SkFontStyle::kUpright_Slant;
+    int mWeight = SkFontStyle::kNormal_Weight;
+    QString mFamily;
 };
 
 struct SvgGradient {
@@ -1263,25 +1275,25 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
                 mTextAttributes.setFontSize(qRound(stripPx(value).toDouble()));
             } else if(name == "font-style") {
                 if(value == "normal") {
-                    mTextAttributes.setFontStyle(QFont::StyleNormal);
+                    mTextAttributes.setFontSlant(SkFontStyle::kUpright_Slant);
                 } else if(value == "italic") {
-                    mTextAttributes.setFontStyle(QFont::StyleItalic);
+                    mTextAttributes.setFontSlant(SkFontStyle::kItalic_Slant);
                 } else if(value == "oblique") {
-                    mTextAttributes.setFontStyle(QFont::StyleOblique);
+                    mTextAttributes.setFontSlant(SkFontStyle::kOblique_Slant);
                 }
             } else if(name == "font-weight") {
                 if(value == "normal") {
-                    mTextAttributes.setFontWeight(QFont::Normal);
+                    mTextAttributes.setFontWeight(SkFontStyle::kNormal_Weight);
                 } else if(value == "bold") {
-                    mTextAttributes.setFontWeight(QFont::Bold);
+                    mTextAttributes.setFontWeight(SkFontStyle::kBold_Weight);
                 } else if(value == "bolder") {
-                    mTextAttributes.setFontWeight(QFont::ExtraBold);
+                    mTextAttributes.setFontWeight(SkFontStyle::kExtraBold_Weight);
                 } else if(value == "lighter") {
-                    mTextAttributes.setFontWeight(QFont::ExtraLight);
+                    mTextAttributes.setFontWeight(SkFontStyle::kLight_Weight);
                 } else {
                     bool ok;
                     const int val = value.toInt(&ok);
-                    if(ok) mTextAttributes.setFontWeight(val/10);
+                    if(ok) mTextAttributes.setFontWeight(val);
                     else qDebug() << "Unrecognized font-weight '" + value + "'";
                 }
             } else if(name == "font-variant") {
@@ -1543,19 +1555,19 @@ void VectorPathSvgAttributes::apply(SmartVectorPath * const path) {
 }
 
 void TextSvgAttributes::setFontFamily(const QString &family) {
-    mFont.setFamily(family);
+    mFamily = family;
 }
 
 void TextSvgAttributes::setFontSize(const int size) {
-    mFont.setPointSize(size > 0 ? size : 1);
+    mSize = size > 0 ? size : 1;
 }
 
-void TextSvgAttributes::setFontStyle(const QFont::Style &style) {
-    mFont.setStyle(style);
+void TextSvgAttributes::setFontSlant(const SkFontStyle::Slant &slant) {
+    mSlant = slant;
 }
 
 void TextSvgAttributes::setFontWeight(const int weight) {
-    mFont.setWeight(weight);
+    mWeight = weight;
 }
 
 void TextSvgAttributes::setFontAlignment(const Qt::Alignment &alignment) {

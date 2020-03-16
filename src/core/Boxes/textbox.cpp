@@ -26,6 +26,7 @@
 #include "Animators/outlinesettingsanimator.h"
 #include "textboxrenderdata.h"
 #include "pathboxrenderdata.h"
+#include "ReadWrite/evformat.h"
 
 TextBox::TextBox() : PathBox("Text", eBoxType::text) {
     mFillSettings->setPaintType(PaintType::FLATPAINT);
@@ -115,7 +116,7 @@ void TextBox::setTextVAlignment(const Qt::Alignment alignment) {
     setPathsOutdated(UpdateReason::userChange);
 }
 
-void TextBox::setFont(const QFont &font) {
+void TextBox::setFont(const SkFont &font) {
     if(mFont == font) return;
     {
         UndoRedo ur;
@@ -135,16 +136,25 @@ void TextBox::setFont(const QFont &font) {
 }
 
 void TextBox::setSelectedFontSize(const qreal size) {
-    QFont newFont = mFont;
-    newFont.setPointSizeF(size);
+    SkFont newFont = mFont;
+    newFont.setSize(size);
     setFont(newFont);
 }
 
-void TextBox::setSelectedFontFamilyAndStyle(const QString &fontFamily,
-                                            const QString &fontStyle) {
-    QFont newFont = mFont;
-    newFont.setFamily(fontFamily);
-    newFont.setStyleName(fontStyle);
+void TextBox::setSelectedFontFamily(const QString &fontFamily) {
+    mFamily = fontFamily;
+    SkFont newFont;
+    const auto fmlStdStr = fontFamily.toStdString();
+    sk_sp<SkTypeface> defTypeface ;
+    auto typeface = mFont.getTypeface();
+    if(!typeface) {
+        defTypeface = SkTypeface::MakeDefault();
+        typeface = defTypeface.get();
+    }
+    const auto newTypeface = SkTypeface::MakeFromName(
+                                 fmlStdStr.c_str(), typeface->fontStyle());
+    newFont.setTypeface(newTypeface);
+    newFont.setSize(mFont.getSize());
     setFont(newFont);
 }
 
@@ -162,7 +172,6 @@ void TextBox::setupRenderData(const qreal relFrame,
     }
     BoundingBox::setupRenderData(relFrame, data, scene);
 
-    const SkFont font = toSkFont(mFont);
     const QString textAtFrame = mText->getValueAtRelFrame(relFrame);
 
     const qreal letterSpacing = mLetterSpacing->getEffectiveValue(relFrame);
@@ -170,7 +179,7 @@ void TextBox::setupRenderData(const qreal relFrame,
     const qreal lineSpacing = mLineSpacing->getEffectiveValue(relFrame);
 
     const auto textData = static_cast<TextBoxRenderData*>(data);
-    textData->initialize(textAtFrame, font,
+    textData->initialize(textAtFrame, mFont,
                          letterSpacing, wordSpacing, lineSpacing,
                          mHAlignment, mVAlignment, this, scene);
     QList<TextEffect*> textEffects;
@@ -190,15 +199,11 @@ void TextBox::setupRenderData(const qreal relFrame,
 }
 
 qreal TextBox::getFontSize() {
-    return mFont.pointSize();
+    return mFont.getSize();
 }
 
 QString TextBox::getFontFamily() {
-    return mFont.family();
-}
-
-QString TextBox::getFontStyle() {
-    return mFont.styleName();
+    return mFamily;
 }
 
 QString TextBox::getCurrentValue() {
@@ -222,7 +227,7 @@ void TextBox::setupCanvasMenu(PropertyMenu * const menu) {
 }
 #include "include/core/SkFontMetrics.h"
 SkPath TextBox::getRelativePath(const qreal relFrame) const {
-    const SkFont font = toSkFont(mFont);
+    const SkFont font = mFont;
     const qreal fontSize = static_cast<qreal>(font.getSize());
     const QString textAtFrame = mText->getValueAtRelFrame(relFrame);
 
@@ -341,9 +346,8 @@ void TextBox::writeBoundingBox(eWriteStream& dst) const {
     PathBox::writeBoundingBox(dst);
     dst.write(&mHAlignment, sizeof(Qt::Alignment));
     dst.write(&mVAlignment, sizeof(Qt::Alignment));
-    dst << mFont.pointSizeF();
-    dst << mFont.family();
-    dst << mFont.styleName();
+    dst << qreal(mFont.getSize());
+    dst << mFamily;
 }
 
 void TextBox::readBoundingBox(eReadStream& src) {
@@ -352,11 +356,13 @@ void TextBox::readBoundingBox(eReadStream& src) {
     src.read(&mVAlignment, sizeof(Qt::Alignment));
     qreal fontSize;
     QString fontFamily;
-    QString fontStyle;
+
     src >> fontSize;
     src >> fontFamily;
-    src >> fontStyle;
-    mFont.setPointSizeF(fontSize);
-    mFont.setFamily(fontFamily);
-    mFont.setStyleName(fontStyle);
+    if(src.evFileVersion() < EvFormat::textSkFont) {
+        QString fontStyle;
+        src >> fontStyle;
+    }
+    mFont.setSize(fontSize);
+    setSelectedFontFamily(fontFamily);
 }

@@ -160,11 +160,10 @@ void Canvas::setSelectedTextVAlignment(const Qt::Alignment alignment) const {
     }
 }
 
-void Canvas::setSelectedFontFamilyAndStyle(
-        const QString& family, const QString& style) {
+void Canvas::setSelectedFontFamily(const QString& family) {
     pushUndoRedoName("Change Font");
     for(const auto &box : mSelectedBoxes) {
-        box->setSelectedFontFamilyAndStyle(family, style);
+        box->setSelectedFontFamily(family);
     }
 }
 

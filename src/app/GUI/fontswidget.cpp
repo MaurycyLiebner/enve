@@ -23,8 +23,6 @@
 #include <QLabel>
 
 FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
-    mFontStyleCombo = new QComboBox(this);
-    mFontStyleCombo->setFocusPolicy(Qt::NoFocus);
     mFontFamilyCombo = new QComboBox(this);
     mFontFamilyCombo->setFocusPolicy(Qt::NoFocus);
     mFontSizeCombo = new QComboBox(this);
@@ -32,6 +30,13 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
     mFontSizeCombo->setEditable(true);
     mFontSizeCombo->setAutoCompletion(false);
     mFontSizeCombo->setMinimumContentsLength(3);
+
+    const auto sizes = mFontDatabase.standardSizes();
+    for(const int size : sizes) {
+        mFontSizeCombo->addItem(QString::number(size));
+    }
+
+    mFontSizeCombo->setCurrentText("72");
 
     mFontSizeCombo->lineEdit()->setStyleSheet(
                 "QLineEdit {"
@@ -45,11 +50,7 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
 
     mFontFamilyCombo->addItems(mFontDatabase.families());
     connect(mFontFamilyCombo, &QComboBox::currentTextChanged,
-            this, qOverload<const QString &>(
-                &FontsWidget::updateStylesFromCurrentFamilyAndEmit));
-
-    connect(mFontStyleCombo, &QComboBox::currentTextChanged,
-            this, &FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit);
+            this, &FontsWidget::emitFamilyChanged);
 
     connect(mFontSizeCombo, &QComboBox::currentTextChanged,
             this, &FontsWidget::emitSizeChanged);
@@ -60,7 +61,6 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
     setContentsMargins(0, 0, 0, 0);
     setLayout(mMainLayout);
     mMainLayout->addWidget(mFontFamilyCombo);
-    mMainLayout->addWidget(mFontStyleCombo);
     mMainLayout->addWidget(mFontSizeCombo);
 
     const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
@@ -110,72 +110,11 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
 
     mMainLayout->addLayout(buttonsLayout);
 
-    updateStylesFromCurrentFamilyAndEmit();
-}
-
-void FontsWidget::updateStylesFromCurrentFamily(const QString &family) {
-    disconnect(mFontStyleCombo, &QComboBox::currentTextChanged,
-               this, &FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit);
-
-    const QString currentStyle = getCurrentFontStyle();
-
-    mFontStyleCombo->clear();
-    QStringList styles = mFontDatabase.styles(family);
-    if(styles.isEmpty()) styles << "Regular";
-    mFontStyleCombo->addItems(styles);
-
-    if(styles.contains(currentStyle)) {
-        mFontStyleCombo->setCurrentText(currentStyle);
-    }
-
-    connect(mFontStyleCombo, &QComboBox::currentTextChanged,
-            this, &FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit);
-    updateSizesFromCurrentFamilyAndStyles();
-}
-
-void FontsWidget::updateStylesFromCurrentFamilyAndEmit(const QString &family) {
-    updateStylesFromCurrentFamily(family);
-
-    emitFamilyAndStyleChanged();
-}
-
-void FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit() {
-    updateSizesFromCurrentFamilyAndStyles();
-    emitFamilyAndStyleChanged();
-}
-
-void FontsWidget::updateSizesFromCurrentFamilyAndStyles() {
-    disconnect(mFontSizeCombo, &QComboBox::currentTextChanged,
-               this, &FontsWidget::emitSizeChanged);
-    const QString currentSize = mFontSizeCombo->currentText();
-
-    mFontSizeCombo->clear();
-    QList<int> sizes = mFontDatabase.smoothSizes(getCurrentFontFamily(),
-                                                       getCurrentFontStyle());
-    if(sizes.isEmpty()) sizes = mFontDatabase.standardSizes();
-    for(const int size : sizes) {
-        mFontSizeCombo->addItem(QString::number(size));
-    }
-
-    if(currentSize.isEmpty()) {
-        mFontSizeCombo->setCurrentText("72");
-    } else {
-        mFontSizeCombo->setCurrentText(currentSize);
-    }
-    connect(mFontSizeCombo, &QComboBox::currentTextChanged,
-            this, &FontsWidget::emitSizeChanged);
-}
-
-void FontsWidget::updateStylesFromCurrentFamilyAndEmit() {
-    updateStylesFromCurrentFamilyAndEmit(getCurrentFontFamily());
+    emitFamilyChanged();
 }
 
 qreal FontsWidget::getCurrentFontSize() const {
     return mFontSizeCombo->currentText().toDouble();
-}
-
-QString FontsWidget::getCurrentFontStyle() const {
-    return mFontStyleCombo->currentText();
 }
 
 QString FontsWidget::getCurrentFontFamily() const {
@@ -192,39 +131,19 @@ void FontsWidget::setCurrentFontSize(const qreal size) {
 
 void FontsWidget::setCurrentFontFamily(const QString &family) {
     disconnect(mFontFamilyCombo, &QComboBox::currentTextChanged,
-               this, qOverload<const QString &>(
-                   &FontsWidget::updateStylesFromCurrentFamilyAndEmit));
+               this, &FontsWidget::emitFamilyChanged);
     mFontFamilyCombo->setCurrentText(family);
     connect(mFontFamilyCombo, &QComboBox::currentTextChanged,
-            this, qOverload<const QString &>(
-                &FontsWidget::updateStylesFromCurrentFamilyAndEmit));
-    updateStylesFromCurrentFamily(family);
+            this, &FontsWidget::emitFamilyChanged);
 }
 
-void FontsWidget::setCurrentFontStyle(const QString &style) {
-    disconnect(mFontStyleCombo, &QComboBox::currentTextChanged,
-               this, &FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit);
-    if(style.isEmpty()) {
-        mFontStyleCombo->setCurrentIndex(0);
-    } else {
-        mFontStyleCombo->setCurrentText(style);
-    }
-    connect(mFontStyleCombo, &QComboBox::currentTextChanged,
-            this, &FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit);
-    updateSizesFromCurrentFamilyAndStyles();
-}
-
-void FontsWidget::setCurrentSettings(const qreal size,
-                                     const QString &family,
-                                     const QString &style) {
+void FontsWidget::setCurrentSettings(const qreal size, const QString &family) {
     setCurrentFontFamily(family);
-    setCurrentFontStyle(style);
     setCurrentFontSize(size);
 }
 
-void FontsWidget::emitFamilyAndStyleChanged() {
-    emit fontFamilyAndStyleChanged(getCurrentFontFamily(),
-                                   getCurrentFontStyle());
+void FontsWidget::emitFamilyChanged() {
+    emit fontFamilyChanged(getCurrentFontFamily());
 }
 
 void FontsWidget::emitSizeChanged() {
