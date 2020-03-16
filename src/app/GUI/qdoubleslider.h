@@ -87,6 +87,7 @@ protected:
     virtual void setValue(const qreal value);
     virtual void finishTransform(const qreal value);
     virtual void cancelTransform();
+    virtual qreal startSlideValue() const { return mValue; }
 
     void paintEvent(QPaintEvent *);
     void mouseDoubleClickEvent(QMouseEvent *event);

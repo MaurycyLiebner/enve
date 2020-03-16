@@ -336,7 +336,7 @@ void QDoubleSlider::mousePressEvent(QMouseEvent *event) {
         mCanceled = false;
         mGlobalPressPos = event->globalPos();
         mLastX = event->globalX();
-        mLastValue = mValue;
+        mLastValue = startSlideValue();
     }
 }
 
@@ -345,7 +345,7 @@ void QDoubleSlider::mouseReleaseEvent(QMouseEvent* event) {
     if(event->button() != Qt::LeftButton) return;
     if(mMouseMoved) {
         mMouseMoved = false;
-        finishTransform(mValue);
+        finishTransform(mLastValue);
         Document::sInstance->actionFinished();
     } else {
         updateLineEditFromValue();
@@ -378,14 +378,13 @@ void QDoubleSlider::mouseMoveEvent(QMouseEvent *event) {
         grabMouse();
         grabKeyboard();
         QApplication::setOverrideCursor(Qt::BlankCursor);
-        startTransform(mValue);
+        startTransform(mLastValue);
         mMouseMoved = true;
     }
 
     const qreal dValue = getDValueForMouseMove(event->globalX());
-    const qreal newValue = clamped(mLastValue + dValue);
-    mLastValue = newValue;
-    setValue(newValue);
+    mLastValue = clamped(mLastValue + dValue);
+    setValue(mLastValue);
 
     cursor().setPos(mGlobalPressPos);
     Document::sInstance->updateScenes();
