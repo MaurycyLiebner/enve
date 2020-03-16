@@ -23,6 +23,63 @@
 #include "mainwindow.h"
 #include "GUI/global.h"
 
+SliderEdit::SliderEdit(QWidget* const parent) :
+    QLineEdit(parent) {
+    setAttribute(Qt::WA_TranslucentBackground);
+    setStyleSheet("background-color: rgba(0, 0, 0, 0);"
+                  "color: black;");
+    setFixedHeight(MIN_WIDGET_DIM);
+
+    connect(this, &QLineEdit::editingFinished,
+            this, &SliderEdit::lineEditingFinished);
+}
+
+void SliderEdit::mousePressEvent(QMouseEvent* e) {
+    if(!rect().contains(e->pos())) clearFocus();
+    QLineEdit::mousePressEvent(e);
+}
+
+void SliderEdit::keyPressEvent(QKeyEvent* e) {
+    const int key = e->key();
+    switch(key) {
+    case Qt::Key_Escape:
+        mCanceled = true;
+        [[fallthrough]];
+    case Qt::Key_Return:
+    case Qt::Key_Enter:
+        clearFocus();
+        break;
+    default: QLineEdit::keyPressEvent(e);
+    }
+}
+
+void SliderEdit::hideEvent(QHideEvent* e) {
+    releaseMouse();
+    unsetCursor();
+    QLineEdit::hideEvent(e);
+}
+
+void SliderEdit::showEvent(QShowEvent* e) {
+    grabMouse();
+    setCursor(Qt::IBeamCursor);
+    QLineEdit::showEvent(e);
+}
+
+void SliderEdit::lineEditingFinished() {
+    deselect();
+    clearFocus();
+    hide();
+    if(mCanceled) {
+        mCanceled = false;
+        return;
+    }
+    QJSEngine engine;
+    const auto result = engine.evaluate(text());
+    if(!result.isNumber()) return;
+    const qreal newValue = result.toNumber();
+    emit valueSet(newValue);
+}
+
 QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
                              const qreal prefferedStep,
                              QWidget * const parent) : QWidget(parent) {
@@ -33,18 +90,17 @@ QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
     updateValueString();
 
     setFixedHeight(MIN_WIDGET_DIM);
-    mLineEdit = new QLineEdit(mValueString, this);
-    mLineEdit->setAttribute(Qt::WA_TranslucentBackground);
-    mLineEdit->setStyleSheet("background-color: rgba(0, 0, 0, 0);"
-                             "color: black;");
-    mLineEdit->setFocusPolicy(Qt::NoFocus);
-    mLineEdit->installEventFilter(this);
-    installEventFilter(this);
-    mLineEdit->setFixedHeight(MIN_WIDGET_DIM);
+    mLineEdit = new SliderEdit(this);
     mLineEdit->hide();
 
-    connect(mLineEdit, &QLineEdit::editingFinished,
-            this, &QDoubleSlider::lineEditingFinished);
+    connect(mLineEdit, &SliderEdit::valueSet,
+            this, [this](const qreal value) {
+        const qreal clampedValue = clamped(value);
+        startTransform(clampedValue);
+        setValue(clampedValue);
+        finishTransform(clampedValue);
+        Document::sInstance->actionFinished();
+    });
 
     fitWidthToContent();
     setContentsMargins(0, 0, 0, 0);
@@ -93,7 +149,7 @@ void QDoubleSlider::updateLineEditFromValue() {
 }
 
 bool QDoubleSlider::cancelMove() {
-    if(!mTextEdit && mMouseMoved && !mCanceled) {
+    if(!textEditing() && mMouseMoved && !mCanceled) {
         cancelTransform();
         return true;
     }
@@ -120,6 +176,10 @@ QString QDoubleSlider::valueToText(const qreal value) const {
 
 qreal QDoubleSlider::getDValueForMouseMove(const int mouseX) const {
     return (mouseX - mLastX)*0.1*mPrefferedValueStep;
+}
+
+bool QDoubleSlider::textEditing() const {
+    return mLineEdit->isVisible();
 }
 
 void QDoubleSlider::paint(QPainter *p) {
@@ -152,7 +212,7 @@ void QDoubleSlider::paint(QPainter *p,
         p->drawRect(boundingRect);
         p->setClipping(false);
     }
-    if(!mTextEdit) {
+    if(!textEditing()) {
         if(mShowValueSlider) {
             p->setPen(Qt::NoPen);
             const qreal valFrac = (mValue - mMinValue)/(mMaxValue - mMinValue);
@@ -205,6 +265,8 @@ void QDoubleSlider::setValue(const qreal value) {
 }
 
 void QDoubleSlider::finishTransform(const qreal value) {
+    releaseMouse();
+    releaseKeyboard();
     if(QApplication::overrideCursor())
         QApplication::restoreOverrideCursor();
     Actions::sInstance->finishSmoothChange();
@@ -212,6 +274,8 @@ void QDoubleSlider::finishTransform(const qreal value) {
 }
 
 void QDoubleSlider::cancelTransform() {
+    releaseMouse();
+    releaseKeyboard();
     if(QApplication::overrideCursor())
         QApplication::restoreOverrideCursor();
     Actions::sInstance->finishSmoothChange();
@@ -266,12 +330,29 @@ void QDoubleSlider::mousePressEvent(QMouseEvent *event) {
         if(cancelMove()) {}
         else openContextMenu(event->globalPos());
     } else if(event->button() == Qt::LeftButton) {
-        grabMouse();
-        grabKeyboard();
+        Actions::sInstance->startSmoothChange();
+        mMouseMoved = false;
+        mMovesCount = 0;
         mCanceled = false;
         mGlobalPressPos = event->globalPos();
         mLastX = event->globalX();
         mLastValue = mValue;
+    }
+}
+
+void QDoubleSlider::mouseReleaseEvent(QMouseEvent* event) {
+    if(mCanceled) return;
+    if(event->button() != Qt::LeftButton) return;
+    if(mMouseMoved) {
+        mMouseMoved = false;
+        finishTransform(mValue);
+        Document::sInstance->actionFinished();
+    } else {
+        updateLineEditFromValue();
+        mCanceled = false;
+        mLineEdit->show();
+        mLineEdit->setFocus();
+        mLineEdit->selectAll();
     }
 }
 
@@ -290,143 +371,22 @@ void QDoubleSlider::setIsLeftSlider(const bool value) {
 }
 
 void QDoubleSlider::mouseMoveEvent(QMouseEvent *event) {
-    if(!mMouseMoved) startTransform(mValue);
+    if(mCanceled) return;
+    if(!(event->buttons() & Qt::LeftButton)) return;
+    if(mMovesCount++ < 2) return;
+    if(!mMouseMoved) {
+        grabMouse();
+        grabKeyboard();
+        QApplication::setOverrideCursor(Qt::BlankCursor);
+        startTransform(mValue);
+        mMouseMoved = true;
+    }
 
     const qreal dValue = getDValueForMouseMove(event->globalX());
     const qreal newValue = clamped(mLastValue + dValue);
     mLastValue = newValue;
     setValue(newValue);
 
-    if(!mMouseMoved) {
-        QApplication::setOverrideCursor(Qt::BlankCursor);
-        mMouseMoved = true;
-    }
     cursor().setPos(mGlobalPressPos);
-}
-
-#include <QApplication>
-bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
-    const auto etype = event->type();
-    if(etype == QEvent::Paint) {
-        return false;
-    } else if(etype == QEvent::KeyPress) {
-        const auto keyEvent = static_cast<QKeyEvent*>(event);
-        const auto ekey = keyEvent->key();
-        if(mTextEdit) {
-            if(ekey == Qt::Key_Escape) mCanceled = true;
-            if(ekey == Qt::Key_Return ||
-               ekey == Qt::Key_Enter ||
-               ekey == Qt::Key_Escape) {
-                finishTextEditing();
-            }
-        } else if(ekey == Qt::Key_Escape) {
-            return !cancelMove();
-        }
-        return !mTextEdit;
-    } else if(etype == QEvent::KeyRelease) {
-        return !mTextEdit;
-    } else if(etype == QEvent::MouseButtonPress) {
-        const auto mouseEvent = static_cast<QMouseEvent*>(event);
-        if(mouseEvent->button() != Qt::LeftButton) return false;
-        mMouseMoved = false;
-        mMovesCount = 0;
-        if(mTextEdit) {
-            if(!rect().contains(mouseEvent->pos()) ) {
-                finishTextEditing();
-            }
-        } else {
-            Actions::sInstance->startSmoothChange();
-            mousePressEvent(mouseEvent);
-        }
-        return !mTextEdit;
-    } else if(etype == QEvent::MouseButtonRelease) {
-        const auto mouseEvent = static_cast<QMouseEvent*>(event);
-        if(mouseEvent->button() == Qt::LeftButton) {
-            releaseMouse();
-            releaseKeyboard();
-        }
-        if(mCanceled) return true;
-        if(mouseEvent->button() != Qt::LeftButton) return false;
-        if(!mTextEdit) {
-            if(mMouseMoved) {
-                mMouseMoved = false;
-                finishTransform(mValue);
-                Document::sInstance->actionFinished();
-            } else {
-                updateLineEditFromValue();
-                mCanceled = false;
-                mLineEdit->setCursor(Qt::IBeamCursor);
-                mLineEdit->show();
-                mLineEdit->setFocus();
-                mLineEdit->selectAll();
-                mLineEdit->grabMouse();
-            }
-        }
-        return !mTextEdit;
-    } else if(etype == QEvent::MouseMove) {
-        if(mCanceled) return true;
-        const auto mouseEvent = static_cast<QMouseEvent*>(event);
-        if(!(mouseEvent->buttons() & Qt::LeftButton)) return false;
-        if(!mTextEdit) {
-            mMovesCount++;
-            if(mMovesCount > 2) {
-                mouseMoveEvent(static_cast<QMouseEvent*>(event));
-                Document::sInstance->updateScenes();
-            }
-        }
-        return !mTextEdit;
-    } else if(etype == QEvent::FocusOut) {
-        mTextEdit = false;
-        mLineEdit->hide();
-    } else if(etype == QEvent::FocusIn) {
-        mTextEdit = true;
-    }/* else if(event->type() == QEvent::Wheel) {
-        if(mWheelEnabled || mTextEdit) {
-            if(obj == mLineEdit) return true;
-            emitEditingStarted(mValue);
-
-            QWheelEvent *wheelEvent = (QWheelEvent*)event;
-            if(wheelEvent->delta() > 0) {
-                setValueNoUpdate(mValue + mPrefferedValueStep);
-            } else {
-                setValueNoUpdate(mValue - mPrefferedValueStep);
-            }
-            if(mTextEdit) {
-                updateLineEditFromValue();
-            }
-            update();
-            event->setAccepted(true);
-
-
-            emitValueChanged(mValue);
-            emitEditingFinished(mValue);
-            MainWindow::getInstance()->callUpdateSchedulers();
-            return true;
-        } else {
-            return false;
-        }
-    }*/
-    return false;
-}
-
-void QDoubleSlider::finishTextEditing() {
-    mLineEdit->deselect();
-    mLineEdit->clearFocus();
-    mLineEdit->editingFinished();
-    Document::sInstance->actionFinished();
-}
-
-void QDoubleSlider::lineEditingFinished() {
-    mLineEdit->releaseMouse();
-    mLineEdit->setCursor(Qt::ArrowCursor);
-    setCursor(Qt::ArrowCursor);
-    if(mCanceled) return;
-    const QString text = mLineEdit->text();
-    QJSEngine engine;
-    const auto result = engine.evaluate(text);
-    if(!result.isNumber()) return;
-    const qreal newValue = clamped(result.toNumber());
-    startTransform(newValue);
-    setValue(newValue);
-    finishTransform(newValue);
+    Document::sInstance->updateScenes();
 }

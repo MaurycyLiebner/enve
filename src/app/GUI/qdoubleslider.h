@@ -21,6 +21,23 @@
 #include <QLineEdit>
 #include <QDoubleValidator>
 
+class SliderEdit : public QLineEdit {
+    Q_OBJECT
+public:
+    SliderEdit(QWidget* const parent);
+signals:
+    void valueSet(const qreal value);
+protected:
+    void mousePressEvent(QMouseEvent* e) override;
+    void keyPressEvent(QKeyEvent *e) override;
+    void hideEvent(QHideEvent *e) override;
+    void showEvent(QShowEvent *e) override;
+private:
+    void lineEditingFinished();
+
+    bool mCanceled = false;
+};
+
 class QDoubleSlider : public QWidget {
     Q_OBJECT
 public:
@@ -71,10 +88,10 @@ protected:
     virtual void finishTransform(const qreal value);
     virtual void cancelTransform();
 
-    bool eventFilter(QObject *, QEvent *event);
     void paintEvent(QPaintEvent *);
     void mouseDoubleClickEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
 
     void paint(QPainter *p,
@@ -92,11 +109,9 @@ protected:
     QString valueToText(const qreal value) const;
     qreal getDValueForMouseMove(const int mouseX) const;
     bool mouseMoved() const { return mMouseMoved; }
-    bool textEditing() const { return mTextEdit; }
+    bool textEditing() const;
     void updateValueString();
 private:
-    void finishTextEditing();
-    void lineEditingFinished();
     void updateLineEditFromValue();
     bool cancelMove();
 
@@ -108,7 +123,7 @@ private:
     QString mName = "";
     bool mShowName = false;
 
-    QLineEdit *mLineEdit = nullptr;
+    SliderEdit *mLineEdit = nullptr;
     QString mValueString;
     qreal mValue = 0;
     bool mTextEdit = false;
