@@ -153,10 +153,25 @@ cd gperftools-2.7-enve-mod
 ./configure --prefix /usr
 make
 ```
+Go back to the third_party folder:
+```
+cd ..
+```
+#### QScintilla
+Extract QScintilla:
+```
+tar xf QScintilla-2.11.4.tar.gz
+```
+Build QScintilla:
+```
+cd QScintilla-2.11.4/Qt4Qt5
+qmake
+make -j 2
+```
 
 Go back to the main enve directory:
 ```
-cd ../../
+cd ../../../
 ```
 
 #### FFmpeg
