@@ -42,7 +42,8 @@ public:
 
     void setTextAlignment(const Qt::Alignment alignment) const;
     void setTextVAlignment(const Qt::Alignment alignment) const;
-    void setFontFamily(const QString& family) const;
+    void setFontFamilyAndStyle(const QString& family,
+                               const SkFontStyle& style) const;
     void setFontSize(const qreal size) const;
 
     void connectPointsSlot() const;

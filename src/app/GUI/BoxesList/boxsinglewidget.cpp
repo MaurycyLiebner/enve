@@ -214,7 +214,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
 
     mFillWidget = new QWidget(this);
     mMainLayout->addWidget(mFillWidget);
-    mFillWidget->setStyleSheet("background-color: rgba(0, 0, 0, 0)");
+    mFillWidget->setObjectName("transparentWidget");
 
     mPromoteToLayerButton = new PixmapActionButton(this);
     // mHwSupportButton->setToolTip(gSingleLineTooltip("GPU/CPU Processing"));

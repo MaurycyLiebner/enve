@@ -29,8 +29,7 @@ LayoutHandler::LayoutHandler(Document& document,
     mComboWidget->setContentsMargins(0, 0, 0, 0);
     mComboWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     mComboWidget->setLayout(canvasComboLayout);
-    mComboWidget->setObjectName("invisWid");
-    mComboWidget->setStyleSheet("QWidget#invisWid { background: transparent; }");
+    mComboWidget->setObjectName("transparentWidget");
 
     mComboBox = new QComboBox;
     mComboBox->setMinimumContentsLength(20);

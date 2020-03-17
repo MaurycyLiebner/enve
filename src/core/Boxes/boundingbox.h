@@ -136,20 +136,16 @@ public:
 
     virtual bool relPointInsidePath(const QPointF &relPos) const;
 
-    virtual void setFont(const SkFont &font)
-    { Q_UNUSED(font) }
-    virtual void setSelectedFontSize(const qreal fontSize)
+    virtual void setFontSize(const qreal fontSize)
     { Q_UNUSED(fontSize) }
-
+    virtual void setFontFamilyAndStyle(const QString &family,
+                                       const SkFontStyle& style)
+    { Q_UNUSED(family) Q_UNUSED(style) }
 
     virtual void setTextVAlignment(const Qt::Alignment alignment)
     { Q_UNUSED(alignment) }
     virtual void setTextHAlignment(const Qt::Alignment alignment)
     { Q_UNUSED(alignment) }
-
-    virtual void setSelectedFontFamily(const QString &family) {
-        Q_UNUSED(family)
-    }
 
     virtual void drawPixmapSk(SkCanvas * const canvas,
                               const SkFilterQuality filter, int &drawId,

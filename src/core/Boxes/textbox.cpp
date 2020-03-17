@@ -135,26 +135,18 @@ void TextBox::setFont(const SkFont &font) {
     setPathsOutdated(UpdateReason::userChange);
 }
 
-void TextBox::setSelectedFontSize(const qreal size) {
-    SkFont newFont = mFont;
-    newFont.setSize(size);
-    setFont(newFont);
+void TextBox::setFontSize(const qreal size) {
+    setFont(mFont.makeWithSize(size));
 }
 
-void TextBox::setSelectedFontFamily(const QString &fontFamily) {
+void TextBox::setFontFamilyAndStyle(const QString &fontFamily,
+                                    const SkFontStyle& style) {
     mFamily = fontFamily;
-    SkFont newFont;
+    mStyle = style;
+    SkFont newFont = mFont;
     const auto fmlStdStr = fontFamily.toStdString();
-    sk_sp<SkTypeface> defTypeface ;
-    auto typeface = mFont.getTypeface();
-    if(!typeface) {
-        defTypeface = SkTypeface::MakeDefault();
-        typeface = defTypeface.get();
-    }
-    const auto newTypeface = SkTypeface::MakeFromName(
-                                 fmlStdStr.c_str(), typeface->fontStyle());
+    const auto newTypeface = SkTypeface::MakeFromName(fmlStdStr.c_str(), style);
     newFont.setTypeface(newTypeface);
-    newFont.setSize(mFont.getSize());
     setFont(newFont);
 }
 
@@ -198,15 +190,19 @@ void TextBox::setupRenderData(const qreal relFrame,
     }
 }
 
-qreal TextBox::getFontSize() {
+const SkFontStyle& TextBox::getFontStyle() const {
+    return mStyle;
+}
+
+SkScalar TextBox::getFontSize() const {
     return mFont.getSize();
 }
 
-QString TextBox::getFontFamily() {
+const QString& TextBox::getFontFamily() const {
     return mFamily;
 }
 
-QString TextBox::getCurrentValue() {
+const QString& TextBox::getCurrentValue() const {
     return mText->getCurrentValue();
 }
 
@@ -348,6 +344,7 @@ void TextBox::writeBoundingBox(eWriteStream& dst) const {
     dst.write(&mVAlignment, sizeof(Qt::Alignment));
     dst << qreal(mFont.getSize());
     dst << mFamily;
+    dst.write(&mStyle, sizeof(SkFontStyle));
 }
 
 void TextBox::readBoundingBox(eReadStream& src) {
@@ -359,10 +356,13 @@ void TextBox::readBoundingBox(eReadStream& src) {
 
     src >> fontSize;
     src >> fontFamily;
+    SkFontStyle style;
     if(src.evFileVersion() < EvFormat::textSkFont) {
         QString fontStyle;
         src >> fontStyle;
+    } else {
+        src.read(&style, sizeof(SkFontStyle));
     }
     mFont.setSize(fontSize);
-    setSelectedFontFamily(fontFamily);
+    setFontFamilyAndStyle(fontFamily, style);
 }

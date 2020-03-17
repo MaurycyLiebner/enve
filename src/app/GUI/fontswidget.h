@@ -23,29 +23,42 @@
 #include <QFontDatabase>
 #include "actionbutton.h"
 
+class SkFontStyle;
+
 class FontsWidget : public QWidget {
     Q_OBJECT
 public:
     FontsWidget(QWidget *parent = nullptr);
 
-    qreal getCurrentFontSize() const;
-    QString getCurrentFontFamily() const;
+    float fontSize() const;
+    QString fontStyle() const;
+    QString fontFamily() const;
 
-    void setCurrentFontSize(const qreal size);
-    void setCurrentFontFamily(const QString &family);
-    void setCurrentSettings(const qreal size, const QString &family);
+    void setDisplayedSettings(const float size,
+                              const QString &family,
+                              const SkFontStyle& style);
 signals:
-    void fontFamilyChanged(const QString& family);
+    void fontFamilyAndStyleChanged(const QString& family,
+                                   const SkFontStyle& style);
     void fontSizeChanged(qreal size);
     void textAlignmentChanged(Qt::Alignment alignment);
     void textVAlignmentChanged(Qt::Alignment alignment);
 private:
-    void emitFamilyChanged();
+    void updateStyles();
+    void updateSizes();
+
+    void emitFamilyAndStyleChanged();
     void emitSizeChanged();
+
+    void afterFamilyChange();
+    void afterStyleChange();
+
+    int mBlockEmit = 0;
 
     QHBoxLayout *mMainLayout;
 
     QComboBox *mFontFamilyCombo;
+    QComboBox *mFontStyleCombo;
     QComboBox *mFontSizeCombo;
 
     ActionButton *mAlignLeft;

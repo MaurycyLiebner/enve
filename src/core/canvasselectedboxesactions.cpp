@@ -160,17 +160,18 @@ void Canvas::setSelectedTextVAlignment(const Qt::Alignment alignment) const {
     }
 }
 
-void Canvas::setSelectedFontFamily(const QString& family) {
+void Canvas::setSelectedFontFamilyAndStyle(const QString& family,
+                                           const SkFontStyle& style) {
     pushUndoRedoName("Change Font");
     for(const auto &box : mSelectedBoxes) {
-        box->setSelectedFontFamily(family);
+        box->setFontFamilyAndStyle(family, style);
     }
 }
 
 void Canvas::setSelectedFontSize(const qreal size) {
     pushUndoRedoName("Change Font Size");
     for(const auto &box : mSelectedBoxes) {
-        box->setSelectedFontSize(size);
+        box->setFontSize(size);
     }
 }
 

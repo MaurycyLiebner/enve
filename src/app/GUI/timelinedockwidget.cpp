@@ -333,9 +333,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     QWidget * const spacerWidget = new QWidget(this);
     spacerWidget->setSizePolicy(QSizePolicy::Expanding,
                                 QSizePolicy::Minimum);
-    spacerWidget->setStyleSheet("QWidget {"
-                                    "background-color: rgba(0, 0, 0, 0)"
-                                "}");
+    spacerWidget->setObjectName("transparentWidget");
     mToolBar->addWidget(spacerWidget);
 
     mToolBar->addSeparator();

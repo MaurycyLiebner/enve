@@ -272,7 +272,8 @@ public:
 
     void setSelectedTextAlignment(const Qt::Alignment alignment) const;
     void setSelectedTextVAlignment(const Qt::Alignment alignment) const;
-    void setSelectedFontFamily(const QString& family);
+    void setSelectedFontFamilyAndStyle(const QString& family,
+                                       const SkFontStyle& style);
     void setSelectedFontSize(const qreal size);
     void removeSelectedPointsAndClearList();
     void removeSelectedBoxesAndClearList();

@@ -9,9 +9,17 @@ QWidget#transparentWidget {
 }
 
 QWidget#colorLabel {
-   background: black;
-   border: 1px solid black;
-   padding-left: -1px;
+    background: black;
+    border: 1px solid black;
+    padding-left: -1px;
+}
+
+QLineEdit#comboEdit {
+    background: rgb(200, 200, 200);
+}
+
+QLineEdit#comboEdit:focus {
+    background: rgb(255, 255, 255);
 }
 
 QMainWindow::separator {

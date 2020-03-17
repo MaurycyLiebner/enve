@@ -958,8 +958,8 @@ void MainWindow::connectToolBarActions() {
 
     connect(mFontWidget, &FontsWidget::fontSizeChanged,
             &mActions, &Actions::setFontSize);
-    connect(mFontWidget, &FontsWidget::fontFamilyChanged,
-            &mActions, &Actions::setFontFamily);
+    connect(mFontWidget, &FontsWidget::fontFamilyAndStyleChanged,
+            &mActions, &Actions::setFontFamilyAndStyle);
     connect(mFontWidget, &FontsWidget::textAlignmentChanged,
             &mActions, &Actions::setTextAlignment);
     connect(mFontWidget, &FontsWidget::textVAlignmentChanged,
@@ -1039,8 +1039,9 @@ SimpleBrushWrapper *MainWindow::getCurrentBrush() const {
 void MainWindow::setCurrentBox(BoundingBox *box) {
     mFillStrokeSettings->setCurrentBox(box);
     if(const auto txtBox = enve_cast<TextBox*>(box)) {
-        mFontWidget->setCurrentSettings(txtBox->getFontSize(),
-                                        txtBox->getFontFamily());
+        mFontWidget->setDisplayedSettings(txtBox->getFontSize(),
+                                          txtBox->getFontFamily(),
+                                          txtBox->getFontStyle());
     }
 }
 

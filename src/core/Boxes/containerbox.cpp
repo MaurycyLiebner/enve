@@ -163,6 +163,19 @@ void ContainerBox::applyStrokeBrushTimeAction(const SegAction& action) {
     }
 }
 
+void ContainerBox::setFontSize(const qreal fontSize) {
+    for(const auto& box : mContainedBoxes) {
+        box->setFontSize(fontSize);
+    }
+}
+
+void ContainerBox::setFontFamilyAndStyle(const QString& family,
+                                         const SkFontStyle& style) {
+    for(const auto& box : mContainedBoxes) {
+        box->setFontFamilyAndStyle(family, style);
+    }
+}
+
 void ContainerBox::strokeWidthAction(const QrealAction& action) {
     for(const auto& box : mContainedBoxes)
         box->strokeWidthAction(action);

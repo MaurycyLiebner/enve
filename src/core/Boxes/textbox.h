@@ -43,17 +43,19 @@ public:
     void setTextVAlignment(const Qt::Alignment alignment);
 
     void setFont(const SkFont &font);
-    void setSelectedFontSize(const qreal size);
-    void setSelectedFontFamily(const QString &fontFamily);
+    void setFontSize(const qreal size);
+    void setFontFamilyAndStyle(const QString &fontFamily,
+                               const SkFontStyle& style);
 
     stdsptr<BoxRenderData> createRenderData();
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data,
                          Canvas * const scene);
 
-    qreal getFontSize();
-    QString getFontFamily();
-    QString getCurrentValue();
+    SkScalar getFontSize() const;
+    const QString& getFontFamily() const;
+    const SkFontStyle& getFontStyle() const;
+    const QString& getCurrentValue() const;
 
     void openTextEditor(QWidget* dialogParent);
 
@@ -64,6 +66,7 @@ private:
 
     SkFont mFont;
     QString mFamily;
+    SkFontStyle mStyle;
 
     qsptr<StaticComplexAnimator> mSpacingCont;
     qsptr<QrealAnimator> mLetterSpacing;

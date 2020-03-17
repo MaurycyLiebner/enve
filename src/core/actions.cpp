@@ -454,10 +454,12 @@ void Actions::setTextVAlignment(const Qt::Alignment alignment) const {
     afterAction();
 }
 
-void Actions::setFontFamily(const QString& family) const {
+void Actions::setFontFamilyAndStyle(const QString& family,
+                                    const SkFontStyle& style) const {
     if(!mActiveScene) return;
     mDocument.fFontFamily = family;
-    mActiveScene->setSelectedFontFamily(family);
+    mDocument.fFontStyle = style;
+    mActiveScene->setSelectedFontFamilyAndStyle(family, style);
     afterAction();
 }
 

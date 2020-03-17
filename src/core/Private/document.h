@@ -67,6 +67,7 @@ public:
     Qt::Alignment fTextAlignment = Qt::AlignLeft;
     Qt::Alignment fTextVAlignment = Qt::AlignTop;
     QString fFontFamily = "Arial";
+    SkFontStyle fFontStyle;
     qreal fFontSize = 72;
 
     FillSettings fFill;

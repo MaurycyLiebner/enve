@@ -20,6 +20,8 @@
 #include <QRectF>
 #include <QMatrix>
 #include <QColor>
+#include <QFont>
+
 #include "skiaincludes.h"
 
 extern inline qreal toQreal(const float ss) {
@@ -30,9 +32,10 @@ extern inline float toSkScalar(const qreal qr) {
     return static_cast<float>(qr);
 }
 
+extern SkFontStyle::Slant toSkSlant(const QFont::Style& style);
+extern int QFontWeightToSkFontWeght(const int qWeight);
+extern SkFont toSkFont(const QFont& qfont, const int qPPI, const int skPPI);
 extern SkFont toSkFont(const QFont& qfont);
-extern SkFont toSkFont(const QFont& qfont,
-                       const int qPPI, const int skPPI);
 
 extern SkColor toSkColor(const QColor& qcol);
 

@@ -104,6 +104,10 @@ public:
     void applyStrokeBrushSpacingAction(const SegAction& action);
     void applyStrokeBrushTimeAction(const SegAction& action);
 
+    void setFontSize(const qreal fontSize);
+    void setFontFamilyAndStyle(const QString &family,
+                               const SkFontStyle& style);
+
     FillSettingsAnimator *getFillSettings() const;
     OutlineSettingsAnimator *getStrokeSettings() const;
 

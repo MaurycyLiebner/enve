@@ -22,35 +22,27 @@
 #include <QIntValidator>
 #include <QLabel>
 
+#include "editablecombobox.h"
+
 FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
+    mFontStyleCombo = new QComboBox(this);
+    mFontStyleCombo->setFocusPolicy(Qt::NoFocus);
     mFontFamilyCombo = new QComboBox(this);
     mFontFamilyCombo->setFocusPolicy(Qt::NoFocus);
-    mFontSizeCombo = new QComboBox(this);
+    mFontSizeCombo = new EditableComboBox(this);
     mFontSizeCombo->setFocusPolicy(Qt::ClickFocus);
-    mFontSizeCombo->setEditable(true);
     mFontSizeCombo->setAutoCompletion(false);
     mFontSizeCombo->setMinimumContentsLength(3);
 
-    const auto sizes = mFontDatabase.standardSizes();
-    for(const int size : sizes) {
-        mFontSizeCombo->addItem(QString::number(size));
-    }
-
-    mFontSizeCombo->setCurrentText("72");
-
-    mFontSizeCombo->lineEdit()->setStyleSheet(
-                "QLineEdit {"
-                    "background: rgb(200, 200, 200);"
-                "} "
-                "QLineEdit:focus {"
-                    "background: rgb(255, 255, 255);"
-                "}");
     MainWindow::sGetInstance()->installNumericFilter(mFontSizeCombo);
-    mFontSizeCombo->setValidator(new QIntValidator(1, 999, mFontSizeCombo));
+    mFontSizeCombo->setValidator(new QDoubleValidator(1, 999, 2, mFontSizeCombo));
 
     mFontFamilyCombo->addItems(mFontDatabase.families());
     connect(mFontFamilyCombo, &QComboBox::currentTextChanged,
-            this, &FontsWidget::emitFamilyChanged);
+            this, &FontsWidget::afterFamilyChange);
+
+    connect(mFontStyleCombo, &QComboBox::currentTextChanged,
+            this, &FontsWidget::afterStyleChange);
 
     connect(mFontSizeCombo, &QComboBox::currentTextChanged,
             this, &FontsWidget::emitSizeChanged);
@@ -61,6 +53,7 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
     setContentsMargins(0, 0, 0, 0);
     setLayout(mMainLayout);
     mMainLayout->addWidget(mFontFamilyCombo);
+    mMainLayout->addWidget(mFontStyleCombo);
     mMainLayout->addWidget(mFontSizeCombo);
 
     const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
@@ -110,42 +103,133 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
 
     mMainLayout->addLayout(buttonsLayout);
 
-    emitFamilyChanged();
+    afterFamilyChange();
 }
 
-qreal FontsWidget::getCurrentFontSize() const {
-    return mFontSizeCombo->currentText().toDouble();
+void FontsWidget::updateStyles() {
+    mBlockEmit++;
+    const QString currentStyle = fontStyle();
+
+    mFontStyleCombo->clear();
+    QStringList styles = mFontDatabase.styles(fontFamily());
+    mFontStyleCombo->addItems(styles);
+
+    if(styles.contains(currentStyle)) {
+        mFontStyleCombo->setCurrentText(currentStyle);
+    }
+    mBlockEmit--;
 }
 
-QString FontsWidget::getCurrentFontFamily() const {
+void FontsWidget::afterFamilyChange() {
+    updateStyles();
+    emitFamilyAndStyleChanged();
+}
+
+void FontsWidget::afterStyleChange() {
+    updateSizes();
+    emitFamilyAndStyleChanged();
+}
+
+void FontsWidget::updateSizes() {
+    mBlockEmit++;
+    const QString currentSize = mFontSizeCombo->currentText();
+
+    mFontSizeCombo->clear();
+    QList<int> sizes = mFontDatabase.smoothSizes(fontFamily(), fontStyle());
+    if(sizes.isEmpty()) sizes = mFontDatabase.standardSizes();
+    for(const int size : sizes) {
+        mFontSizeCombo->addItem(QString::number(size));
+    }
+
+    if(currentSize.isEmpty()) {
+        mFontSizeCombo->setCurrentIndex(0);
+    } else {
+        const int id = mFontSizeCombo->findText(currentSize);
+        if(id != -1) mFontSizeCombo->setCurrentIndex(id);
+        else mFontSizeCombo->setCurrentText(currentSize);
+    }
+    mBlockEmit--;
+}
+
+float FontsWidget::fontSize() const {
+    return mFontSizeCombo->currentText().toFloat();
+}
+
+QString FontsWidget::fontStyle() const {
+    return mFontStyleCombo->currentText();
+}
+
+QString FontsWidget::fontFamily() const {
     return mFontFamilyCombo->currentText();
 }
 
-void FontsWidget::setCurrentFontSize(const qreal size) {
-    disconnect(mFontSizeCombo, &QComboBox::currentTextChanged,
-               this, &FontsWidget::emitSizeChanged);
-    mFontSizeCombo->setCurrentText(QString::number(qRound(size)));
-    connect(mFontSizeCombo, &QComboBox::currentTextChanged,
-            this, &FontsWidget::emitSizeChanged);
+static QString styleStringHelper(const int weight,
+                                 const SkFontStyle::Slant slant) {
+    QString result;
+    if (weight > SkFontStyle::kNormal_Weight) {
+        if (weight >= SkFontStyle::kBlack_Weight)
+            result = QCoreApplication::translate("QFontDatabase", "Black");
+        else if (weight >= SkFontStyle::kExtraBold_Weight)
+            result = QCoreApplication::translate("QFontDatabase", "Extra Bold");
+        else if (weight >= SkFontStyle::kBold_Weight)
+            result = QCoreApplication::translate("QFontDatabase", "Bold");
+        else if (weight >= SkFontStyle::kSemiBold_Weight)
+            result = QCoreApplication::translate("QFontDatabase", "Demi Bold");
+        else if (weight >= SkFontStyle::kMedium_Weight)
+            result = QCoreApplication::translate("QFontDatabase", "Medium", "The Medium font weight");
+    } else {
+        if (weight <= SkFontStyle::kThin_Weight)
+            result = QCoreApplication::translate("QFontDatabase", "Thin");
+        else if (weight <= SkFontStyle::kExtraLight_Weight)
+            result = QCoreApplication::translate("QFontDatabase", "Extra Light");
+        else if (weight <= SkFontStyle::kLight_Weight)
+            result = QCoreApplication::translate("QFontDatabase", "Light");
+    }
+    if(slant == SkFontStyle::kItalic_Slant)
+        result += QLatin1Char(' ') + QCoreApplication::translate("QFontDatabase", "Italic");
+    else if(slant == SkFontStyle::kOblique_Slant)
+        result += QLatin1Char(' ') + QCoreApplication::translate("QFontDatabase", "Oblique");
+    if(result.isEmpty())
+        result = QCoreApplication::translate("QFontDatabase", "Regular");
+    return result.simplified();
 }
 
-void FontsWidget::setCurrentFontFamily(const QString &family) {
-    disconnect(mFontFamilyCombo, &QComboBox::currentTextChanged,
-               this, &FontsWidget::emitFamilyChanged);
+void FontsWidget::setDisplayedSettings(const float size,
+                                       const QString &family,
+                                       const SkFontStyle &style) {
+    mBlockEmit++;
     mFontFamilyCombo->setCurrentText(family);
-    connect(mFontFamilyCombo, &QComboBox::currentTextChanged,
-            this, &FontsWidget::emitFamilyChanged);
+    const QString styleStr = styleStringHelper(style.weight(), style.slant());
+    if(styleStr.isEmpty()) {
+        mFontStyleCombo->setCurrentIndex(0);
+    } else {
+        mFontStyleCombo->setCurrentText(styleStr);
+    }
+
+    const auto sizeStr = QString::number(size);
+    const int id = mFontSizeCombo->findText(sizeStr);
+    if(id != -1) mFontSizeCombo->setCurrentIndex(id);
+    else mFontSizeCombo->setCurrentText(sizeStr);
+    mBlockEmit--;
 }
 
-void FontsWidget::setCurrentSettings(const qreal size, const QString &family) {
-    setCurrentFontFamily(family);
-    setCurrentFontSize(size);
-}
-
-void FontsWidget::emitFamilyChanged() {
-    emit fontFamilyChanged(getCurrentFontFamily());
+void FontsWidget::emitFamilyAndStyleChanged() {
+    if(mBlockEmit) return;
+    const auto family = fontFamily();
+    const auto style = fontStyle();
+    const int qWeight = mFontDatabase.weight(family, style);
+    const int weight = QFontWeightToSkFontWeght(qWeight);
+    const int width = SkFontStyle::kNormal_Width;
+//    const bool italic = mFontDatabase.italic(family, style);
+//    const auto slant = italic ? SkFontStyle::kItalic_Slant :
+//                                SkFontStyle::kUpright_Slant;
+    const auto qFont = mFontDatabase.font(family, style, 10);
+    const auto slant = toSkSlant(qFont.style());
+    const SkFontStyle skStyle(weight, width, slant);
+    emit fontFamilyAndStyleChanged(family, skStyle);
 }
 
 void FontsWidget::emitSizeChanged() {
-    emit fontSizeChanged(getCurrentFontSize());
+    if(mBlockEmit) return;
+    emit fontSizeChanged(fontSize());
 }

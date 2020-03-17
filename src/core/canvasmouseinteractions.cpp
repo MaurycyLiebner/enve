@@ -219,8 +219,9 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     } else if(mCurrentMode == CanvasMode::textCreate) {
         const auto newPath = enve::make_shared<TextBox>();
         newPath->planCenterPivotPosition();
-        newPath->setSelectedFontFamily(mDocument.fFontFamily);
-        newPath->setSelectedFontSize(mDocument.fFontSize);
+        newPath->setFontFamilyAndStyle(mDocument.fFontFamily,
+                                       mDocument.fFontStyle);
+        newPath->setFontSize(mDocument.fFontSize);
         mCurrentContainer->addContained(newPath);
         newPath->setAbsolutePos(e.fPos);
 
