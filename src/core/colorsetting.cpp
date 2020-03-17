@@ -99,7 +99,7 @@ void ColorSetting::startColorTransform(ColorAnimator* const target) const {
             if(!isZero4Dec(targetVal2 - fVal2)) target->startVal2Transform();
             if(!isZero4Dec(targetVal3 - fVal3)) target->startVal3Transform();
         } else if(fChangedValue == ColorParameter::green ||
-                  fChangedValue == ColorParameter::hsvSaturaton ||
+                  fChangedValue == ColorParameter::hsvSaturation ||
                   fChangedValue == ColorParameter::hslSaturation) {
             target->startVal2Transform();
 

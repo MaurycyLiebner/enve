@@ -41,9 +41,7 @@ public:
     explicit ColorSettingsWidget(QWidget *parent = nullptr);
 
     QColor getCurrentQColor();
-    void setCurrentColor(const QColor &color);
-    void setCurrentColor(const qreal h_t, const qreal s_t,
-                         const qreal v_t, const qreal a_t = 1);
+    void setDisplayedColor(const QColor& color);
 
     void setTarget(ColorAnimator * const target);
 
@@ -83,17 +81,6 @@ private:
     void updateValuesFromHSLSpins();
     void updateAlphaFromSpin();
 
-    void setAllDisplayedFromRGB(const qreal red,
-                                const qreal green,
-                                const qreal blue);
-    void setAllDisplayedFromHSV(const qreal hue,
-                                const qreal saturation,
-                                const qreal value);
-    void setAllDisplayedFromHSL(const qreal hue,
-                                const qreal saturation,
-                                const qreal lightness);
-
-
     void setDisplayedRGB(const qreal red,
                          const qreal green,
                          const qreal blue);
@@ -103,6 +90,7 @@ private:
     void setDisplayedHSL(const qreal hue,
                          const qreal saturation,
                          const qreal lightness);
+    void setDisplayedAlpha(const qreal alpha);
 
     void setRGB(const qreal red,
                 const qreal green,
@@ -129,19 +117,10 @@ private:
     void setColorMode();
     void updateWidgetTargets();
 
-    void connectSignalsAndSlots();
-    void connectColorWidgetSignalToSlot(ColorWidget *slot_obj,
-                                        const char *slot,
-                                        ColorWidget *signal_src,
-                                        const char *signal);
-    void connectColorWidgetSignalToSlots(ColorWidget *signal_src,
-                                         const char *signal,
-                                         const char *slot );
-    void connectColorWidgetSignalToSlotsWithoutThis(ColorWidget *signal_src,
-                                                    const char *signal,
-                                                    const char *slot);
+    qreal mLastNonZeroHue = 0;
+    qreal mLastNonZeroHsvS = 0;
+    qreal mLastNonZeroHslS = 0;
 
-    bool mBlockColorSettings = false;
     ColorParameter mLastTriggered;
 
     ConnContextQPtr<ColorAnimator> mTarget;

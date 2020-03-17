@@ -24,54 +24,16 @@ class ColorWidget : public GLWidget {
 public:
     ColorWidget(QWidget *parent = nullptr);
 
-    void setColor(const QColor& color) {
-        setColorHSV(color.hueF(),
-                    color.hsvSaturationF(),
-                    color.valueF());
-    }
-
-    void setColorHSV(const qreal h,
-                     const qreal s,
-                     const qreal v) {
-        setColorHSV_f(static_cast<GLfloat>(h),
-                      static_cast<GLfloat>(s),
-                      static_cast<GLfloat>(v));
-    }
-    void setColorHSV_f(GLfloat h, GLfloat s, GLfloat v);
+    void setColor(const QColor& color);
+    void setColor(const qreal h, const qreal s, const qreal v);
 protected:
     bool mValueBlocked = false;
 
-    GLfloat mHslSaturatonTmp = -1.f; // HSL saturation saved when changing lightness
+    GLfloat mHslSaturatonTmp = -1; // HSL saturation saved when changing lightness
 
-    GLfloat mHue = 0.f;
-    GLfloat mSaturation = 0.f;
-    GLfloat mValue = 0.f;
-public slots:
-    void setHue_f(GLfloat h);
-    void setHSVSaturation_f(GLfloat s);
-    void setValue_f(GLfloat v);
-
-    void setColorHSV_i(GLushort h, GLushort s, GLushort v);
-    void setHue_i(GLushort h);
-    void setHSVSaturation_i(GLushort s);
-    void setValue_i(GLushort v);
-
-    void setColorHSL_f(GLfloat h, GLfloat s, GLfloat l);
-    void setLightness_f(GLfloat l);
-    void setHSLSaturation_f(GLfloat s);
-
-    void setColorHSL_i(GLushort h, GLushort s, GLushort l);
-    void setLightness_i(GLushort l);
-    void setHSLSaturation_i(GLushort s);
-
-    void setColorRGB_f(GLfloat r, GLfloat g, GLfloat b);
-    void setR_f(GLfloat r);
-    void setG_f(GLfloat g);
-    void setB_f(GLfloat b);
-
-    void setR_i(GLushort r);
-    void setG_i(GLushort g);
-    void setB_i(GLushort b);
+    GLfloat mHue = 0;
+    GLfloat mSaturation = 0;
+    GLfloat mValue = 0;
 };
 
 #endif // COLORWIDGET_H

@@ -25,7 +25,7 @@ enum class ColorMode : short {
 enum class ColorParameter : short {
     none,
     red, green, blue,
-    hue, hsvSaturaton, value,
+    hue, hsvSaturation, value,
     hslSaturation, lightness,
     alpha,
     colorMode,

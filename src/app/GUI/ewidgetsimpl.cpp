@@ -25,7 +25,7 @@ QWidget *eWidgetsImpl::colorWidget(QWidget * const parent,
                                    QObject * const receiver,
                                    const Func<void (const ColorSetting &)> &slot) {
     const auto wid = new ColorSettingsWidget(parent);
-    wid->setCurrentColor(iniColor);
+    wid->setDisplayedColor(iniColor);
     if(slot) {
         QObject::connect(wid, &ColorSettingsWidget::colorSettingSignal,
                          receiver, slot);

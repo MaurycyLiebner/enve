@@ -25,89 +25,6 @@
 #include "GUI/actionbutton.h"
 #include "GUI/ColorWidgets/savedcolorswidget.h"
 
-void moveAndResizeValueRect(const int rect_x_t,
-                            int *rect_y_t,
-                            const int rect_width,
-                            const int rect_height,
-                            ColorValueRect *rect_t) {
-    if(rect_t->isHidden()) {
-        return;
-    }
-    rect_t->move(rect_x_t, *rect_y_t);
-    *rect_y_t += rect_height;
-    rect_t->resize(rect_width, rect_height);
-}
-
-void ColorSettingsWidget::setCurrentColor(const qreal h_t,
-                                          const qreal s_t,
-                                          const qreal v_t,
-                                          const qreal a_t) {
-    GLfloat hueGl = static_cast<GLfloat>(h_t);
-    GLfloat satGl = static_cast<GLfloat>(s_t);
-    GLfloat valGl = static_cast<GLfloat>(v_t);
-    //GLfloat alphaGl = static_cast<GLfloat>(a_t);
-    //wheel_triangle_widget->setColorHSV_f(h_t, s_t, v_t);
-    rRect->setColorHSV_f(hueGl, satGl, valGl);
-    gRect->setColorHSV_f(hueGl, satGl, valGl);
-    bRect->setColorHSV_f(hueGl, satGl, valGl);
-
-    hRect->setColorHSV_f(hueGl, satGl, valGl);
-    hRect->setDisplayedValue(h_t);
-    hsvSatRect->setColorHSV_f(hueGl, satGl, valGl);
-    hRect->setDisplayedValue(s_t);
-    vRect->setColorHSV_f(hueGl, satGl, valGl);
-    hRect->setDisplayedValue(v_t);
-
-    hslSatRect->setColorHSV_f(hueGl, satGl, valGl);
-    lRect->setColorHSV_f(hueGl, satGl, valGl);
-
-    mColorLabel->setColorHSV_f(hueGl, satGl, valGl);
-
-    qreal hue = h_t;
-    qreal hsvSat = s_t;
-    qreal val = v_t;
-
-    qreal red = hue;
-    qreal green = hsvSat;
-    qreal blue = val;
-    qhsv_to_rgb(red, green, blue);
-
-    rRect->setDisplayedValue(red);
-    gRect->setDisplayedValue(green);
-    bRect->setDisplayedValue(blue);
-
-    rSpin->setDisplayedValue(red);
-    gSpin->setDisplayedValue(green);
-    bSpin->setDisplayedValue(blue);
-
-    hSpin->setDisplayedValue(hue);
-    hsvSSpin->setDisplayedValue(hsvSat);
-    vSpin->setDisplayedValue(val);
-
-    qreal hslSat = hsvSat;
-    qreal lig = val;
-    qhsv_to_hsl(hue, hslSat, lig);
-
-    hslSatRect->setDisplayedValue(hslSat);
-    lRect->setDisplayedValue(lig);
-
-    hslSSpin->setDisplayedValue(hslSat);
-    lSpin->setDisplayedValue(lig);
-
-    mBookmarkedColors->setColor(QColor::fromHsvF(h_t, s_t, v_t, a_t));
-
-    if(mAlphaHidden) return;
-    mColorLabel->setAlpha(a_t);
-    aRect->setColorHSV_f(hueGl, satGl, valGl);
-    aRect->setDisplayedValue(a_t);
-    aSpin->setDisplayedValue(a_t);
-}
-
-void ColorSettingsWidget::setCurrentColor(const QColor &color) {
-    setCurrentColor(color.hueF(), color.saturationF(),
-                    color.valueF(), color.alphaF());
-}
-
 void ColorSettingsWidget::updateWidgetTargets() {
     mUpdateConnections.clear();
     if(mTarget) {
@@ -216,6 +133,7 @@ void ColorSettingsWidget::emitColorChangedSignal() {
 void ColorSettingsWidget::emitEditingFinishedSignal() {
     const auto colorSetting = getColorSetting(ColorSettingType::finish,
                                               mLastTriggered);
+    mLastTriggered = ColorParameter::none;
     emit colorSettingSignal(colorSetting);
 }
 
@@ -246,7 +164,7 @@ void ColorSettingsWidget::emitEditingStartedHue() {
 }
 
 void ColorSettingsWidget::emitEditingStartedHSVSaturation() {
-    mLastTriggered = ColorParameter::hsvSaturaton;
+    mLastTriggered = ColorParameter::hsvSaturation;
     emitEditingStartedSignal();
 }
 
@@ -334,7 +252,7 @@ void ColorSettingsWidget::startColorPicking() {
     connect(wid, &ColorPickingWidget::colorSelected,
             [this](const QColor & color) {
         emitStartFullColorChangedSignal();
-        setCurrentColor(color);
+        setDisplayedColor(color);
         emitFinishFullColorChangedSignal();
     });
 }
@@ -457,7 +375,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     connect(mBookmarkedColors, &SavedColorsWidget::colorSet,
             this, [this](const QColor& color) {
         emitStartFullColorChangedSignal();
-        setCurrentColor(color);
+        setDisplayedColor(color);
         emitFinishFullColorChangedSignal();
         Document::sInstance->actionFinished();
     });
@@ -606,7 +524,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     //setMinimumSize(250, 200);
     mTabWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                               QSizePolicy::Maximum);
-    setCurrentColor(0, 0, 0);
+    setDisplayedColor(Qt::black);
 
     moveAlphaWidgetToTab(0);
 }
@@ -616,35 +534,28 @@ QColor ColorSettingsWidget::getCurrentQColor() {
     const qreal green = gSpin->value();
     const qreal blue = bSpin->value();
     const qreal alpha = aSpin->value();
-    QColor col;
-    col.setRgbF(red, green, blue, alpha);
-    return col;
-}
-
-void addColorWidgetActionToMenu(QMenu *menu_t,
-                                QString label_t,
-                                ColorWidget *widget_t) {
-    QAction *action_t = menu_t->addAction(label_t);
-    action_t->setCheckable(true);
-    action_t->setChecked(widget_t->isVisible() );
+    return QColor::fromRgbF(red, green, blue, alpha);
 }
 
 void ColorSettingsWidget::updateValuesFromRGBSpins() {
-    setAllDisplayedFromRGB(rSpin->value(),
-                           gSpin->value(),
-                           bSpin->value());
+    setDisplayedColor(QColor::fromRgbF(rSpin->value(),
+                                       gSpin->value(),
+                                       bSpin->value(),
+                                       aSpin->value()));
 }
 
 void ColorSettingsWidget::updateValuesFromHSVSpins() {
-    setAllDisplayedFromHSV(hSpin->value(),
-                           hsvSSpin->value(),
-                           vSpin->value());
+    setDisplayedColor(QColor::fromHsvF(hSpin->value(),
+                                       hsvSSpin->value(),
+                                       vSpin->value(),
+                                       aSpin->value()));
 }
 
 void ColorSettingsWidget::updateValuesFromHSLSpins() {
-    setAllDisplayedFromHSL(hSpin->value(),
-                           hslSSpin->value(),
-                           lSpin->value());
+    setDisplayedColor(QColor::fromHslF(hSpin->value(),
+                                       hslSSpin->value(),
+                                       lSpin->value(),
+                                       aSpin->value()));
 }
 
 void ColorSettingsWidget::setDisplayedRGB(const qreal red,
@@ -670,21 +581,20 @@ void ColorSettingsWidget::setDisplayedHSV(const qreal hue,
     hsvSatRect->setDisplayedValue(saturation);
     vRect->setDisplayedValue(value);
 
-    rRect->setColorHSV_f(hue, saturation, value);
-    gRect->setColorHSV_f(hue, saturation, value);
-    bRect->setColorHSV_f(hue, saturation, value);
+    rRect->setColor(hue, saturation, value);
+    gRect->setColor(hue, saturation, value);
+    bRect->setColor(hue, saturation, value);
 
-    hRect->setColorHSV_f(hue, saturation, value);
-    hsvSatRect->setColorHSV_f(hue, saturation, value);
-    vRect->setColorHSV_f(hue, saturation, value);
+    hRect->setColor(hue, saturation, value);
+    hsvSatRect->setColor(hue, saturation, value);
+    vRect->setColor(hue, saturation, value);
 
-    hslSatRect->setColorHSV_f(hue, saturation, value);
-    lRect->setColorHSV_f(hue, saturation, value);
+    hslSatRect->setColor(hue, saturation, value);
+    lRect->setColor(hue, saturation, value);
 
-    if(!mAlphaHidden)
-        aRect->setColorHSV_f(hue, saturation, value);
+    if(!mAlphaHidden) aRect->setColor(hue, saturation, value);
 
-    mColorLabel->setColorHSV_f(hue, saturation, value);
+    mColorLabel->setColor(hue, saturation, value);
 }
 
 void ColorSettingsWidget::setDisplayedHSL(const qreal hue,
@@ -699,78 +609,62 @@ void ColorSettingsWidget::setDisplayedHSL(const qreal hue,
     lRect->setDisplayedValue(lightness);
 }
 
-void ColorSettingsWidget::setAllDisplayedFromRGB(const qreal red,
-                                                 const qreal green,
-                                                 const qreal blue) {
-    setDisplayedRGB(red, green, blue);
-
-    qreal hue = red;
-    qreal hsvSaturation = green;
-    qreal value = blue;
-    qrgb_to_hsv(hue, hsvSaturation, value);
-    setDisplayedHSV(hue, hsvSaturation, value);
-
-    hue = red;
-    qreal hslSaturation = green;
-    qreal lightness = blue;
-    qrgb_to_hsl(hue, hslSaturation, lightness);
-    setDisplayedHSL(hue, hslSaturation, lightness);
+void ColorSettingsWidget::setDisplayedAlpha(const qreal alpha) {
+    if(mAlphaHidden) return;
+    mColorLabel->setAlpha(alpha);
+    aRect->setDisplayedValue(alpha);
+    aSpin->setDisplayedValue(alpha);
 }
 
-void ColorSettingsWidget::setAllDisplayedFromHSV(const qreal hue,
-                                                 const qreal saturation,
-                                                 const qreal value) {
-    setDisplayedHSV(hue, saturation, value);
-
-    qreal red = hue;
-    qreal green = saturation;
-    qreal blue = value;
-    qhsv_to_rgb(red, green, blue);
-    setDisplayedRGB(red, green, blue);
-
-    qreal hslhue = hue;
-    qreal hslSaturation = saturation;
-    qreal lightness = value;
-    qhsv_to_hsl(hslhue, hslSaturation, lightness);
-    setDisplayedHSL(hslhue, hslSaturation, lightness);
-}
-
-void ColorSettingsWidget::setAllDisplayedFromHSL(const qreal hue,
-                                                 const qreal saturation,
-                                                 const qreal lightness) {
-    setDisplayedHSL(hue, saturation, lightness);
-
-    qreal red = hue;
-    qreal green = saturation;
-    qreal blue = lightness;
-    qhsl_to_rgb(red, green, blue);
-    setDisplayedRGB(red, green, blue);
-
-    qreal hsvhue = hue;
-    qreal hsvSaturation = saturation;
-    qreal value = lightness;
-    qhsl_to_hsv(hsvhue, hsvSaturation, value);
-    setDisplayedHSV(hue, hsvSaturation, value);
+void ColorSettingsWidget::setDisplayedColor(const QColor& color) {
+    qreal hue = qBound(0., color.hueF(), 1.);
+    if(isZero4Dec(hue) &&
+       (mLastTriggered == ColorParameter::value ||
+        mLastTriggered == ColorParameter::lightness ||
+        mLastTriggered == ColorParameter::hsvSaturation ||
+        mLastTriggered == ColorParameter::hslSaturation)) {
+        hue = mLastNonZeroHue;
+    } else mLastNonZeroHue = hue;
+    qreal hsvS = color.hsvSaturationF();
+    if(isZero4Dec(hsvS) &&
+       (mLastTriggered == ColorParameter::value ||
+        mLastTriggered == ColorParameter::lightness)) {
+        hsvS = mLastNonZeroHsvS;
+    } else mLastNonZeroHsvS = hsvS;
+    qreal hslS = color.hslSaturationF();
+    if(isZero4Dec(hslS) &&
+       (mLastTriggered == ColorParameter::value ||
+        mLastTriggered == ColorParameter::lightness)) {
+        hslS = mLastNonZeroHslS;
+    } else mLastNonZeroHslS = hslS;
+    setDisplayedRGB(color.redF(), color.greenF(), color.blueF());
+    setDisplayedHSV(hue, hsvS, color.valueF());
+    setDisplayedHSL(hue, hslS, color.lightnessF());
+    setDisplayedAlpha(color.alphaF());
+    mBookmarkedColors->setColor(color);
 }
 
 void ColorSettingsWidget::setRGB(const qreal red,
                                  const qreal green,
                                  const qreal blue) {
-    setAllDisplayedFromRGB(red, green, blue);
+    setDisplayedColor(QColor::fromRgbF(red, green, blue,
+                                       aSpin->value()));
     emitColorChangedSignal();
 }
 
 void ColorSettingsWidget::setHSV(const qreal hue,
                                  const qreal saturation,
                                  const qreal value) {
-    setAllDisplayedFromHSV(hue, saturation, value);
+    setDisplayedColor(QColor::fromHsvF(hue, saturation, value,
+                                       aSpin->value()));
     emitColorChangedSignal();
 }
 
 void ColorSettingsWidget::setHSL(const qreal hue,
                                  const qreal saturation,
                                  const qreal lightness) {
-    setAllDisplayedFromHSL(hue, saturation, lightness);
+    setDisplayedColor(QColor::fromHslF(hue, saturation, lightness,
+                                       aSpin->value()));
     emitColorChangedSignal();
 }
 
