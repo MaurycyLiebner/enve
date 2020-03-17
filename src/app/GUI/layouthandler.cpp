@@ -16,24 +16,26 @@
 
 #include "layouthandler.h"
 #include "Private/document.h"
+#include "editablecombobox.h"
+
 #include <QPushButton>
 
 LayoutHandler::LayoutHandler(Document& document,
-                             AudioHandler& audioHandler) :
+                             AudioHandler& audioHandler,
+                             QWidget* const parent) :
     mDocument(document), mAudioHandler(audioHandler) {
     const auto canvasComboLayout = new QHBoxLayout;
     canvasComboLayout->setSpacing(0);
     canvasComboLayout->setContentsMargins(0, 0, 0, 0);
 
-    mComboWidget = new QWidget;
+    mComboWidget = new QWidget(parent);
     mComboWidget->setContentsMargins(0, 0, 0, 0);
     mComboWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     mComboWidget->setLayout(canvasComboLayout);
     mComboWidget->setObjectName("transparentWidget");
 
-    mComboBox = new QComboBox;
+    mComboBox = new EditableComboBox(mComboWidget);
     mComboBox->setMinimumContentsLength(20);
-    mComboBox->setEditable(true);
     mComboBox->setObjectName("currentLayoutComboBox");
     mComboBox->setLayoutDirection(Qt::RightToLeft);
     mComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

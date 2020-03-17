@@ -19,6 +19,7 @@
 #include "outputsettingsdialog.h"
 #include "outputsettingsdisplaywidget.h"
 #include "GUI/global.h"
+#include "GUI/editablecombobox.h"
 
 OutputProfilesDialog::OutputProfilesDialog(
         const OutputSettings &currentSettings,
@@ -36,7 +37,7 @@ OutputProfilesDialog::OutputProfilesDialog(
 
     mProfileLayout = new QHBoxLayout();
     mProfileLabel = new QLabel("Profile:", this);
-    mProfilesComboBox = new QComboBox(this);
+    mProfilesComboBox = new EditableComboBox(this);
     mProfilesComboBox->setMinimumContentsLength(20);
     mProfileLayout->addWidget(mProfileLabel);
     mProfileLayout->addWidget(mProfilesComboBox);
@@ -111,7 +112,6 @@ OutputProfilesDialog::OutputProfilesDialog(
     }
 
     updateButtonsEnabled();
-    mProfilesComboBox->setEditable(true);
     mProfilesComboBox->setInsertPolicy(QComboBox::NoInsert);
     if(mProfilesComboBox->count() == 0) {
         mProfilesComboBox->setDisabled(true);

@@ -35,6 +35,7 @@
 #include "memoryhandler.h"
 #include "switchbutton.h"
 #include "GUI/BrushWidgets/brushlabel.h"
+#include "editablecombobox.h"
 
 TimelineDockWidget::TimelineDockWidget(Document& document,
                                        LayoutHandler * const layoutH,
@@ -61,12 +62,11 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mMainLayout->setSpacing(0);
     mMainLayout->setMargin(0);
 
-    mResolutionComboBox = new QComboBox(this);
+    mResolutionComboBox = new EditableComboBox(this);
     mResolutionComboBox->addItem("100 %");
     mResolutionComboBox->addItem("75 %");
     mResolutionComboBox->addItem("50 %");
     mResolutionComboBox->addItem("25 %");
-    mResolutionComboBox->setEditable(true);
     mResolutionComboBox->lineEdit()->setInputMask("D00 %");
     mResolutionComboBox->setCurrentText("100 %");
     MainWindow::sGetInstance()->installNumericFilter(mResolutionComboBox);

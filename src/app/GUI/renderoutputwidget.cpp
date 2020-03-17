@@ -15,9 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "renderoutputwidget.h"
+
+#include "GUI/edialogs.h"
+#include "editablecombobox.h"
+
 #include <QLineEdit>
 #include <QDir>
-#include "GUI/edialogs.h"
 
 RenderOutputWidget::RenderOutputWidget(const int canvasWidth,
                                        const int canvasHeight,
@@ -58,12 +61,11 @@ RenderOutputWidget::RenderOutputWidget(const int canvasWidth,
 
     mResoultionLabel = new QLabel("Resolution:", this);
 
-    mResolutionComboBox = new QComboBox(this);
+    mResolutionComboBox = new EditableComboBox(this);
     mResolutionComboBox->addItem("100 %");
     mResolutionComboBox->addItem("75 %");
     mResolutionComboBox->addItem("50 %");
     mResolutionComboBox->addItem("25 %");
-    mResolutionComboBox->setEditable(true);
     mResolutionComboBox->lineEdit()->setInputMask("D00 %");
     mResolutionComboBox->setProperty("forceHandleEvent", QVariant(true));
     mResolutionComboBox->setCurrentText("100 %");

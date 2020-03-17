@@ -149,7 +149,7 @@ MainWindow::MainWindow(Document& document,
     mTimelineDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::BottomDockWidgetArea, mTimelineDock);
 
-    mLayoutHandler = new LayoutHandler(mDocument, mAudioHandler);
+    mLayoutHandler = new LayoutHandler(mDocument, mAudioHandler, this);
     mTimeline = new TimelineDockWidget(mDocument, mLayoutHandler, this);
     mTimelineDock->setWidget(mTimeline);
 
