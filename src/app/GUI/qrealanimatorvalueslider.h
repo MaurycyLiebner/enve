@@ -46,7 +46,7 @@ protected:
     void setValue(const qreal value);
     void finishTransform(const qreal value);
     void cancelTransform();
-    qreal startSlideValue() const { return mBaseValue; }
+    qreal startSlideValue() const;
 
     void mouseMoveEvent(QMouseEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);

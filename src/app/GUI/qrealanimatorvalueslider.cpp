@@ -143,6 +143,11 @@ void QrealAnimatorValueSlider::cancelTransform() {
     QDoubleSlider::cancelTransform();
 }
 
+qreal QrealAnimatorValueSlider::startSlideValue() const {
+    if(mTarget && mTarget->hasExpression()) return mBaseValue;
+    else return QDoubleSlider::startSlideValue();
+}
+
 void QrealAnimatorValueSlider::paint(QPainter *p) {
     if(!mTarget) {
         QDoubleSlider::paint(p);
