@@ -54,6 +54,7 @@ class ScrollArea;
 class UsageWidget;
 class CentralWidget;
 class CloseSignalingDockWidget;
+class PaintColorWidget;
 //class SoundComposition;
 
 const QString MENU_STYLESHEET =
@@ -332,6 +333,7 @@ private:
     LayoutHandler *mLayoutHandler = nullptr;
 
     FillStrokeSettingsWidget *mFillStrokeSettings;
+    PaintColorWidget* mPaintColorWidget;
 
     bool mChangedSinceSaving = false;
     bool mEventFilterDisabled = true;

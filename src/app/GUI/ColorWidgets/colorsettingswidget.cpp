@@ -47,19 +47,19 @@ void ColorSettingsWidget::setCurrentColor(const qreal h_t,
     GLfloat valGl = static_cast<GLfloat>(v_t);
     //GLfloat alphaGl = static_cast<GLfloat>(a_t);
     //wheel_triangle_widget->setColorHSV_f(h_t, s_t, v_t);
-    r_rect->setColorHSV_f(hueGl, satGl, valGl);
-    g_rect->setColorHSV_f(hueGl, satGl, valGl);
-    b_rect->setColorHSV_f(hueGl, satGl, valGl);
+    rRect->setColorHSV_f(hueGl, satGl, valGl);
+    gRect->setColorHSV_f(hueGl, satGl, valGl);
+    bRect->setColorHSV_f(hueGl, satGl, valGl);
 
-    h_rect->setColorHSV_f(hueGl, satGl, valGl);
-    h_rect->setDisplayedValue(h_t);
-    hsv_s_rect->setColorHSV_f(hueGl, satGl, valGl);
-    h_rect->setDisplayedValue(s_t);
-    v_rect->setColorHSV_f(hueGl, satGl, valGl);
-    h_rect->setDisplayedValue(v_t);
+    hRect->setColorHSV_f(hueGl, satGl, valGl);
+    hRect->setDisplayedValue(h_t);
+    hsvSatRect->setColorHSV_f(hueGl, satGl, valGl);
+    hRect->setDisplayedValue(s_t);
+    vRect->setColorHSV_f(hueGl, satGl, valGl);
+    hRect->setDisplayedValue(v_t);
 
-    hsl_s_rect->setColorHSV_f(hueGl, satGl, valGl);
-    l_rect->setColorHSV_f(hueGl, satGl, valGl);
+    hslSatRect->setColorHSV_f(hueGl, satGl, valGl);
+    lRect->setColorHSV_f(hueGl, satGl, valGl);
 
     mColorLabel->setColorHSV_f(hueGl, satGl, valGl);
 
@@ -72,9 +72,9 @@ void ColorSettingsWidget::setCurrentColor(const qreal h_t,
     qreal blue = val;
     qhsv_to_rgb(red, green, blue);
 
-    r_rect->setDisplayedValue(red);
-    g_rect->setDisplayedValue(green);
-    b_rect->setDisplayedValue(blue);
+    rRect->setDisplayedValue(red);
+    gRect->setDisplayedValue(green);
+    bRect->setDisplayedValue(blue);
 
     rSpin->setDisplayedValue(red);
     gSpin->setDisplayedValue(green);
@@ -88,8 +88,8 @@ void ColorSettingsWidget::setCurrentColor(const qreal h_t,
     qreal lig = val;
     qhsv_to_hsl(hue, hslSat, lig);
 
-    hsl_s_rect->setDisplayedValue(hslSat);
-    l_rect->setDisplayedValue(lig);
+    hslSatRect->setDisplayedValue(hslSat);
+    lRect->setDisplayedValue(lig);
 
     hslSSpin->setDisplayedValue(hslSat);
     lSpin->setDisplayedValue(lig);
@@ -345,6 +345,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     setLayout(mWidgetsLayout);
 
     mColorLabel = new ColorLabel(this);
+    mColorLabel->setFixedHeight(MIN_WIDGET_DIM);
 
 //    mWheelWidget->setLayout(mWheelLayout);
 //    mWheelLayout->setAlignment(Qt::AlignTop);
@@ -352,22 +353,25 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
 //    mWheelLayout->addWidget(wheel_triangle_widget, Qt::AlignHCenter);
 //    mWheelLayout->setAlignment(wheel_triangle_widget, Qt::AlignHCenter);
 
-    int LABEL_WIDTH = MIN_WIDGET_DIM;
+    const int labelWidth = MIN_WIDGET_DIM;
 
-    r_rect = new ColorValueRect(RED_PROGRAM, this);
-    rLabel->setFixedWidth(LABEL_WIDTH);
+    rRect = new ColorValueRect(RED_PROGRAM, this);
+    rRect->setFixedHeight(MIN_WIDGET_DIM);
+    rLabel->setFixedWidth(labelWidth);
     rLayout->addWidget(rLabel);
-    rLayout->addWidget(r_rect);
+    rLayout->addWidget(rRect);
     rLayout->addWidget(rSpin);
-    g_rect = new ColorValueRect(GREEN_PROGRAM, this);
-    gLabel->setFixedWidth(LABEL_WIDTH);
+    gRect = new ColorValueRect(GREEN_PROGRAM, this);
+    gRect->setFixedHeight(MIN_WIDGET_DIM);
+    gLabel->setFixedWidth(labelWidth);
     gLayout->addWidget(gLabel);
-    gLayout->addWidget(g_rect);
+    gLayout->addWidget(gRect);
     gLayout->addWidget(gSpin);
-    b_rect = new ColorValueRect(BLUE_PROGRAM, this);
-    bLabel->setFixedWidth(LABEL_WIDTH);
+    bRect = new ColorValueRect(BLUE_PROGRAM, this);
+    bRect->setFixedHeight(MIN_WIDGET_DIM);
+    bLabel->setFixedWidth(labelWidth);
     bLayout->addWidget(bLabel);
-    bLayout->addWidget(b_rect);
+    bLayout->addWidget(bRect);
     bLayout->addWidget(bSpin);
     mRGBLayout->setAlignment(Qt::AlignTop);
     mRGBLayout->addLayout(rLayout);
@@ -375,20 +379,23 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mRGBLayout->addLayout(bLayout);
     mRGBWidget->setLayout(mRGBLayout);
 
-    h_rect = new ColorValueRect(HUE_PROGRAM, this);
-    hLabel->setFixedWidth(LABEL_WIDTH);
+    hRect = new ColorValueRect(HUE_PROGRAM, this);
+    hRect->setFixedHeight(MIN_WIDGET_DIM);
+    hLabel->setFixedWidth(labelWidth);
     hLayout->addWidget(hLabel);
-    hLayout->addWidget(h_rect);
+    hLayout->addWidget(hRect);
     hLayout->addWidget(hSpin);
-    hsv_s_rect = new ColorValueRect(HSV_SATURATION_PROGRAM, this);
-    hsvSLabel->setFixedWidth(LABEL_WIDTH);
+    hsvSatRect = new ColorValueRect(HSV_SATURATION_PROGRAM, this);
+    hsvSatRect->setFixedHeight(MIN_WIDGET_DIM);
+    hsvSLabel->setFixedWidth(labelWidth);
     hsvSLayout->addWidget(hsvSLabel);
-    hsvSLayout->addWidget(hsv_s_rect);
+    hsvSLayout->addWidget(hsvSatRect);
     hsvSLayout->addWidget(hsvSSpin);
-    v_rect = new ColorValueRect(VALUE_PROGRAM, this);
-    vLabel->setFixedWidth(LABEL_WIDTH);
+    vRect = new ColorValueRect(VALUE_PROGRAM, this);
+    vRect->setFixedHeight(MIN_WIDGET_DIM);
+    vLabel->setFixedWidth(labelWidth);
     vLayout->addWidget(vLabel);
-    vLayout->addWidget(v_rect);
+    vLayout->addWidget(vRect);
     vLayout->addWidget(vSpin);
     mHSVLayout->setAlignment(Qt::AlignTop);
     mHSVLayout->addLayout(hLayout);
@@ -396,15 +403,17 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mHSVLayout->addLayout(vLayout);
     mHSVWidget->setLayout(mHSVLayout);
 
-    hsl_s_rect = new ColorValueRect(HSL_SATURATION_PROGRAM, this);
-    hslSLabel->setFixedWidth(LABEL_WIDTH);
+    hslSatRect = new ColorValueRect(HSL_SATURATION_PROGRAM, this);
+    hslSatRect->setFixedHeight(MIN_WIDGET_DIM);
+    hslSLabel->setFixedWidth(labelWidth);
     hslSLayout->addWidget(hslSLabel);
-    hslSLayout->addWidget(hsl_s_rect);
+    hslSLayout->addWidget(hslSatRect);
     hslSLayout->addWidget(hslSSpin);
-    l_rect = new ColorValueRect(LIGHTNESS_PROGRAM, this);
-    lLabel->setFixedWidth(LABEL_WIDTH);
+    lRect = new ColorValueRect(LIGHTNESS_PROGRAM, this);
+    lRect->setFixedHeight(MIN_WIDGET_DIM);
+    lLabel->setFixedWidth(labelWidth);
     lLayout->addWidget(lLabel);
-    lLayout->addWidget(l_rect);
+    lLayout->addWidget(lRect);
     lLayout->addWidget(lSpin);
     mHSLLayout->setAlignment(Qt::AlignTop);
     mHSLLayout->addLayout(hslSLayout);
@@ -412,7 +421,8 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mHSLWidget->setLayout(mHSLLayout);
 
     aRect = new ColorValueRect(ALPHA_PROGRAM, this);
-    aLabel->setFixedWidth(LABEL_WIDTH);
+    aRect->setFixedHeight(MIN_WIDGET_DIM);
+    aLabel->setFixedWidth(labelWidth);
     aLayout->addWidget(aLabel);
     aLayout->addWidget(aRect);
     aLayout->addWidget(aSpin);
@@ -521,67 +531,67 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     connect(aSpin, &QrealAnimatorValueSlider::editingFinished,
             this, &ColorSettingsWidget::emitEditingFinishedSignal);
 
-    connect(r_rect, &ColorValueRect::valueChanged,
+    connect(rRect, &ColorValueRect::valueChanged,
             this, &ColorSettingsWidget::setRed);
-    connect(g_rect, &ColorValueRect::valueChanged,
+    connect(gRect, &ColorValueRect::valueChanged,
             this, &ColorSettingsWidget::setGreen);
-    connect(b_rect, &ColorValueRect::valueChanged,
+    connect(bRect, &ColorValueRect::valueChanged,
             this, &ColorSettingsWidget::setBlue);
 
-    connect(h_rect, &ColorValueRect::valueChanged,
+    connect(hRect, &ColorValueRect::valueChanged,
             this, &ColorSettingsWidget::setHSVHue);
-    connect(hsv_s_rect, &ColorValueRect::valueChanged,
+    connect(hsvSatRect, &ColorValueRect::valueChanged,
             this, &ColorSettingsWidget::setHSVSaturation);
-    connect(v_rect, &ColorValueRect::valueChanged,
+    connect(vRect, &ColorValueRect::valueChanged,
             this, &ColorSettingsWidget::setHSVValue);
 
-    connect(hsl_s_rect, &ColorValueRect::valueChanged,
+    connect(hslSatRect, &ColorValueRect::valueChanged,
             this, &ColorSettingsWidget::setHSLSaturation);
-    connect(l_rect, &ColorValueRect::valueChanged,
+    connect(lRect, &ColorValueRect::valueChanged,
             this, &ColorSettingsWidget::setHSLLightness);
 
     connect(aRect, &ColorValueRect::valueChanged,
             this, &ColorSettingsWidget::setAlpha);
 
-    connect(r_rect, &ColorValueRect::editingStarted,
+    connect(rRect, &ColorValueRect::editingStarted,
             this, &ColorSettingsWidget::emitEditingStartedRed);
-    connect(g_rect, &ColorValueRect::editingStarted,
+    connect(gRect, &ColorValueRect::editingStarted,
             this, &ColorSettingsWidget::emitEditingStartedGreen);
-    connect(b_rect, &ColorValueRect::editingStarted,
+    connect(bRect, &ColorValueRect::editingStarted,
             this, &ColorSettingsWidget::emitEditingStartedBlue);
 
-    connect(h_rect, &ColorValueRect::editingStarted,
+    connect(hRect, &ColorValueRect::editingStarted,
             this, &ColorSettingsWidget::emitEditingStartedHue);
-    connect(hsv_s_rect, &ColorValueRect::editingStarted,
+    connect(hsvSatRect, &ColorValueRect::editingStarted,
             this, &ColorSettingsWidget::emitEditingStartedHSVSaturation);
-    connect(v_rect, &ColorValueRect::editingStarted,
+    connect(vRect, &ColorValueRect::editingStarted,
             this, &ColorSettingsWidget::emitEditingStartedValue);
 
-    connect(hsl_s_rect, &ColorValueRect::editingStarted,
+    connect(hslSatRect, &ColorValueRect::editingStarted,
             this, &ColorSettingsWidget::emitEditingStartedHSLSaturation);
-    connect(l_rect, &ColorValueRect::editingStarted,
+    connect(lRect, &ColorValueRect::editingStarted,
             this, &ColorSettingsWidget::emitEditingStartedLightness);
 
     connect(aRect, &ColorValueRect::editingStarted,
             this, &ColorSettingsWidget::emitEditingStartedAlpha);
 
-    connect(r_rect, &ColorValueRect::editingFinished,
+    connect(rRect, &ColorValueRect::editingFinished,
             this, &ColorSettingsWidget::emitEditingFinishedSignal);
-    connect(g_rect, &ColorValueRect::editingFinished,
+    connect(gRect, &ColorValueRect::editingFinished,
             this, &ColorSettingsWidget::emitEditingFinishedSignal);
-    connect(b_rect, &ColorValueRect::editingFinished,
-            this, &ColorSettingsWidget::emitEditingFinishedSignal);
-
-    connect(h_rect, &ColorValueRect::editingFinished,
-            this, &ColorSettingsWidget::emitEditingFinishedSignal);
-    connect(hsv_s_rect, &ColorValueRect::editingFinished,
-            this, &ColorSettingsWidget::emitEditingFinishedSignal);
-    connect(v_rect, &ColorValueRect::editingFinished,
+    connect(bRect, &ColorValueRect::editingFinished,
             this, &ColorSettingsWidget::emitEditingFinishedSignal);
 
-    connect(hsl_s_rect, &ColorValueRect::editingFinished,
+    connect(hRect, &ColorValueRect::editingFinished,
             this, &ColorSettingsWidget::emitEditingFinishedSignal);
-    connect(l_rect, &ColorValueRect::editingFinished,
+    connect(hsvSatRect, &ColorValueRect::editingFinished,
+            this, &ColorSettingsWidget::emitEditingFinishedSignal);
+    connect(vRect, &ColorValueRect::editingFinished,
+            this, &ColorSettingsWidget::emitEditingFinishedSignal);
+
+    connect(hslSatRect, &ColorValueRect::editingFinished,
+            this, &ColorSettingsWidget::emitEditingFinishedSignal);
+    connect(lRect, &ColorValueRect::editingFinished,
             this, &ColorSettingsWidget::emitEditingFinishedSignal);
 
     connect(aRect, &ColorValueRect::editingFinished,
@@ -644,9 +654,9 @@ void ColorSettingsWidget::setDisplayedRGB(const qreal red,
     gSpin->setDisplayedValue(green);
     bSpin->setDisplayedValue(blue);
 
-    r_rect->setDisplayedValue(red);
-    g_rect->setDisplayedValue(green);
-    b_rect->setDisplayedValue(blue);
+    rRect->setDisplayedValue(red);
+    gRect->setDisplayedValue(green);
+    bRect->setDisplayedValue(blue);
 }
 
 void ColorSettingsWidget::setDisplayedHSV(const qreal hue,
@@ -656,20 +666,20 @@ void ColorSettingsWidget::setDisplayedHSV(const qreal hue,
     hsvSSpin->setDisplayedValue(saturation);
     vSpin->setDisplayedValue(value);
 
-    h_rect->setDisplayedValue(hue);
-    hsv_s_rect->setDisplayedValue(saturation);
-    v_rect->setDisplayedValue(value);
+    hRect->setDisplayedValue(hue);
+    hsvSatRect->setDisplayedValue(saturation);
+    vRect->setDisplayedValue(value);
 
-    r_rect->setColorHSV_f(hue, saturation, value);
-    g_rect->setColorHSV_f(hue, saturation, value);
-    b_rect->setColorHSV_f(hue, saturation, value);
+    rRect->setColorHSV_f(hue, saturation, value);
+    gRect->setColorHSV_f(hue, saturation, value);
+    bRect->setColorHSV_f(hue, saturation, value);
 
-    h_rect->setColorHSV_f(hue, saturation, value);
-    hsv_s_rect->setColorHSV_f(hue, saturation, value);
-    v_rect->setColorHSV_f(hue, saturation, value);
+    hRect->setColorHSV_f(hue, saturation, value);
+    hsvSatRect->setColorHSV_f(hue, saturation, value);
+    vRect->setColorHSV_f(hue, saturation, value);
 
-    hsl_s_rect->setColorHSV_f(hue, saturation, value);
-    l_rect->setColorHSV_f(hue, saturation, value);
+    hslSatRect->setColorHSV_f(hue, saturation, value);
+    lRect->setColorHSV_f(hue, saturation, value);
 
     if(!mAlphaHidden)
         aRect->setColorHSV_f(hue, saturation, value);
@@ -684,9 +694,9 @@ void ColorSettingsWidget::setDisplayedHSL(const qreal hue,
     hslSSpin->setDisplayedValue(saturation);
     lSpin->setDisplayedValue(lightness);
 
-    h_rect->setDisplayedValue(hue);
-    hsl_s_rect->setDisplayedValue(saturation);
-    l_rect->setDisplayedValue(lightness);
+    hRect->setDisplayedValue(hue);
+    hslSatRect->setDisplayedValue(saturation);
+    lRect->setDisplayedValue(lightness);
 }
 
 void ColorSettingsWidget::setAllDisplayedFromRGB(const qreal red,

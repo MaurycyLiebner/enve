@@ -613,7 +613,6 @@ void FillStrokeSettingsWidget::colorSettingReceived(
         paintSetting << std::make_shared<ColorPaintSetting>(mTarget, colorSetting);
         scene->applyPaintSettingToSelected(paintSetting);
     }
-    mDocument.setBrushColor(colorSetting.getColor());
 }
 
 void FillStrokeSettingsWidget::connectGradient() {

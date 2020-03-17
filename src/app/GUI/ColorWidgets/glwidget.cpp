@@ -21,7 +21,7 @@
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent) {
 //    setFormat(QSurfaceFormat::defaultFormat());
-    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     setMinimumSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM);
 }
 

@@ -62,6 +62,7 @@
 #include "GUI/edialogs.h"
 #include "closesignalingdockwidget.h"
 #include "eimporters.h"
+#include "ColorWidgets/paintcolorwidget.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 
@@ -144,6 +145,13 @@ MainWindow::MainWindow(Document& document,
     addDockWidget(Qt::RightDockWidgetArea, mFillStrokeSettingsDock);
     mFillStrokeSettingsDock->setMinimumWidth(MIN_WIDGET_DIM*12);
     mFillStrokeSettingsDock->setMaximumWidth(MIN_WIDGET_DIM*20);
+
+    mPaintColorWidget = new PaintColorWidget(this);
+    mPaintColorWidget->hide();
+    connect(mPaintColorWidget, &PaintColorWidget::colorChanged,
+            &mDocument, &Document::setBrushColor);
+    connect(&mDocument, &Document::brushColorChanged,
+            mPaintColorWidget, &PaintColorWidget::setDisplayedColor);
 
     mTimelineDock = new CloseSignalingDockWidget(tr("Timeline", "Dock"), this);
     mTimelineDock->setTitleBarWidget(new QWidget());
@@ -1007,6 +1015,11 @@ void MainWindow::updateCanvasModeButtonsChecked() {
 
     const bool paintMode = mode == CanvasMode::paint;
     mActionNewEmptyPaintFrameAct->setVisible(paintMode);
+    if(paintMode) {
+        mFillStrokeSettingsDock->setWidget(mPaintColorWidget);
+    } else {
+        mFillStrokeSettingsDock->setWidget(mFillStrokeSettings);
+    }
 }
 
 //void MainWindow::stopPreview() {

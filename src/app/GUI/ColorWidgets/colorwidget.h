@@ -24,6 +24,12 @@ class ColorWidget : public GLWidget {
 public:
     ColorWidget(QWidget *parent = nullptr);
 
+    void setColor(const QColor& color) {
+        setColorHSV(color.hueF(),
+                    color.hsvSaturationF(),
+                    color.valueF());
+    }
+
     void setColorHSV(const qreal h,
                      const qreal s,
                      const qreal v) {
