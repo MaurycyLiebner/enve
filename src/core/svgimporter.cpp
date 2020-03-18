@@ -43,6 +43,8 @@ public:
     void setFontSize(const int size);
     void setFontSlant(const SkFontStyle::Slant &slant);
     void setFontWeight(const int weight);
+    void bolderFontWeight() { mWeight = qMin(900, mWeight + 100); }
+    void lighterFontWeight() { mWeight = qMax(100, mWeight - 100); }
 
     void setFontAlignment(const Qt::Alignment &alignment);
 
@@ -940,9 +942,9 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
                 } else if(value == "bold") {
                     mTextAttributes.setFontWeight(SkFontStyle::kBold_Weight);
                 } else if(value == "bolder") {
-                    mTextAttributes.setFontWeight(SkFontStyle::kExtraBold_Weight);
+                    mTextAttributes.bolderFontWeight();
                 } else if(value == "lighter") {
-                    mTextAttributes.setFontWeight(SkFontStyle::kLight_Weight);
+                    mTextAttributes.lighterFontWeight();
                 } else {
                     bool ok;
                     const int val = value.toInt(&ok);
