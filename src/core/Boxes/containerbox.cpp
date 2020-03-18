@@ -121,6 +121,18 @@ OutlineSettingsAnimator *ContainerBox::getStrokeSettings() const {
     return mContainedBoxes.last()->getStrokeSettings();
 }
 
+QDomElement ContainerBox::saveSVG(QDomDocument& doc,
+                                  QDomElement& defs,
+                                  const FrameRange& absRange,
+                                  const qreal fps) const {
+    auto ele = doc.createElement("g");
+    for(const auto& box : mContainedBoxes) {
+        if(!box->isVisible()) continue;
+        box->saveSVGWithTransform(doc, ele, defs, absRange, fps);
+    }
+    return ele;
+}
+
 void ContainerBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
     for(const auto& box : mContainedBoxes) {
         box->setStrokeCapStyle(capStyle);

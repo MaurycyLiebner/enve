@@ -79,6 +79,34 @@ QGradientStops Gradient::getQGradientStops(const qreal absFrame) {
     return stops;
 }
 
+void Gradient::saveSVG(QDomDocument& doc,
+                       QDomElement& defs,
+                       const FrameRange& absRange,
+                       const qreal fps) const {
+    auto ele = doc.createElement("linearGradient");
+    const auto baseGradId = QString("0x%1").arg(
+                                (quintptr)this,
+                                QT_POINTER_SIZE * 2, 16, QChar('0'));
+    const int count = ca_getNumberOfChildren();
+    if(count == 0) {
+        auto stop = doc.createElement("stop");
+        stop.setAttribute("offset", 0);
+        stop.setAttribute("stop-color", "black");
+        ele.appendChild(stop);
+    } else {
+        for(int i = 0; i < count; i++) {
+            const auto color = getChild(i);
+            auto stop = doc.createElement("stop");
+            stop.setAttribute("offset", count == 1 ? 0. : qreal(i)/(count - 1));
+            color->saveSVG(doc, stop, defs, absRange, fps, "stop-color");
+            ele.appendChild(stop);
+        }
+    }
+    ele.setAttribute("id", baseGradId);
+
+    defs.appendChild(ele);
+}
+
 void Gradient::updateQGradientStops() {
     const int nCols = ca_getNumberOfChildren();
     mQGradientStops.clear();

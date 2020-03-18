@@ -116,3 +116,68 @@ bool Rectangle::differenceInEditPathBetweenFrames(
     if(mBottomRightAnimator->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
     return mRadiusAnimator->prp_differencesBetweenRelFrames(frame1, frame2);
 }
+
+#include "simpletask.h"
+#include "Animators/customproperties.h"
+#include "Expressions/expression.h"
+
+QDomElement Rectangle::saveSVG(QDomDocument& doc,
+                               QDomElement& defs,
+                               const FrameRange& absRange,
+                               const qreal fps) const {
+    const auto copy = enve::make_shared<Rectangle>();
+    BoxClipboard::sCopyAndPaste(this, copy.get());
+    getParentGroup()->addContained(copy);
+    SimpleTask::sProcessAll();
+
+    auto& cProps = copy->mCustomProperties;
+
+    const auto cX = cProps->addPropertyOfType<QrealAnimator>("x");
+    const auto cY = cProps->addPropertyOfType<QrealAnimator>("y");
+    const auto cW = cProps->addPropertyOfType<QrealAnimator>("width");
+    const auto cH = cProps->addPropertyOfType<QrealAnimator>("height");
+
+    const QString bindings = "left = top left.x;"
+                             "top = top left.y;"
+                             "right = bottom right.x;"
+                             "bottom = bottom right.y;";
+
+    const auto xScript = "return Math.min(left, right);";
+    const auto yScript = "return Math.min(top, bottom);";
+    const auto wScript = "return Math.abs(left - right);";
+    const auto hScript = "return Math.abs(top - bottom);";
+
+    const auto xExpr = Expression::sCreate(bindings, "", xScript, cX,
+                                           Expression::sQrealAnimatorTester);
+    const auto yExpr = Expression::sCreate(bindings, "", yScript, cY,
+                                           Expression::sQrealAnimatorTester);
+    const auto wExpr = Expression::sCreate(bindings, "", wScript, cW,
+                                           Expression::sQrealAnimatorTester);
+    const auto hExpr = Expression::sCreate(bindings, "", hScript, cH,
+                                           Expression::sQrealAnimatorTester);
+
+    cX->setExpression(xExpr);
+    cY->setExpression(yExpr);
+    cW->setExpression(wExpr);
+    cH->setExpression(hExpr);
+
+    auto ele = doc.createElement("rect");
+    const auto xAnim = copy->mTopLeftAnimator->getXAnimator();
+    const auto yAnim = copy->mTopLeftAnimator->getYAnimator();
+
+    const auto rightAnim = copy->mBottomRightAnimator->getXAnimator();
+    const auto bottomAnim = copy->mBottomRightAnimator->getYAnimator();
+
+    xAnim->anim_coordinateKeysWith(rightAnim);
+    yAnim->anim_coordinateKeysWith(bottomAnim);
+
+    cX->saveSVG(doc, ele, defs, absRange, fps, "x");
+    cY->saveSVG(doc, ele, defs, absRange, fps, "y");
+    cW->saveSVG(doc, ele, defs, absRange, fps, "width");
+    cH->saveSVG(doc, ele, defs, absRange, fps, "height");
+
+    savePathBoxSVG(doc, ele, defs, absRange, fps);
+
+    copy->removeFromParent_k();
+    return ele;
+}

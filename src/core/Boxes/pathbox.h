@@ -113,6 +113,12 @@ public:
         mCurrentFillPathOutdated = true;
         planUpdate(reason);
     }
+
+    void savePathBoxSVG(QDomDocument& doc,
+                        QDomElement& ele,
+                        QDomElement& defs,
+                        const FrameRange& absRange,
+                        const qreal fps) const;
 protected:
     bool mOutlineAffectedByScale = true;
     bool mCurrentPathsOutdated = true;

@@ -165,6 +165,7 @@ public:
     void saveFile();
     void saveFileAs();
     void saveBackup();
+    void exportSVG();
     bool closeProject();
     void linkFile();
     void importImageSequence();

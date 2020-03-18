@@ -63,6 +63,7 @@
 #include "closesignalingdockwidget.h"
 #include "eimporters.h"
 #include "ColorWidgets/paintcolorwidget.h"
+#include "Dialogs/exportsvgdialog.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 
@@ -287,6 +288,10 @@ void MainWindow::setupMenuBar() {
                          Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     mFileMenu->addAction(tr("Save Backup", "MenuBar_File"),
                          this, &MainWindow::saveBackup);
+
+    const auto exportMenu = mFileMenu->addMenu(tr("Export", "MenuBar_File"));
+    exportMenu->addAction(tr("Export SVG...", "MenuBar_File"),
+                          this, &MainWindow::exportSVG);
     mFileMenu->addSeparator();
     mFileMenu->addAction(tr("Close", "MenuBar_File"),
                          this, &MainWindow::closeProject);
@@ -756,7 +761,7 @@ void MainWindow::openWelcomeDialog() {
 }
 
 void MainWindow::closeWelcomeDialog() {
-    SimpleTask::sSchedule([this]() {
+    SimpleTask::sScheduleContexted(this, [this]() {
         if(!mWelcomeDialog) return;
         mWelcomeDialog = nullptr;
         setCentralWidget(mCentralWidget);
@@ -1312,6 +1317,19 @@ void MainWindow::saveBackup() {
         saveToFile(backupPath.arg(id));
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
+    }
+}
+
+void MainWindow::exportSVG() {
+    const QString fileType = tr("SVG Files %1", "ExportDialog_FileType");
+    QString saveAs = eDialogs::saveFile("Export SVG",
+                                        mDocument.projectDirectory(),
+                                        fileType.arg("(*.svg)"));
+    if(!saveAs.isEmpty()) {
+        if(saveAs.right(4) != ".svg") saveAs += ".svg";
+        const auto dialog = new ExportSvgDialog(saveAs, this);
+        dialog->show();
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
     }
 }
 

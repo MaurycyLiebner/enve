@@ -18,6 +18,8 @@
 #define CUSTOMPROPERTIES_H
 #include "dynamiccomplexanimator.h"
 
+#include "Properties/namedproperty.h"
+
 qsptr<Animator> readIdCreateCProperty(eReadStream& src);
 void writeCPropertyType(Animator* const obj, eWriteStream& dst);
 
@@ -38,6 +40,14 @@ public:
     void prp_readProperty(eReadStream& src) override;
 
     void addProperty(const qsptr<Animator>& prop);
+
+    template <typename T>
+    T* addPropertyOfType(const QString& name) {
+        using PropType = NamedProperty<T>;
+        const auto prop = enve::make_shared<PropType>(name);
+        this->addProperty(prop);
+        return prop.get();
+    }
 private:
     using CustomPropertiesBase::addChild;
     using CustomPropertiesBase::insertChild;

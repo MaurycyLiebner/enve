@@ -44,6 +44,16 @@ bool SmartVectorPath::differenceInEditPathBetweenFrames(
     return mPathAnimator->prp_differencesBetweenRelFrames(frame1, frame2);
 }
 
+QDomElement SmartVectorPath::saveSVG(QDomDocument& doc,
+                                     QDomElement& defs,
+                                     const FrameRange& absRange,
+                                     const qreal fps) const {
+    auto ele = doc.createElement("path");
+    mPathAnimator->saveSVG(doc, ele, defs, absRange, fps);
+    savePathBoxSVG(doc, ele, defs, absRange, fps);
+    return ele;
+}
+
 void SmartVectorPath::loadSkPath(const SkPath &path) {
     mPathAnimator->loadSkPath(path);
 }

@@ -155,6 +155,10 @@ public:
     void prp_afterChangedAbsRange(const FrameRange &range,
                                   const bool clip = true);
 
+    void saveSceneSVG(QDomDocument& doc,
+                      const FrameRange& absRange,
+                      const qreal fps) const;
+
     void selectOnlyLastPressedBox();
     void selectOnlyLastPressedPoint();
 

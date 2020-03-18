@@ -26,6 +26,9 @@
 #include "MovablePoints/segment.h"
 #include "Animators/qcubicsegment1danimator.h"
 #include "BlendEffects/blendeffect.h"
+
+#include <QDomDocument>
+
 class Canvas;
 
 class QrealAction;
@@ -220,6 +223,17 @@ public:
     virtual SkBlendMode getBlendMode() const
     { return mBlendMode; }
 
+    virtual QDomElement saveSVG(QDomDocument& doc,
+                                QDomElement& defs,
+                                const FrameRange& absRange,
+                                const qreal fps) const {
+        Q_UNUSED(doc)
+        Q_UNUSED(defs)
+        Q_UNUSED(absRange)
+        Q_UNUSED(fps)
+        return QDomElement();
+    }
+
     virtual void updateIfUsesProgram(const ShaderEffectProgram * const program) const;
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
@@ -397,6 +411,12 @@ public:
     { return blendEffectsEnabled() && hasBlendEffects(); }
 
     ContainerBox* getFirstParentLayer() const;
+
+    void saveSVGWithTransform(QDomDocument& doc,
+                              QDomElement& parent,
+                              QDomElement& defs,
+                              const FrameRange& absRange,
+                              const qreal fps) const;
 private:
     void cancelWaitingTasks();
     void afterTotalTransformChanged(const UpdateReason reason);

@@ -69,9 +69,7 @@ void addText(const OraText& text, QDomElement& dst,
              QDomDocument& doc) {
     QDomElement textEle = doc.createElement("text");
     saveOraElementAttributes(text, textEle);
-    QDomCharacterData textData;
-    textData.setData(text.fText);
-    textEle.appendChild(textData);
+    textEle.appendChild(doc.createTextNode(text.fText));
     dst.appendChild(textEle);
 }
 

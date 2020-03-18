@@ -22,7 +22,7 @@
 
 VERSION = 0.0.0
 
-QT += core qml
+QT += core qml xml
 CONFIG += c++14
 ENVE_FOLDER = $$PWD/../../..
 

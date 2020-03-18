@@ -96,6 +96,12 @@ public:
                              UpdateStrokeSettings& settings);
     void duplicateStrokeSettingsNotAnim(
             OutlineSettingsAnimator * const settings);
+
+    void saveSVG(QDomDocument& doc,
+                 QDomElement& parent,
+                 QDomElement& defs,
+                 const FrameRange& absRange,
+                 const qreal fps) const;
 private:
     SkPaint::Cap mCapStyle = SkPaint::kRound_Cap;
     SkPaint::Join mJoinStyle = SkPaint::kRound_Join;

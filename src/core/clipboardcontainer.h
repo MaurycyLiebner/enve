@@ -105,12 +105,13 @@ public:
     }
 
     template<typename T>
-    static bool sCopyAndPaste(T* const from, T* const to) {
+    static bool sCopyAndPaste(const T* const from, T* const to) {
         return BoxClipboard(from).paste(to);
     }
 
     template<typename T>
-    static bool sCopyAndPaste(const qsptr<T>& from, const qsptr<T>& to) {
+    static bool sCopyAndPaste(const qsptr<const T>& from,
+                              const qsptr<T>& to) {
         return BoxClipboard(from.get()).paste(to.get());
     }
 private:

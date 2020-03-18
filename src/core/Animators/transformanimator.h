@@ -16,10 +16,12 @@
 
 #ifndef TRANSFORMANIMATOR_H
 #define TRANSFORMANIMATOR_H
-#include <QMatrix>
 #include "staticcomplexanimator.h"
 #include "../skia/skiaincludes.h"
 #include "transformvalues.h"
+
+#include <QMatrix>
+#include <QDomDocument>
 
 class TransformUpdater;
 class BoxPathPoint;
@@ -104,9 +106,9 @@ public:
 
     QMatrix getParentTotalTransformAtRelFrame(const qreal relFrame);
 
-    QPointFAnimator *getPosAnimator();
-    QPointFAnimator *getScaleAnimator();
-    QrealAnimator *getRotAnimator();
+    QPointFAnimator *getPosAnimator() const;
+    QPointFAnimator *getScaleAnimator() const;
+    QrealAnimator *getRotAnimator() const;
 
     void updateTotalTransform(const UpdateReason reason);
 protected:
@@ -168,15 +170,15 @@ public:
     bool posOrPivotRecording() const;
     bool rotOrScaleOrPivotRecording() const;
 
-    QPointFAnimator *getShearAnimator() {
+    QPointFAnimator *getShearAnimator() const {
         return mShearAnimator.get();
     }
 
-    QPointFAnimator *getPivotAnimator() {
+    QPointFAnimator *getPivotAnimator() const {
         return mPivotAnimator.get();
     }
 
-    QrealAnimator *getOpacityAnimator() {
+    QrealAnimator *getOpacityAnimator() const {
         return mOpacityAnimator.get();
     }
 private:
@@ -189,6 +191,13 @@ class BoxTransformAnimator : public AdvancedTransformAnimator {
     e_OBJECT
 protected:
     BoxTransformAnimator();
+public:
+    void saveSVG(QDomDocument& doc,
+                 QDomElement& parent,
+                 QDomElement& defs,
+                 const FrameRange& absRange,
+                 const qreal fps,
+                 const QDomElement& child) const;
 };
 
 #endif // TRANSFORMANIMATOR_H

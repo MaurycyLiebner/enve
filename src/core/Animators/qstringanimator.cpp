@@ -19,3 +19,53 @@
 
 QStringAnimator::QStringAnimator(const QString &name) :
     SteppedAnimator<QString>(name) {}
+
+QDomElement createTextElement(QDomDocument& doc,
+                              const QString& text) {
+    auto ele = doc.createElement("text");
+    ele.appendChild(doc.createTextNode(text));
+    return ele;
+}
+
+void QStringAnimator::saveSVG(QDomDocument& doc,
+                              QDomElement& parent,
+                              const FrameRange& absRange,
+                              const qreal fps) const {
+    const auto relRange = prp_absRangeToRelRange(absRange);
+    const auto idRange = prp_getIdenticalRelRange(relRange.fMin);
+    const int span = absRange.span();
+    if(idRange.inRange(relRange) || span == 1) {
+        auto ele = createTextElement(doc, getValueAtRelFrame(relRange.fMin));
+        parent.appendChild(ele);
+    } else {
+        int i = relRange.fMin;
+        const qreal div = span - 1;
+        while(true) {
+            const auto iRange = absRange*prp_getIdenticalAbsRange(i);
+
+            const qreal begin = (iRange.fMin - absRange.fMin)/div;
+            const qreal end = (iRange.fMax - absRange.fMin + 1)/div;
+
+            auto ele = createTextElement(doc, getValueAtRelFrame(i));
+
+            ele.setAttribute("visibility", "hidden");
+
+            auto anim = doc.createElement("animate");
+            anim.setAttribute("attributeName", "visibility");
+            anim.setAttribute("values", "hidden;visible;hidden;hidden");
+            anim.setAttribute("keyTimes", QString("0;%1;%2;1").
+                                          arg(begin).arg(end));
+
+            const int span = absRange.span();
+            const qreal dur = span/fps;
+            anim.setAttribute("dur", QString::number(dur)  + 's');
+
+            anim.setAttribute("repeatCount", "indefinite");
+
+            parent.appendChild(ele);
+
+            if(iRange.fMax >= relRange.fMax) break;
+            i = prp_nextDifferentRelFrame(i);
+        }
+    }
+}

@@ -86,6 +86,15 @@ void Document::setPath(const QString &path) {
     emit evFilePathChanged(fEvFile);
 }
 
+QString Document::projectDirectory() const {
+    if(fEvFile.isEmpty()) {
+        return QDir::homePath();
+    } else {
+        QFileInfo fileInfo(fEvFile);
+        return fileInfo.dir().path();
+    }
+}
+
 void Document::setCanvasMode(const CanvasMode mode) {
     fCanvasMode = mode;
     emit canvasModeSet(mode);

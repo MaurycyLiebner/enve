@@ -224,3 +224,33 @@ void QPointFAnimator::applyTransform(const QMatrix &transform) {
         }
     }
 }
+
+void QPointFAnimator::saveSVG(QDomDocument& doc,
+                              QDomElement& parent,
+                              QDomElement& defs,
+                              const FrameRange& absRange,
+                              const qreal fps,
+                              const QString& name) const {
+    Animator::saveSVG(doc, parent, defs, absRange, fps, name,
+                      [this](const int relFrame) {
+        const auto value = getEffectiveValue(relFrame);
+        return QString::number(value.x()) + " " +
+               QString::number(value.y());
+    });
+}
+
+void QPointFAnimator::saveSVG(QDomDocument& doc,
+                              QDomElement& parent,
+                              QDomElement& defs,
+                              const FrameRange& absRange,
+                              const qreal fps,
+                              const QString& name,
+                              const bool transform,
+                              const QString& type) const {
+    Animator::saveSVG(doc, parent, defs, absRange, fps, name,
+                      [this](const int relFrame) {
+        const auto value = getEffectiveValue(relFrame);
+        return QString::number(value.x()) + " " +
+               QString::number(value.y());
+    }, transform, type);
+}

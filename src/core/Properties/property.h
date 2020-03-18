@@ -156,6 +156,16 @@ public:
             mParent_k->prp_afterChangedCurrent(reason);
     }
 
+    int prp_nextDifferentRelFrame(const int relFrame) const
+    { return prp_getIdenticalRelRange(relFrame).adjusted(0, 1).fMax; }
+    int prp_prevDifferentRelFrame(const int relFrame) const
+    { return prp_getIdenticalRelRange(relFrame).adjusted(-1, 0).fMin; }
+
+    int prp_nextDifferentAbsFrame(const int relFrame) const
+    { return prp_getIdenticalAbsRange(relFrame).adjusted(0, 1).fMax; }
+    int prp_prevDifferentAbsFrame(const int relFrame) const
+    { return prp_getIdenticalAbsRange(relFrame).adjusted(-1, 0).fMin; }
+
     FrameRange prp_getIdenticalAbsRange(const int relFrame) const;
     FrameRange prp_relRangeToAbsRange(const FrameRange &range) const;
     FrameRange prp_absRangeToRelRange(const FrameRange &range) const;

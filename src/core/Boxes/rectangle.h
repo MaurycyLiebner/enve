@@ -24,18 +24,23 @@ class Rectangle : public PathBox {
 protected:
     Rectangle();
 public:
+    SkPath getRelativePath(const qreal relFrame) const;
+    bool differenceInEditPathBetweenFrames(
+                const int frame1, const int frame2) const;
+
+    QDomElement saveSVG(QDomDocument& doc,
+                        QDomElement& defs,
+                        const FrameRange& absRange,
+                        const qreal fps) const;
+
     void moveSizePointByAbs(const QPointF &absTrans);
 
     MovablePoint *getBottomRightPoint();
-
-    SkPath getRelativePath(const qreal relFrame) const;
 
     void setTopLeftPos(const QPointF &pos);
     void setBottomRightPos(const QPointF &pos);
     void setYRadius(const qreal radiusY);
     void setXRadius(const qreal radiusX);
-    bool differenceInEditPathBetweenFrames(
-                const int frame1, const int frame2) const;
 private:
     qsptr<QPointFAnimator> mTopLeftAnimator;
     qsptr<QPointFAnimator> mBottomRightAnimator;

@@ -198,7 +198,7 @@ void RenderInstanceSettings::read(eReadStream &src) {
         };
         mTargetCanvas.assign(nullptr);
         canvasSetter();
-        if(!mTargetCanvas) SimpleTask::sSchedule(canvasSetter);
+        if(!mTargetCanvas) SimpleTask::sScheduleContexted(this, canvasSetter);
     }
 
     emit stateChanged(mState);

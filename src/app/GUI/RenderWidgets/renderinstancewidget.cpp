@@ -275,23 +275,15 @@ void RenderInstanceWidget::openOutputSettingsDialog() {
 
 #include "Private/document.h"
 
-QString renderOutputDir() {
-    const auto evFilePath = Document::sInstance->fEvFile;
-    if(evFilePath.isEmpty()) {
-        return QDir::homePath();
-    } else {
-        QFileInfo fileInfo(evFilePath);
-        return fileInfo.dir().path();
-    }
-}
-
 void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
     const OutputSettings &outputSettings = mSettings.getOutputRenderSettings();
     const auto format = outputSettings.fOutputFormat;
     if(!format) return;
     const bool isImgSeq = !std::strcmp(format->name, "image2");
     QString outputDst = mSettings.getOutputDestination();
-    if(outputDst.isEmpty()) outputDst = renderOutputDir() + "/untitled";
+    if(outputDst.isEmpty()) {
+        outputDst = Document::sInstance->projectDirectory() + "/untitled";
+    }
     const QString tmpStr = QString(format->extensions);
     const QStringList supportedExt = tmpStr.split(",");
     const QString fileName = outputDst.split("/").last();
@@ -346,7 +338,8 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     }
     QString iniText = mSettings.getOutputDestination();
     if(iniText.isEmpty()) {
-        iniText = renderOutputDir() + "/untitled" + selectedExt;
+        iniText = Document::sInstance->projectDirectory() +
+                  "/untitled" + selectedExt;
     }
     QString saveAs = eDialogs::saveFile("Output Destination",
                                         iniText, supportedExts);

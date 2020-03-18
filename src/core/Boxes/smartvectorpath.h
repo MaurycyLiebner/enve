@@ -41,6 +41,12 @@ public:
 
     bool differenceInEditPathBetweenFrames(const int frame1,
                                            const int frame2) const;
+
+    QDomElement saveSVG(QDomDocument& doc,
+                        QDomElement& defs,
+                        const FrameRange& absRange,
+                        const qreal fps) const;
+
     void applyCurrentTransform();
 
     void loadSkPath(const SkPath& path);

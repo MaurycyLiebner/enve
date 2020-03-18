@@ -19,27 +19,22 @@
 #include "qrealanimator.h"
 #include "qpointfanimator.h"
 
-#include "Properties/namedproperty.h"
 #include "typemenu.h"
 
 enum class PropertyType {
     QrealAnimator, QPointFAnimator
 };
 
-CustomProperties::CustomProperties() :
-    CustomPropertiesBase("properties") {}
-
 template <typename T>
-void addPropertyOfType(CustomProperties* const target,
-                       QWidget* const parent) {
+void execPropertyDialog(CustomProperties* const target,
+                        QWidget* const parent) {
     QString name = target->makeNameUnique("property 0");
     const bool ret = PropertyNameDialog::sGetPropertyName(name, parent);
-    if(ret) {
-        using PropType = NamedProperty<T>;
-        const auto prop = enve::make_shared<PropType>(name);
-        target->addProperty(prop);
-    }
+    if(ret) target->addPropertyOfType<T>(name);
 }
+
+CustomProperties::CustomProperties() :
+    CustomPropertiesBase("properties") {}
 
 void CustomProperties::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<CustomProperties>()) return;
@@ -48,14 +43,14 @@ void CustomProperties::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     {
         const PropertyMenu::PlainSelectedOp<CustomProperties> aOp =
         [parent](CustomProperties* target) {
-            addPropertyOfType<QrealAnimator>(target, parent);
+            execPropertyDialog<QrealAnimator>(target, parent);
         };
         menu->addPlainAction("Add Single Value Property...", aOp);
     }
     {
         const PropertyMenu::PlainSelectedOp<CustomProperties> aOp =
         [parent](CustomProperties* target) {
-            addPropertyOfType<QPointFAnimator>(target, parent);
+            execPropertyDialog<QPointFAnimator>(target, parent);
         };
         menu->addPlainAction("Add Two Value Property...", aOp);
     }

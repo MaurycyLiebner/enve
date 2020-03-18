@@ -47,6 +47,11 @@ public:
     void startColorIdTransform(const int id);
 
     QGradientStops getQGradientStops(const qreal absFrame);
+
+    void saveSVG(QDomDocument& doc,
+                 QDomElement& defs,
+                 const FrameRange& absRange,
+                 const qreal fps) const;
 signals:
     void removed();
 private:

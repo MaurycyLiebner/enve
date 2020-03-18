@@ -25,7 +25,7 @@ QList<std::shared_ptr<SimpleTask>> SimpleTask::sTasks;
 SimpleTask::SimpleTask(const Func& func) : mFunc(func) {}
 
 SimpleTask *SimpleTask::sScheduleContexted(
-        const QPointer<QObject> &ctxt,
+        const QPointer<const QObject> &ctxt,
         const Func &func) {
     return sSchedule([func, ctxt]() { if(ctxt) func(); });
 }

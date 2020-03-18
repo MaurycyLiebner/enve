@@ -51,6 +51,12 @@ qsptr<PropertyBinding> PropertyBinding::sCreate(
     return qsptr<PropertyBinding>(result);
 }
 
+qsptr<PropertyBinding> PropertyBinding::sCreate(Property* const prop) {
+    const auto result = new PropertyBinding(nullptr, nullptr);
+    result->bindProperty("", prop);
+    return qsptr<PropertyBinding>(result);
+}
+
 void PropertyBinding::setPath(const QString& path) {
     mPath = path;
     reloadBindProperty();

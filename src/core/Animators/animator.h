@@ -18,9 +18,12 @@
 #define ANIMATOR_H
 
 class QIODevice;
+
 #include "../Properties/property.h"
 #include "key.h"
 #include "overlappingkeylist.h"
+
+#include <QDomDocument>
 
 class QPainter;
 class TimelineMovable;
@@ -180,6 +183,24 @@ public:
 
     void anim_appendKeyAction(const stdsptr<Key> &newKey);
     void anim_removeKeyAction(const stdsptr<Key> &newKey);
+
+    using ValueGetter = std::function<QString(const int relFrane)>;
+    void saveSVG(QDomDocument& doc,
+                 QDomElement& parent,
+                 QDomElement& defs,
+                 const FrameRange& absRange,
+                 const qreal fps,
+                 const QString& attrName,
+                 const ValueGetter& valueGetter) const;
+    void saveSVG(QDomDocument& doc,
+                 QDomElement& parent,
+                 QDomElement& defs,
+                 const FrameRange& absRange,
+                 const qreal fps,
+                 const QString& attrName,
+                 const ValueGetter& valueGetter,
+                 const bool transform,
+                 const QString& type) const;
 protected:
     void anim_readKeys(eReadStream &src);
     void anim_writeKeys(eWriteStream& dst) const;
@@ -207,7 +228,6 @@ private:
     QList<Key*> anim_mSelectedKeys;
     OverlappingKeyList anim_mKeys;
 };
-
 
 template <class T>
 T *Animator::anim_getKeyOnCurrentFrame() const {

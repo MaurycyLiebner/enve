@@ -443,13 +443,47 @@ void Canvas::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) 
     }
 }
 
+void Canvas::saveSceneSVG(QDomDocument& doc,
+                          const FrameRange& absRange,
+                          const qreal fps) const {
+    auto ele = doc.createElement("svg");
+    ele.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    ele.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+
+    const auto viewBox = QString("0 0 %1 %2").
+                         arg(mWidth).arg(mHeight);
+    ele.setAttribute("viewBox", viewBox);
+    ele.setAttribute("width", mWidth);
+    ele.setAttribute("height", mHeight);
+
+    auto defs = doc.createElement("defs");
+
+    for(const auto& grad : mGradients) {
+        grad->saveSVG(doc, defs, absRange, fps);
+    }
+
+    auto bg = doc.createElement("rect");
+    bg.setAttribute("width", "100%");
+    bg.setAttribute("height", "100%");
+    mBackgroundColor->saveSVG(doc, bg, defs, absRange, fps, "fill");
+    ele.appendChild(bg);
+
+    for(const auto& box : getContainedBoxes()) {
+        if(!box->isVisible()) continue;
+        box->saveSVGWithTransform(doc, ele, defs, absRange, fps);
+    }
+
+    ele.appendChild(defs);
+    doc.appendChild(ele);
+}
+
 qsptr<BoundingBox> Canvas::createLink(const bool inner) {
     return enve::make_shared<InternalLinkCanvas>(this, inner);
 }
 
 void Canvas::schedulePivotUpdate() {
     if(mTransMode == TransformMode::rotate ||
-       mTransMode == TransformMode::scale ||
+            mTransMode == TransformMode::scale ||
        mRotPivot->isSelected()) return;
     mPivotUpdateNeeded = true;
 }
@@ -979,7 +1013,7 @@ SceneBoundGradient *Canvas::getGradientWithDocumentId(const int id) const {
 
 #include "simpletask.h"
 void Canvas::clearGradientRWIds() const {
-    SimpleTask::sSchedule([this]() {
+    SimpleTask::sScheduleContexted(this, [this]() {
         for(const auto &grad : mGradients)
             grad->clearReadWriteId();
     });

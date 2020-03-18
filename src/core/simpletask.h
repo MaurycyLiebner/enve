@@ -29,7 +29,7 @@ class SimpleTask : public QObject {
     SimpleTask(const Func& func);
 public:
     static SimpleTask *sScheduleContexted(
-            const QPointer<QObject>& ctxt,
+            const QPointer<const QObject>& ctxt,
             const Func& func);
     static SimpleTask *sSchedule(const Func& func);
     static void sProcessAll();

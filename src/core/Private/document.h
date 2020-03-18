@@ -101,6 +101,7 @@ public:
     SmartPathClipboard* getSmartPathClipboard() const;
 
     void setPath(const QString& path);
+    QString projectDirectory() const;
 
     void setCanvasMode(const CanvasMode mode);
 

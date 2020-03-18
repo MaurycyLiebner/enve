@@ -26,6 +26,7 @@
 #include "canvas.h"
 #include "transformanimator.h"
 #include "simpletask.h"
+#include "qpointfanimator.h"
 
 PaintSettingsAnimator::PaintSettingsAnimator(const QString &name,
                                              BoundingBox * const parent) :
@@ -54,7 +55,7 @@ void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
     src.read(&mGradientType, sizeof(GradientType));
     int gradRWId; src >> gradRWId;
     int gradDocId; src >> gradDocId;
-    SimpleTask::sSchedule([this, gradRWId, gradDocId]() {
+    SimpleTask::sScheduleContexted(this, [this, gradRWId, gradDocId]() {
         const auto parentScene = getParentScene();
         if(!parentScene) return;
         SceneBoundGradient* gradient = nullptr;
@@ -172,6 +173,90 @@ void PaintSettingsAnimator::duplicatePaintSettingsNotAnim(
 
 void PaintSettingsAnimator::applyTransform(const QMatrix &transform) {
     mGradientPoints->applyTransform(transform);
+}
+
+#include "Expressions/expression.h"
+
+void PaintSettingsAnimator::saveSVG(QDomDocument& doc,
+                                    QDomElement& parent,
+                                    QDomElement& defs,
+                                    const FrameRange& absRange,
+                                    const qreal fps,
+                                    const QString& name) const {
+    if(mPaintType == NOPAINT) {
+        parent.setAttribute(name, "none");
+    } else if(mPaintType == GRADIENTPAINT) {
+        if(mGradient) {
+            const auto baseGradId = QString("0x%1").arg(
+                                        (quintptr)mGradient.data(),
+                                        QT_POINTER_SIZE * 2, 16, QChar('0'));
+            const auto thisGradId = QString("0x%1").arg(
+                                        (quintptr)this,
+                                        QT_POINTER_SIZE * 2, 16, QChar('0'));
+            QDomElement grad;
+
+            const auto p1 = mGradientPoints->startAnimator();
+            const auto p2 = mGradientPoints->endAnimator();
+
+            const auto x1 = p1->getXAnimator();
+            const auto y1 = p1->getYAnimator();
+
+            const auto x2 = p2->getXAnimator();
+            const auto y2 = p2->getYAnimator();
+
+            switch(mGradientType) {
+            case GradientType::LINEAR: {
+                grad = doc.createElement("linearGradient");
+
+                x1->saveSVG(doc, grad, defs, absRange, fps, "x1");
+                y1->saveSVG(doc, grad, defs, absRange, fps, "y1");
+                x2->saveSVG(doc, grad, defs, absRange, fps, "x2");
+                y2->saveSVG(doc, grad, defs, absRange, fps, "y2");
+            } break;
+            case GradientType::RADIAL: {
+                grad = doc.createElement("radialGradient");
+
+//                const QPointF distPt = p2 - p1;
+//                const qreal radius = qSqrt(pow2(distPt.x()) + pow2(distPt.y()));
+                x1->saveSVG(doc, grad, defs, absRange, fps, "cx");
+                y1->saveSVG(doc, grad, defs, absRange, fps, "cy");
+
+                PropertyBindingMap bindings;
+
+                bindings.insert({"p1", PropertyBinding::sCreate(p1)});
+                bindings.insert({"p2", PropertyBinding::sCreate(p2)});
+
+                const auto rScript = "var distPt = [p2[0] - p1[0], p2[1] - p1[1]];"
+                                     "return Math.sqrt(distPt[0]*distPt[0] + "
+                                                      "distPt[1]*distPt[1]);";
+
+                auto engine = std::make_unique<QJSEngine>();
+                Expression::sAddDefinitionsTo("", *engine);
+                QJSValue eEvaluate;
+                Expression::sAddScriptTo(rScript, bindings, *engine, eEvaluate,
+                                         Expression::sQrealAnimatorTester);
+                const auto rExpr = Expression::sCreate("", rScript,
+                                                       std::move(bindings),
+                                                       std::move(engine),
+                                                       std::move(eEvaluate));
+
+                const auto rAnim = enve::make_shared<QrealAnimator>("");
+                rAnim->setExpression(rExpr);
+
+                rAnim->saveSVG(doc, grad, defs, absRange, fps, "r");
+            } break;
+            }
+            grad.setAttribute("gradientUnits", "userSpaceOnUse");
+            grad.setAttribute("xlink:href", "#" + baseGradId);
+            grad.setAttribute("id", thisGradId);
+            defs.appendChild(grad);
+            parent.setAttribute(name, QString("url(#%1)").arg(thisGradId));
+        } else {
+            parent.setAttribute(name, "black");
+        }
+    } else {
+        mColor->saveSVG(doc, parent, defs, absRange, fps, name);
+    }
 }
 
 PaintType PaintSettingsAnimator::getPaintType() const {

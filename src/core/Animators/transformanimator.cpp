@@ -282,15 +282,15 @@ QMatrix BasicTransformAnimator::getParentTotalTransformAtRelFrame(
     }
 }
 
-QPointFAnimator *BasicTransformAnimator::getPosAnimator() {
+QPointFAnimator *BasicTransformAnimator::getPosAnimator() const {
     return mPosAnimator.get();
 }
 
-QPointFAnimator *BasicTransformAnimator::getScaleAnimator() {
+QPointFAnimator *BasicTransformAnimator::getScaleAnimator() const {
     return mScaleAnimator.get();
 }
 
-QrealAnimator *BasicTransformAnimator::getRotAnimator() {
+QrealAnimator *BasicTransformAnimator::getRotAnimator() const {
     return mRotAnimator.get();
 }
 
@@ -532,4 +532,58 @@ BoxTransformAnimator::BoxTransformAnimator() {
     const auto pivotPt = enve::make_shared<BoxPathPoint>(
                 getPivotAnimator(), this);
     getPointsHandler()->appendPt(pivotPt);
+}
+
+void BoxTransformAnimator::saveSVG(QDomDocument& doc,
+                                   QDomElement& parent,
+                                   QDomElement& defs,
+                                   const FrameRange& absRange,
+                                   const qreal fps,
+                                   const QDomElement& child) const {
+    auto pivot = doc.createElement("g");
+    auto translate = doc.createElement("g");
+    auto rotate = doc.createElement("g");
+    auto scale = doc.createElement("g");
+    auto shear = doc.createElement("g");
+    auto unpivot = doc.createElement("g");
+
+    const auto pivotAnim = getPivotAnimator();
+    pivotAnim->saveSVG(doc, pivot, defs, absRange, fps,
+                       "transform", true, "translate");
+    const auto opacityAnim = getOpacityAnimator();
+    opacityAnim->Animator::saveSVG(doc, pivot, defs, absRange, fps, "opacity",
+                                   [opacityAnim](const int relFrame) {
+        const qreal value = opacityAnim->getEffectiveValue(relFrame);
+        return QString::number(value/100);
+    });
+    getPosAnimator()->saveSVG(doc, translate, defs, absRange, fps,
+                              "transform", true, "translate");
+    getRotAnimator()->saveSVG(doc, rotate, defs, absRange, fps,
+                              "transform", true, "rotate");
+    getScaleAnimator()->saveSVG(doc, scale, defs, absRange, fps,
+                                "transform", true, "scale");
+    const auto shearAnim = getShearAnimator();
+    const auto shearXAnim = shearAnim->getXAnimator();
+    const auto shearYAnim = shearAnim->getYAnimator();
+    shearXAnim->saveSVG(doc, shear, defs, absRange, fps,
+                        "transform", true, "skewX");
+    shearYAnim->saveSVG(doc, shear, defs, absRange, fps,
+                        "transform", true, "skewY");
+
+    const auto animGetter = [pivotAnim](const int relFrame) {
+        const auto value = pivotAnim->getEffectiveValue(relFrame);
+        return QString::number(-value.x()) + " " +
+               QString::number(-value.y());
+    };
+    pivotAnim->Animator::saveSVG(doc, unpivot, defs, absRange, fps,
+                                 "transform", animGetter, true, "translate");
+
+    unpivot.appendChild(child);
+    shear.appendChild(unpivot);
+    scale.appendChild(shear);
+    rotate.appendChild(scale);
+    translate.appendChild(rotate);
+    pivot.appendChild(translate);
+
+    parent.appendChild(pivot);
 }

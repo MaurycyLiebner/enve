@@ -298,6 +298,15 @@ bool PathBox::differenceInOutlinePathBetweenFrames(const int frame1, const int f
     return BoxWithPathEffects::differenceInOutlinePathBetweenFrames(frame1, frame2);
 }
 
+void PathBox::savePathBoxSVG(QDomDocument& doc,
+                             QDomElement& ele,
+                             QDomElement& defs,
+                             const FrameRange& absRange,
+                             const qreal fps) const {
+    mFillSettings->saveSVG(doc, ele, defs, absRange, fps);
+    mStrokeSettings->saveSVG(doc, ele, defs, absRange, fps);
+}
+
 SmartVectorPath *PathBox::objectToVectorPathBox() {
     if(enve_cast<SmartVectorPath*>(this)) return nullptr;
     const auto newPath = enve::make_shared<SmartVectorPath>();

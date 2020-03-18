@@ -46,6 +46,9 @@ public:
     QPointF getEndPoint(const qreal relFrame);
 
     bool enabled() const { return mEnabled; }
+
+    QPointFAnimator* startAnimator() const { return mStartAnimator.get(); }
+    QPointFAnimator* endAnimator() const { return mEndAnimator.get(); }
 private:
     bool mEnabled;
 

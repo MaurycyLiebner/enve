@@ -54,6 +54,22 @@ void SmartPathCollection::prp_readProperty(eReadStream &src) {
     src.read(&mFillType, sizeof(SkPathFillType));
 }
 
+#include "include/utils/SkParsePath.h"
+
+void SmartPathCollection::saveSVG(QDomDocument& doc,
+                                  QDomElement& parent,
+                                  QDomElement& defs,
+                                  const FrameRange& absRange,
+                                  const qreal fps) {
+    Animator::saveSVG(doc, parent, defs, absRange, fps, "d",
+                      [this](const int relFrame) {
+        const auto path = getPathAtRelFrame(relFrame);
+        SkString pathStr;
+        SkParsePath::ToSVGString(path, &pathStr);
+        return QString(pathStr.c_str());
+    });
+}
+
 SmartNodePoint *SmartPathCollection::createNewSubPathAtRelPos(const QPointF &relPos) {
     const auto newPath = createNewPath();
     const auto handler = newPath->getPointsHandler();

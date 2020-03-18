@@ -24,6 +24,11 @@ class QStringAnimator : public SteppedAnimator<QString> {
     e_OBJECT
 protected:
     QStringAnimator(const QString& name);
+public:
+    void saveSVG(QDomDocument& doc,
+                 QDomElement& parent,
+                 const FrameRange& absRange,
+                 const qreal fps) const;
 };
 
 #endif // QSTRINGANIMATOR_H

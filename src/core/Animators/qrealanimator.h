@@ -154,6 +154,15 @@ public:
 
     void setExpression(const qsptr<Expression>& expression);
     void setExpressionAction(const qsptr<Expression>& expression);
+
+    void saveSVG(QDomDocument& doc,
+                 QDomElement& parent,
+                 QDomElement& defs,
+                 const FrameRange& absRange,
+                 const qreal fps,
+                 const QString& attrName,
+                 const bool transform = false,
+                 const QString& type = "") const;
 private:
     qreal calculateBaseValueAtRelFrame(const qreal frame) const;
     void startBaseValueTransform();

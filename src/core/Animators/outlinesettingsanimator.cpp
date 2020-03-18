@@ -124,6 +124,15 @@ void OutlineSettingsAnimator::duplicateStrokeSettingsNotAnim(
     }
 }
 
+void OutlineSettingsAnimator::saveSVG(QDomDocument& doc,
+                                      QDomElement& parent,
+                                      QDomElement& defs,
+                                      const FrameRange& absRange,
+                                      const qreal fps) const {
+    PaintSettingsAnimator::saveSVG(doc, parent, defs, absRange, fps, "stroke");
+    mLineWidth->saveSVG(doc, parent, defs, absRange, fps, "stroke-width");
+}
+
 void OutlineSettingsAnimator::setupStrokeSettings(const qreal relFrame,
                                                   UpdateStrokeSettings &settings) {
     setupPaintSettings(relFrame, settings);

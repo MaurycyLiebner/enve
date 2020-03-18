@@ -615,3 +615,17 @@ void QrealAnimator::multCurrentBaseValue(const qreal mult) {
 qreal QrealAnimator::getSavedBaseValue() {
     return mSavedCurrentValue;
 }
+
+void QrealAnimator::saveSVG(QDomDocument& doc,
+                            QDomElement& parent,
+                            QDomElement& defs,
+                            const FrameRange& absRange,
+                            const qreal fps,
+                            const QString& attrName,
+                            const bool transform,
+                            const QString& type) const {
+    Animator::saveSVG(doc, parent, defs, absRange, fps, attrName,
+                      [this](const int relFrame) {
+        return QString::number(getEffectiveValue(relFrame));
+    }, transform, type);
+}

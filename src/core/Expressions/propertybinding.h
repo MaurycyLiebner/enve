@@ -33,6 +33,7 @@ public:
     static qsptr<PropertyBinding> sCreate(const QString& binding,
                                           const Validator& validator,
                                           const Property* const context);
+    static qsptr<PropertyBinding> sCreate(Property* const prop);
     template <class T>
     static bool sValidateClass(const Validator& validator,
                                Property* const prop);

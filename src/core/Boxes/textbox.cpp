@@ -366,3 +366,71 @@ void TextBox::readBoundingBox(eReadStream& src) {
     mFont.setSize(fontSize);
     setFontFamilyAndStyle(fontFamily, style);
 }
+
+void saveTextAttributesSVG(QDomElement& ele,
+                           const SkFont& font) {
+    ele.setAttribute("font-size", font.getSize());
+
+    SkString familyName;
+    QList<SkString> familySet;
+    sk_sp<SkTypeface> tface = font.refTypefaceOrDefault();
+
+    SkASSERT(tface);
+    SkFontStyle style = tface->fontStyle();
+    if (style.slant() == SkFontStyle::kItalic_Slant) {
+        ele.setAttribute("font-style", "italic");
+    } else if (style.slant() == SkFontStyle::kOblique_Slant) {
+        ele.setAttribute("font-style", "oblique");
+    }
+    int weightIndex = (SkTPin(style.weight(), 100, 900) - 50) / 100;
+    if (weightIndex != 3) {
+        static constexpr const char* weights[] = {
+            "100", "200", "300", "normal", "400", "500", "600", "bold", "800", "900"
+        };
+        ele.setAttribute("font-weight", weights[weightIndex]);
+    }
+    int stretchIndex = style.width() - 1;
+    if (stretchIndex != 4) {
+        static constexpr const char* stretches[] = {
+            "ultra-condensed", "extra-condensed", "condensed", "semi-condensed",
+            "normal",
+            "semi-expanded", "expanded", "extra-expanded", "ultra-expanded"
+        };
+        ele.setAttribute("font-stretch", stretches[stretchIndex]);
+    }
+
+    sk_sp<SkTypeface::LocalizedStrings> familyNameIter(
+                tface->createFamilyNameIterator());
+    SkTypeface::LocalizedString familyString;
+    if (familyNameIter) {
+        while (familyNameIter->next(&familyString)) {
+            if (familySet.contains(familyString.fString)) {
+                continue;
+            }
+            familySet.append(familyString.fString);
+            familyName.appendf((familyName.isEmpty() ? "%s" : ", %s"),
+                               familyString.fString.c_str());
+        }
+    }
+    if (!familyName.isEmpty()) {
+        ele.setAttribute("font-family", familyName.c_str());
+    }
+}
+
+QDomElement TextBox::saveSVG(QDomDocument& doc,
+                             QDomElement& defs,
+                             const FrameRange& absRange,
+                             const qreal fps) const {
+    auto ele = doc.createElement("g");
+    saveTextAttributesSVG(ele, mFont);
+    savePathBoxSVG(doc, ele, defs, absRange, fps);
+    QString textAnchor;
+    switch(mHAlignment) {
+    case Qt::AlignLeft: textAnchor = "start"; break;
+    case Qt::AlignCenter: textAnchor = "middle"; break;
+    case Qt::AlignRight: textAnchor = "end"; break;
+    }
+    ele.setAttribute("text-anchor", textAnchor);
+    mText->saveSVG(doc, ele, absRange, fps);
+    return ele;
+}

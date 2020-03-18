@@ -14,31 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ANIMATIONTOPAINTDIALOG_H
-#define ANIMATIONTOPAINTDIALOG_H
+#ifndef EXPORTSVGDIALOG_H
+#define EXPORTSVGDIALOG_H
 
 #include <QDialog>
+
 #include <QSpinBox>
 
-#include "Boxes/animationbox.h"
+class SceneChooser;
 
-class AnimationToPaintDialog : public QDialog {
+class ExportSvgDialog : public QDialog {
 public:
-    AnimationToPaintDialog(const QString& objName,
-                           const FrameRange& range,
-                           QWidget* const parent);
+    ExportSvgDialog(const QString& path,
+                    QWidget* const parent = nullptr);
 
-    int firstFrame() const;
-    int lastFrame() const;
-    int increment() const;
-
-    static bool sExec(const AnimationBox* const src,
-                      int& firstAbsFrame, int& lastAbsFrame,
-                      int& increment, QWidget* const parent);
 private:
+    SceneChooser* mScene;
+
     QSpinBox* mFirstFrame;
     QSpinBox* mLastFrame;
-    QSpinBox* mIncrement;
+
+    const QString mPath;
 };
 
-#endif // ANIMATIONTOPAINTDIALOG_H
+#endif // EXPORTSVGDIALOG_H

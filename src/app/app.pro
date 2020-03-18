@@ -84,6 +84,7 @@ SOURCES += main.cpp\
     GUI/Dialogs/animationtopaintdialog.cpp \
     GUI/Dialogs/dialogsinterfaceimpl.cpp \
     GUI/Dialogs/durationrectsettingsdialog.cpp \
+    GUI/Dialogs/exportsvgdialog.cpp \
     GUI/Expressions/expressiondialog.cpp \
     GUI/Expressions/expressioneditor.cpp \
     GUI/Expressions/expressionhighlighter.cpp \
@@ -204,6 +205,7 @@ HEADERS  += \
     GUI/Dialogs/animationtopaintdialog.h \
     GUI/Dialogs/dialogsinterfaceimpl.h \
     GUI/Dialogs/durationrectsettingsdialog.h \
+    GUI/Dialogs/exportsvgdialog.h \
     GUI/Expressions/expressiondialog.h \
     GUI/Expressions/expressioneditor.h \
     GUI/Expressions/expressionhighlighter.h \

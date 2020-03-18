@@ -21,6 +21,8 @@
 #include "smartpathanimator.h"
 #include "../../MovablePoints/segment.h"
 
+#include <QDomDocument>
+
 class SmartPathAnimator;
 class SmartNodePoint;
 typedef DynamicComplexAnimator<SmartPathAnimator> SmartPathCollectionBase;
@@ -33,6 +35,12 @@ protected:
 public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
+
+    void saveSVG(QDomDocument& doc,
+                 QDomElement& parent,
+                 QDomElement& defs,
+                 const FrameRange& absRange,
+                 const qreal fps);
 
     SmartNodePoint * createNewSubPathAtRelPos(const QPointF &relPos);
     SmartNodePoint * createNewSubPathAtPos(const QPointF &absPos);
