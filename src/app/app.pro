@@ -25,6 +25,7 @@ VERSION = 0.0.0
 QT += multimedia core gui svg opengl sql qml xml concurrent
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample
 CONFIG += c++14
+DEFINES += QT_NO_FOREACH
 
 ENVE_FOLDER = $$PWD/../..
 THIRD_PARTY_FOLDER =  $$ENVE_FOLDER/third_party

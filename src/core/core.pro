@@ -28,6 +28,7 @@ CONFIG += c++14
 TARGET = envecore
 TEMPLATE = lib
 DEFINES += CORE_LIBRARY
+DEFINES += QT_NO_FOREACH
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings

@@ -19,8 +19,6 @@
 
 #include "skiadefines.h"
 
-#undef foreach
-
 #include "include/gpu/GrBackendSurface.h"
 #include "include/gpu/GrContext.h"
 
@@ -54,7 +52,5 @@
 #include <QtGui/qopengl.h>
 
 #include "src/core/SkStroke.h"
-
-#define foreach Q_FOREACH
 
 #endif // SKIAINCLUDES_H
