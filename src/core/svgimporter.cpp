@@ -167,26 +167,13 @@ class SmartPathAnimator;
 class SmartVectorPath;
 class VectorPathSvgAttributes : public BoxSvgAttributes {
 public:
-    SkPath& newPath() {
-        mSeparatePaths << SkPath();
-        return mSeparatePaths.last();
-    }
+    SkPath& path() { return mPath; }
 
     void apply(SmartVectorPath * const path);
 
-    void removeInvalidPaths() {
-        for(int i = mSeparatePaths.count() - 1; i >= 0; i--) {
-            const auto& path = mSeparatePaths.at(i);
-            const bool valid = path.countVerbs() > 1;
-            if(!valid) mSeparatePaths.removeAt(i);
-        }
-    }
-
-    bool isEmpty() const {
-        return mSeparatePaths.isEmpty();
-    }
+    bool isEmpty() const { return mPath.isEmpty(); }
 protected:
-    QList<SkPath> mSeparatePaths;
+    SkPath mPath;
 };
 
 struct SvgAttribute {
@@ -360,348 +347,18 @@ static void parseNumbersArray(const QChar *&str,
     }
 }
 
-bool parsePathDataFast(const QString &dataStr,
+#include "include/utils/SkParsePath.h"
+
+bool parsePolylineData(const QString &dataStr,
                        VectorPathSvgAttributes &attributes) {
     float x0 = 0, y0 = 0;              // starting point
     float x = 0, y = 0;                // current point
-    char lastMode = 0;
-    SkPoint ctrlPt{0, 0};
     const QChar *str = dataStr.constData();
     const QChar *end = str + dataStr.size();
 
-    SkPath *lastPath = nullptr;
-    while(str != end) {
-        while(str->isSpace()) str++;
-        QChar pathElem = *str;
-        ++str;
-        QChar endc = *end;
-        *const_cast<QChar *>(end) = 0; // parseNumbersArray requires 0-termination that QStringRef cannot guarantee
-        QVarLengthArray<float, 8> arg;
-        parseNumbersArray(str, arg);
-        *const_cast<QChar *>(end) = endc;
-        if(pathElem == QLatin1Char('z') || pathElem == QLatin1Char('Z'))
-            arg.append(0);//dummy
-        const float *num = arg.constData();
-        int count = arg.count();
-        while (count > 0) {
-            float offsetX = x;        // correction offsets
-            float offsetY = y;        // for relative commands
-            switch (pathElem.unicode()) {
-            case 'm': {
-                if(count < 2) {
-                    num++;
-                    count--;
-                    break;
-                }
-                x = x0 = num[0] + offsetX;
-                y = y0 = num[1] + offsetY;
-                num += 2;
-                count -= 2;
-                lastPath = &attributes.newPath();
-                lastPath->moveTo({x0, y0});
-
-                pathElem = QLatin1Char('l');
-            }
-                break;
-            case 'M': {
-                if(count < 2) {
-                    num++;
-                    count--;
-                    break;
-                }
-                x = x0 = num[0];
-                y = y0 = num[1];
-                num += 2;
-                count -= 2;
-                lastPath = &attributes.newPath();
-                lastPath->moveTo({x0, y0});
-
-                pathElem = QLatin1Char('L');
-            }
-                break;
-            case 'z':
-            case 'Z': {
-                x = x0;
-                y = y0;
-                count--; // skip dummy
-                num++;
-                lastPath->close();
-            }
-                break;
-            case 'l': {
-                if(count < 2) {
-                    num++;
-                    count--;
-                    break;
-                }
-                x = num[0] + offsetX;
-                y = num[1] + offsetY;
-                num += 2;
-                count -= 2;
-                lastPath->lineTo({x, y});
-            }
-                break;
-            case 'L': {
-                if(count < 2) {
-                    num++;
-                    count--;
-                    break;
-                }
-                x = num[0];
-                y = num[1];
-                num += 2;
-                count -= 2;
-                lastPath->lineTo({x, y});
-            }
-                break;
-            case 'h': {
-                x = num[0] + offsetX;
-                num++;
-                count--;
-                lastPath->lineTo({x, y});
-            }
-                break;
-            case 'H': {
-                x = num[0];
-                num++;
-                count--;
-                lastPath->lineTo({x, y});
-            }
-                break;
-            case 'v': {
-                y = num[0] + offsetY;
-                num++;
-                count--;
-                lastPath->lineTo({x, y});
-            }
-                break;
-            case 'V': {
-                y = num[0];
-                num++;
-                count--;
-                lastPath->lineTo({x, y});
-            }
-                break;
-            case 'c': {
-                if(count < 6) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                SkPoint c1{num[0] + offsetX, num[1] + offsetY};
-                SkPoint c2{num[2] + offsetX, num[3] + offsetY};
-                SkPoint e{num[4] + offsetX, num[5] + offsetY};
-                num += 6;
-                count -= 6;
-                lastPath->cubicTo(c1, c2, e);
-
-                ctrlPt = c2;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 'C': {
-                if(count < 6) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                SkPoint c1{num[0], num[1]};
-                SkPoint c2{num[2], num[3]};
-                SkPoint e{num[4], num[5]};
-                num += 6;
-                count -= 6;
-                lastPath->cubicTo(c1, c2, e);
-
-                ctrlPt = c2;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 's': {
-                if(count < 4) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                SkPoint c1;
-                if(lastMode == 'c' || lastMode == 'C' ||
-                    lastMode == 's' || lastMode == 'S')
-                    c1 = {2*x-ctrlPt.x(), 2*y-ctrlPt.y()};
-                else c1 = {x, y};
-                SkPoint c2{num[0] + offsetX, num[1] + offsetY};
-                SkPoint e{num[2] + offsetX, num[3] + offsetY};
-                num += 4;
-                count -= 4;
-                lastPath->cubicTo(c1, c2, e);
-
-                ctrlPt = c2;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 'S': {
-                if(count < 4) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                SkPoint c1;
-                if(lastMode == 'c' || lastMode == 'C' ||
-                   lastMode == 's' || lastMode == 'S')
-                    c1 = {2*x - ctrlPt.x(), 2*y - ctrlPt.y()};
-                else c1 = {x, y};
-                SkPoint c2{num[0], num[1]};
-                SkPoint e{num[2], num[3]};
-                num += 4;
-                count -= 4;
-                lastPath->cubicTo(c1, c2, e);
-
-                ctrlPt = c2;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 'q': {
-                if(count < 4) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                SkPoint c{num[0] + offsetX, num[1] + offsetY};
-                SkPoint e{num[2] + offsetX, num[3] + offsetY};
-                num += 4;
-                count -= 4;
-                lastPath->quadTo(c, e);
-
-                ctrlPt = c;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 'Q': {
-                if(count < 4) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                SkPoint c{num[0], num[1]};
-                SkPoint e{num[2], num[3]};
-                num += 4;
-                count -= 4;
-                lastPath->quadTo(c, e);
-
-                ctrlPt = c;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 't': {
-                if(count < 2) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                SkPoint e{num[0] + offsetX, num[1] + offsetY};
-                num += 2;
-                count -= 2;
-                SkPoint c;
-                if(lastMode == 'q' || lastMode == 'Q' ||
-                   lastMode == 't' || lastMode == 'T')
-                    c = {2*x - ctrlPt.x(), 2*y - ctrlPt.y()};
-                else c = {x, y};
-                lastPath->quadTo(c, e);
-
-                ctrlPt = c;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 'T': {
-                if(count < 2) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                SkPoint e{num[0], num[1]};
-                num += 2;
-                count -= 2;
-                SkPoint c;
-                if(lastMode == 'q' || lastMode == 'Q' ||
-                    lastMode == 't' || lastMode == 'T')
-                    c = {2*x - ctrlPt.x(), 2*y - ctrlPt.y()};
-                else
-                    c = {x, y};
-                lastPath->quadTo(c, e);
-
-                ctrlPt = c;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 'a': {
-                if(count < 7) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                const float rx = (*num++);
-                const float ry = (*num++);
-                const float xAxisRotation = (*num++);
-                const auto largeArcFlag  = SkPath::ArcSize(*num++);
-                const auto sweepFlag = SkPathDirection(static_cast<int>(*num++) ? 0 : 1);
-                const float ex = (*num++) + offsetX;
-                const float ey = (*num++) + offsetY;
-                count -= 7;
-                lastPath->arcTo(rx, ry, xAxisRotation, largeArcFlag,
-                                sweepFlag, ex, ey);
-
-                x = ex;
-                y = ey;
-            }
-                break;
-            case 'A': {
-                if(count < 7) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                const float rx = (*num++);
-                const float ry = (*num++);
-                const float xAxisRotation = (*num++);
-                const auto largeArcFlag  = SkPath::ArcSize(*num++);
-                const auto sweepFlag = SkPathDirection(static_cast<int>(*num++) ? 0 : 1);
-                const float ex = (*num++);
-                const float ey = (*num++);
-                count -= 7;
-                lastPath->arcTo(rx, ry, xAxisRotation, largeArcFlag,
-                                sweepFlag, ex, ey);
-
-                x = ex;
-                y = ey;
-            }
-                break;
-            default:
-                return false;
-            }
-            lastMode = pathElem.toLatin1();
-        }
-    }
-    return true;
-}
-
-
-bool parsePolylineDataFast(const QString &dataStr,
-                           VectorPathSvgAttributes &attributes) {
-    float x0 = 0, y0 = 0;              // starting point
-    float x = 0, y = 0;                // current point
-    const QChar *str = dataStr.constData();
-    const QChar *end = str + dataStr.size();
-
-    SkPath *lastPath = nullptr;
+    SkPath& path = attributes.path();
     while (str != end) {
-        while (str->isSpace())
-            ++str;
+        while(str->isSpace()) ++str;
         QChar endc = *end;
         *const_cast<QChar *>(end) = 0; // parseNumbersArray requires 0-termination that QStringRef cannot guarantee
         QVarLengthArray<float, 8> arg;
@@ -710,7 +367,7 @@ bool parsePolylineDataFast(const QString &dataStr,
         const float *num = arg.constData();
         int count = arg.count();
         bool first = true;
-        while (count > 0) {
+        while(count > 0) {
             x = num[0];
             y = num[1];
             num++;
@@ -719,18 +376,17 @@ bool parsePolylineDataFast(const QString &dataStr,
             if(count < 0) {
                 if(qAbs(x - x0) < 0.001f &&
                    qAbs(y - y0) < 0.001f) {
-                    lastPath->close();
+                    path.close();
                     return true;
                 }
             }
             if(first) {
                 x0 = x;
                 y0 = y;
-                lastPath = &attributes.newPath();
-                lastPath->moveTo({x0, y0});
+                path.moveTo({x0, y0});
                 first = false;
             } else {
-                lastPath->lineTo({x, y});
+                path.lineTo({x, y});
             }
         }
     }
@@ -771,8 +427,7 @@ void loadVectorPath(const QDomElement &pathElement,
                     ContainerBox *parentGroup,
                     VectorPathSvgAttributes& attributes) {
     const QString pathStr = pathElement.attribute("d");
-    parsePathDataFast(pathStr, attributes);
-    attributes.removeInvalidPaths();
+    SkParsePath::FromSVGString(pathStr.toUtf8().data(), &attributes.path());
     if(attributes.isEmpty()) return;
     const auto vectorPath = enve::make_shared<SmartVectorPath>();
     vectorPath->planCenterPivotPosition();
@@ -784,8 +439,7 @@ void loadPolyline(const QDomElement &pathElement,
                   ContainerBox *parentGroup,
                   VectorPathSvgAttributes &attributes) {
     const QString pathStr = pathElement.attribute("points");
-    parsePolylineDataFast(pathStr, attributes);
-    attributes.removeInvalidPaths();
+    parsePolylineData(pathStr, attributes);
     if(attributes.isEmpty()) return;
     const auto vectorPath = enve::make_shared<SmartVectorPath>();
     vectorPath->planCenterPivotPosition();
@@ -858,7 +512,6 @@ void loadRect(const QDomElement &pathElement,
     attributes.apply(rect.data());
     parentGroup->addContained(rect);
 }
-
 
 void loadText(const QDomElement &pathElement,
               ContainerBox *parentGroup,
@@ -1541,15 +1194,7 @@ void BoxSvgAttributes::apply(BoundingBox *box) const {
 
 void VectorPathSvgAttributes::apply(SmartVectorPath * const path) {
     SmartPathCollection* const pathAnimator = path->getPathAnimator();
-//    for(const auto& separatePath : mSvgSeparatePaths) {
-//        const auto singlePath = enve::make_shared<SmartPathAnimator>();
-//        separatePath->apply(singlePath.get());
-//        pathAnimator->addChild(singlePath);
-//    }
-    for(const auto& separatePath : mSeparatePaths) {
-        const auto singlePath = enve::make_shared<SmartPathAnimator>(separatePath);
-        pathAnimator->addChild(singlePath);
-    }
+    pathAnimator->loadSkPath(mPath);
     pathAnimator->setFillType(mFillRule);
     BoxSvgAttributes::apply(path);
 }

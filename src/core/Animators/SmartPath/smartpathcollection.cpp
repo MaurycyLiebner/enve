@@ -124,7 +124,9 @@ void SmartPathCollection::applyTransform(const QMatrix &transform) const {
 
 void SmartPathCollection::loadSkPath(const SkPath &path) {
     const QList<SkPath> paths = gBreakApart(path);
-    for(const auto& sPath : paths) createNewPath(sPath);
+    for(const auto& path : paths) {
+        if(path.countVerbs() > 1) createNewPath(path);
+    }
 }
 
 void SmartPathCollection::setFillType(const SkPathFillType fillType) {
