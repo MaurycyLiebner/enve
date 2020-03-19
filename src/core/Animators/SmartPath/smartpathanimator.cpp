@@ -20,8 +20,7 @@
 #include "MovablePoints/pathpointshandler.h"
 
 SmartPathAnimator::SmartPathAnimator() :
-    GraphAnimator("path"),
-    pathChanged([this]() { pathChangedExec(); }) {
+    InterOptimalAnimatorT<SmartPath>("path") {
     const auto ptsHandler = enve::make_shared<PathPointsHandler>(this);
     QObject::connect(this, &Property::prp_currentFrameChanged,
                      this, [ptsHandler] {
@@ -32,15 +31,15 @@ SmartPathAnimator::SmartPathAnimator() :
 
 SmartPathAnimator::SmartPathAnimator(const SkPath &path) :
     SmartPathAnimator() {
-    mBaseValue.setPath(path);
-    mCurrentPath = path;
+    baseValue().setPath(path);
+    mResultPath = path;
     updateAllPoints();
 }
 
 SmartPathAnimator::SmartPathAnimator(const SmartPath &baseValue) :
     SmartPathAnimator() {
-    mBaseValue = baseValue;
-    mPathUpToDate = false;
+    this->baseValue() = baseValue;
+    setResultUpToDate(false);
     updateAllPoints();
 }
 
@@ -63,7 +62,7 @@ void SmartPathAnimator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
         pastePath(spClipboard->path());
     })->setEnabled(spClipboard);
     menu->addPlainAction("Copy Path", [this] {
-        const auto spClipboard = enve::make_shared<SmartPathClipboard>(mBaseValue);
+        const auto spClipboard = enve::make_shared<SmartPathClipboard>(baseValue());
         Document::sInstance->replaceClipboard(spClipboard);
     });
     menu->addSeparator();
@@ -80,23 +79,15 @@ void SmartPathAnimator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
 void SmartPathAnimator::prp_drawCanvasControls(
         SkCanvas * const canvas, const CanvasMode mode,
         const float invScale, const bool ctrlPressed) {
-    SkiaHelpers::drawOutlineOverlay(canvas, mCurrentPath, invScale,
+    SkiaHelpers::drawOutlineOverlay(canvas, mResultPath, invScale,
                                     toSkMatrix(getTransform()),
                                     toSkColor(mPathColor));
     Property::prp_drawCanvasControls(canvas, mode, invScale, ctrlPressed);
 }
 
-void SmartPathAnimator::prp_afterChangedAbsRange(
-        const FrameRange &range, const bool clip) {
-    if(range.inRange(anim_getCurrentAbsFrame())) {
-        updateBaseValue();
-    }
-    GraphAnimator::prp_afterChangedAbsRange(range, clip);
-}
-
 void SmartPathAnimator::prp_readProperty(eReadStream& src) {
     anim_readKeys(src);
-    src >> mBaseValue;
+    src >> baseValue();
     src.read(&mMode, sizeof(Mode));
     if(src.evFileVersion() > 3) {
         QString name; src >> name;
@@ -107,73 +98,9 @@ void SmartPathAnimator::prp_readProperty(eReadStream& src) {
 
 void SmartPathAnimator::prp_writeProperty(eWriteStream &dst) const {
     anim_writeKeys(dst);
-    dst << mBaseValue;
+    dst << baseValue();
     dst.write(&mMode, sizeof(Mode));
     dst << prp_getName();
-}
-
-void SmartPathAnimator::anim_setAbsFrame(const int frame) {
-    if(frame == anim_getCurrentAbsFrame()) return;
-    const int lastRelFrame = anim_getCurrentRelFrame();
-    Animator::anim_setAbsFrame(frame);
-    const bool diff = prp_differencesBetweenRelFrames(
-                anim_getCurrentRelFrame(), lastRelFrame);
-    if(diff) {
-        updateBaseValue();
-        prp_afterChangedCurrent(UpdateReason::frameChange);
-    }
-}
-
-void SmartPathAnimator::anim_addKeyAtRelFrame(const int relFrame) {
-    if(anim_getKeyAtRelFrame(relFrame)) return;
-    const auto newKey = enve::make_shared<SmartPathKey>(this);
-    newKey->setRelFrame(relFrame);
-    deepCopySmartPathFromRelFrame(relFrame, newKey->getValue());
-    anim_appendKeyAction(newKey);
-}
-
-stdsptr<Key> SmartPathAnimator::anim_createKey() {
-    return enve::make_shared<SmartPathKey>(this);
-}
-
-void SmartPathAnimator::anim_afterKeyOnCurrentFrameChanged(Key * const key) {
-    const auto spk = static_cast<SmartPathKey*>(key);
-    if(spk) mPathBeingChanged_d = &spk->getValue();
-    else mPathBeingChanged_d = &mBaseValue;
-}
-
-void SmartPathAnimator::anim_removeAllKeys() {
-    if(!this->anim_hasKeys()) return;
-    startBaseValueTransform();
-
-    const auto currentValue = mBaseValue;
-    Animator::anim_removeAllKeys();
-
-    mBaseValue = currentValue;
-    prp_afterWholeInfluenceRangeChanged();
-    finishBaseValueTransform();
-}
-
-void SmartPathAnimator::graph_getValueConstraints(
-        GraphKey *key, const QrealPointType type,
-        qreal &minValue, qreal &maxValue) const {
-    if(type == QrealPointType::keyPt) {
-        minValue = key->getRelFrame();
-        maxValue = minValue;
-        //getFrameConstraints(key, type, minValue, maxValue);
-    } else {
-        minValue = -DBL_MAX;
-        maxValue = DBL_MAX;
-    }
-}
-
-void SmartPathAnimator::deepCopySmartPathFromRelFrame(
-        const int relFrame, SmartPath &result) const {
-    const auto prevKey = anim_getPrevKey<SmartPathKey>(relFrame);
-    const auto nextKey = anim_getNextKey<SmartPathKey>(relFrame);
-    const auto keyAtFrame = anim_getKeyAtRelFrame<SmartPathKey>(relFrame);
-    deepCopySmartPathFromRelFrame(relFrame, prevKey, nextKey,
-                                  keyAtFrame, result);
 }
 
 SkPath SmartPathAnimator::getPathAtRelFrame(const qreal frame) {
@@ -203,70 +130,7 @@ SkPath SmartPathAnimator::getPathAtRelFrame(const qreal frame) {
     } else if(prevKey && !nextKey) {
         return prevKey->getPath();
     }
-    return mBaseValue.getPathAt();
-}
-
-void SmartPathAnimator::prp_startTransform() {
-    if(mPathChanged) return;
-    mPathChanged = true;
-    if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
-        anim_saveCurrentValueAsKey();
-    }
-    if(const auto key = anim_getKeyOnCurrentFrame<SmartPathKey>()) {
-        key->startValueTransform();
-    } else {
-        mBaseValue.save();
-    }
-}
-
-void SmartPathAnimator::pathChangedExec() {
-    const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
-    if(spk) anim_updateAfterChangedKey(spk);
-    else prp_afterWholeInfluenceRangeChanged();
-}
-
-void SmartPathAnimator::prp_cancelTransform() {
-    if(!mPathChanged) return;
-    mPathChanged = false;
-    mPathBeingChanged_d->restore();
-    if(const auto key = anim_getKeyOnCurrentFrame<SmartPathKey>()) {
-        key->cancelValueTransform();
-        anim_updateAfterChangedKey(key);
-    } else {
-        mBaseValue.restore();
-        prp_afterWholeInfluenceRangeChanged();
-    }
-}
-
-void SmartPathAnimator::startBaseValueTransform() {
-    mBaseValue.save();
-}
-
-void SmartPathAnimator::finishBaseValueTransform() {
-    if(!mPathChanged) return;
-    mPathChanged = false;
-    const auto oldValue = mBaseValue.getSaved();
-    const auto newValue = mBaseValue.getNodesRef();
-    UndoRedo ur;
-    ur.fUndo = [this, oldValue]() {
-        mBaseValue = oldValue;
-        prp_afterWholeInfluenceRangeChanged();
-    };
-    ur.fRedo = [this, newValue]() {
-        mBaseValue = newValue;
-        prp_afterWholeInfluenceRangeChanged();
-    };
-    prp_addUndoRedo(ur);
-}
-
-void SmartPathAnimator::prp_finishTransform() {
-    if(!mPathChanged) return;
-    if(const auto key = anim_getKeyOnCurrentFrame<SmartPathKey>()) {
-        mPathChanged = false;
-        key->finishValueTransform();
-    } else {
-        finishBaseValueTransform();
-    }
+    return baseValue().getPathAt();
 }
 
 void SmartPathAnimator::actionSetNormalNodeCtrlsMode(
@@ -274,9 +138,9 @@ void SmartPathAnimator::actionSetNormalNodeCtrlsMode(
     prp_pushUndoRedoName("Set Node Ctrls Mode");
 
     prp_startTransform();
-    mPathBeingChanged_d->actionSetNormalNodeCtrlsMode(nodeId, mode);
+    getCurrentlyEdited()->actionSetNormalNodeCtrlsMode(nodeId, mode);
     prp_finishTransform();
-    pathChanged();
+    changed();
 }
 
 void SmartPathAnimator::actionDemoteToDissolved(
@@ -284,23 +148,23 @@ void SmartPathAnimator::actionDemoteToDissolved(
     prp_pushUndoRedoName("Demote Node");
 
     prp_startTransform();
-    mPathBeingChanged_d->actionDemoteToDissolved(nodeId, approx);
+    getCurrentlyEdited()->actionDemoteToDissolved(nodeId, approx);
     prp_finishTransform();
-    pathChanged();
+    changed();
 }
 
 void SmartPathAnimator::actionPromoteToNormal(const int nodeId) {
     prp_pushUndoRedoName("Promote Node");
 
     prp_startTransform();
-    mPathBeingChanged_d->actionPromoteDissolvedNodeToNormal(nodeId);
+    getCurrentlyEdited()->actionPromoteDissolvedNodeToNormal(nodeId);
     prp_finishTransform();
-    pathChanged();
+    changed();
 }
 
 qsptr<SmartPathAnimator> SmartPathAnimator::createFromDetached() {
     if(!hasDetached()) return nullptr;
-    const auto baseDetached = mBaseValue.getAndClearLastDetached();
+    const auto baseDetached = baseValue().getAndClearLastDetached();
     SmartPath baseSmartPath(baseDetached);
     const auto newAnim = enve::make_shared<SmartPathAnimator>(baseSmartPath);
     const auto& keys = anim_getKeys();
@@ -324,18 +188,18 @@ void SmartPathAnimator::applyTransform(const QMatrix &transform) {
     }
     if(keys.isEmpty()) {
         prp_startTransform();
-        mBaseValue.applyTransform(transform);
+        baseValue().applyTransform(transform);
         prp_finishTransform();
-    } else mBaseValue.applyTransform(transform);
+    } else baseValue().applyTransform(transform);
     prp_afterWholeInfluenceRangeChanged();
 }
 
 const SkPath &SmartPathAnimator::getCurrentPath() {
-    if(!mPathUpToDate) {
-        mCurrentPath = getCurrentlyEditedPath()->getPathAt();
-        mPathUpToDate = true;
+    if(!resultUpToDate()) {
+        mResultPath = getCurrentlyEdited()->getPathAt();
+        setResultUpToDate(true);
     }
-    return mCurrentPath;
+    return mResultPath;
 }
 
 void SmartPathAnimator::setMode(const SmartPathAnimator::Mode mode) {
@@ -360,11 +224,11 @@ void SmartPathAnimator::setMode(const SmartPathAnimator::Mode mode) {
 
 void SmartPathAnimator::pastePath(const int frame, SmartPath path) {
     if(!anim_isRecording()) {
-        mBaseValue = path;
+        baseValue() = path;
         return prp_afterWholeInfluenceRangeChanged();
     }
     const bool pasteClosed = path.isClosed();
-    const bool baseClosed = mBaseValue.isClosed();
+    const bool baseClosed = baseValue().isClosed();
 
     if(pasteClosed != baseClosed) {
         if(pasteClosed) path.actionOpen();
@@ -379,7 +243,7 @@ void SmartPathAnimator::pastePath(const int frame, SmartPath path) {
     }
 
     const int pasteNodes = path.getNodeCount();
-    const int baseNodes = mBaseValue.getNodeCount();
+    const int baseNodes = baseValue().getNodeCount();
     const int addNodes = pasteNodes - baseNodes;
     if(addNodes > 0) {
         const auto& keys = anim_getKeys();
@@ -400,41 +264,8 @@ void SmartPathAnimator::pastePath(const int frame, SmartPath path) {
     }
 }
 
-void SmartPathAnimator::updateBaseValue() {
-    const auto prevK = anim_getPrevKey<SmartPathKey>(anim_getCurrentRelFrame());
-    const auto nextK = anim_getNextKey<SmartPathKey>(anim_getCurrentRelFrame());
-    const auto keyAtFrame = anim_getKeyOnCurrentFrame<SmartPathKey>();
-    mPathUpToDate = false;
-    deepCopySmartPathFromRelFrame(anim_getCurrentRelFrame(),
-                                  prevK, nextK, keyAtFrame,
-                                  mBaseValue);
-}
-
 void SmartPathAnimator::updateAllPoints() {
     const auto handler = getPointsHandler();
     const auto pathHandler = static_cast<PathPointsHandler*>(handler);
     pathHandler->updateAllPoints();
-}
-
-void SmartPathAnimator::deepCopySmartPathFromRelFrame(
-        const int relFrame,
-        SmartPathKey * const prevKey,
-        SmartPathKey * const nextKey,
-        SmartPathKey * const keyAtFrame,
-        SmartPath &result) const {
-    if(keyAtFrame) {
-        result = keyAtFrame->getValue();
-    } else if(prevKey && nextKey) {
-        const qreal nWeight = graph_prevKeyWeight(prevKey, nextKey, relFrame);
-        const auto& prevPath = prevKey->getValue();
-        const auto& nextPath = nextKey->getValue();
-        gInterpolate(prevPath, nextPath, nWeight, result);
-    } else if(prevKey) {
-        result = prevKey->getValue();
-    } else if(nextKey) {
-        result = nextKey->getValue();
-    } else {
-        if(&result == &mBaseValue) return;
-        result = mBaseValue;
-    }
 }

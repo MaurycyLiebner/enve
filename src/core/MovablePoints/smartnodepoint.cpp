@@ -102,7 +102,7 @@ void SmartNodePoint::setRelativePos(const QPointF &relPos) {
         currentPath()->actionSetDissolvedNodeT(getNodeId(), mappedT);
         NonAnimatedMovablePoint::setRelativePos(closest.fPos);
     }
-    mParentAnimator->pathChanged();
+    mParentAnimator->changed();
 }
 
 void SmartNodePoint::remove() {
@@ -355,14 +355,14 @@ void SmartNodePoint::setC2Enabled(const bool enabled) {
     if(enabled == getC2Enabled()) return;
     if(getC2Enabled()) setCtrlsMode(CtrlsMode::corner);
     currentPath()->actionSetNormalNodeC2Enabled(getNodeId(), enabled);
-    mParentAnimator->pathChanged();
+    mParentAnimator->changed();
 }
 
 void SmartNodePoint::setC0Enabled(const bool enabled) {
     if(enabled == getC0Enabled()) return;
     if(mNode_d->getC0Enabled()) setCtrlsMode(CtrlsMode::corner);
     currentPath()->actionSetNormalNodeC0Enabled(getNodeId(), enabled);
-    mParentAnimator->pathChanged();
+    mParentAnimator->changed();
 }
 
 void SmartNodePoint::resetC2() {
@@ -417,7 +417,7 @@ void SmartNodePoint::setCtrlsMode(const CtrlsMode mode) {
     if(getCtrlsMode() == mode) return;
     currentPath()->actionSetNormalNodeCtrlsMode(getNodeId(), mode);
     updateFromNodeData();
-    mParentAnimator->pathChanged();
+    mParentAnimator->changed();
     if(mode == CtrlsMode::corner) return;
     mNextNormalSegment.afterChanged();
     if(mPrevNormalPoint) mPrevNormalPoint->afterNextNodeC0P1Changed();
@@ -449,7 +449,7 @@ void SmartNodePoint::setNextNormalPoint(SmartNodePoint * const nextPoint) {
 }
 
 SmartPath *SmartNodePoint::currentPath() const {
-    return mParentAnimator->getCurrentlyEditedPath();
+    return mParentAnimator->getCurrentlyEdited();
 }
 
 bool SmartNodePoint::hasNextPoint() const {
@@ -551,7 +551,7 @@ void SmartNodePoint::c0Moved(const QPointF &c0) {
     }
 
     if(mPrevNormalPoint) mPrevNormalPoint->afterNextNodeC0P1Changed();
-    mParentAnimator->pathChanged();
+    mParentAnimator->changed();
 }
 
 void SmartNodePoint::c2Moved(const QPointF &c2) {
@@ -563,7 +563,7 @@ void SmartNodePoint::c2Moved(const QPointF &c2) {
     }
 
     mNextNormalSegment.afterChanged();
-    mParentAnimator->pathChanged();
+    mParentAnimator->changed();
 }
 
 void SmartNodePoint::updateFromNodeDataPosOnly() {

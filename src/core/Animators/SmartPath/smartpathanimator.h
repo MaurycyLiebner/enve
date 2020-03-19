@@ -16,15 +16,15 @@
 
 #ifndef SMARTPATHANIMATOR_H
 #define SMARTPATHANIMATOR_H
-#include "../interpolationanimatort.h"
-#include "differsinterpolate.h"
+
 #include "../../ReadWrite/basicreadwrite.h"
-#include "smartpathkey.h"
 #include "../../MovablePoints/segment.h"
 #include "../../skia/skiahelpers.h"
-#include "simpletask.h"
+#include "../interoptimalanimatort.h"
+#include "differsinterpolate.h"
+#include "smartpathkey.h"
 
-class SmartPathAnimator : public GraphAnimator {
+class SmartPathAnimator : public InterOptimalAnimatorT<SmartPath> {
     e_OBJECT
     Q_OBJECT
 protected:
@@ -47,40 +47,15 @@ public:
             SkCanvas * const canvas, const CanvasMode mode,
             const float invScale, const bool ctrlPressed);
 
-    void prp_afterChangedAbsRange(const FrameRange &range,
-                                  const bool clip = true);
-
     void prp_readProperty(eReadStream& src);
     void prp_writeProperty(eWriteStream& dst) const;
-
-    void anim_setAbsFrame(const int frame);
-    void anim_addKeyAtRelFrame(const int relFrame);
-    stdsptr<Key> anim_createKey();
-    void anim_afterKeyOnCurrentFrameChanged(Key* const key);
-    void anim_removeAllKeys();
-
-    void graph_getValueConstraints(
-            GraphKey *key, const QrealPointType type,
-            qreal &minValue, qreal &maxValue) const;
-
-    void deepCopySmartPathFromRelFrame(const int relFrame,
-                                       SmartPath &result) const;
 
     SkPath getPathAtAbsFrame(const qreal frame)
     { return getPathAtRelFrame(prp_absFrameToRelFrameF(frame)); }
     SkPath getPathAtRelFrame(const qreal frame);
 
-    SmartPath * getCurrentlyEditedPath() const
-    { return mPathBeingChanged_d; }
-
     bool isClosed() const
-    { return mBaseValue.isClosed(); }
-
-    void prp_startTransform();
-    SimpleTaskScheduler pathChanged;
-    void pathChangedExec();
-    void prp_cancelTransform();
-    void prp_finishTransform();
+    { return baseValue().isClosed(); }
 
     void actionSetNormalNodeCtrlsMode(const int nodeId, const CtrlsMode mode);
     void actionDemoteToDissolved(const int nodeId, const bool approx);
@@ -106,7 +81,7 @@ public:
     void actionPrependMoveAllFrom(SmartPathAnimator * const other);
 
     bool hasDetached() const
-    { return mBaseValue.hasDetached(); }
+    { return baseValue().hasDetached(); }
 
     qsptr<SmartPathAnimator> createFromDetached();
 
@@ -128,30 +103,13 @@ public:
 signals:
     void pathBlendModeChagned(Mode);
     void emptied();
-protected:
-    SmartPath& getBaseValue()
-    { return mBaseValue; }
-    void startBaseValueTransform();
-    void finishBaseValueTransform();
 private:
     int actionAddFirstNode(const QPointF &relPos);
     int actionAddFirstNode(const NormalNodeData &data);
 
-    void updateBaseValue();
-
     void updateAllPoints();
 
-    void deepCopySmartPathFromRelFrame(const int relFrame,
-                                       SmartPathKey * const prevKey,
-                                       SmartPathKey * const nextKey,
-                                       SmartPathKey * const keyAtFrame,
-                                       SmartPath &result) const;
-
-    bool mPathChanged = false;
-    bool mPathUpToDate = true;
-    SkPath mCurrentPath;
-    SmartPath mBaseValue;
-    SmartPath * mPathBeingChanged_d = &mBaseValue;
+    SkPath mResultPath;
     Mode mMode = Mode::normal;
     QColor mPathColor = Qt::white;
 };

@@ -112,11 +112,6 @@ public:
     bool isClosed() const
     { return mNodesList.isClosed(); }
 
-    void save() { mSavedList = mNodesList; }
-    void restore() { mNodesList = mSavedList; }
-
-    const NodeList& getSaved() { return mSavedList; }
-
     int getNodeCount() const
     { return mNodesList.count(); }
 
@@ -150,7 +145,6 @@ private:
                           const Node &nodeBlueprint);
 
     NodeList mNodesList;
-    NodeList mSavedList;
 
     NodeList mLastDetached;
 };

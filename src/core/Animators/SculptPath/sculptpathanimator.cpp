@@ -101,7 +101,7 @@ void SculptPathAnimator::sculpt(const SculptTarget target,
                                 const SculptBrush &brush) {
     const auto toSculpt = getCurrentlyEdited();
     toSculpt->sculpt(target, mode, brush);
-    changed();
+    changedExec();
 }
 
 void SculptPathAnimator::applyTransform(const QMatrix &transform) {

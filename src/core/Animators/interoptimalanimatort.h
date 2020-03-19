@@ -19,13 +19,15 @@
 #include "graphanimatort.h"
 #include "qrealpoint.h"
 #include "interpolationkeyt.h"
+#include "simpletask.h"
 
 template <typename T, typename K = InterpolationKeyT<T>>
 class InterOptimalAnimatorT : public GraphAnimator {
     e_OBJECT
 protected:
     InterOptimalAnimatorT(const QString& name) :
-        GraphAnimator(name) {}
+        GraphAnimator(name),
+        changed([this]() { changedExec(); }) {}
 public:
     void prp_startTransform() override;
     void prp_cancelTransform() override;
@@ -49,7 +51,8 @@ public:
             GraphKey *key, const QrealPointType type,
             qreal &minValue, qreal &maxValue) const override;
 
-    void changed();
+    SimpleTaskScheduler changed;
+    void changedExec();
 
     void deepCopyValue(const qreal relFrame, T &result) const;
 
@@ -57,6 +60,10 @@ public:
     { return mBeingChanged; }
 protected:
     T& baseValue() { return mBaseValue; }
+    const T& baseValue() const { return mBaseValue; }
+
+    bool resultUpToDate() const { return mResultUpToDate; }
+    void setResultUpToDate(const bool upToDate) { mResultUpToDate = upToDate; }
 private:
     void updateBaseValue();
     void deepCopyValue(const qreal relFrame,
@@ -66,6 +73,8 @@ private:
     void finishBaseValueTransform();
 
     bool mChanged = false;
+    bool mResultUpToDate = true;
+
     T mBaseValue;
     T mSavedBaseValue;
     T * mBeingChanged = &mBaseValue;
@@ -74,8 +83,10 @@ private:
 template <typename T, typename K>
 void InterOptimalAnimatorT<T, K>::prp_afterChangedAbsRange(
         const FrameRange &range, const bool clip) {
-    if(!mChanged && range.inRange(anim_getCurrentAbsFrame()))
-        updateBaseValue();
+    if(range.inRange(anim_getCurrentAbsFrame())) {
+        if(mChanged) mResultUpToDate = false;
+        else updateBaseValue();
+    }
     GraphAnimator::prp_afterChangedAbsRange(range, clip);
 }
 
@@ -146,7 +157,7 @@ void InterOptimalAnimatorT<T, K>::prp_startTransform() {
 }
 
 template <typename T, typename K>
-void InterOptimalAnimatorT<T, K>::changed() {
+void InterOptimalAnimatorT<T, K>::changedExec() {
     const auto spk = anim_getKeyOnCurrentFrame<K>();
     if(spk) anim_updateAfterChangedKey(spk);
     else prp_afterWholeInfluenceRangeChanged();
@@ -233,6 +244,7 @@ void InterOptimalAnimatorT<T, K>::updateBaseValue() {
     const auto prevK = anim_getPrevKey<K>(anim_getCurrentRelFrame());
     const auto nextK = anim_getNextKey<K>(anim_getCurrentRelFrame());
     const auto keyAtFrame = anim_getKeyOnCurrentFrame<K>();
+    mResultUpToDate = false;
     deepCopyValue(anim_getCurrentRelFrame(),
                   prevK, nextK, keyAtFrame,
                   mBaseValue);

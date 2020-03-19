@@ -260,7 +260,6 @@ void SmartPath::actionMergeNodes(const int node1Id, const int node2Id) {
 
 void SmartPath::reset() {
     mNodesList.clear();
-    mSavedList.clear();
     mLastDetached.clear();
 }
 

@@ -58,7 +58,7 @@ SmartNodePoint *PathPointsHandler::createAndAssignNewNodePoint(const int nodeId)
 }
 
 SmartPath *PathPointsHandler::targetPath() const {
-    return mTargetAnimator->getCurrentlyEditedPath();
+    return mTargetAnimator->getCurrentlyEdited();
 }
 
 void PathPointsHandler::updatePoint(const int nodeId) {

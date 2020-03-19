@@ -28,10 +28,10 @@ void SmartPathAnimator::actionRemoveNode(const int nodeId, const bool approx) {
         spKey->getValue().actionRemoveNode(nodeId, approx);
         key->finishValueTransform();
     }
-    mBaseValue.actionRemoveNode(nodeId, approx);
+    baseValue().actionRemoveNode(nodeId, approx);
     prp_finishTransform();
 
-    if(mBaseValue.isEmpty()) emit emptied();
+    if(baseValue().isEmpty()) emit emptied();
     else prp_afterWholeInfluenceRangeChanged();
 }
 
@@ -41,7 +41,7 @@ int SmartPathAnimator::actionAddNewAtStart(const QPointF &relPos) {
 }
 
 int SmartPathAnimator::actionAddNewAtStart(const NormalNodeData &data) {
-    if(mBaseValue.getNodeCount() == 0)
+    if(baseValue().getNodeCount() == 0)
         return actionAddFirstNode(data);
 
     prp_pushUndoRedoName("Add New Node");
@@ -56,8 +56,8 @@ int SmartPathAnimator::actionAddNewAtStart(const NormalNodeData &data) {
         spKey->finishValueTransform();
     }
 
-    const int id = mBaseValue.actionPrependNode();
-    getCurrentlyEditedPath()->actionSetNormalNodeValues(id, data);
+    const int id = baseValue().actionPrependNode();
+    getCurrentlyEdited()->actionSetNormalNodeValues(id, data);
     prp_finishTransform();
 
     prp_afterWholeInfluenceRangeChanged();
@@ -70,7 +70,7 @@ int SmartPathAnimator::actionAddNewAtEnd(const QPointF &relPos) {
 }
 
 int SmartPathAnimator::actionAddNewAtEnd(const NormalNodeData &data) {
-    if(mBaseValue.getNodeCount() == 0) return actionAddFirstNode(data);
+    if(baseValue().getNodeCount() == 0) return actionAddFirstNode(data);
     prp_pushUndoRedoName("Add New Node");
 
     prp_startTransform();
@@ -83,8 +83,8 @@ int SmartPathAnimator::actionAddNewAtEnd(const NormalNodeData &data) {
         spKey->finishValueTransform();
     }
 
-    const int id = mBaseValue.actionAppendNodeAtEndNode();
-    getCurrentlyEditedPath()->actionSetNormalNodeValues(id, data);
+    const int id = baseValue().actionAppendNodeAtEndNode();
+    getCurrentlyEdited()->actionSetNormalNodeValues(id, data);
     prp_finishTransform();
 
     prp_afterWholeInfluenceRangeChanged();
@@ -104,14 +104,14 @@ int SmartPathAnimator::actionInsertNodeBetween(
         spKey->finishValueTransform();
     }
 
-    const auto curr = getCurrentlyEditedPath();
+    const auto curr = getCurrentlyEdited();
     if(curr->getNodePtr(node1Id)->getCtrlsMode() == CtrlsMode::symmetric) {
         curr->actionSetNormalNodeCtrlsMode(node1Id, CtrlsMode::smooth);
     }
     if(curr->getNodePtr(node2Id)->getCtrlsMode() == CtrlsMode::symmetric) {
         curr->actionSetNormalNodeCtrlsMode(node2Id, CtrlsMode::smooth);
     }
-    const int id = mBaseValue.actionInsertNodeBetween(node1Id, node2Id, t);
+    const int id = baseValue().actionInsertNodeBetween(node1Id, node2Id, t);
     curr->actionPromoteDissolvedNodeToNormal(id);
     prp_finishTransform();
 
@@ -132,7 +132,7 @@ void SmartPathAnimator::actionConnectNodes(
         spKey->finishValueTransform();
     }
 
-    mBaseValue.actionConnectNodes(node1Id, node2Id);
+    baseValue().actionConnectNodes(node1Id, node2Id);
     prp_finishTransform();
 
     prp_afterWholeInfluenceRangeChanged();
@@ -150,7 +150,7 @@ void SmartPathAnimator::actionMergeNodes(const int node1Id, const int node2Id) {
         spKey->finishValueTransform();
     }
 
-    mBaseValue.actionMergeNodes(node1Id, node2Id);
+    baseValue().actionMergeNodes(node1Id, node2Id);
     prp_finishTransform();
 
     prp_afterWholeInfluenceRangeChanged();
@@ -160,14 +160,14 @@ void SmartPathAnimator::actionMoveNodeBetween(
         const int nodeId, const int prevNodeId, const int nextNodeId) {
     prp_pushUndoRedoName("Move Node");
     prp_startTransform();
-    getCurrentlyEditedPath()->actionMoveNodeBetween(
+    getCurrentlyEdited()->actionMoveNodeBetween(
                 nodeId, prevNodeId, nextNodeId);
     prp_finishTransform();
-    pathChanged();
+    changed();
 }
 
 void SmartPathAnimator::actionClose() {
-    actionConnectNodes(0, mBaseValue.getNodeCount() - 1);
+    actionConnectNodes(0, baseValue().getNodeCount() - 1);
 }
 
 void SmartPathAnimator::actionDisconnectNodes(const int node1Id,
@@ -184,7 +184,7 @@ void SmartPathAnimator::actionDisconnectNodes(const int node1Id,
         key->finishValueTransform();
     }
 
-    mBaseValue.actionDisconnectNodes(node1Id, node2Id);
+    baseValue().actionDisconnectNodes(node1Id, node2Id);
     prp_finishTransform();
 
     prp_afterWholeInfluenceRangeChanged();
@@ -194,9 +194,9 @@ void SmartPathAnimator::actionReverseCurrent() {
     prp_pushUndoRedoName("Reverse Nodes");
 
     prp_startTransform();
-    getCurrentlyEditedPath()->actionReversePath();
+    getCurrentlyEdited()->actionReversePath();
     prp_finishTransform();
-    pathChanged();
+    changed();
 }
 
 void SmartPathAnimator::actionReverseAll() {
@@ -212,7 +212,7 @@ void SmartPathAnimator::actionReverseAll() {
         key->finishValueTransform();
     }
 
-    mBaseValue.actionReversePath();
+    baseValue().actionReversePath();
     prp_finishTransform();
 
     prp_afterWholeInfluenceRangeChanged();
@@ -235,7 +235,7 @@ void SmartPathAnimator::actionAppendMoveAllFrom(SmartPathAnimator * const other)
         thisKey->finishValueTransform();
     }
 
-    mBaseValue.actionAppendMoveAllFrom(std::move(other->getBaseValue()));
+    baseValue().actionAppendMoveAllFrom(std::move(other->baseValue()));
     prp_finishTransform();
 
     prp_afterWholeInfluenceRangeChanged();
@@ -258,7 +258,7 @@ void SmartPathAnimator::actionPrependMoveAllFrom(SmartPathAnimator * const other
         thisKey->finishValueTransform();
     }
 
-    mBaseValue.actionPrependMoveAllFrom(std::move(other->getBaseValue()));
+    baseValue().actionPrependMoveAllFrom(std::move(other->baseValue()));
     prp_finishTransform();
 
     prp_afterWholeInfluenceRangeChanged();
@@ -283,7 +283,7 @@ int SmartPathAnimator::actionAddFirstNode(const NormalNodeData &data) {
         key->finishValueTransform();
     }
 
-    const int id = mBaseValue.actionAddFirstNode(data);
+    const int id = baseValue().actionAddFirstNode(data);
     prp_finishTransform();
 
     prp_afterWholeInfluenceRangeChanged();
