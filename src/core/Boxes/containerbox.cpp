@@ -126,7 +126,9 @@ QDomElement ContainerBox::saveSVG(QDomDocument& doc,
                                   const FrameRange& absRange,
                                   const qreal fps) const {
     auto ele = doc.createElement("g");
-    for(const auto& box : mContainedBoxes) {
+    const auto& boxes = getContainedBoxes();
+    for(int i = boxes.count() - 1; i >= 0; i--) {
+        const auto& box = boxes.at(i);
         if(!box->isVisible()) continue;
         box->saveSVGWithTransform(doc, ele, defs, absRange, fps);
     }

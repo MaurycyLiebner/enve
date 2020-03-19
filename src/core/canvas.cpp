@@ -468,7 +468,9 @@ void Canvas::saveSceneSVG(QDomDocument& doc,
     mBackgroundColor->saveSVG(doc, bg, defs, absRange, fps, "fill");
     ele.appendChild(bg);
 
-    for(const auto& box : getContainedBoxes()) {
+    const auto& boxes = getContainedBoxes();
+    for(int i = boxes.count() - 1; i >= 0; i--) {
+        const auto& box = boxes.at(i);
         if(!box->isVisible()) continue;
         box->saveSVGWithTransform(doc, ele, defs, absRange, fps);
     }
