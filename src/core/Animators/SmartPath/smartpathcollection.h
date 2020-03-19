@@ -36,11 +36,11 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
-    void saveSVG(QDomDocument& doc,
-                 QDomElement& parent,
-                 QDomElement& defs,
-                 const FrameRange& absRange,
-                 const qreal fps);
+    void savePathsSVG(QDomDocument& doc,
+                      QDomElement& parent,
+                      QDomElement& defs,
+                      const FrameRange& absRange,
+                      const qreal fps);
 
     SmartNodePoint * createNewSubPathAtRelPos(const QPointF &relPos);
     SmartNodePoint * createNewSubPathAtPos(const QPointF &absPos);

@@ -625,7 +625,7 @@ void QrealAnimator::saveQrealSVG(QDomDocument& doc,
                                  const qreal multiplier,
                                  const bool transform,
                                  const QString& type) const {
-    if(hasExpression()) {
+    if(true || hasExpression()) {
         Animator::saveSVG(doc, parent, defs, absRange, fps, attrName,
                           [this, multiplier](const int relFrame) {
             return QString::number(getEffectiveValue(relFrame)*multiplier);

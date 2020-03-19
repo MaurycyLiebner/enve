@@ -29,6 +29,17 @@ qCubicSegment1D qCubicSegment1D::normalized() const {
             (mC2 - min)/span, (mP1 - min)/span};
 }
 
+qCubicSegment1D qCubicSegment1D::reverted() const {
+    auto result = *this;
+    result.reverse();
+    return result;
+}
+
+void qCubicSegment1D::reverse() {
+    std::swap(mP0, mP1);
+    std::swap(mC1, mC2);
+}
+
 qreal qCubicSegment1D::valAtT(const qreal t) const {
     return qPow(1 - t, 3)*p0() +
             3*qPow(1 - t, 2)*t*c1() +

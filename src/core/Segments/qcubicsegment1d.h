@@ -41,6 +41,10 @@ struct qCubicSegment1D {
 
     //! @brief Returns the segment scaled to range [0, 1]
     Q_REQUIRED_RESULT qCubicSegment1D normalized() const;
+    //! @brief Returns the segment with reverted p0/p1 c1/c2
+    Q_REQUIRED_RESULT qCubicSegment1D reverted() const;
+
+    void reverse();
 
     qreal valAtT(const qreal t) const;
 

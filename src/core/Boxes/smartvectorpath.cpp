@@ -49,7 +49,7 @@ QDomElement SmartVectorPath::saveSVG(QDomDocument& doc,
                                      const FrameRange& absRange,
                                      const qreal fps) const {
     auto ele = doc.createElement("path");
-    mPathAnimator->saveSVG(doc, ele, defs, absRange, fps);
+    mPathAnimator->savePathsSVG(doc, ele, defs, absRange, fps);
     savePathBoxSVG(doc, ele, defs, absRange, fps);
     return ele;
 }

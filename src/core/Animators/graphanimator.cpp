@@ -423,6 +423,38 @@ qreal GraphAnimator::graph_prevKeyWeight(const GraphKey * const prevKey,
     return pWeight;
 }
 
+QList<qCubicSegment1D::Pair> splitSegmentOnExtremas(const qCubicSegment1D& segX,
+                                                    const qCubicSegment1D& segY) {
+    QList<qCubicSegment1D::Pair> result;
+    const bool maxExtr = segY.maxPointValue() > qMax(segY.p0(), segY.p1());
+    const bool minExtr = segY.maxPointValue() > qMax(segY.p0(), segY.p1());
+    if(minExtr && maxExtr) {
+        const qreal minValT = segY.tWithSmallestValue();
+        const qreal maxValT = segY.tWithBiggestValue();
+        const qreal minT = qMin(minValT, maxValT);
+        const qreal maxT = qMax(minValT, maxValT);
+        result << qCubicSegment1D::Pair{segX.tFragment(0, minT),
+                                        segY.tFragment(0, minT)};
+        result << qCubicSegment1D::Pair{segX.tFragment(minT, maxT),
+                                        segY.tFragment(minT, maxT)};
+        result << qCubicSegment1D::Pair{segX.tFragment(maxT, 1),
+                                        segY.tFragment(maxT, 1)};
+    } else if(minExtr) {
+        const qreal minValT = segY.tWithSmallestValue();
+        result << qCubicSegment1D::Pair{segX.tFragment(0, minValT),
+                                        segY.tFragment(0, minValT)};
+        result << qCubicSegment1D::Pair{segX.tFragment(minValT, 1),
+                                        segY.tFragment(minValT, 1)};
+    } else if(maxExtr) {
+        const qreal maxValT = segY.tWithBiggestValue();
+        result << qCubicSegment1D::Pair{segX.tFragment(0, maxValT),
+                                        segY.tFragment(0, maxValT)};
+        result << qCubicSegment1D::Pair{segX.tFragment(maxValT, 1),
+                                        segY.tFragment(maxValT, 1)};
+    } else result << qCubicSegment1D::Pair{segX, segY};
+    return result;
+}
+
 void GraphAnimator::graph_saveSVG(QDomDocument& doc,
                                   QDomElement& parent,
                                   QDomElement& defs,
@@ -483,13 +515,17 @@ void GraphAnimator::graph_saveSVG(QDomDocument& doc,
                 qreal divT;
                 const auto boundXSeg = gDividedAtX(xSeg, nextRelFrame, &divT).first;
                 const auto boundYSeg = ySeg.dividedAtT(divT).first;
-                const auto xKeySplines = boundXSeg.normalized();
-                const auto yKeySplines = boundYSeg.normalized();
-                keySplines << ks.arg(xKeySplines.c1()).arg(yKeySplines.c1()).
-                                 arg(xKeySplines.c2()).arg(yKeySplines.c2());
-                const qreal t = (nextRelFrame - relRange.fMin)/div;
-                keyTimes << QString::number(t);
-                values << valueGetter(nextRelFrame);
+                const auto subSegs = splitSegmentOnExtremas(boundXSeg, boundYSeg);
+                for(const auto& subSeg : subSegs) {
+                    const auto xKeySplines = subSeg.first.normalized();
+                    auto yKeySplines = subSeg.second.normalized();
+                    if(yKeySplines.p0() > yKeySplines.p1()) yKeySplines.reverse();
+                    keySplines << ks.arg(xKeySplines.c1()).arg(yKeySplines.c1()).
+                                     arg(xKeySplines.c2()).arg(yKeySplines.c2());
+                    const qreal t = (nextRelFrame - relRange.fMin)/div;
+                    keyTimes << QString::number(t);
+                    values << valueGetter(nextRelFrame);
+                }
                 if(nextKeyRelFrame >= relRange.fMax) break;
             }
             prevKey = nextKey;
