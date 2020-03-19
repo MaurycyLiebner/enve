@@ -565,10 +565,16 @@ void BoxTransformAnimator::saveSVG(QDomDocument& doc,
     const auto shearAnim = getShearAnimator();
     const auto shearXAnim = shearAnim->getXAnimator();
     const auto shearYAnim = shearAnim->getYAnimator();
-    shearXAnim->saveSVG(doc, shear, defs, absRange, fps,
-                        "transform", true, "skewX");
-    shearYAnim->saveSVG(doc, shear, defs, absRange, fps,
-                        "transform", true, "skewY");
+    shearXAnim->Animator::saveSVG(doc, shear, defs, absRange, fps, "transform",
+                                  [shearXAnim](const int relFrame) {
+        const qreal value = shearXAnim->getEffectiveValue(relFrame);
+        return QString::number(value*45);
+    }, true, "skewX");
+    shearYAnim->Animator::saveSVG(doc, shear, defs, absRange, fps, "transform",
+                                  [shearYAnim](const int relFrame) {
+        const qreal value = shearYAnim->getEffectiveValue(relFrame);
+        return QString::number(value*45);
+    }, true, "skewY");
 
     const auto animGetter = [pivotAnim](const int relFrame) {
         const auto value = pivotAnim->getEffectiveValue(relFrame);
