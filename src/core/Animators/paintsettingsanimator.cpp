@@ -176,6 +176,7 @@ void PaintSettingsAnimator::applyTransform(const QMatrix &transform) {
 }
 
 #include "Expressions/expression.h"
+#include "svgexporthelpers.h"
 
 void PaintSettingsAnimator::saveSVG(QDomDocument& doc,
                                     QDomElement& parent,
@@ -187,12 +188,9 @@ void PaintSettingsAnimator::saveSVG(QDomDocument& doc,
         parent.setAttribute(name, "none");
     } else if(mPaintType == GRADIENTPAINT) {
         if(mGradient) {
-            const auto baseGradId = QString("0x%1").arg(
-                                        (quintptr)mGradient.data(),
-                                        QT_POINTER_SIZE * 2, 16, QChar('0'));
-            const auto thisGradId = QString("0x%1").arg(
-                                        (quintptr)this,
-                                        QT_POINTER_SIZE * 2, 16, QChar('0'));
+            const auto baseGradId = SvgExportHelpers::ptrToStr(mGradient);
+            const auto thisGradId = SvgExportHelpers::ptrToStr(this);
+
             QDomElement grad;
 
             const auto p1 = mGradientPoints->startAnimator();

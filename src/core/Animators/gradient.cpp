@@ -17,6 +17,7 @@
 #include "gradient.h"
 #include "Animators/coloranimator.h"
 #include "Boxes/pathbox.h"
+#include "svgexporthelpers.h"
 
 Gradient::Gradient() : DynamicComplexAnimator<ColorAnimator>("gradient") {
     connect(this, &Property::prp_currentFrameChanged,
@@ -84,9 +85,7 @@ void Gradient::saveSVG(QDomDocument& doc,
                        const FrameRange& absRange,
                        const qreal fps) const {
     auto ele = doc.createElement("linearGradient");
-    const auto baseGradId = QString("0x%1").arg(
-                                (quintptr)this,
-                                QT_POINTER_SIZE * 2, 16, QChar('0'));
+    const auto baseGradId = SvgExportHelpers::ptrToStr(this);
     const int count = ca_getNumberOfChildren();
     if(count == 0) {
         auto stop = doc.createElement("stop");
