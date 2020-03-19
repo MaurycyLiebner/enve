@@ -1232,5 +1232,6 @@ void BoundingBox::saveSVGWithTransform(QDomDocument& doc,
                                        const FrameRange& absRange,
                                        const qreal fps) const {
     const auto child = saveSVG(doc, defs, absRange, fps);
+    if(child.isNull()) return;
     mTransformAnimator->saveSVG(doc, parent, defs, absRange, fps, child);
 }
