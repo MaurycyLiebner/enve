@@ -136,7 +136,7 @@ public:
     }
 
     template<typename T>
-    static bool sCopyAndPaste(T* const from, T* const to) {
+    static bool sCopyAndPaste(const T* const from, T* const to) {
         return PropertyClipboard(from).paste(to);
     }
 

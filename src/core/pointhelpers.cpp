@@ -73,8 +73,18 @@ qreal gSolveForP1(const qreal p0, const qreal p2,
     return (p0*tm1*tm1*tm1 + 3.*p2*t*t*tm1 - p3*t*t*t + value)/(3*tm1*tm1*t);
 }
 
-// only for beziers that do not have multiple points of the same x value
-// for qrealanimators
+qCubicSegment1D::Pair gDividedAtX(const qCubicSegment1D& seg,
+                                  const qreal x, qreal* t) {
+    const qreal min = qMin4(seg.p0(), seg.c1(), seg.c2(), seg.p1());
+    const qreal max = qMax4(seg.p0(), seg.c1(), seg.c2(), seg.p1());
+    if(x < min) return {qCubicSegment1D(seg.p0()), seg};
+    if(x > max) return {seg, qCubicSegment1D(seg.p1())};
+    qreal tTmp;
+    if(!t) t = &tTmp;
+    *t = gTFromX(seg, x);
+    return seg.dividedAtT(*t);
+}
+
 qreal gTFromX(const qCubicSegment1D &seg,
              const qreal x) {
     qreal minT = 0.;

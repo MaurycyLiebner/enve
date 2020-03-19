@@ -89,6 +89,12 @@ extern qreal gCubicValueAtT(const qCubicSegment1D &seg,
 extern QPointF gCubicValueAtT(const qCubicSegment2D &seg,
                               const qreal t);
 
+//! @brief Only for beziers that do not have multiple points of the same x value,
+//! e.g., for GraphAnimators.
+extern qCubicSegment1D::Pair gDividedAtX(const qCubicSegment1D &seg,
+                                         const qreal x, qreal* t);
+//! @brief Only for beziers that do not have multiple points of the same x value,
+//! e.g., for GraphAnimators.
 extern qreal gTFromX(const qCubicSegment1D &seg,
                      const qreal x);
 

@@ -15,7 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "qstringanimator.h"
+
 #include "undoredo.h"
+#include "simplemath.h"
 
 QStringAnimator::QStringAnimator(const QString &name) :
     SteppedAnimator<QString>(name) {}
@@ -40,6 +42,7 @@ void QStringAnimator::saveSVG(QDomDocument& doc,
     } else {
         int i = relRange.fMin;
         const qreal div = span - 1;
+        const qreal dur = div/fps;
         while(true) {
             const auto iRange = absRange*prp_getIdenticalAbsRange(i);
 
@@ -53,12 +56,15 @@ void QStringAnimator::saveSVG(QDomDocument& doc,
             auto anim = doc.createElement("animate");
             anim.setAttribute("attributeName", "visibility");
             anim.setAttribute("values", "hidden;visible;hidden;hidden");
-            anim.setAttribute("keyTimes", QString("0;%1;%2;1").
-                                          arg(begin).arg(end));
 
-            const int span = absRange.span();
-            const qreal dur = span/fps;
-            anim.setAttribute("dur", QString::number(dur)  + 's');
+            QString keyTimes;
+            if(!isZero6Dec(begin)) keyTimes += "0;";
+            keyTimes += QString::number(begin) + ";";
+            keyTimes += QString::number(end);
+            if(!isOne6Dec(end)) keyTimes += ";1";
+            anim.setAttribute("keyTimes", keyTimes);
+
+            anim.setAttribute("dur", QString::number(dur) + 's');
 
             anim.setAttribute("repeatCount", "indefinite");
 

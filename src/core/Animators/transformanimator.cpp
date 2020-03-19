@@ -534,52 +534,84 @@ BoxTransformAnimator::BoxTransformAnimator() {
     getPointsHandler()->appendPt(pivotPt);
 }
 
+
+QDomElement saveSVG_Split(QPointFAnimator* const anim,
+                          const qreal multiplier,
+                          const qreal def,
+                          const QString& type,
+                          QDomDocument& doc,
+                          QDomElement& defs,
+                          const FrameRange& absRange,
+                          const qreal fps,
+                          const QDomElement& child) {
+    const auto animX = anim->getXAnimator();
+    const auto animY = anim->getYAnimator();
+
+    if(animX->anim_hasKeys() && animY->anim_hasKeys()) {
+        auto unpivotX = doc.createElement("g");
+        anim->saveQPointFSVGX(doc, unpivotX, defs, absRange, fps,
+                              "transform", def, multiplier, true, type);
+        auto unpivotY = doc.createElement("g");
+        anim->saveQPointFSVGY(doc, unpivotY, defs, absRange, fps,
+                              "transform", def, multiplier, true, type);
+
+        unpivotY.appendChild(child);
+        unpivotX.appendChild(unpivotY);
+        return unpivotX;
+    } else {
+        auto unpivot = doc.createElement("g");
+        const bool xAnim = animX->anim_hasKeys();
+        if(xAnim) {
+            const qreal y = multiplier*animY->getEffectiveValue();
+            anim->saveQPointFSVGX(doc, unpivot, defs, absRange, fps,
+                                  "transform", y, multiplier, true, type);
+        } else {
+            const qreal x = multiplier*animX->getEffectiveValue();
+            anim->saveQPointFSVGY(doc, unpivot, defs, absRange, fps,
+                                  "transform", x, multiplier, true, type);
+        }
+        unpivot.appendChild(child);
+        return unpivot;
+    }
+}
+
 void BoxTransformAnimator::saveSVG(QDomDocument& doc,
                                    QDomElement& parent,
                                    QDomElement& defs,
                                    const FrameRange& absRange,
                                    const qreal fps,
                                    const QDomElement& child) const {
-    auto pivot = doc.createElement("g");
-    auto translate = doc.createElement("g");
-    auto rotate = doc.createElement("g");
-    auto scale = doc.createElement("g");
+    auto unpivot = saveSVG_Split(getPivotAnimator(), -1, 0, "translate",
+                                 doc, defs, absRange, fps, child);
+    {
+        const auto opaAnim = getOpacityAnimator();
+        opaAnim->saveQrealSVG(doc, unpivot, defs, absRange, fps, "opacity", 0.01);
+    }
+
     auto shear = doc.createElement("g");
-    auto unpivot = doc.createElement("g");
+    {
+        const auto shearAnim = getShearAnimator();
+        const auto shearXAnim = shearAnim->getXAnimator();
+        const auto shearYAnim = shearAnim->getYAnimator();
+        shearXAnim->saveQrealSVG(doc, shear, defs, absRange, fps,
+                                 "transform", 45, true, "skewX");
+        shearYAnim->saveQrealSVG(doc, shear, defs, absRange, fps,
+                                 "transform", 45, true, "skewY");
+        shear.appendChild(unpivot);
+    }
+    const auto scale = saveSVG_Split(getScaleAnimator(), 1, 1, "scale",
+                                     doc, defs, absRange, fps, shear);
 
-    const auto pivotAnim = getPivotAnimator();
-    pivotAnim->saveSVG(doc, pivot, defs, absRange, fps,
-                       "transform", true, "translate");
-    const auto opacityAnim = getOpacityAnimator();
-    opacityAnim->saveQrealSVG(doc, pivot, defs, absRange, fps, "opacity", 0.01);
-    getPosAnimator()->saveSVG(doc, translate, defs, absRange, fps,
-                              "transform", true, "translate");
-    getRotAnimator()->saveQrealSVG(doc, rotate, defs, absRange, fps,
-                                   "transform", 1, true, "rotate");
-    getScaleAnimator()->saveSVG(doc, scale, defs, absRange, fps,
-                                "transform", true, "scale");
-    const auto shearAnim = getShearAnimator();
-    const auto shearXAnim = shearAnim->getXAnimator();
-    const auto shearYAnim = shearAnim->getYAnimator();
-    shearXAnim->saveQrealSVG(doc, shear, defs, absRange, fps,
-                             "transform", 45, true, "skewX");
-    shearYAnim->saveQrealSVG(doc, shear, defs, absRange, fps,
-                             "transform", 45, true, "skewY");
-
-    const auto animGetter = [pivotAnim](const int relFrame) {
-        const auto value = pivotAnim->getEffectiveValue(relFrame);
-        return QString::number(-value.x()) + " " +
-               QString::number(-value.y());
-    };
-    pivotAnim->Animator::saveSVG(doc, unpivot, defs, absRange, fps,
-                                 "transform", animGetter, true, "translate");
-
-    unpivot.appendChild(child);
-    shear.appendChild(unpivot);
-    scale.appendChild(shear);
-    rotate.appendChild(scale);
-    translate.appendChild(rotate);
-    pivot.appendChild(translate);
+    auto rotate = doc.createElement("g");
+    {
+        getRotAnimator()->saveQrealSVG(doc, rotate, defs, absRange, fps,
+                                       "transform", 1, true, "rotate");
+        rotate.appendChild(scale);
+    }
+    const auto translate = saveSVG_Split(getPosAnimator(), 1, 0, "translate",
+                                         doc, defs, absRange, fps, rotate);
+    auto pivot = saveSVG_Split(getPivotAnimator(), 1, 0, "translate",
+                               doc, defs, absRange, fps, translate);
 
     parent.appendChild(pivot);
 }

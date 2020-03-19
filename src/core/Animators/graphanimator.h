@@ -75,6 +75,16 @@ public:
     void graph_startSelectedKeysTransform();
     void graph_finishSelectedKeysTransform();
     void graph_cancelSelectedKeysTransform();
+
+    void graph_saveSVG(QDomDocument& doc,
+                       QDomElement& parent,
+                       QDomElement& defs,
+                       const FrameRange& absRange,
+                       const qreal fps,
+                       const QString& attrName,
+                       const ValueGetter& valueGetter,
+                       const bool transform = false,
+                       const QString& type = "") const;
 protected:
     qreal graph_prevKeyWeight(const GraphKey * const prevKey,
                               const GraphKey * const nextKey,

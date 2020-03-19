@@ -647,12 +647,12 @@ void Animator::saveSVG(QDomDocument& doc,
         auto anim = doc.createElement(tagName);
         anim.setAttribute("attributeName", attrName);
         if(!type.isEmpty()) anim.setAttribute("type", type);
-        const qreal dur = span/fps;
+        const qreal div = span - 1;
+        const qreal dur = div/fps;
         anim.setAttribute("dur", QString::number(dur)  + 's');
         int i = relRange.fMin;
         QStringList values;
         QStringList keyTimes;
-        const qreal div = span - 1;
         while(true) {
             const auto value = valueGetter(i);
             values << value;

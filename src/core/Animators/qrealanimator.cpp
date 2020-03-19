@@ -625,8 +625,15 @@ void QrealAnimator::saveQrealSVG(QDomDocument& doc,
                                  const qreal multiplier,
                                  const bool transform,
                                  const QString& type) const {
-    Animator::saveSVG(doc, parent, defs, absRange, fps, attrName,
+    if(hasExpression()) {
+        Animator::saveSVG(doc, parent, defs, absRange, fps, attrName,
+                          [this, multiplier](const int relFrame) {
+            return QString::number(getEffectiveValue(relFrame)*multiplier);
+        }, transform, type);
+    } else {
+        graph_saveSVG(doc, parent, defs, absRange, fps, attrName,
                       [this, multiplier](const int relFrame) {
-        return QString::number(getEffectiveValue(relFrame)*multiplier);
-    }, transform, type);
+            return QString::number(getEffectiveValue(relFrame)*multiplier);
+        }, transform, type);
+    }
 }

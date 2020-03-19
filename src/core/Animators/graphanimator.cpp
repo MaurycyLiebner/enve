@@ -392,23 +392,119 @@ void GraphAnimator::graph_getSelectedSegments(QList<QList<GraphKey*>> &segments)
     }
 }
 
+qCubicSegment1D getGraphXSegment(const GraphKey * const prevKey,
+                                 const GraphKey * const nextKey) {
+    return qCubicSegment1D{qreal(prevKey->getRelFrame()),
+                           prevKey->getC1Frame(),
+                           nextKey->getC0Frame(),
+                           qreal(nextKey->getRelFrame())};
+}
+
+qCubicSegment1D getGraphYSegment(const GraphKey * const prevKey,
+                                 const GraphKey * const nextKey) {
+    return qCubicSegment1D{qreal(prevKey->getValueForGraph()),
+                           prevKey->getC1Value(),
+                           nextKey->getC0Value(),
+                           qreal(nextKey->getValueForGraph())};
+}
+
 qreal GraphAnimator::graph_prevKeyWeight(const GraphKey * const prevKey,
                                          const GraphKey * const nextKey,
                                          const qreal frame) const {
     const qreal prevFrame = prevKey->getRelFrame();
     const qreal nextFrame = nextKey->getRelFrame();
 
-    const qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
-                prevKey->getC1Frame(),
-                nextKey->getC0Frame(),
-                qreal(nextKey->getRelFrame())};
-    const qreal t = gTFromX(seg, frame);
-    const qreal p0y = prevKey->getValueForGraph();
-    const qreal p1y = prevKey->getC1Value();
-    const qreal p2y = nextKey->getC0Value();
-    const qreal p3y = nextKey->getValueForGraph();
-    const qreal iFrame = gCubicValueAtT({p0y, p1y, p2y, p3y}, t);
+    const auto xSeg = getGraphXSegment(prevKey, nextKey);
+    const qreal t = gTFromX(xSeg, frame);
+    const auto ySeg = getGraphYSegment(prevKey, nextKey);
+    const qreal iFrame = gCubicValueAtT(ySeg, t);
     const qreal dFrame = nextFrame - prevFrame;
     const qreal pWeight = (iFrame - prevFrame)/dFrame;
     return pWeight;
+}
+
+void GraphAnimator::graph_saveSVG(QDomDocument& doc,
+                                  QDomElement& parent,
+                                  QDomElement& defs,
+                                  const FrameRange& absRange,
+                                  const qreal fps,
+                                  const QString& attrName,
+                                  const ValueGetter& valueGetter,
+                                  const bool transform,
+                                  const QString& type) const {
+    Q_UNUSED(defs)
+    Q_ASSERT(!transform || attrName == "transform");
+    const auto relRange = prp_absRangeToRelRange(absRange);
+    const auto idRange = prp_getIdenticalRelRange(relRange.fMin);
+    const int span = absRange.span();
+    if(idRange.inRange(relRange) || span == 1) {
+        auto value = valueGetter(relRange.fMin);
+        if(transform) {
+            value = parent.attribute(attrName) + " " +
+                    type + "(" + value + ")";
+        }
+        parent.setAttribute(attrName, value.trimmed());
+    } else {
+        const auto tagName = transform ? "animateTransform" : "animate";
+        auto anim = doc.createElement(tagName);
+        anim.setAttribute("attributeName", attrName);
+        if(!type.isEmpty()) anim.setAttribute("type", type);
+        const qreal div = span - 1;
+        const qreal dur = div/fps;
+        anim.setAttribute("dur", QString::number(dur)  + 's');
+
+        const auto& keys = anim_getKeys();
+        GraphKey* nextKey = nullptr;
+        GraphKey* prevKey = nullptr;
+        QStringList values;
+        QStringList keyTimes;
+        QStringList keySplines;
+        const QString ks = QString("%1 %2 %3 %4");
+        bool first = true;
+        for(const auto &key : keys) {
+            nextKey = GetAsGK(key);
+            const int nextKeyRelFrame = nextKey->getRelFrame();
+            if(nextKeyRelFrame > relRange.fMin && prevKey) {
+                if(first) {
+                    first = false;
+                    if(nextKeyRelFrame != relRange.fMin) {
+                        keySplines << ks.arg(0).arg(0).arg(1).arg(1);
+                        keyTimes << QString::number(0);
+                        values << valueGetter(relRange.fMin);
+                    }
+                    const int prevRelFrame = prevKey->getRelFrame();
+                    const qreal t = (prevRelFrame - relRange.fMin)/div;
+                    keyTimes << QString::number(t);
+                    values << valueGetter(prevRelFrame);
+                }
+                const auto xSeg = getGraphXSegment(prevKey, nextKey);
+                const auto ySeg = getGraphYSegment(prevKey, nextKey);
+                const int nextRelFrame = qMin(nextKeyRelFrame, relRange.fMax);
+                qreal divT;
+                const auto boundXSeg = gDividedAtX(xSeg, nextRelFrame, &divT).first;
+                const auto boundYSeg = ySeg.dividedAtT(divT).first;
+                const auto xKeySplines = boundXSeg.normalized();
+                const auto yKeySplines = boundYSeg.normalized();
+                keySplines << ks.arg(xKeySplines.c1()).arg(yKeySplines.c1()).
+                                 arg(xKeySplines.c2()).arg(yKeySplines.c2());
+                const qreal t = (nextRelFrame - relRange.fMin)/div;
+                keyTimes << QString::number(t);
+                values << valueGetter(nextRelFrame);
+                if(nextKeyRelFrame >= relRange.fMax) break;
+            }
+            prevKey = nextKey;
+        }
+        if(nextKey && nextKey->getRelFrame() < relRange.fMax) {
+            keySplines << ks.arg(0).arg(0).arg(1).arg(1);
+            keyTimes << QString::number(1);
+            values << valueGetter(relRange.fMax);
+        }
+
+        anim.setAttribute("calcMode", "spline");
+        anim.setAttribute("values", values.join(';'));
+        anim.setAttribute("keyTimes", keyTimes.join(';'));
+        anim.setAttribute("keySplines", keySplines.join(';'));
+        anim.setAttribute("repeatCount", "indefinite");
+        parent.appendChild(anim);
+    }
 }

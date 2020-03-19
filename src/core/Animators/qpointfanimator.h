@@ -87,20 +87,34 @@ public:
 
     void applyTransform(const QMatrix &transform);
 
-    void saveSVG(QDomDocument& doc,
-                 QDomElement& parent,
-                 QDomElement& defs,
-                 const FrameRange& absRange,
-                 const qreal fps,
-                 const QString& name) const;
-    void saveSVG(QDomDocument& doc,
-                 QDomElement& parent,
-                 QDomElement& defs,
-                 const FrameRange& absRange,
-                 const qreal fps,
-                 const QString& name,
-                 const bool transform,
-                 const QString& type) const;
+    void saveQPointFSVG(QDomDocument& doc,
+                        QDomElement& parent,
+                        QDomElement& defs,
+                        const FrameRange& absRange,
+                        const qreal fps,
+                        const QString& name,
+                        const bool transform = false,
+                        const QString& type = "") const;
+    void saveQPointFSVGX(QDomDocument& doc,
+                         QDomElement& parent,
+                         QDomElement& defs,
+                         const FrameRange& absRange,
+                         const qreal fps,
+                         const QString& name,
+                         const qreal y,
+                         const qreal multiplier,
+                         const bool transform = false,
+                         const QString& type = "") const;
+    void saveQPointFSVGY(QDomDocument& doc,
+                         QDomElement& parent,
+                         QDomElement& defs,
+                         const FrameRange& absRange,
+                         const qreal fps,
+                         const QString& name,
+                         const qreal x,
+                         const qreal multiplier,
+                         const bool transform = false,
+                         const QString& type = "") const;
 protected:
     qsptr<QrealAnimator> mXAnimator;
     qsptr<QrealAnimator> mYAnimator;

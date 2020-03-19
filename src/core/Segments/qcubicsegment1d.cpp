@@ -20,6 +20,15 @@
 #include "skia/skiaincludes.h"
 #include "../ReadWrite/basicreadwrite.h"
 
+qCubicSegment1D qCubicSegment1D::normalized() const {
+    const qreal min = minPointValue();
+    const qreal max = maxPointValue();
+    const qreal span = max - min;
+    if(isZero4Dec(span)) return sMakeLinearToT(0, 1);
+    return {(mP0 - min)/span, (mC1 - min)/span,
+            (mC2 - min)/span, (mP1 - min)/span};
+}
+
 qreal qCubicSegment1D::valAtT(const qreal t) const {
     return qPow(1 - t, 3)*p0() +
             3*qPow(1 - t, 2)*t*c1() +
@@ -170,12 +179,20 @@ qreal qCubicSegment1D::minDistanceTo(const qreal p,
     return minError;
 }
 
-qreal qCubicSegment1D::maxValue() const {
-    return valAtT(tWithBiggestValue());
+qreal qCubicSegment1D::minPointValue() const {
+    return qMin4(mP0, mC1, mC2, mP1);
+}
+
+qreal qCubicSegment1D::maxPointValue() const {
+    return qMax4(mP0, mC1, mC2, mP1);
 }
 
 qreal qCubicSegment1D::minValue() const {
     return valAtT(tWithSmallestValue());
+}
+
+qreal qCubicSegment1D::maxValue() const {
+    return valAtT(tWithBiggestValue());
 }
 
 void qCubicSegment1D::solveDerivativeZero(
@@ -187,28 +204,6 @@ void qCubicSegment1D::solveDerivativeZero(
     t1 = CLAMP01((num0 + numSqrt)/den);
     t2 = CLAMP01((num0 - numSqrt)/den);
     t3 = CLAMP01((3*c2() - 2*p0() - p1())/(6*c2() - 2*p0() - 4*p1()));
-}
-
-qreal qCubicSegment1D::tWithBiggestValue() const {
-    const bool p0Further = p0() >= c1() && p0() >= c2();
-    const bool p1Further = p1() >= c1() && p1() >= c2();
-    if(p0Further || p1Further) {
-        if(p1() > p0()) return 1;
-        return 0;
-    }
-    qreal t1, t2, t3;
-    solveDerivativeZero(t1, t2, t3);
-
-    qreal maxVal = DBL_MIN;
-    qreal bestT = 0;
-    for(const qreal& t : { 0., 1., t1, t2, t3}) {
-        const qreal valT = valAtT(t);
-        if(valT > maxVal) {
-            maxVal = valT;
-            bestT = t;
-        }
-    }
-    return bestT;
 }
 
 qreal qCubicSegment1D::tWithSmallestValue() const {
@@ -227,6 +222,28 @@ qreal qCubicSegment1D::tWithSmallestValue() const {
         const qreal valT = valAtT(t);
         if(valT < minVal) {
             minVal = valT;
+            bestT = t;
+        }
+    }
+    return bestT;
+}
+
+qreal qCubicSegment1D::tWithBiggestValue() const {
+    const bool p0Further = p0() >= c1() && p0() >= c2();
+    const bool p1Further = p1() >= c1() && p1() >= c2();
+    if(p0Further || p1Further) {
+        if(p1() > p0()) return 1;
+        return 0;
+    }
+    qreal t1, t2, t3;
+    solveDerivativeZero(t1, t2, t3);
+
+    qreal maxVal = DBL_MIN;
+    qreal bestT = 0;
+    for(const qreal& t : { 0., 1., t1, t2, t3}) {
+        const qreal valT = valAtT(t);
+        if(valT > maxVal) {
+            maxVal = valT;
             bestT = t;
         }
     }

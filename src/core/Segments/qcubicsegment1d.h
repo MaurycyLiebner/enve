@@ -27,9 +27,7 @@ struct qCubicSegment1D {
     typedef std::pair<qCubicSegment1D, qCubicSegment1D> Pair;
     qCubicSegment1D() {}
 
-    qCubicSegment1D(const qreal p) {
-        mP0 = p; mC1 = p; mC2 = p; mP1 = p;
-    }
+    qCubicSegment1D(const qreal p) : qCubicSegment1D(p, p, p, p) {}
 
     qCubicSegment1D(const qreal p0, const qreal c1,
                     const qreal c2, const qreal p1){
@@ -40,6 +38,9 @@ struct qCubicSegment1D {
         const qreal dist = p1 - p0;
         return qCubicSegment1D(p0, p0 + dist/3, p1 - dist/3, p1);
     }
+
+    //! @brief Returns the segment scaled to range [0, 1]
+    Q_REQUIRED_RESULT qCubicSegment1D normalized() const;
 
     qreal valAtT(const qreal t) const;
 
@@ -111,11 +112,15 @@ struct qCubicSegment1D {
         setP1(p1()/b);
         return *this;
     }
-    qreal maxValue() const;
-    qreal minValue() const;
 
-    qreal tWithBiggestValue() const;
+    qreal minPointValue() const;
+    qreal maxPointValue() const;
+
+    qreal minValue() const;
+    qreal maxValue() const;
+
     qreal tWithSmallestValue() const;
+    qreal tWithBiggestValue() const;
 //    static QList<qrealPair> sIntersectionTs(_qCubicSegment2D& seg1,
 //                                            _qCubicSegment2D& seg2);
 private:
