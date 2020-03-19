@@ -28,7 +28,7 @@ public:
     void saveSVG(QDomDocument& doc,
                  QDomElement& parent,
                  const FrameRange& absRange,
-                 const qreal fps) const;
+                 const qreal fps, const bool loop) const;
 };
 
 #endif // QSTRINGANIMATOR_H

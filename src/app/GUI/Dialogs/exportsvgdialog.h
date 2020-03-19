@@ -20,6 +20,7 @@
 #include <QDialog>
 
 #include <QSpinBox>
+#include <QCheckBox>
 
 class SceneChooser;
 
@@ -33,6 +34,10 @@ private:
 
     QSpinBox* mFirstFrame;
     QSpinBox* mLastFrame;
+
+    QCheckBox* mBackground;
+    QCheckBox* mFixedSize;
+    QCheckBox* mLoop;
 
     const QString mPath;
 };

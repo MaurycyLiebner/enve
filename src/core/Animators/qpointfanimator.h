@@ -93,6 +93,7 @@ public:
                         const FrameRange& absRange,
                         const qreal fps,
                         const QString& name,
+                        const bool loop,
                         const bool transform = false,
                         const QString& type = "") const;
     void saveQPointFSVGX(QDomDocument& doc,
@@ -103,6 +104,7 @@ public:
                          const QString& name,
                          const qreal y,
                          const qreal multiplier,
+                         const bool loop,
                          const bool transform = false,
                          const QString& type = "") const;
     void saveQPointFSVGY(QDomDocument& doc,
@@ -113,6 +115,7 @@ public:
                          const QString& name,
                          const qreal x,
                          const qreal multiplier,
+                         const bool loop,
                          const bool transform = false,
                          const QString& type = "") const;
 protected:

@@ -60,7 +60,7 @@ void SmartPathCollection::savePathsSVG(QDomDocument& doc,
                                        QDomElement& parent,
                                        QDomElement& defs,
                                        const FrameRange& absRange,
-                                       const qreal fps) {
+                                       const qreal fps, const bool loop) {
 //    if(ca_getNumberOfChildren() == 1) {
 //        const auto path0 = getChild(0);
 //        path0->graph_saveSVG(doc, parent, defs, absRange, fps, "d",
@@ -77,7 +77,7 @@ void SmartPathCollection::savePathsSVG(QDomDocument& doc,
             SkString pathStr;
             SkParsePath::ToSVGString(path, &pathStr);
             return QString(pathStr.c_str());
-        });
+        }, loop);
 //    }
 }
 

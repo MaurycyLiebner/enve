@@ -231,6 +231,7 @@ void QPointFAnimator::saveQPointFSVG(QDomDocument& doc,
                                      const FrameRange& absRange,
                                      const qreal fps,
                                      const QString& name,
+                                     const bool loop,
                                      const bool transform,
                                      const QString& type) const {
     Animator::saveSVG(doc, parent, defs, absRange, fps, name,
@@ -238,7 +239,7 @@ void QPointFAnimator::saveQPointFSVG(QDomDocument& doc,
         const auto value = getEffectiveValue(relFrame);
         return QString::number(value.x()) + " " +
                QString::number(value.y());
-    }, transform, type);
+    }, transform, type, loop);
 }
 
 void QPointFAnimator::saveQPointFSVGX(QDomDocument& doc,
@@ -249,6 +250,7 @@ void QPointFAnimator::saveQPointFSVGX(QDomDocument& doc,
                                       const QString& name,
                                       const qreal y,
                                       const qreal multiplier,
+                                      const bool loop,
                                       const bool transform,
                                       const QString& type) const {
     mXAnimator->graph_saveSVG(doc, parent, defs, absRange, fps, name,
@@ -256,7 +258,7 @@ void QPointFAnimator::saveQPointFSVGX(QDomDocument& doc,
         const auto value = getEffectiveValue(relFrame);
         return QString::number(multiplier*value.x()) + " " +
                QString::number(y);
-    }, transform, type);
+    }, loop, transform, type);
 }
 
 void QPointFAnimator::saveQPointFSVGY(QDomDocument& doc,
@@ -267,6 +269,7 @@ void QPointFAnimator::saveQPointFSVGY(QDomDocument& doc,
                                       const QString& name,
                                       const qreal x,
                                       const qreal multiplier,
+                                      const bool loop,
                                       const bool transform,
                                       const QString& type) const {
     mYAnimator->graph_saveSVG(doc, parent, defs, absRange, fps, name,
@@ -274,5 +277,5 @@ void QPointFAnimator::saveQPointFSVGY(QDomDocument& doc,
         const auto value = getEffectiveValue(relFrame);
         return QString::number(x) + " " +
                QString::number(multiplier*value.y());
-    }, transform, type);
+    }, loop, transform, type);
 }

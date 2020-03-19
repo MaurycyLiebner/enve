@@ -124,13 +124,13 @@ OutlineSettingsAnimator *ContainerBox::getStrokeSettings() const {
 QDomElement ContainerBox::saveSVG(QDomDocument& doc,
                                   QDomElement& defs,
                                   const FrameRange& absRange,
-                                  const qreal fps) const {
+                                  const qreal fps, const bool loop) const {
     auto ele = doc.createElement("g");
     const auto& boxes = getContainedBoxes();
     for(int i = boxes.count() - 1; i >= 0; i--) {
         const auto& box = boxes.at(i);
         if(!box->isVisible()) continue;
-        box->saveSVGWithTransform(doc, ele, defs, absRange, fps);
+        box->saveSVGWithTransform(doc, ele, defs, absRange, fps, loop);
     }
     return ele;
 }

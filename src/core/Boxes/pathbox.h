@@ -118,7 +118,7 @@ public:
                         QDomElement& ele,
                         QDomElement& defs,
                         const FrameRange& absRange,
-                        const qreal fps) const;
+                        const qreal fps, const bool loop) const;
 protected:
     bool mOutlineAffectedByScale = true;
     bool mCurrentPathsOutdated = true;

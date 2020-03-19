@@ -18,9 +18,11 @@
 #define SVGEXPORTHELPERS_H
 
 #include <QtCore>
+#include <QDomElement>
 
 namespace SvgExportHelpers {
     QString ptrToStr(const void* const ptr);
+    void assignLoop(QDomElement& ele, const bool loop);
 };
 
 #endif // SVGEXPORTHELPERS_H

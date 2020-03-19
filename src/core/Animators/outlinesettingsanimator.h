@@ -101,7 +101,7 @@ public:
                  QDomElement& parent,
                  QDomElement& defs,
                  const FrameRange& absRange,
-                 const qreal fps) const;
+                 const qreal fps, const bool loop) const;
 private:
     SkPaint::Cap mCapStyle = SkPaint::kRound_Cap;
     SkPaint::Join mJoinStyle = SkPaint::kRound_Join;

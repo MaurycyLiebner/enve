@@ -157,7 +157,10 @@ public:
 
     void saveSceneSVG(QDomDocument& doc,
                       const FrameRange& absRange,
-                      const qreal fps) const;
+                      const qreal fps,
+                      const bool background,
+                      const bool fixedSize,
+                      const bool loop) const;
 
     void selectOnlyLastPressedBox();
     void selectOnlyLastPressedPoint();

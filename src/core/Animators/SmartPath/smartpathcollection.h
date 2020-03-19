@@ -40,7 +40,7 @@ public:
                       QDomElement& parent,
                       QDomElement& defs,
                       const FrameRange& absRange,
-                      const qreal fps);
+                      const qreal fps, const bool loop);
 
     SmartNodePoint * createNewSubPathAtRelPos(const QPointF &relPos);
     SmartNodePoint * createNewSubPathAtPos(const QPointF &absPos);

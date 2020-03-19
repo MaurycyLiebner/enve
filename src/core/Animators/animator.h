@@ -191,7 +191,8 @@ public:
                  const FrameRange& absRange,
                  const qreal fps,
                  const QString& attrName,
-                 const ValueGetter& valueGetter) const;
+                 const ValueGetter& valueGetter,
+                 const bool loop) const;
     void saveSVG(QDomDocument& doc,
                  QDomElement& parent,
                  QDomElement& defs,
@@ -200,7 +201,8 @@ public:
                  const QString& attrName,
                  const ValueGetter& valueGetter,
                  const bool transform,
-                 const QString& type) const;
+                 const QString& type,
+                 const bool loop) const;
 protected:
     void anim_readKeys(eReadStream &src);
     void anim_writeKeys(eWriteStream& dst) const;

@@ -16,11 +16,13 @@
 
 #include "animator.h"
 
-#include <QPainter>
 #include "complexanimator.h"
 #include "key.h"
 #include "qrealpoint.h"
 #include "simplemath.h"
+#include "svgexporthelpers.h"
+
+#include <QPainter>
 
 Animator::Animator(const QString& name) : Property(name), anim_mKeys(this) {}
 
@@ -629,7 +631,8 @@ void Animator::saveSVG(QDomDocument& doc,
                        const QString& attrName,
                        const ValueGetter& valueGetter,
                        const bool transform,
-                       const QString& type) const {
+                       const QString& type,
+                       const bool loop) const {
     Q_UNUSED(defs)
     Q_ASSERT(!transform || attrName == "transform");
     const auto relRange = prp_absRangeToRelRange(absRange);
@@ -669,7 +672,7 @@ void Animator::saveSVG(QDomDocument& doc,
         }
         anim.setAttribute("values", values.join(';'));
         anim.setAttribute("keyTimes", keyTimes.join(';'));
-        anim.setAttribute("repeatCount", "indefinite");
+        SvgExportHelpers::assignLoop(anim, loop);
         parent.appendChild(anim);
     }
 }
@@ -680,7 +683,8 @@ void Animator::saveSVG(QDomDocument& doc,
                        const FrameRange& absRange,
                        const qreal fps,
                        const QString& attrName,
-                       const ValueGetter& valueGetter) const {
+                       const ValueGetter& valueGetter,
+                       const bool loop) const {
     saveSVG(doc, parent, defs, absRange, fps, attrName,
-            valueGetter, false, "");
+            valueGetter, false, "", loop);
 }

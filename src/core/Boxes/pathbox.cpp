@@ -302,9 +302,9 @@ void PathBox::savePathBoxSVG(QDomDocument& doc,
                              QDomElement& ele,
                              QDomElement& defs,
                              const FrameRange& absRange,
-                             const qreal fps) const {
-    mFillSettings->saveSVG(doc, ele, defs, absRange, fps);
-    mStrokeSettings->saveSVG(doc, ele, defs, absRange, fps);
+                             const qreal fps, const bool loop) const {
+    mFillSettings->saveSVG(doc, ele, defs, absRange, fps, loop);
+    mStrokeSettings->saveSVG(doc, ele, defs, absRange, fps, loop);
 }
 
 SmartVectorPath *PathBox::objectToVectorPathBox() {

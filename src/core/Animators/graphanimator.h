@@ -83,6 +83,7 @@ public:
                        const qreal fps,
                        const QString& attrName,
                        const ValueGetter& valueGetter,
+                       const bool loop,
                        const bool transform = false,
                        const QString& type = "") const;
 protected:

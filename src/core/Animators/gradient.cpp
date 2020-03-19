@@ -83,7 +83,7 @@ QGradientStops Gradient::getQGradientStops(const qreal absFrame) {
 void Gradient::saveSVG(QDomDocument& doc,
                        QDomElement& defs,
                        const FrameRange& absRange,
-                       const qreal fps) const {
+                       const qreal fps, const bool loop) const {
     auto ele = doc.createElement("linearGradient");
     const auto baseGradId = SvgExportHelpers::ptrToStr(this);
     const int count = ca_getNumberOfChildren();
@@ -97,7 +97,8 @@ void Gradient::saveSVG(QDomDocument& doc,
             const auto color = getChild(i);
             auto stop = doc.createElement("stop");
             stop.setAttribute("offset", count == 1 ? 0. : qreal(i)/(count - 1));
-            color->saveSVG(doc, stop, defs, absRange, fps, "stop-color");
+            color->saveColorSVG(doc, stop, defs, absRange,
+                                fps, "stop-color", loop);
             ele.appendChild(stop);
         }
     }

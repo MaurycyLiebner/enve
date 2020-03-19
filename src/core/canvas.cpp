@@ -445,7 +445,10 @@ void Canvas::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) 
 
 void Canvas::saveSceneSVG(QDomDocument& doc,
                           const FrameRange& absRange,
-                          const qreal fps) const {
+                          const qreal fps,
+                          const bool background,
+                          const bool fixedSize,
+                          const bool loop) const {
     auto ele = doc.createElement("svg");
     ele.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     ele.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
@@ -453,26 +456,31 @@ void Canvas::saveSceneSVG(QDomDocument& doc,
     const auto viewBox = QString("0 0 %1 %2").
                          arg(mWidth).arg(mHeight);
     ele.setAttribute("viewBox", viewBox);
-    ele.setAttribute("width", mWidth);
-    ele.setAttribute("height", mHeight);
+
+    if(fixedSize) {
+        ele.setAttribute("width", mWidth);
+        ele.setAttribute("height", mHeight);
+    }
 
     auto defs = doc.createElement("defs");
 
     for(const auto& grad : mGradients) {
-        grad->saveSVG(doc, defs, absRange, fps);
+        grad->saveSVG(doc, defs, absRange, fps, loop);
     }
 
-    auto bg = doc.createElement("rect");
-    bg.setAttribute("width", "100%");
-    bg.setAttribute("height", "100%");
-    mBackgroundColor->saveSVG(doc, bg, defs, absRange, fps, "fill");
-    ele.appendChild(bg);
+    if(background) {
+        auto bg = doc.createElement("rect");
+        bg.setAttribute("width", mWidth);
+        bg.setAttribute("height", mHeight);
+        mBackgroundColor->saveColorSVG(doc, bg, defs, absRange, fps, "fill", loop);
+        ele.appendChild(bg);
+    }
 
     const auto& boxes = getContainedBoxes();
     for(int i = boxes.count() - 1; i >= 0; i--) {
         const auto& box = boxes.at(i);
         if(!box->isVisible()) continue;
-        box->saveSVGWithTransform(doc, ele, defs, absRange, fps);
+        box->saveSVGWithTransform(doc, ele, defs, absRange, fps, loop);
     }
 
     ele.appendChild(defs);

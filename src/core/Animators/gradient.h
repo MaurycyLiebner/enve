@@ -51,7 +51,7 @@ public:
     void saveSVG(QDomDocument& doc,
                  QDomElement& defs,
                  const FrameRange& absRange,
-                 const qreal fps) const;
+                 const qreal fps, const bool loop) const;
 signals:
     void removed();
 private:

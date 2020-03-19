@@ -124,7 +124,7 @@ bool Rectangle::differenceInEditPathBetweenFrames(
 QDomElement Rectangle::saveSVG(QDomDocument& doc,
                                QDomElement& defs,
                                const FrameRange& absRange,
-                               const qreal fps) const {
+                               const qreal fps, const bool loop) const {
     const auto copy = enve::make_shared<Rectangle>();
     BoxClipboard::sCopyAndPaste(this, copy.get());
     getParentGroup()->addContained(copy);
@@ -171,12 +171,12 @@ QDomElement Rectangle::saveSVG(QDomDocument& doc,
     xAnim->anim_coordinateKeysWith(rightAnim);
     yAnim->anim_coordinateKeysWith(bottomAnim);
 
-    cX->saveQrealSVG(doc, ele, defs, absRange, fps, "x");
-    cY->saveQrealSVG(doc, ele, defs, absRange, fps, "y");
-    cW->saveQrealSVG(doc, ele, defs, absRange, fps, "width");
-    cH->saveQrealSVG(doc, ele, defs, absRange, fps, "height");
+    cX->saveQrealSVG(doc, ele, defs, absRange, fps, "x", loop);
+    cY->saveQrealSVG(doc, ele, defs, absRange, fps, "y", loop);
+    cW->saveQrealSVG(doc, ele, defs, absRange, fps, "width", loop);
+    cH->saveQrealSVG(doc, ele, defs, absRange, fps, "height", loop);
 
-    savePathBoxSVG(doc, ele, defs, absRange, fps);
+    savePathBoxSVG(doc, ele, defs, absRange, fps, loop);
 
     copy->removeFromParent_k();
     return ele;

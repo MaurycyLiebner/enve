@@ -32,6 +32,8 @@ ExportSvgDialog::ExportSvgDialog(const QString& path,
                                  QWidget* const parent) :
     QDialog(parent), mPath(path) {
 
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
     setWindowTitle("Export SVG");
 
     const auto mainLayout = new QVBoxLayout(this);
@@ -57,23 +59,37 @@ ExportSvgDialog::ExportSvgDialog(const QString& path,
     }
     mScene->setCurrentScene(scene);
 
+    const auto sceneButton = new QPushButton(mScene->title(), this);
+    sceneButton->setMenu(mScene);
+
     mFirstFrame = new QSpinBox(this);
+    mLastFrame = new QSpinBox(this);
+
     const int minFrame = scene ? scene->getMinFrame() : 0;
     const int maxFrame = scene ? scene->getMaxFrame() : 0;
 
     mFirstFrame->setRange(-99999, maxFrame);
     mFirstFrame->setValue(minFrame);
-    mLastFrame = new QSpinBox(this);
     mLastFrame->setRange(minFrame, 99999);
     mLastFrame->setValue(maxFrame);
 
-    const auto sceneButton = new QPushButton(mScene->title(), this);
-    sceneButton->setMenu(mScene);
+    mBackground = new QCheckBox("Background", this);
+    mBackground->setChecked(true);
+    mFixedSize = new QCheckBox("Fixed Size", this);
+    mFixedSize->setChecked(false);
+    mLoop = new QCheckBox("Loop", this);
+    mLoop->setChecked(true);
 
     spinLayout->addWidget(sceneButton);
     spinLayout->addSpacing(MIN_WIDGET_DIM);
     spinLayout->addWidget(mFirstFrame);
     spinLayout->addWidget(mLastFrame);
+
+    mainLayout->addSpacing(MIN_WIDGET_DIM);
+    mainLayout->addWidget(mBackground);
+    mainLayout->addWidget(mFixedSize);
+    mainLayout->addWidget(mLoop);
+    mainLayout->addSpacing(MIN_WIDGET_DIM);
 
     connect(mFirstFrame, qOverload<int>(&QSpinBox::valueChanged),
             mLastFrame, &QSpinBox::setMinimum);
@@ -101,8 +117,16 @@ ExportSvgDialog::ExportSvgDialog(const QString& path,
             const int firstFrame = mFirstFrame->value();
             const int lastFrame = mLastFrame->value();
 
+            const bool background = mBackground->isChecked();
+            const bool fixedSize = mFixedSize->isChecked();
+            const bool loop = mLoop->isChecked();
+
+            const FrameRange frameRange{firstFrame, lastFrame};
+            const qreal fps = scene->getFps();
+
             QDomDocument doc;
-            scene->saveSceneSVG(doc, {firstFrame, lastFrame}, scene->getFps());
+            scene->saveSceneSVG(doc, frameRange, fps,
+                                background, fixedSize, loop);
 
             QFile file(mPath);
             if(file.open(QIODevice::WriteOnly)) {

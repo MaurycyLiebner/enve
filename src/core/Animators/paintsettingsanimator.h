@@ -79,7 +79,8 @@ protected:
                  QDomElement& defs,
                  const FrameRange& absRange,
                  const qreal fps,
-                 const QString& name) const;
+                 const QString& name,
+                 const bool loop) const;
 private:
     void setGradientVar(Gradient * const grad);
     void resetGradientPoints();
@@ -105,8 +106,9 @@ public:
                  QDomElement& parent,
                  QDomElement& defs,
                  const FrameRange& absRange,
-                 const qreal fps) const {
-        PaintSettingsAnimator::saveSVG(doc, parent, defs, absRange, fps, "fill");
+                 const qreal fps, const bool loop) const {
+        PaintSettingsAnimator::saveSVG(doc, parent, defs, absRange,
+                                       fps, "fill", loop);
     }
 };
 

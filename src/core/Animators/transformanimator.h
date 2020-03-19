@@ -197,7 +197,8 @@ public:
                  QDomElement& defs,
                  const FrameRange& absRange,
                  const qreal fps,
-                 const QDomElement& child) const;
+                 const QDomElement& child,
+                 const bool loop) const;
 };
 
 #endif // TRANSFORMANIMATOR_H

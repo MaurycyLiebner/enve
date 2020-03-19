@@ -18,6 +18,7 @@
 
 #include "undoredo.h"
 #include "simplemath.h"
+#include "svgexporthelpers.h"
 
 QStringAnimator::QStringAnimator(const QString &name) :
     SteppedAnimator<QString>(name) {}
@@ -32,7 +33,7 @@ QDomElement createTextElement(QDomDocument& doc,
 void QStringAnimator::saveSVG(QDomDocument& doc,
                               QDomElement& parent,
                               const FrameRange& absRange,
-                              const qreal fps) const {
+                              const qreal fps, const bool loop) const {
     const auto relRange = prp_absRangeToRelRange(absRange);
     const auto idRange = prp_getIdenticalRelRange(relRange.fMin);
     const int span = absRange.span();
@@ -66,7 +67,7 @@ void QStringAnimator::saveSVG(QDomDocument& doc,
 
             anim.setAttribute("dur", QString::number(dur) + 's');
 
-            anim.setAttribute("repeatCount", "indefinite");
+            SvgExportHelpers::assignLoop(anim, loop);
 
             parent.appendChild(ele);
 

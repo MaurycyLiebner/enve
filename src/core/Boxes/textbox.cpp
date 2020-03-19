@@ -420,10 +420,10 @@ void saveTextAttributesSVG(QDomElement& ele,
 QDomElement TextBox::saveSVG(QDomDocument& doc,
                              QDomElement& defs,
                              const FrameRange& absRange,
-                             const qreal fps) const {
+                             const qreal fps, const bool loop) const {
     auto ele = doc.createElement("g");
     saveTextAttributesSVG(ele, mFont);
-    savePathBoxSVG(doc, ele, defs, absRange, fps);
+    savePathBoxSVG(doc, ele, defs, absRange, fps, loop);
     QString textAnchor;
     switch(mHAlignment) {
     case Qt::AlignLeft: textAnchor = "start"; break;
@@ -431,6 +431,6 @@ QDomElement TextBox::saveSVG(QDomDocument& doc,
     case Qt::AlignRight: textAnchor = "end"; break;
     }
     ele.setAttribute("text-anchor", textAnchor);
-    mText->saveSVG(doc, ele, absRange, fps);
+    mText->saveSVG(doc, ele, absRange, fps, loop);
     return ele;
 }

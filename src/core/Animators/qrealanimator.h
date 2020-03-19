@@ -161,6 +161,7 @@ public:
                       const FrameRange& absRange,
                       const qreal fps,
                       const QString& attrName,
+                      const bool loop,
                       const qreal multiplier = 1.,
                       const bool transform = false,
                       const QString& type = "") const;

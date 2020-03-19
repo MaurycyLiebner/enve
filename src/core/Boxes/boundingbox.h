@@ -226,11 +226,12 @@ public:
     virtual QDomElement saveSVG(QDomDocument& doc,
                                 QDomElement& defs,
                                 const FrameRange& absRange,
-                                const qreal fps) const {
+                                const qreal fps, const bool loop) const {
         Q_UNUSED(doc)
         Q_UNUSED(defs)
         Q_UNUSED(absRange)
         Q_UNUSED(fps)
+        Q_UNUSED(loop)
         return QDomElement();
     }
 
@@ -416,7 +417,8 @@ public:
                               QDomElement& parent,
                               QDomElement& defs,
                               const FrameRange& absRange,
-                              const qreal fps) const;
+                              const qreal fps,
+                              const bool loop) const;
 private:
     void cancelWaitingTasks();
     void afterTotalTransformChanged(const UpdateReason reason);

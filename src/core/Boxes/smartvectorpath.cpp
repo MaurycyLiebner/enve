@@ -47,10 +47,10 @@ bool SmartVectorPath::differenceInEditPathBetweenFrames(
 QDomElement SmartVectorPath::saveSVG(QDomDocument& doc,
                                      QDomElement& defs,
                                      const FrameRange& absRange,
-                                     const qreal fps) const {
+                                     const qreal fps, const bool loop) const {
     auto ele = doc.createElement("path");
-    mPathAnimator->savePathsSVG(doc, ele, defs, absRange, fps);
-    savePathBoxSVG(doc, ele, defs, absRange, fps);
+    mPathAnimator->savePathsSVG(doc, ele, defs, absRange, fps, loop);
+    savePathBoxSVG(doc, ele, defs, absRange, fps, loop);
     return ele;
 }
 

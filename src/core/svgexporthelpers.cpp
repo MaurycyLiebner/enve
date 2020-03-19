@@ -20,3 +20,8 @@ QString SvgExportHelpers::ptrToStr(const void* const ptr) {
     const auto size = QT_POINTER_SIZE * 2;
     return QString("0x%1").arg((quintptr)ptr, size, 16, QChar('0'));
 }
+
+void SvgExportHelpers::assignLoop(QDomElement& ele, const bool loop) {
+    if(loop) ele.setAttribute("repeatCount", "indefinite");
+    else ele.setAttribute("fill", "freeze");
+}

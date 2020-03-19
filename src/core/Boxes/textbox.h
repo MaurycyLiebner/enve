@@ -64,7 +64,7 @@ public:
     QDomElement saveSVG(QDomDocument& doc,
                         QDomElement& defs,
                         const FrameRange& absRange,
-                        const qreal fps) const;
+                        const qreal fps, const bool loop) const;
 private:
     Qt::Alignment mHAlignment = Qt::AlignLeft;
     Qt::Alignment mVAlignment = Qt::AlignTop;

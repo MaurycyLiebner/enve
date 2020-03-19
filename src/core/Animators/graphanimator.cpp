@@ -17,6 +17,7 @@
 #include "graphanimator.h"
 #include "graphkey.h"
 #include "qrealpoint.h"
+#include "svgexporthelpers.h"
 
 GraphAnimator::GraphAnimator(const QString& name) : Animator(name) {
     connect(this, &Animator::anim_addedKey, [this](Key * key) {
@@ -462,6 +463,7 @@ void GraphAnimator::graph_saveSVG(QDomDocument& doc,
                                   const qreal fps,
                                   const QString& attrName,
                                   const ValueGetter& valueGetter,
+                                  const bool loop,
                                   const bool transform,
                                   const QString& type) const {
     Q_UNUSED(defs)
@@ -540,7 +542,9 @@ void GraphAnimator::graph_saveSVG(QDomDocument& doc,
         anim.setAttribute("values", values.join(';'));
         anim.setAttribute("keyTimes", keyTimes.join(';'));
         anim.setAttribute("keySplines", keySplines.join(';'));
-        anim.setAttribute("repeatCount", "indefinite");
+
+        SvgExportHelpers::assignLoop(anim, loop);
+
         parent.appendChild(anim);
     }
 }
