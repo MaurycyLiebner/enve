@@ -206,18 +206,18 @@ void PaintSettingsAnimator::saveSVG(QDomDocument& doc,
             case GradientType::LINEAR: {
                 grad = doc.createElement("linearGradient");
 
-                x1->saveSVG(doc, grad, defs, absRange, fps, "x1");
-                y1->saveSVG(doc, grad, defs, absRange, fps, "y1");
-                x2->saveSVG(doc, grad, defs, absRange, fps, "x2");
-                y2->saveSVG(doc, grad, defs, absRange, fps, "y2");
+                x1->saveQrealSVG(doc, grad, defs, absRange, fps, "x1");
+                y1->saveQrealSVG(doc, grad, defs, absRange, fps, "y1");
+                x2->saveQrealSVG(doc, grad, defs, absRange, fps, "x2");
+                y2->saveQrealSVG(doc, grad, defs, absRange, fps, "y2");
             } break;
             case GradientType::RADIAL: {
                 grad = doc.createElement("radialGradient");
 
 //                const QPointF distPt = p2 - p1;
 //                const qreal radius = qSqrt(pow2(distPt.x()) + pow2(distPt.y()));
-                x1->saveSVG(doc, grad, defs, absRange, fps, "cx");
-                y1->saveSVG(doc, grad, defs, absRange, fps, "cy");
+                x1->saveQrealSVG(doc, grad, defs, absRange, fps, "cx");
+                y1->saveQrealSVG(doc, grad, defs, absRange, fps, "cy");
 
                 PropertyBindingMap bindings;
 
@@ -241,7 +241,7 @@ void PaintSettingsAnimator::saveSVG(QDomDocument& doc,
                 const auto rAnim = enve::make_shared<QrealAnimator>("");
                 rAnim->setExpression(rExpr);
 
-                rAnim->saveSVG(doc, grad, defs, absRange, fps, "r");
+                rAnim->saveQrealSVG(doc, grad, defs, absRange, fps, "r");
             } break;
             }
             grad.setAttribute("gradientUnits", "userSpaceOnUse");

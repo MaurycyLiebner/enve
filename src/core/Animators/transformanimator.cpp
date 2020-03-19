@@ -551,30 +551,20 @@ void BoxTransformAnimator::saveSVG(QDomDocument& doc,
     pivotAnim->saveSVG(doc, pivot, defs, absRange, fps,
                        "transform", true, "translate");
     const auto opacityAnim = getOpacityAnimator();
-    opacityAnim->Animator::saveSVG(doc, pivot, defs, absRange, fps, "opacity",
-                                   [opacityAnim](const int relFrame) {
-        const qreal value = opacityAnim->getEffectiveValue(relFrame);
-        return QString::number(value/100);
-    });
+    opacityAnim->saveQrealSVG(doc, pivot, defs, absRange, fps, "opacity", 0.01);
     getPosAnimator()->saveSVG(doc, translate, defs, absRange, fps,
                               "transform", true, "translate");
-    getRotAnimator()->saveSVG(doc, rotate, defs, absRange, fps,
-                              "transform", true, "rotate");
+    getRotAnimator()->saveQrealSVG(doc, rotate, defs, absRange, fps,
+                                   "transform", 1, true, "rotate");
     getScaleAnimator()->saveSVG(doc, scale, defs, absRange, fps,
                                 "transform", true, "scale");
     const auto shearAnim = getShearAnimator();
     const auto shearXAnim = shearAnim->getXAnimator();
     const auto shearYAnim = shearAnim->getYAnimator();
-    shearXAnim->Animator::saveSVG(doc, shear, defs, absRange, fps, "transform",
-                                  [shearXAnim](const int relFrame) {
-        const qreal value = shearXAnim->getEffectiveValue(relFrame);
-        return QString::number(value*45);
-    }, true, "skewX");
-    shearYAnim->Animator::saveSVG(doc, shear, defs, absRange, fps, "transform",
-                                  [shearYAnim](const int relFrame) {
-        const qreal value = shearYAnim->getEffectiveValue(relFrame);
-        return QString::number(value*45);
-    }, true, "skewY");
+    shearXAnim->saveQrealSVG(doc, shear, defs, absRange, fps,
+                             "transform", 45, true, "skewX");
+    shearYAnim->saveQrealSVG(doc, shear, defs, absRange, fps,
+                             "transform", 45, true, "skewY");
 
     const auto animGetter = [pivotAnim](const int relFrame) {
         const auto value = pivotAnim->getEffectiveValue(relFrame);

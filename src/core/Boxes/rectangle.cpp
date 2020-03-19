@@ -171,10 +171,10 @@ QDomElement Rectangle::saveSVG(QDomDocument& doc,
     xAnim->anim_coordinateKeysWith(rightAnim);
     yAnim->anim_coordinateKeysWith(bottomAnim);
 
-    cX->saveSVG(doc, ele, defs, absRange, fps, "x");
-    cY->saveSVG(doc, ele, defs, absRange, fps, "y");
-    cW->saveSVG(doc, ele, defs, absRange, fps, "width");
-    cH->saveSVG(doc, ele, defs, absRange, fps, "height");
+    cX->saveQrealSVG(doc, ele, defs, absRange, fps, "x");
+    cY->saveQrealSVG(doc, ele, defs, absRange, fps, "y");
+    cW->saveQrealSVG(doc, ele, defs, absRange, fps, "width");
+    cH->saveQrealSVG(doc, ele, defs, absRange, fps, "height");
 
     savePathBoxSVG(doc, ele, defs, absRange, fps);
 

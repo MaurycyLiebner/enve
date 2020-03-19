@@ -616,16 +616,17 @@ qreal QrealAnimator::getSavedBaseValue() {
     return mSavedCurrentValue;
 }
 
-void QrealAnimator::saveSVG(QDomDocument& doc,
-                            QDomElement& parent,
-                            QDomElement& defs,
-                            const FrameRange& absRange,
-                            const qreal fps,
-                            const QString& attrName,
-                            const bool transform,
-                            const QString& type) const {
+void QrealAnimator::saveQrealSVG(QDomDocument& doc,
+                                 QDomElement& parent,
+                                 QDomElement& defs,
+                                 const FrameRange& absRange,
+                                 const qreal fps,
+                                 const QString& attrName,
+                                 const qreal multiplier,
+                                 const bool transform,
+                                 const QString& type) const {
     Animator::saveSVG(doc, parent, defs, absRange, fps, attrName,
-                      [this](const int relFrame) {
-        return QString::number(getEffectiveValue(relFrame));
+                      [this, multiplier](const int relFrame) {
+        return QString::number(getEffectiveValue(relFrame)*multiplier);
     }, transform, type);
 }
