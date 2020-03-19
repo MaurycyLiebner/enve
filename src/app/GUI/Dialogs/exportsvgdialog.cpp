@@ -55,17 +55,22 @@ ExportSvgDialog::ExportSvgDialog(const QString& path,
             if(!scenes.isEmpty()) scene = scenes.first().get();
         }
     }
+    mScene->setCurrentScene(scene);
 
     mFirstFrame = new QSpinBox(this);
-    mFirstFrame->setRange(-99999, 200);
-    mFirstFrame->setValue(0);
-    mLastFrame = new QSpinBox(this);
-    mLastFrame->setRange(0, 99999);
-    mLastFrame->setValue(200);
+    const int minFrame = scene ? scene->getMinFrame() : 0;
+    const int maxFrame = scene ? scene->getMaxFrame() : 0;
 
-    const auto menuBar = new QMenuBar(this);
-    menuBar->addMenu(mScene);
-    spinLayout->addWidget(menuBar);
+    mFirstFrame->setRange(-99999, maxFrame);
+    mFirstFrame->setValue(minFrame);
+    mLastFrame = new QSpinBox(this);
+    mLastFrame->setRange(minFrame, 99999);
+    mLastFrame->setValue(maxFrame);
+
+    const auto sceneButton = new QPushButton(mScene->title(), this);
+    sceneButton->setMenu(mScene);
+
+    spinLayout->addWidget(sceneButton);
     spinLayout->addSpacing(MIN_WIDGET_DIM);
     spinLayout->addWidget(mFirstFrame);
     spinLayout->addWidget(mLastFrame);
@@ -84,12 +89,12 @@ ExportSvgDialog::ExportSvgDialog(const QString& path,
                                               QDialogButtonBox::Cancel);
 
     connect(mScene, &SceneChooser::currentChanged,
-            this, [buttons](Canvas* const scene) {
+            this, [this, buttons, sceneButton](Canvas* const scene) {
         buttons->button(QDialogButtonBox::Ok)->setEnabled(scene);
+        sceneButton->setText(mScene->title());
     });
 
-    connect(buttons, &QDialogButtonBox::accepted, this,
-            [this]() {
+    connect(buttons, &QDialogButtonBox::accepted, this, [this]() {
         try {
             const auto scene = mScene->getCurrentScene();
             if(!scene) RuntimeThrow("No scene selected");
