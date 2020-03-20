@@ -36,11 +36,15 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
+    using EffectApplier = std::function<void(const int relFrame,
+                                             SkPath& path)>;
     void savePathsSVG(QDomDocument& doc,
                       QDomElement& parent,
                       QDomElement& defs,
                       const FrameRange& absRange,
-                      const qreal fps, const bool loop);
+                      const qreal fps, const bool loop,
+                      const EffectApplier& applier,
+                      const bool forceDumbIncrement);
 
     SmartNodePoint * createNewSubPathAtRelPos(const QPointF &relPos);
     SmartNodePoint * createNewSubPathAtPos(const QPointF &absPos);

@@ -48,10 +48,76 @@ QDomElement SmartVectorPath::saveSVG(QDomDocument& doc,
                                      QDomElement& defs,
                                      const FrameRange& absRange,
                                      const qreal fps, const bool loop) const {
-    auto ele = doc.createElement("path");
-    mPathAnimator->savePathsSVG(doc, ele, defs, absRange, fps, loop);
-    savePathBoxSVG(doc, ele, defs, absRange, fps, loop);
-    return ele;
+    const bool baseEffects = hasBasePathEffects();
+    const bool outlineBaseEffects = hasOutlineBaseEffects();
+    const bool outlineEffects = hasOutlineEffects();
+    const bool fillEffects = hasFillEffects();
+    const bool splitFillStroke = fillEffects ||
+                                 outlineBaseEffects ||
+                                 outlineEffects;
+    QDomElement result;
+    if(splitFillStroke) {
+        result = doc.createElement("g");
+
+        auto fill = doc.createElement("path");
+        SmartPathCollection::EffectApplier fillApplier;
+        if(baseEffects || fillEffects) {
+            fillApplier = [this](const int relFrame, SkPath& path) {
+                applyBasePathEffects(relFrame, path);
+                applyFillEffects(relFrame, path);
+            };
+        };
+        mPathAnimator->savePathsSVG(doc, fill, defs, absRange,
+                                    fps, loop, fillApplier,
+                                    baseEffects || fillEffects);
+        saveFillSettingsSVG(doc, fill, defs, absRange, fps, loop);
+        fill.setAttribute("stroke", "none");
+        result.appendChild(fill);
+        switch(mPathAnimator->getFillType()) {
+        case SkPathFillType::kEvenOdd:
+            fill.setAttribute("fill-rule", "evenodd");
+            break;
+        default:
+            fill.setAttribute("fill-rule", "nonzero");
+        }
+
+        auto stroke = doc.createElement("path");
+        SmartPathCollection::EffectApplier strokeApplier;
+        if(baseEffects || outlineBaseEffects || outlineEffects) {
+            strokeApplier = [this, outlineEffects](const int relFrame, SkPath& path) {
+                applyBasePathEffects(relFrame, path);
+                applyOutlineBaseEffects(relFrame, path);
+                if(!outlineEffects) return;
+                const auto strokeSettings = getStrokeSettings();
+                SkStroke stroker;
+                strokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &stroker);
+                stroker.strokePath(path, &path);
+                applyOutlineEffects(relFrame, path);
+            };
+        };
+        mPathAnimator->savePathsSVG(doc, stroke, defs, absRange,
+                                    fps, loop, strokeApplier,
+                                    baseEffects || outlineBaseEffects ||
+                                    outlineEffects);
+        saveStrokeSettingsSVG(doc, stroke, defs, absRange,
+                              fps, loop, outlineEffects);
+        stroke.setAttribute(outlineEffects ? "stroke" : "fill", "none");
+        if(outlineEffects) stroke.setAttribute("fill-rule", "nonzero");
+
+        result.appendChild(stroke);
+    } else {
+        result = doc.createElement("path");
+        SmartPathCollection::EffectApplier applier;
+        if(baseEffects) {
+            applier = [this](const int relFrame, SkPath& path) {
+                applyBasePathEffects(relFrame, path);
+            };
+        };
+        mPathAnimator->savePathsSVG(doc, result, defs, absRange,
+                                    fps, loop, applier, baseEffects);
+        savePathBoxSVG(doc, result, defs, absRange, fps, loop);
+    }
+    return result;
 }
 
 void SmartVectorPath::loadSkPath(const SkPath &path) {

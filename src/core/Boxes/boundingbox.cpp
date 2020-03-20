@@ -1226,6 +1226,27 @@ void BoundingBox::renderDataFinished(BoxRenderData *renderData) {
     }
 }
 
+//QString skBlendModeToSVG(const SkBlendMode mode) {
+//    switch(mode) {
+//    case SkBlendMode::kMultiply:    return "multiply";
+//    case SkBlendMode::kScreen:      return "screen";
+//    case SkBlendMode::kOverlay:     return "overlay";
+//    case SkBlendMode::kDarken:      return "darken";
+//    case SkBlendMode::kLighten:     return "lighten";
+//    case SkBlendMode::kColorDodge:  return "color-dodge";
+//    case SkBlendMode::kColorBurn:   return "color-burn";
+//    case SkBlendMode::kHardLight:   return "hard-light";
+//    case SkBlendMode::kSoftLight:   return "soft-light";
+//    case SkBlendMode::kDifference:  return "difference";
+//    case SkBlendMode::kExclusion:   return "exclusion";
+//    case SkBlendMode::kHue:         return "hue";
+//    case SkBlendMode::kSaturation:  return "saturation";
+//    case SkBlendMode::kColor:       return "color";
+//    case SkBlendMode::kLuminosity:  return "luminosity";
+//    default: return "";
+//    }
+//}
+
 void BoundingBox::saveSVGWithTransform(QDomDocument& doc,
                                        QDomElement& parent,
                                        QDomElement& defs,

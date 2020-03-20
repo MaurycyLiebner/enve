@@ -41,6 +41,12 @@ void PathEffect::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     menu->addPlainAction("Delete Effect(s)", dOp);
 }
 
+void PathEffect::apply(const qreal relFrame,
+                       const qreal influence,
+                       SkPath& path) const {
+    getEffectCaller(relFrame, influence)->apply(path);
+}
+
 PathEffectType PathEffect::getEffectType() {
     return mPathEffectType;
 }

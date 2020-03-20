@@ -58,14 +58,33 @@ public:
     bool differenceInFillPathBetweenFrames(
             const int frame1, const int frame2) const;
 
+    bool hasBasePathEffects() const;
+    bool hasFillEffects() const;
+    bool hasOutlineBaseEffects() const;
+    bool hasOutlineEffects() const;
+
+    void applyBasePathEffects(const qreal relFrame, SkPath& path,
+                              const qreal influence = 1) const;
+    void applyFillEffects(const qreal relFrame, SkPath& path,
+                          const qreal influence = 1) const;
+    void applyOutlineBaseEffects(const qreal relFrame, SkPath& path,
+                                 const qreal influence = 1) const;
+    void applyOutlineEffects(const qreal relFrame, SkPath& path,
+                             const qreal influence = 1) const;
+
+    using PathCallerList = QList<stdsptr<PathEffectCaller>>;
     void addBasePathEffects(const qreal relFrame,
-                        QList<stdsptr<PathEffectCaller>>& list);
+                            PathCallerList& list,
+                            const qreal influence = 1) const;
     void addFillEffects(const qreal relFrame,
-                        QList<stdsptr<PathEffectCaller>>& list);
+                        PathCallerList& list,
+                        const qreal influence = 1) const;
     void addOutlineBaseEffects(const qreal relFrame,
-                               QList<stdsptr<PathEffectCaller>>& list);
+                               PathCallerList& list,
+                               const qreal influence = 1) const;
     void addOutlineEffects(const qreal relFrame,
-                           QList<stdsptr<PathEffectCaller>>& list);
+                           PathCallerList& list,
+                           const qreal influence = 1) const;
 protected:
     void getMotionBlurProperties(QList<Property*> &list) const;
 

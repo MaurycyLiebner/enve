@@ -128,9 +128,11 @@ void OutlineSettingsAnimator::saveSVG(QDomDocument& doc,
                                       QDomElement& parent,
                                       QDomElement& defs,
                                       const FrameRange& absRange,
-                                      const qreal fps, const bool loop) const {
+                                      const qreal fps, const bool loop,
+                                      const bool asFill) const {
     PaintSettingsAnimator::saveSVG(doc, parent, defs, absRange,
-                                   fps, "stroke", loop);
+                                   fps, asFill ? "fill" : "stroke", loop);
+    if(asFill) return;
     mLineWidth->saveQrealSVG(doc, parent, defs, absRange, fps,
                              "stroke-width", loop);
 }

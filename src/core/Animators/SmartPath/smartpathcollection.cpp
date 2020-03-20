@@ -60,22 +60,28 @@ void SmartPathCollection::savePathsSVG(QDomDocument& doc,
                                        QDomElement& parent,
                                        QDomElement& defs,
                                        const FrameRange& absRange,
-                                       const qreal fps, const bool loop) {
-    if(ca_getNumberOfChildren() == 1) {
+                                       const qreal fps, const bool loop,
+                                       const EffectApplier& applier,
+                                       const bool forceDumbIncrement) {
+    if(!forceDumbIncrement && ca_getNumberOfChildren() == 1) {
         const auto path0 = getChild(0);
         path0->graph_saveSVG(doc, parent, defs, absRange, fps, "d",
-                             [path0](const int relFrame) {
-            const auto path = path0->getPathAtRelFrame(relFrame);
+                             [path0, &applier](const int relFrame) {
+            auto path = path0->getPathAtRelFrame(relFrame);
+            if(applier) applier(relFrame, path);
             SkString pathStr;
             SkParsePath::ToSVGString(path, &pathStr);
+            if(pathStr.isEmpty()) return QString("M0 0");
             return QString(pathStr.c_str());
         }, loop);
     } else {
         Animator::saveSVG(doc, parent, defs, absRange, fps, "d",
-                          [this](const int relFrame) {
-            const auto path = getPathAtRelFrame(relFrame);
+                          [this, &applier](const int relFrame) {
+            auto path = getPathAtRelFrame(relFrame);
+            if(applier) applier(relFrame, path);
             SkString pathStr;
             SkParsePath::ToSVGString(path, &pathStr);
+            if(pathStr.isEmpty()) return QString("M0 0");
             return QString(pathStr.c_str());
         }, loop);
     }

@@ -55,6 +55,9 @@ public:
 
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
+    void apply(const qreal relFrame,
+               const qreal influence,
+               SkPath& path) const;
     PathEffectType getEffectType();
 protected:
     const PathEffectType mPathEffectType;
