@@ -88,7 +88,7 @@ void SvgExportHelpers::assignVisibility(QDomDocument& doc,
     const qreal dur = div/fps;
 
     const qreal begin = (visRange.fMin - absRange.fMin)/div;
-    const qreal end = (visRange.fMax - absRange.fMin + 1)/div;
+    const qreal end = qMin(1., (visRange.fMax - absRange.fMin + 1)/div);
 
     auto anim = doc.createElement("animate");
     anim.setAttribute("attributeName", "visibility");

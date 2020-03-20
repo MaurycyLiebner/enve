@@ -42,33 +42,12 @@ void QStringAnimator::saveSVG(QDomDocument& doc,
         parent.appendChild(ele);
     } else {
         int i = relRange.fMin;
-        const qreal div = span - 1;
-        const qreal dur = div/fps;
         while(true) {
             const auto iRange = absRange*prp_getIdenticalAbsRange(i);
 
-            const qreal begin = (iRange.fMin - absRange.fMin)/div;
-            const qreal end = (iRange.fMax - absRange.fMin + 1)/div;
-
             auto ele = createTextElement(doc, getValueAtRelFrame(i));
-
-            ele.setAttribute("visibility", "hidden");
-
-            auto anim = doc.createElement("animate");
-            anim.setAttribute("attributeName", "visibility");
-            anim.setAttribute("values", "hidden;visible;hidden;hidden");
-
-            QString keyTimes;
-            if(!isZero6Dec(begin)) keyTimes += "0;";
-            keyTimes += QString::number(begin) + ";";
-            keyTimes += QString::number(end);
-            if(!isOne6Dec(end)) keyTimes += ";1";
-            anim.setAttribute("keyTimes", keyTimes);
-
-            anim.setAttribute("dur", QString::number(dur) + 's');
-
-            SvgExportHelpers::assignLoop(anim, loop);
-
+            SvgExportHelpers::assignVisibility(doc, ele, iRange,
+                                               absRange, fps, loop);
             parent.appendChild(ele);
 
             if(iRange.fMax >= relRange.fMax) break;
