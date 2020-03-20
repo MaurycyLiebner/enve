@@ -70,6 +70,8 @@ struct Node {
     bool getC0Enabled() const { return mC0Enabled; }
     bool getC2Enabled() const { return mC2Enabled; }
 
+    NormalNodeData normalData() const;
+
     void applyTransform(const QMatrix &transform);
 
     void disableUnnecessaryCtrls();

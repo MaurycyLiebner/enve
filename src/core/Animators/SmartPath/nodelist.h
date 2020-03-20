@@ -104,6 +104,9 @@ public:
 
     bool read(eReadStream& src);
     bool write(eWriteStream &dst) const;
+
+    void normalize();
+    Q_REQUIRED_RESULT NodeList normalized() const;
 protected:
     void append(NodeList&& other);
     void prepend(NodeList&& other);

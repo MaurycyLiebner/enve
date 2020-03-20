@@ -95,6 +95,12 @@ Node Node::sInterpolateDissolved(const Node &node1, const Node &node2,
     return Node(w1*node1.t() + weight2*node2.t());
 }
 
+NormalNodeData Node::normalData() const {
+    Q_ASSERT(isNormal());
+    return {mC0Enabled, mC2Enabled,
+            mCtrlsMode, mC0, mP1, mC2};
+}
+
 void Node::applyTransform(const QMatrix &transform) {
     mC0 = transform.map(mC0);
     mP1 = transform.map(mP1);

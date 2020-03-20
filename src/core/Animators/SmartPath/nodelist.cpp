@@ -77,6 +77,20 @@ bool NodeList::write(eWriteStream& dst) const {
     return true;
 }
 
+void NodeList::normalize() {
+    const int iMax = count();
+    for(int i = 0; i < iMax; i++) {
+        const auto node = at(i);
+        if(node->isDissolved()) promoteDissolvedNodeToNormal(i);
+    }
+}
+
+NodeList NodeList::normalized() const {
+    NodeList result = *this;
+    result.normalize();
+    return result;
+}
+
 void NodeList::append(NodeList &&other) {
     mNodes.appendNodes(std::move(other.mNodes));
 }
@@ -387,6 +401,14 @@ void gCubicTo(const Node& prevNode, const Node& nextNode,
 SkPath NodeList::toSkPath() const {
     SkPath result;
 
+    if(mNodes.isEmpty()) return result;
+
+    if(at(0)->isDissolved()) {
+        auto copy = *this;
+        copy.promoteDissolvedNodeToNormal(0);
+        return copy.toSkPath();
+    }
+
     const Node * firstNode = nullptr;
     const Node * prevNormalNode = nullptr;
 
@@ -394,8 +416,9 @@ SkPath NodeList::toSkPath() const {
 
     bool move = true;
     for(const auto& node : mNodes) {
-        if(node->isDissolved()) dissolvedTs << node->t();
-        else if(node->isNormal()) {
+        if(node->isDissolved()) {
+            dissolvedTs << node->t();
+        } else if(node->isNormal()) {
             if(move) {
                 firstNode = node.get();
                 result.moveTo(toSkPoint(node->p1()));

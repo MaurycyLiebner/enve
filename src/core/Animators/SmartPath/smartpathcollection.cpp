@@ -61,16 +61,16 @@ void SmartPathCollection::savePathsSVG(QDomDocument& doc,
                                        QDomElement& defs,
                                        const FrameRange& absRange,
                                        const qreal fps, const bool loop) {
-//    if(ca_getNumberOfChildren() == 1) {
-//        const auto path0 = getChild(0);
-//        path0->graph_saveSVG(doc, parent, defs, absRange, fps, "d",
-//                             [path0](const int relFrame) {
-//            const auto path = path0->getPathAtRelFrame(relFrame);
-//            SkString pathStr;
-//            SkParsePath::ToSVGString(path, &pathStr);
-//            return QString(pathStr.c_str());
-//        });
-//    } else {
+    if(ca_getNumberOfChildren() == 1) {
+        const auto path0 = getChild(0);
+        path0->graph_saveSVG(doc, parent, defs, absRange, fps, "d",
+                             [path0](const int relFrame) {
+            const auto path = path0->getPathAtRelFrame(relFrame);
+            SkString pathStr;
+            SkParsePath::ToSVGString(path, &pathStr);
+            return QString(pathStr.c_str());
+        }, loop);
+    } else {
         Animator::saveSVG(doc, parent, defs, absRange, fps, "d",
                           [this](const int relFrame) {
             const auto path = getPathAtRelFrame(relFrame);
@@ -78,7 +78,7 @@ void SmartPathCollection::savePathsSVG(QDomDocument& doc,
             SkParsePath::ToSVGString(path, &pathStr);
             return QString(pathStr.c_str());
         }, loop);
-//    }
+    }
 }
 
 SmartNodePoint *SmartPathCollection::createNewSubPathAtRelPos(const QPointF &relPos) {
