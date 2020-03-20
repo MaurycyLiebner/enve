@@ -114,21 +114,12 @@ public:
         planUpdate(reason);
     }
 
-    void savePathBoxSVG(QDomDocument& doc,
-                        QDomElement& ele,
-                        QDomElement& defs,
-                        const FrameRange& absRange,
-                        const qreal fps, const bool loop) const;
-    void saveFillSettingsSVG(QDomDocument& doc,
-                             QDomElement& ele,
-                             QDomElement& defs,
-                             const FrameRange& absRange,
-                             const qreal fps, const bool loop) const;
-    void saveStrokeSettingsSVG(QDomDocument& doc,
+    void savePathBoxSVG(SvgExporter& exp,
+                        QDomElement& ele) const;
+    void saveFillSettingsSVG(SvgExporter& exp,
+                             QDomElement& ele) const;
+    void saveStrokeSettingsSVG(SvgExporter& exp,
                                QDomElement& ele,
-                               QDomElement& defs,
-                               const FrameRange& absRange,
-                               const qreal fps, const bool loop,
                                const bool asFill = false) const;
 protected:
     bool mOutlineAffectedByScale = true;

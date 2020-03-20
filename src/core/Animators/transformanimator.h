@@ -192,13 +192,9 @@ class BoxTransformAnimator : public AdvancedTransformAnimator {
 protected:
     BoxTransformAnimator();
 public:
-    void saveSVG(QDomDocument& doc,
+    void saveSVG(SvgExporter& exp,
                  QDomElement& parent,
-                 QDomElement& defs,
-                 const FrameRange& absRange,
-                 const qreal fps,
-                 const QDomElement& child,
-                 const bool loop) const;
+                 const QDomElement& child) const;
 };
 
 #endif // TRANSFORMANIMATOR_H

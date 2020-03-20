@@ -616,25 +616,21 @@ qreal QrealAnimator::getSavedBaseValue() {
     return mSavedCurrentValue;
 }
 
-void QrealAnimator::saveQrealSVG(QDomDocument& doc,
+void QrealAnimator::saveQrealSVG(SvgExporter& exp,
                                  QDomElement& parent,
-                                 QDomElement& defs,
-                                 const FrameRange& absRange,
-                                 const qreal fps,
                                  const QString& attrName,
-                                 const bool loop,
                                  const qreal multiplier,
                                  const bool transform,
                                  const QString& type) const {
-    if(true || hasExpression()) {
-        Animator::saveSVG(doc, parent, defs, absRange, fps, attrName,
+    if(hasExpression()) {
+        Animator::saveSVG(exp, parent, attrName,
                           [this, multiplier](const int relFrame) {
             return QString::number(getEffectiveValue(relFrame)*multiplier);
-        }, transform, type, loop);
+        }, transform, type);
     } else {
-        graph_saveSVG(doc, parent, defs, absRange, fps, attrName,
+        graph_saveSVG(exp, parent, attrName,
                       [this, multiplier](const int relFrame) {
             return QString::number(getEffectiveValue(relFrame)*multiplier);
-        }, loop, transform, type);
+        }, transform, type);
     }
 }

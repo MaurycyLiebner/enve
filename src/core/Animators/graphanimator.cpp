@@ -456,21 +456,16 @@ QList<qCubicSegment1D::Pair> splitSegmentOnExtremas(const qCubicSegment1D& segX,
     return result;
 }
 
-void GraphAnimator::graph_saveSVG(QDomDocument& doc,
+void GraphAnimator::graph_saveSVG(SvgExporter& exp,
                                   QDomElement& parent,
-                                  QDomElement& defs,
-                                  const FrameRange& absRange,
-                                  const qreal fps,
                                   const QString& attrName,
                                   const ValueGetter& valueGetter,
-                                  const bool loop,
                                   const bool transform,
                                   const QString& type) const {
-    Q_UNUSED(defs)
     Q_ASSERT(!transform || attrName == "transform");
-    const auto relRange = prp_absRangeToRelRange(absRange);
+    const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
     const auto idRange = prp_getIdenticalRelRange(relRange.fMin);
-    const int span = absRange.span();
+    const int span = exp.fAbsRange.span();
     if(idRange.inRange(relRange) || span == 1) {
         auto value = valueGetter(relRange.fMin);
         if(transform) {
@@ -480,11 +475,11 @@ void GraphAnimator::graph_saveSVG(QDomDocument& doc,
         parent.setAttribute(attrName, value.trimmed());
     } else {
         const auto tagName = transform ? "animateTransform" : "animate";
-        auto anim = doc.createElement(tagName);
+        auto anim = exp.createElement(tagName);
         anim.setAttribute("attributeName", attrName);
         if(!type.isEmpty()) anim.setAttribute("type", type);
         const qreal div = span - 1;
-        const qreal dur = div/fps;
+        const qreal dur = div/exp.fFps;
         anim.setAttribute("dur", QString::number(dur)  + 's');
 
         const auto& keys = anim_getKeys();
@@ -543,7 +538,7 @@ void GraphAnimator::graph_saveSVG(QDomDocument& doc,
         anim.setAttribute("keyTimes", keyTimes.join(';'));
         anim.setAttribute("keySplines", keySplines.join(';'));
 
-        SvgExportHelpers::assignLoop(anim, loop);
+        SvgExportHelpers::assignLoop(anim, exp.fLoop);
 
         parent.appendChild(anim);
     }

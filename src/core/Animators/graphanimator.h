@@ -76,14 +76,10 @@ public:
     void graph_finishSelectedKeysTransform();
     void graph_cancelSelectedKeysTransform();
 
-    void graph_saveSVG(QDomDocument& doc,
+    void graph_saveSVG(SvgExporter& exp,
                        QDomElement& parent,
-                       QDomElement& defs,
-                       const FrameRange& absRange,
-                       const qreal fps,
                        const QString& attrName,
                        const ValueGetter& valueGetter,
-                       const bool loop,
                        const bool transform = false,
                        const QString& type = "") const;
 protected:

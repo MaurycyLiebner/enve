@@ -1247,13 +1247,9 @@ void BoundingBox::renderDataFinished(BoxRenderData *renderData) {
 //    }
 //}
 
-void BoundingBox::saveSVGWithTransform(QDomDocument& doc,
-                                       QDomElement& parent,
-                                       QDomElement& defs,
-                                       const FrameRange& absRange,
-                                       const qreal fps,
-                                       const bool loop) const {
-    const auto child = saveSVG(doc, defs, absRange, fps, loop);
+void BoundingBox::saveSVGWithTransform(SvgExporter& exp,
+                                       QDomElement& parent) const {
+    const auto child = saveSVG(exp);
     if(child.isNull()) return;
-    mTransformAnimator->saveSVG(doc, parent, defs, absRange, fps, child, loop);
+    mTransformAnimator->saveSVG(exp, parent, child);
 }

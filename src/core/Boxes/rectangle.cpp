@@ -120,11 +120,9 @@ bool Rectangle::differenceInEditPathBetweenFrames(
 #include "simpletask.h"
 #include "Animators/customproperties.h"
 #include "Expressions/expression.h"
+#include "svgexporter.h"
 
-QDomElement Rectangle::saveSVG(QDomDocument& doc,
-                               QDomElement& defs,
-                               const FrameRange& absRange,
-                               const qreal fps, const bool loop) const {
+QDomElement Rectangle::saveSVG(SvgExporter& exp) const {
     const auto copy = enve::make_shared<Rectangle>();
     BoxClipboard::sCopyAndPaste(this, copy.get());
     getParentGroup()->addContained(copy);
@@ -161,7 +159,7 @@ QDomElement Rectangle::saveSVG(QDomDocument& doc,
     cW->setExpression(wExpr);
     cH->setExpression(hExpr);
 
-    auto ele = doc.createElement("rect");
+    auto ele = exp.createElement("rect");
     const auto xAnim = copy->mTopLeftAnimator->getXAnimator();
     const auto yAnim = copy->mTopLeftAnimator->getYAnimator();
 
@@ -171,12 +169,12 @@ QDomElement Rectangle::saveSVG(QDomDocument& doc,
     xAnim->anim_coordinateKeysWith(rightAnim);
     yAnim->anim_coordinateKeysWith(bottomAnim);
 
-    cX->saveQrealSVG(doc, ele, defs, absRange, fps, "x", loop);
-    cY->saveQrealSVG(doc, ele, defs, absRange, fps, "y", loop);
-    cW->saveQrealSVG(doc, ele, defs, absRange, fps, "width", loop);
-    cH->saveQrealSVG(doc, ele, defs, absRange, fps, "height", loop);
+    cX->saveQrealSVG(exp, ele, "x");
+    cY->saveQrealSVG(exp, ele, "y");
+    cW->saveQrealSVG(exp, ele, "width");
+    cH->saveQrealSVG(exp, ele, "height");
 
-    savePathBoxSVG(doc, ele, defs, absRange, fps, loop);
+    savePathBoxSVG(exp, ele);
 
     copy->removeFromParent_k();
     return ele;

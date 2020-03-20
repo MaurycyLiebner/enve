@@ -23,31 +23,28 @@
 QStringAnimator::QStringAnimator(const QString &name) :
     SteppedAnimator<QString>(name) {}
 
-QDomElement createTextElement(QDomDocument& doc,
+QDomElement createTextElement(SvgExporter& exp,
                               const QString& text) {
-    auto ele = doc.createElement("text");
-    ele.appendChild(doc.createTextNode(text));
+    auto ele = exp.createElement("text");
+    ele.appendChild(exp.createTextNode(text));
     return ele;
 }
 
-void QStringAnimator::saveSVG(QDomDocument& doc,
-                              QDomElement& parent,
-                              const FrameRange& absRange,
-                              const qreal fps, const bool loop) const {
-    const auto relRange = prp_absRangeToRelRange(absRange);
+void QStringAnimator::saveSVG(SvgExporter& exp,
+                              QDomElement& parent) const {
+    const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
     const auto idRange = prp_getIdenticalRelRange(relRange.fMin);
-    const int span = absRange.span();
+    const int span = exp.fAbsRange.span();
     if(idRange.inRange(relRange) || span == 1) {
-        auto ele = createTextElement(doc, getValueAtRelFrame(relRange.fMin));
+        auto ele = createTextElement(exp, getValueAtRelFrame(relRange.fMin));
         parent.appendChild(ele);
     } else {
         int i = relRange.fMin;
         while(true) {
-            const auto iRange = absRange*prp_getIdenticalAbsRange(i);
+            const auto iRange = exp.fAbsRange*prp_getIdenticalAbsRange(i);
 
-            auto ele = createTextElement(doc, getValueAtRelFrame(i));
-            SvgExportHelpers::assignVisibility(doc, ele, iRange,
-                                               absRange, fps, loop);
+            auto ele = createTextElement(exp, getValueAtRelFrame(i));
+            SvgExportHelpers::assignVisibility(exp, ele, iRange);
             parent.appendChild(ele);
 
             if(iRange.fMax >= relRange.fMax) break;

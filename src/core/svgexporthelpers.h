@@ -23,6 +23,7 @@
 #include "include/core/SkImage.h"
 
 #include "framerange.h"
+#include "svgexporter.h"
 
 namespace SvgExportHelpers {
     QString ptrToStr(const void* const ptr);
@@ -30,11 +31,9 @@ namespace SvgExportHelpers {
     void defImage(QDomDocument& doc, QDomElement& defs,
                   const sk_sp<SkImage>& image,
                   const QString id);
-    void assignVisibility(QDomDocument& doc,
+    void assignVisibility(SvgExporter& exp,
                           QDomElement& ele,
-                          const FrameRange& visRange,
-                          const FrameRange& absRange,
-                          const qreal fps, const bool loop);
+                          const FrameRange& visRange);
 };
 
 #endif // SVGEXPORTHELPERS_H

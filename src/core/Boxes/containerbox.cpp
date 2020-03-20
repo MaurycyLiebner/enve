@@ -29,6 +29,7 @@
 #include "namefixer.h"
 #include "BlendEffects/blendeffectcollection.h"
 #include "BlendEffects/blendeffectboxshadow.h"
+#include "svgexporter.h"
 
 ContainerBox::ContainerBox(const eBoxType type) :
     BoxWithPathEffects(type == eBoxType::group ? "Group" : "Layer",
@@ -121,16 +122,13 @@ OutlineSettingsAnimator *ContainerBox::getStrokeSettings() const {
     return mContainedBoxes.last()->getStrokeSettings();
 }
 
-QDomElement ContainerBox::saveSVG(QDomDocument& doc,
-                                  QDomElement& defs,
-                                  const FrameRange& absRange,
-                                  const qreal fps, const bool loop) const {
-    auto ele = doc.createElement("g");
+QDomElement ContainerBox::saveSVG(SvgExporter& exp) const {
+    auto ele = exp.createElement("g");
     const auto& boxes = getContainedBoxes();
     for(int i = boxes.count() - 1; i >= 0; i--) {
         const auto& box = boxes.at(i);
         if(!box->isVisible()) continue;
-        box->saveSVGWithTransform(doc, ele, defs, absRange, fps, loop);
+        box->saveSVGWithTransform(exp, ele);
     }
     return ele;
 }

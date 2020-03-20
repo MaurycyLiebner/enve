@@ -27,6 +27,7 @@
 #include "textboxrenderdata.h"
 #include "pathboxrenderdata.h"
 #include "ReadWrite/evformat.h"
+#include "svgexporter.h"
 
 TextBox::TextBox() : PathBox("Text", eBoxType::text) {
     mFillSettings->setPaintType(PaintType::FLATPAINT);
@@ -417,13 +418,10 @@ void saveTextAttributesSVG(QDomElement& ele,
     }
 }
 
-QDomElement TextBox::saveSVG(QDomDocument& doc,
-                             QDomElement& defs,
-                             const FrameRange& absRange,
-                             const qreal fps, const bool loop) const {
-    auto ele = doc.createElement("g");
+QDomElement TextBox::saveSVG(SvgExporter& exp) const {
+    auto ele = exp.createElement("g");
     saveTextAttributesSVG(ele, mFont);
-    savePathBoxSVG(doc, ele, defs, absRange, fps, loop);
+    savePathBoxSVG(exp, ele);
     QString textAnchor;
     switch(mHAlignment) {
     case Qt::AlignLeft: textAnchor = "start"; break;
@@ -431,6 +429,6 @@ QDomElement TextBox::saveSVG(QDomDocument& doc,
     case Qt::AlignRight: textAnchor = "end"; break;
     }
     ele.setAttribute("text-anchor", textAnchor);
-    mText->saveSVG(doc, ele, absRange, fps, loop);
+    mText->saveSVG(exp, ele);
     return ele;
 }

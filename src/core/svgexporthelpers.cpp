@@ -79,18 +79,16 @@ void SvgExportHelpers::defImage(QDomDocument& doc, QDomElement& defs,
     defs.appendChild(def);
 }
 
-void SvgExportHelpers::assignVisibility(QDomDocument& doc,
+void SvgExportHelpers::assignVisibility(SvgExporter& exp,
                                         QDomElement& ele,
-                                        const FrameRange& visRange,
-                                        const FrameRange& absRange,
-                                        const qreal fps, const bool loop) {
-    const qreal div = absRange.span() - 1;
-    const qreal dur = div/fps;
+                                        const FrameRange& visRange) {
+    const qreal div = exp.fAbsRange.span() - 1;
+    const qreal dur = div/exp.fFps;
 
-    const qreal begin = (visRange.fMin - absRange.fMin)/div;
-    const qreal end = qMin(1., (visRange.fMax - absRange.fMin + 1)/div);
+    const qreal begin = (visRange.fMin - exp.fAbsRange.fMin)/div;
+    const qreal end = qMin(1., (visRange.fMax - exp.fAbsRange.fMin + 1)/div);
 
-    auto anim = doc.createElement("animate");
+    auto anim = exp.createElement("animate");
     anim.setAttribute("attributeName", "visibility");
 
     QString values;
@@ -110,7 +108,7 @@ void SvgExportHelpers::assignVisibility(QDomDocument& doc,
 
     anim.setAttribute("dur", QString::number(dur) + 's');
 
-    SvgExportHelpers::assignLoop(anim, loop);
+    SvgExportHelpers::assignLoop(anim, exp.fLoop);
 
     ele.setAttribute("visibility", "hidden");
     ele.appendChild(anim);

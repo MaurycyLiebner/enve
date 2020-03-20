@@ -48,10 +48,7 @@ public:
 
     QGradientStops getQGradientStops(const qreal absFrame);
 
-    void saveSVG(QDomDocument& doc,
-                 QDomElement& defs,
-                 const FrameRange& absRange,
-                 const qreal fps, const bool loop) const;
+    void saveSVG(SvgExporter& exp) const;
 signals:
     void removed();
 private:

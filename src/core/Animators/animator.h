@@ -23,10 +23,11 @@ class QIODevice;
 #include "key.h"
 #include "overlappingkeylist.h"
 
-#include <QDomDocument>
+#include <QDomElement>
 
 class QPainter;
 class TimelineMovable;
+class SvgExporter;
 
 class Animator : public Property {
     Q_OBJECT
@@ -185,24 +186,16 @@ public:
     void anim_removeKeyAction(const stdsptr<Key> &newKey);
 
     using ValueGetter = std::function<QString(const int relFrane)>;
-    void saveSVG(QDomDocument& doc,
+    void saveSVG(SvgExporter& exp,
                  QDomElement& parent,
-                 QDomElement& defs,
-                 const FrameRange& absRange,
-                 const qreal fps,
                  const QString& attrName,
-                 const ValueGetter& valueGetter,
-                 const bool loop) const;
-    void saveSVG(QDomDocument& doc,
+                 const ValueGetter& valueGetter) const;
+    void saveSVG(SvgExporter& exp,
                  QDomElement& parent,
-                 QDomElement& defs,
-                 const FrameRange& absRange,
-                 const qreal fps,
                  const QString& attrName,
                  const ValueGetter& valueGetter,
                  const bool transform,
-                 const QString& type,
-                 const bool loop) const;
+                 const QString& type) const;
 protected:
     void anim_readKeys(eReadStream &src);
     void anim_writeKeys(eWriteStream& dst) const;

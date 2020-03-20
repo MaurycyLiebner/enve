@@ -254,17 +254,12 @@ void ColorAnimator::setCurrentAlphaValue(const qreal alpha) {
     mAlphaAnimator->setCurrentBaseValue(alpha);
 }
 
-void ColorAnimator::saveColorSVG(QDomDocument& doc,
+void ColorAnimator::saveColorSVG(SvgExporter& exp,
                                  QDomElement& parent,
-                                 QDomElement& defs,
-                                 const FrameRange& absRange,
-                                 const qreal fps,
-                                 const QString& name,
-                                 const bool loop) const {
-    Animator::saveSVG(doc, parent, defs, absRange, fps, name,
-                      [this](const int relFrame) {
+                                 const QString& name) const {
+    Animator::saveSVG(exp, parent, name, [this](const int relFrame) {
         return getColor(relFrame).name();
-    }, loop);
+    });
 }
 
 void ColorAnimator::prp_setupTreeViewMenu(PropertyMenu * const menu) {

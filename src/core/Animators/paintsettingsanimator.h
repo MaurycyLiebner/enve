@@ -74,13 +74,9 @@ public:
     void duplicatePaintSettingsNotAnim(PaintSettingsAnimator * const settings);
     void applyTransform(const QMatrix& transform);
 protected:
-    void saveSVG(QDomDocument& doc,
+    void saveSVG(SvgExporter& exp,
                  QDomElement& parent,
-                 QDomElement& defs,
-                 const FrameRange& absRange,
-                 const qreal fps,
-                 const QString& name,
-                 const bool loop) const;
+                 const QString& name) const;
 private:
     void setGradientVar(Gradient * const grad);
     void resetGradientPoints();
@@ -102,13 +98,8 @@ protected:
     FillSettingsAnimator(BoundingBox * const parent) :
         PaintSettingsAnimator("fill", parent) {}
 public:
-    void saveSVG(QDomDocument& doc,
-                 QDomElement& parent,
-                 QDomElement& defs,
-                 const FrameRange& absRange,
-                 const qreal fps, const bool loop) const {
-        PaintSettingsAnimator::saveSVG(doc, parent, defs, absRange,
-                                       fps, "fill", loop);
+    void saveSVG(SvgExporter& exp, QDomElement& parent) const {
+        PaintSettingsAnimator::saveSVG(exp, parent, "fill");
     }
 };
 

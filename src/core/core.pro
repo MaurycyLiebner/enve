@@ -302,6 +302,7 @@ SOURCES += \
     Animators/intanimator.cpp \
     Animators/key.cpp \
     Animators/boolanimator.cpp \
+    svgexporter.cpp \
     svgexporthelpers.cpp \
     svgimporter.cpp \
     switchablecontext.cpp \
@@ -622,6 +623,7 @@ HEADERS += \
     Animators/animator.h \
     Animators/intanimator.h \
     Animators/boolanimator.h \
+    svgexporter.h \
     svgexporthelpers.h \
     svgimporter.h \
     switchablecontext.h \

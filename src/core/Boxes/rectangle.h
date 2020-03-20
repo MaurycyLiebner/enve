@@ -28,10 +28,7 @@ public:
     bool differenceInEditPathBetweenFrames(
                 const int frame1, const int frame2) const;
 
-    QDomElement saveSVG(QDomDocument& doc,
-                        QDomElement& defs,
-                        const FrameRange& absRange,
-                        const qreal fps, const bool loop) const;
+    QDomElement saveSVG(SvgExporter& exp) const;
 
     void moveSizePointByAbs(const QPointF &absTrans);
 

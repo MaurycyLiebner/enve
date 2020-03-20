@@ -20,6 +20,7 @@
 #include "GUI/scenechooser.h"
 #include "GUI/global.h"
 #include "canvas.h"
+#include "svgexporter.h"
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -124,21 +125,11 @@ ExportSvgDialog::ExportSvgDialog(const QString& path,
             const FrameRange frameRange{firstFrame, lastFrame};
             const qreal fps = scene->getFps();
 
-            QDomDocument doc;
-            scene->saveSceneSVG(doc, frameRange, fps,
-                                background, fixedSize, loop);
-
-            QFile file(mPath);
-            if(file.open(QIODevice::WriteOnly)) {
-                QTextStream stream(&file);
-                stream << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" << endl;
-                stream << "<!-- Created with enve https://maurycyliebner.github.io -->" << endl << endl;
-                stream << doc.toString();
-                stream.flush();
-            } else {
-                RuntimeThrow("Could not open:\n\"" + mPath + "\"");
-            }
-            file.close();
+            const auto task = new SvgExporter(mPath, scene, frameRange, fps,
+                                              background, fixedSize, loop);
+            const auto taskSPtr = QSharedPointer<SvgExporter>(task);
+            task->nextStep();
+            TaskScheduler::instance()->addComplexTask(taskSPtr);
         } catch(const std::exception& e) {
             gPrintExceptionCritical(e);
             return;

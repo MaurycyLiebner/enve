@@ -29,9 +29,6 @@ public:
 
     virtual void nextStep() = 0;
 
-    eTask* addEmptyTask();
-    void addTask(const stdsptr<eTask>& task);
-
     void cancel();
     bool setValue(const int value);
 
@@ -43,6 +40,9 @@ signals:
     void finished(const int value);
     void finishedAll();
     void canceled();
+protected:
+    eTask* addEmptyTask();
+    void addTask(const stdsptr<eTask>& task);
 private:
     bool finishedEmitters();
 

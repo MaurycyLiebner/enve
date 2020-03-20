@@ -223,15 +223,8 @@ public:
     virtual SkBlendMode getBlendMode() const
     { return mBlendMode; }
 
-    virtual QDomElement saveSVG(QDomDocument& doc,
-                                QDomElement& defs,
-                                const FrameRange& absRange,
-                                const qreal fps, const bool loop) const {
-        Q_UNUSED(doc)
-        Q_UNUSED(defs)
-        Q_UNUSED(absRange)
-        Q_UNUSED(fps)
-        Q_UNUSED(loop)
+    virtual QDomElement saveSVG(SvgExporter& exp) const {
+        Q_UNUSED(exp)
         return QDomElement();
     }
 
@@ -413,12 +406,8 @@ public:
 
     ContainerBox* getFirstParentLayer() const;
 
-    void saveSVGWithTransform(QDomDocument& doc,
-                              QDomElement& parent,
-                              QDomElement& defs,
-                              const FrameRange& absRange,
-                              const qreal fps,
-                              const bool loop) const;
+    void saveSVGWithTransform(SvgExporter& exp,
+                              QDomElement& parent) const;
 private:
     void cancelWaitingTasks();
     void afterTotalTransformChanged(const UpdateReason reason);

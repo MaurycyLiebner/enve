@@ -623,21 +623,16 @@ int Animator::anim_getLowestAbsFrameForSelectedKey() {
     return lowestKey;
 }
 
-void Animator::saveSVG(QDomDocument& doc,
+void Animator::saveSVG(SvgExporter& exp,
                        QDomElement& parent,
-                       QDomElement& defs,
-                       const FrameRange& absRange,
-                       const qreal fps,
                        const QString& attrName,
                        const ValueGetter& valueGetter,
                        const bool transform,
-                       const QString& type,
-                       const bool loop) const {
-    Q_UNUSED(defs)
+                       const QString& type) const {
     Q_ASSERT(!transform || attrName == "transform");
-    const auto relRange = prp_absRangeToRelRange(absRange);
+    const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
     const auto idRange = prp_getIdenticalRelRange(relRange.fMin);
-    const int span = absRange.span();
+    const int span = exp.fAbsRange.span();
     if(idRange.inRange(relRange) || span == 1) {
         auto value = valueGetter(relRange.fMin);
         if(transform) {
@@ -647,11 +642,11 @@ void Animator::saveSVG(QDomDocument& doc,
         parent.setAttribute(attrName, value.trimmed());
     } else {
         const auto tagName = transform ? "animateTransform" : "animate";
-        auto anim = doc.createElement(tagName);
+        auto anim = exp.createElement(tagName);
         anim.setAttribute("attributeName", attrName);
         if(!type.isEmpty()) anim.setAttribute("type", type);
         const qreal div = span - 1;
-        const qreal dur = div/fps;
+        const qreal dur = div/exp.fFps;
         anim.setAttribute("dur", QString::number(dur)  + 's');
         int i = relRange.fMin;
         QStringList values;
@@ -659,12 +654,12 @@ void Animator::saveSVG(QDomDocument& doc,
         while(true) {
             const auto value = valueGetter(i);
             values << value;
-            const auto iRange = absRange*prp_getIdenticalAbsRange(i);
-            const qreal minTime = (iRange.fMin - absRange.fMin)/div;
+            const auto iRange = exp.fAbsRange*prp_getIdenticalAbsRange(i);
+            const qreal minTime = (iRange.fMin - exp.fAbsRange.fMin)/div;
             keyTimes << QString::number(minTime);
             if(iRange.fMin != iRange.fMax) {
                 values << value;
-                const qreal maxTime = (iRange.fMax - absRange.fMin)/div;
+                const qreal maxTime = (iRange.fMax - exp.fAbsRange.fMin)/div;
                 keyTimes << QString::number(maxTime);
             }
             if(iRange.fMax >= relRange.fMax) break;
@@ -672,19 +667,14 @@ void Animator::saveSVG(QDomDocument& doc,
         }
         anim.setAttribute("values", values.join(';'));
         anim.setAttribute("keyTimes", keyTimes.join(';'));
-        SvgExportHelpers::assignLoop(anim, loop);
+        SvgExportHelpers::assignLoop(anim, exp.fLoop);
         parent.appendChild(anim);
     }
 }
 
-void Animator::saveSVG(QDomDocument& doc,
+void Animator::saveSVG(SvgExporter& exp,
                        QDomElement& parent,
-                       QDomElement& defs,
-                       const FrameRange& absRange,
-                       const qreal fps,
                        const QString& attrName,
-                       const ValueGetter& valueGetter,
-                       const bool loop) const {
-    saveSVG(doc, parent, defs, absRange, fps, attrName,
-            valueGetter, false, "", loop);
+                       const ValueGetter& valueGetter) const {
+    saveSVG(exp, parent, attrName, valueGetter, false, "");
 }

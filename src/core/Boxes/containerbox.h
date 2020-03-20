@@ -113,10 +113,7 @@ public:
 
     bool shouldScheduleUpdate() { return isLayer(); }
 
-    QDomElement saveSVG(QDomDocument& doc,
-                        QDomElement& defs,
-                        const FrameRange& absRange,
-                        const qreal fps, const bool loop) const;
+    QDomElement saveSVG(SvgExporter& exp) const;
 
     void queChildrenTasks();
     void queTasks();

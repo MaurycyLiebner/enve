@@ -28,6 +28,7 @@
 #include "Animators/SmartPath/smartpathanimator.h"
 #include "PathEffects/patheffectcollection.h"
 #include "Animators/qpointfanimator.h"
+#include "svgexporter.h"
 
 SmartVectorPath::SmartVectorPath() :
     PathBox("Path", eBoxType::vectorPath) {
@@ -44,10 +45,7 @@ bool SmartVectorPath::differenceInEditPathBetweenFrames(
     return mPathAnimator->prp_differencesBetweenRelFrames(frame1, frame2);
 }
 
-QDomElement SmartVectorPath::saveSVG(QDomDocument& doc,
-                                     QDomElement& defs,
-                                     const FrameRange& absRange,
-                                     const qreal fps, const bool loop) const {
+QDomElement SmartVectorPath::saveSVG(SvgExporter& exp) const {
     const bool baseEffects = hasBasePathEffects();
     const bool outlineBaseEffects = hasOutlineBaseEffects();
     const bool outlineEffects = hasOutlineEffects();
@@ -57,9 +55,9 @@ QDomElement SmartVectorPath::saveSVG(QDomDocument& doc,
                                  outlineEffects;
     QDomElement result;
     if(splitFillStroke) {
-        result = doc.createElement("g");
+        result = exp.createElement("g");
 
-        auto fill = doc.createElement("path");
+        auto fill = exp.createElement("path");
         SmartPathCollection::EffectApplier fillApplier;
         if(baseEffects || fillEffects) {
             fillApplier = [this](const int relFrame, SkPath& path) {
@@ -67,10 +65,9 @@ QDomElement SmartVectorPath::saveSVG(QDomDocument& doc,
                 applyFillEffects(relFrame, path);
             };
         };
-        mPathAnimator->savePathsSVG(doc, fill, defs, absRange,
-                                    fps, loop, fillApplier,
+        mPathAnimator->savePathsSVG(exp, fill, fillApplier,
                                     baseEffects || fillEffects);
-        saveFillSettingsSVG(doc, fill, defs, absRange, fps, loop);
+        saveFillSettingsSVG(exp, fill);
         fill.setAttribute("stroke", "none");
         result.appendChild(fill);
         switch(mPathAnimator->getFillType()) {
@@ -81,7 +78,7 @@ QDomElement SmartVectorPath::saveSVG(QDomDocument& doc,
             fill.setAttribute("fill-rule", "nonzero");
         }
 
-        auto stroke = doc.createElement("path");
+        auto stroke = exp.createElement("path");
         SmartPathCollection::EffectApplier strokeApplier;
         if(baseEffects || outlineBaseEffects || outlineEffects) {
             strokeApplier = [this, outlineEffects](const int relFrame, SkPath& path) {
@@ -95,27 +92,24 @@ QDomElement SmartVectorPath::saveSVG(QDomDocument& doc,
                 applyOutlineEffects(relFrame, path);
             };
         };
-        mPathAnimator->savePathsSVG(doc, stroke, defs, absRange,
-                                    fps, loop, strokeApplier,
+        mPathAnimator->savePathsSVG(exp, stroke, strokeApplier,
                                     baseEffects || outlineBaseEffects ||
                                     outlineEffects);
-        saveStrokeSettingsSVG(doc, stroke, defs, absRange,
-                              fps, loop, outlineEffects);
+        saveStrokeSettingsSVG(exp, stroke, outlineEffects);
         stroke.setAttribute(outlineEffects ? "stroke" : "fill", "none");
         if(outlineEffects) stroke.setAttribute("fill-rule", "nonzero");
 
         result.appendChild(stroke);
     } else {
-        result = doc.createElement("path");
+        result = exp.createElement("path");
         SmartPathCollection::EffectApplier applier;
         if(baseEffects) {
             applier = [this](const int relFrame, SkPath& path) {
                 applyBasePathEffects(relFrame, path);
             };
         };
-        mPathAnimator->savePathsSVG(doc, result, defs, absRange,
-                                    fps, loop, applier, baseEffects);
-        savePathBoxSVG(doc, result, defs, absRange, fps, loop);
+        mPathAnimator->savePathsSVG(exp, result, applier, baseEffects);
+        savePathBoxSVG(exp, result);
     }
     return result;
 }

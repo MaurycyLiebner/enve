@@ -178,13 +178,9 @@ void PaintSettingsAnimator::applyTransform(const QMatrix &transform) {
 #include "Expressions/expression.h"
 #include "svgexporthelpers.h"
 
-void PaintSettingsAnimator::saveSVG(QDomDocument& doc,
+void PaintSettingsAnimator::saveSVG(SvgExporter& exp,
                                     QDomElement& parent,
-                                    QDomElement& defs,
-                                    const FrameRange& absRange,
-                                    const qreal fps,
-                                    const QString& name,
-                                    const bool loop) const {
+                                    const QString& name) const {
     if(mPaintType == NOPAINT) {
         parent.setAttribute(name, "none");
     } else if(mPaintType == GRADIENTPAINT) {
@@ -205,20 +201,20 @@ void PaintSettingsAnimator::saveSVG(QDomDocument& doc,
 
             switch(mGradientType) {
             case GradientType::LINEAR: {
-                grad = doc.createElement("linearGradient");
+                grad = exp.createElement("linearGradient");
 
-                x1->saveQrealSVG(doc, grad, defs, absRange, fps, "x1", loop);
-                y1->saveQrealSVG(doc, grad, defs, absRange, fps, "y1", loop);
-                x2->saveQrealSVG(doc, grad, defs, absRange, fps, "x2", loop);
-                y2->saveQrealSVG(doc, grad, defs, absRange, fps, "y2", loop);
+                x1->saveQrealSVG(exp, grad, "x1");
+                y1->saveQrealSVG(exp, grad, "y1");
+                x2->saveQrealSVG(exp, grad, "x2");
+                y2->saveQrealSVG(exp, grad, "y2");
             } break;
             case GradientType::RADIAL: {
-                grad = doc.createElement("radialGradient");
+                grad = exp.createElement("radialGradient");
 
 //                const QPointF distPt = p2 - p1;
 //                const qreal radius = qSqrt(pow2(distPt.x()) + pow2(distPt.y()));
-                x1->saveQrealSVG(doc, grad, defs, absRange, fps, "cx", loop);
-                y1->saveQrealSVG(doc, grad, defs, absRange, fps, "cy", loop);
+                x1->saveQrealSVG(exp, grad, "cx");
+                y1->saveQrealSVG(exp, grad, "cy");
 
                 PropertyBindingMap bindings;
 
@@ -242,19 +238,19 @@ void PaintSettingsAnimator::saveSVG(QDomDocument& doc,
                 const auto rAnim = enve::make_shared<QrealAnimator>("");
                 rAnim->setExpression(rExpr);
 
-                rAnim->saveQrealSVG(doc, grad, defs, absRange, fps, "r", loop);
+                rAnim->saveQrealSVG(exp, grad, "r");
             } break;
             }
             grad.setAttribute("gradientUnits", "userSpaceOnUse");
             grad.setAttribute("xlink:href", "#" + baseGradId);
             grad.setAttribute("id", thisGradId);
-            defs.appendChild(grad);
+            exp.addToDefs(grad);
             parent.setAttribute(name, QString("url(#%1)").arg(thisGradId));
         } else {
             parent.setAttribute(name, "black");
         }
     } else {
-        mColor->saveColorSVG(doc, parent, defs, absRange, fps, name, loop);
+        mColor->saveColorSVG(exp, parent, name);
     }
 }
 

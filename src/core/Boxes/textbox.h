@@ -61,10 +61,7 @@ public:
 
     void setCurrentValue(const QString &text);
 
-    QDomElement saveSVG(QDomDocument& doc,
-                        QDomElement& defs,
-                        const FrameRange& absRange,
-                        const qreal fps, const bool loop) const;
+    QDomElement saveSVG(SvgExporter& doc) const;
 private:
     Qt::Alignment mHAlignment = Qt::AlignLeft;
     Qt::Alignment mVAlignment = Qt::AlignTop;

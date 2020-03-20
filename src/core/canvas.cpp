@@ -36,6 +36,7 @@
 #include "glhelpers.h"
 #include "Private/document.h"
 #include "Boxes/sculptpathbox.h"
+#include "svgexporter.h"
 
 Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
@@ -443,48 +444,38 @@ void Canvas::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) 
     }
 }
 
-void Canvas::saveSceneSVG(QDomDocument& doc,
-                          const FrameRange& absRange,
-                          const qreal fps,
-                          const bool background,
-                          const bool fixedSize,
-                          const bool loop) const {
-    auto ele = doc.createElement("svg");
-    ele.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    ele.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+void Canvas::saveSceneSVG(SvgExporter& exp) const {
+    auto& svg = exp.svg();
+    svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
 
     const auto viewBox = QString("0 0 %1 %2").
                          arg(mWidth).arg(mHeight);
-    ele.setAttribute("viewBox", viewBox);
+    svg.setAttribute("viewBox", viewBox);
 
-    if(fixedSize) {
-        ele.setAttribute("width", mWidth);
-        ele.setAttribute("height", mHeight);
+    if(exp.fFixedSize) {
+        svg.setAttribute("width", mWidth);
+        svg.setAttribute("height", mHeight);
     }
-
-    auto defs = doc.createElement("defs");
 
     for(const auto& grad : mGradients) {
-        grad->saveSVG(doc, defs, absRange, fps, loop);
+        grad->saveSVG(exp);
     }
 
-    if(background) {
-        auto bg = doc.createElement("rect");
+    if(exp.fBackground) {
+        auto bg = exp.createElement("rect");
         bg.setAttribute("width", mWidth);
         bg.setAttribute("height", mHeight);
-        mBackgroundColor->saveColorSVG(doc, bg, defs, absRange, fps, "fill", loop);
-        ele.appendChild(bg);
+        mBackgroundColor->saveColorSVG(exp, bg, "fill");
+        svg.appendChild(bg);
     }
 
     const auto& boxes = getContainedBoxes();
     for(int i = boxes.count() - 1; i >= 0; i--) {
         const auto& box = boxes.at(i);
         if(!box->isVisible()) continue;
-        box->saveSVGWithTransform(doc, ele, defs, absRange, fps, loop);
+        box->saveSVGWithTransform(exp, svg);
     }
-
-    ele.appendChild(defs);
-    doc.appendChild(ele);
 }
 
 qsptr<BoundingBox> Canvas::createLink(const bool inner) {

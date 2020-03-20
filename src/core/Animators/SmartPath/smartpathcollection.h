@@ -38,11 +38,8 @@ public:
 
     using EffectApplier = std::function<void(const int relFrame,
                                              SkPath& path)>;
-    void savePathsSVG(QDomDocument& doc,
+    void savePathsSVG(SvgExporter& exp,
                       QDomElement& parent,
-                      QDomElement& defs,
-                      const FrameRange& absRange,
-                      const qreal fps, const bool loop,
                       const EffectApplier& applier,
                       const bool forceDumbIncrement);
 
