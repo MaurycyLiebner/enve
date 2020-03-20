@@ -126,9 +126,9 @@ SkPath SmartPathAnimator::getPathAtRelFrame(const qreal frame) {
         gInterpolate(prevPath, nextPath, nWeight, sPath);
         return sPath.getPathAt();
     } else if(!prevKey && nextKey) {
-        return nextKey->getPath();
+        return nextKey->getValue().getPathAt();
     } else if(prevKey && !nextKey) {
-        return prevKey->getPath();
+        return prevKey->getValue().getPathAt();
     }
     return baseValue().getPathAt();
 }

@@ -22,7 +22,9 @@
 #include "../../skia/skiahelpers.h"
 #include "../interoptimalanimatort.h"
 #include "differsinterpolate.h"
-#include "smartpathkey.h"
+#include "smartpath.h"
+
+using SmartPathKey = InterpolationKeyT<SmartPath>;
 
 class SmartPathAnimator : public InterOptimalAnimatorT<SmartPath> {
     e_OBJECT
