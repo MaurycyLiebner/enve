@@ -27,10 +27,13 @@ class ComplexTask : public QObject {
 public:
     ComplexTask(const int finishValue, const QString& name);
 
+    virtual void nextStep() = 0;
+
+    eTask* addEmptyTask();
     void addTask(const stdsptr<eTask>& task);
 
     void cancel();
-    void setValue(const int value);
+    bool setValue(const int value);
 
     const QString& name() const { return mName; }
     int finishValue() const { return mFinishValue; }
@@ -41,7 +44,7 @@ signals:
     void finishedAll();
     void canceled();
 private:
-    void finishedEmitters();
+    bool finishedEmitters();
 
     bool mDone = false;
     int mFinishValue = 0;

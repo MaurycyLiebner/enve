@@ -19,7 +19,18 @@
 ComplexTask::ComplexTask(const int finishValue, const QString &name) :
     mFinishValue(finishValue), mName(name) {}
 
+eTask* ComplexTask::addEmptyTask() {
+    const auto emptyTask = enve::make_shared<eCustomCpuTask>(
+                nullptr, nullptr, nullptr, nullptr);
+    emptyTask->queTask();
+    addTask(emptyTask);
+    return emptyTask.get();
+}
+
 void ComplexTask::addTask(const stdsptr<eTask> &task) {
+    const QPointer<ComplexTask> ptr = this;
+    task->addDependent({[ptr]() { if(ptr) ptr->nextStep(); },
+                        [ptr]() { if(ptr) ptr->cancel(); }});
     mTasks << task;
 }
 
@@ -33,16 +44,18 @@ void ComplexTask::cancel() {
     emit canceled();
 }
 
-void ComplexTask::setValue(const int value) {
+bool ComplexTask::setValue(const int value) {
     mValue = value;
-    finishedEmitters();
+    return finishedEmitters();
 }
 
-void ComplexTask::finishedEmitters() {
-    if(mDone) return;
+bool ComplexTask::finishedEmitters() {
+    if(mDone) return false;
     emit finished(mValue);
     if(mValue >= finishValue()) {
-        emit finishedAll();
         mDone = true;
+        emit finishedAll();
+        return true;
     }
+    return false;
 }

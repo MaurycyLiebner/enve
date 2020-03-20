@@ -284,9 +284,9 @@ void TaskScheduler::addComplexTask(const qsptr<ComplexTask> &task) {
     const auto deleter = [this, taskPtr]() {
         mComplexTasks.removeOne(taskPtr);
     };
+    emit complexTaskAdded(task.data());
     connect(task.data(), &ComplexTask::canceled, this, deleter);
     connect(task.data(), &ComplexTask::finishedAll, this, deleter);
-    emit complexTaskAdded(task.data());
 }
 
 void TaskScheduler::enterCriticalMemoryState() {

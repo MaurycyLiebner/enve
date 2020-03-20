@@ -149,68 +149,42 @@ FrameRange AnimationBox::prp_getIdenticalRelRange(const int relFrame) const {
     return BoundingBox::prp_getIdenticalRelRange(relFrame);
 }
 
-class AnimationToPaint : public QObject {
+class AnimationToPaint : public ComplexTask {
 public:
     using Loader = std::function<void(int, int)>;
-    using Cancel = std::function<void()>;
     AnimationToPaint(const int firstAbsFrame, const int firstRelFrame,
                      const int iMax, const int increment,
                      AnimationBox* const box,
                      AnimationFrameHandler* const src,
-                     ComplexTask* const cplxTask,
-                     const Loader& loader,
-                     const Cancel& cancel,
-                     QObject* const parent) :
-        QObject(parent),
+                     const Loader& loader) :
+        ComplexTask(iMax, "Video to Paint"),
         mFirstAbsFrame(firstAbsFrame), mFirstRelFrame(firstRelFrame),
-        mIMax(iMax), mIncrement(increment),
-        mBox(box), mSrc(src), mCplxTask(cplxTask),
-        mLoader(loader), mCancel(cancel) {}
+        mIncrement(increment), mBox(box), mSrc(src), mLoader(loader) {}
 
-    void process() {
-        if(!mCplxTask) return;
-        if(!mBox || !mSrc) return mCplxTask->cancel();
-        if(mI > mIMax) {
-            const int finishValue = mCplxTask->finishValue();
-            mCplxTask->setValue(finishValue);
-            return;
-        };
+    void nextStep() {
+        if(!mBox || !mSrc) return cancel();
+        if(setValue(mI)) return;
+
         const int relFrame = mFirstRelFrame + mI;
         const int absFrame = mFirstAbsFrame + mI;
         const int animFrame = mBox->getAnimationFrameForRelFrame(relFrame);
         auto task = mSrc->scheduleFrameLoad(animFrame);
-        if(!task) {
-            const auto emptyTask = enve::make_shared<eCustomCpuTask>(
-                        nullptr, nullptr, nullptr, nullptr);
-            emptyTask->queTask();
-            task = emptyTask.get();
-        }
-        mCplxTask->addTask(task->ref<eTask>());
+        if(task) addTask(task->ref<eTask>());
+        else task = addEmptyTask();
         const QPointer<AnimationToPaint> ptr = this;
-        const QPointer<ComplexTask> cplxPtr = mCplxTask;
-        const int i = mI;
-        task->addDependent({[ptr, cplxPtr, animFrame, absFrame, i]() {
-            if(!ptr) return;
-            ptr->mLoader(animFrame, absFrame);
-            ptr->process();
-            if(cplxPtr) {
-                const int newValue = qMax(cplxPtr->value(), i);
-                cplxPtr->setValue(newValue);
-            }
-        }, mCancel});
+        task->addDependent({[ptr, animFrame, absFrame]() {
+            if(ptr) ptr->mLoader(animFrame, absFrame);
+        }, nullptr});
         mI += mIncrement;
     }
 private:
     const int mFirstAbsFrame;
     const int mFirstRelFrame;
-    const int mIMax;
     const int mIncrement;
 
     const QPointer<AnimationBox> mBox;
     const QPointer<AnimationFrameHandler> mSrc;
-    const QPointer<ComplexTask> mCplxTask;
     const Loader mLoader;
-    const std::function<void()> mCancel;
 
     int mI = 0;
 };
@@ -292,25 +266,17 @@ void AnimationBox::createPaintObject(const int firstAbsFrame,
     };
     const int firstRelFrame = prp_absFrameToRelFrame(firstAbsFrame);
     const int iMax = lastAbsFrame - firstAbsFrame;
-    const auto complexTask = QSharedPointer<ComplexTask>(
-                new ComplexTask(iMax, "Video to Paint"));
-    const auto cancel = [complexTask]() {
-        complexTask->cancel();
-    };
 
-    const auto taskCreator = new AnimationToPaint(
-                firstAbsFrame, firstRelFrame, iMax, increment,
-                this, src, complexTask.get(), loader, cancel,
-                complexTask.get());
+    const auto task = new AnimationToPaint(firstAbsFrame, firstRelFrame, iMax,
+                                           increment, this, src, loader);
+    const auto taskSPtr = QSharedPointer<AnimationToPaint>(task);
+    task->nextStep();
 
-    taskCreator->process();
-
-    if(complexTask->done()) {
+    if(task->done()) {
         adder();
     } else {
-        connect(complexTask.get(), &ComplexTask::finishedAll,
-                paintObj.get(), adder);
-        TaskScheduler::instance()->addComplexTask(complexTask);
+        connect(task, &ComplexTask::finishedAll, paintObj.get(), adder);
+        TaskScheduler::instance()->addComplexTask(taskSPtr);
     }
 }
 
