@@ -16,6 +16,12 @@
 
 #include "svgexporthelpers.h"
 
+#include "include/utils/SkBase64.h"
+#include "src/codec/SkJpegCodec.h"
+#include "src/codec/SkPngCodec.h"
+
+#include "simplemath.h"
+
 QString SvgExportHelpers::ptrToStr(const void* const ptr) {
     const auto size = QT_POINTER_SIZE * 2;
     return QString("0x%1").arg((quintptr)ptr, size, 16, QChar('0'));
@@ -24,4 +30,88 @@ QString SvgExportHelpers::ptrToStr(const void* const ptr) {
 void SvgExportHelpers::assignLoop(QDomElement& ele, const bool loop) {
     if(loop) ele.setAttribute("repeatCount", "indefinite");
     else ele.setAttribute("fill", "freeze");
+}
+
+sk_sp<SkData> asDataUri(SkImage* image) {
+    sk_sp<SkData> imageData = image->encodeToData();
+    if (!imageData) {
+        return nullptr;
+    }
+
+    const char* src = (char*)imageData->data();
+    const char* selectedPrefix = nullptr;
+    size_t selectedPrefixLength = 0;
+
+    const static char pngDataPrefix[] = "data:image/png;base64,";
+    const static char jpgDataPrefix[] = "data:image/jpeg;base64,";
+
+    if (SkJpegCodec::IsJpeg(src, imageData->size())) {
+        selectedPrefix = jpgDataPrefix;
+        selectedPrefixLength = sizeof(jpgDataPrefix);
+    } else {
+      if (!SkPngCodec::IsPng(src, imageData->size())) {
+        imageData = image->encodeToData(SkEncodedImageFormat::kPNG, 100);
+      }
+      selectedPrefix = pngDataPrefix;
+      selectedPrefixLength = sizeof(pngDataPrefix);
+    }
+
+    size_t b64Size = SkBase64::Encode(imageData->data(), imageData->size(), nullptr);
+    sk_sp<SkData> dataUri = SkData::MakeUninitialized(selectedPrefixLength + b64Size);
+    char* dest = (char*)dataUri->writable_data();
+    memcpy(dest, selectedPrefix, selectedPrefixLength);
+    SkBase64::Encode(imageData->data(), imageData->size(), dest + selectedPrefixLength - 1);
+    dest[dataUri->size() - 1] = 0;
+    return dataUri;
+}
+
+void SvgExportHelpers::defImage(QDomDocument& doc, QDomElement& defs,
+                                const sk_sp<SkImage>& image,
+                                const QString id) {
+    auto def = doc.createElement("image");
+    def.setAttribute("id", id);
+    def.setAttribute("x", 0);
+    def.setAttribute("y", 0);
+    def.setAttribute("width", image->width());
+    def.setAttribute("height", image->height());
+    const auto dataUri = asDataUri(image.get());
+    def.setAttribute("xlink:href", static_cast<const char*>(dataUri->data()));
+    defs.appendChild(def);
+}
+
+void SvgExportHelpers::assignVisibility(QDomDocument& doc,
+                                        QDomElement& ele,
+                                        const FrameRange& visRange,
+                                        const FrameRange& absRange,
+                                        const qreal fps, const bool loop) {
+    const qreal div = absRange.span() - 1;
+    const qreal dur = div/fps;
+
+    const qreal begin = (visRange.fMin - absRange.fMin)/div;
+    const qreal end = (visRange.fMax - absRange.fMin + 1)/div;
+
+    auto anim = doc.createElement("animate");
+    anim.setAttribute("attributeName", "visibility");
+
+    QString values;
+    QString keyTimes;
+    if(!isZero6Dec(begin)) {
+        values += "hidden;";
+        keyTimes += "0;";
+    }
+    values += "visible;hidden";
+    keyTimes += QString::number(begin) + ";" + QString::number(end);
+    if(!isOne6Dec(end)) {
+        values += ";hidden";
+        keyTimes += ";1";
+    }
+    anim.setAttribute("keyTimes", keyTimes);
+    anim.setAttribute("values", values);
+
+    anim.setAttribute("dur", QString::number(dur) + 's');
+
+    SvgExportHelpers::assignLoop(anim, loop);
+
+    ele.setAttribute("visibility", "hidden");
+    ele.appendChild(anim);
 }

@@ -129,6 +129,110 @@ void AnimatedSurface::addUndoRedo(const QString& name, const QRect& roi) {
     }
 }
 
+#include "svgexporthelpers.h"
+#include "Private/Tasks/taskscheduler.h"
+
+bool AnimatedSurface::savePaintSVG(
+        QDomDocument& doc, QDomElement& defs,
+        QDomElement& parent, const FrameRange& absRange,
+        const qreal fps, const bool loop) {
+    const auto relRange = prp_absRangeToRelRange(absRange);
+    const auto idRange = prp_getIdenticalRelRange(relRange.fMin);
+    const int span = absRange.span();
+    const qreal div = span - 1;
+    const qreal dur = div/fps;
+    const auto taskScheduler = TaskScheduler::instance();
+
+    auto use = doc.createElement("use");
+
+    QStringList hrefValues;
+    QStringList xValues;
+    QStringList yValues;
+    QStringList keyTimes;
+
+    const auto useCreator = [&](const int relFrame,
+                                DrawableAutoTiledSurface* surf) {
+        if(!surf) surf = getSurface(relFrame);
+        sk_sp<SkImage> image;
+        const auto task = getFrameImage(relFrame, image);
+        if(task) taskScheduler->waitTillFinished();
+
+        const qreal t = (relFrame - relRange.fMin)/div;
+        keyTimes << QString::number(t);
+
+        const QString imageId = SvgExportHelpers::ptrToStr(surf);
+        SvgExportHelpers::defImage(doc, defs, image, imageId);
+        hrefValues << "#" + imageId;
+
+        const QPoint pos = -surf->zeroTilePos();
+        xValues << QString::number(pos.x());
+        yValues << QString::number(pos.y());
+    };
+
+    if(idRange.inRange(relRange) || span == 1) {
+        useCreator(relRange.fMin, nullptr);
+    } else {
+        ASKey* prevKey = nullptr;
+
+        const auto& keys = anim_getKeys();
+        bool first = true;
+        for(const auto &i : keys) {
+            const auto key = static_cast<ASKey*>(i);
+            const int keyRelFrame = key->getRelFrame();
+            if(keyRelFrame >= relRange.fMax) break;
+            if(keyRelFrame >= relRange.fMin) {
+                const bool keyOnFirstFrame = keyRelFrame == relRange.fMin;
+                if(first) {
+                    first = false;
+                    const auto firstKey = keyOnFirstFrame ? key : prevKey;
+                    useCreator(keyRelFrame, &firstKey->dSurface());
+                } else useCreator(keyRelFrame, &key->dSurface());
+            }
+            prevKey = key;
+        }
+    }
+
+    if(hrefValues.isEmpty()) return false;
+
+    hrefValues << hrefValues.last();
+    xValues << xValues.last();
+    yValues << yValues.last();
+    keyTimes << "1";
+
+    const auto durStr = QString::number(dur)  + 's';
+    const auto keyTimesStr = keyTimes.join(';');
+    {
+        auto anim = doc.createElement("animate");
+        anim.setAttribute("attributeName", "href");
+        anim.setAttribute("dur", durStr);
+        anim.setAttribute("values", hrefValues.join(';'));
+        anim.setAttribute("keyTimes", keyTimesStr);
+        SvgExportHelpers::assignLoop(anim, loop);
+        use.appendChild(anim);
+    }
+    {
+        auto anim = doc.createElement("animate");
+        anim.setAttribute("attributeName", "x");
+        anim.setAttribute("dur", durStr);
+        anim.setAttribute("values", xValues.join(';'));
+        anim.setAttribute("keyTimes", keyTimesStr);
+        SvgExportHelpers::assignLoop(anim, loop);
+        use.appendChild(anim);
+    }
+    {
+        auto anim = doc.createElement("animate");
+        anim.setAttribute("attributeName", "y");
+        anim.setAttribute("dur", durStr);
+        anim.setAttribute("values", yValues.join(';'));
+        anim.setAttribute("keyTimes", keyTimesStr);
+        SvgExportHelpers::assignLoop(anim, loop);
+        use.appendChild(anim);
+    }
+
+    parent.appendChild(use);
+    return true;
+}
+
 ASKey::ASKey(AnimatedSurface * const parent) :
     Key(parent),
     mValue(enve::make_shared<DrawableAutoTiledSurface>()) {}

@@ -124,3 +124,11 @@ void PaintBox::setupCanvasMenu(PropertyMenu * const menu) {
 
     BoundingBox::setupCanvasMenu(menu);
 }
+
+QDomElement PaintBox::saveSVG(QDomDocument& doc, QDomElement& defs,
+                              const FrameRange& absRange,
+                              const qreal fps, const bool loop) const {
+    auto ele = doc.createElement("g");
+    mSurface->savePaintSVG(doc, defs, ele, absRange, fps, loop);
+    return ele;
+}

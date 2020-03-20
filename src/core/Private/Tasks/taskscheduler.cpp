@@ -301,6 +301,14 @@ void TaskScheduler::finishCriticalMemoryState() {
     processNextTasks();
 }
 
+void TaskScheduler::waitTillFinished() {
+    if(allQuedTasksFinished()) return;
+    QEventLoop loop;
+    QObject::connect(this, &TaskScheduler::finishedAllQuedTasks,
+                     &loop, &QEventLoop::quit, Qt::QueuedConnection);
+    loop.exec();
+}
+
 void TaskScheduler::processNextQuedCpuTask() {
     bool finished = false;
     QList<stdsptr<eTask>> tasks;

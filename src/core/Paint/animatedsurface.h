@@ -245,6 +245,10 @@ public:
 
     void afterChangedCurrentContent();
     void addUndoRedo(const QString &name, const QRect &roi);
+
+    bool savePaintSVG(QDomDocument& doc, QDomElement& defs,
+                      QDomElement& parent, const FrameRange& absRange,
+                      const qreal fps, const bool loop);
 signals:
     void currentSurfaceChanged(DrawableAutoTiledSurface*);
 private:

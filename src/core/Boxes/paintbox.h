@@ -36,6 +36,10 @@ public:
 
     void setupCanvasMenu(PropertyMenu * const menu);
 
+    QDomElement saveSVG(QDomDocument &doc, QDomElement &defs,
+                        const FrameRange &absRange,
+                        const qreal fps, const bool loop) const;
+
     AnimatedSurface * getSurface() const
     { return mSurface.get(); }
 private:

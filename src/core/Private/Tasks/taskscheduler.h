@@ -81,6 +81,8 @@ public:
 
     void enterCriticalMemoryState();
     void finishCriticalMemoryState();
+
+    void waitTillFinished();
 signals:
     void finishedAllQuedTasks() const;
     void hddUsageChanged(bool);
