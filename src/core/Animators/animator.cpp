@@ -282,6 +282,22 @@ void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
     removeKeyWithoutDeselecting(keyToRemove);
 }
 
+void Animator::anim_removeKeys(const FrameRange& relRange,
+                               const bool action) {
+    int i = relRange.adjusted(-1, 0).fMin;
+    while(i < relRange.fMax) {
+        const auto key = anim_getNextKey(i);
+        if(!key) break;
+        const int keyFrame = key->getRelFrame();
+        const bool inRange = relRange.inRange(keyFrame);
+        if(inRange) {
+            if(action) anim_removeKeyAction(key->ref<Key>());
+            else anim_removeKey(key->ref<Key>());
+        }
+        i = keyFrame;
+    }
+}
+
 void Animator::removeKeyWithoutDeselecting(const stdsptr<Key>& keyToRemove) {
     Key * const keyPtr = keyToRemove.get();
     anim_updateAfterChangedKey(keyPtr);
@@ -434,7 +450,7 @@ int Animator::anim_getCurrentRelFrame() const {
 }
 
 FrameRange Animator::prp_getIdenticalRelRange(const int relFrame) const {
-    if(anim_mKeys.isEmpty()) return {FrameRange::EMIN, FrameRange::EMAX};
+    if(anim_mKeys.count() <= 1) return FrameRange::EMINMAX;
     const auto pn = anim_getPrevAndNextKeyId(relFrame);
     const int prevId = pn.first;
     const int nextId = pn.second;
@@ -479,6 +495,33 @@ FrameRange Animator::prp_getIdenticalRelRange(const int relFrame) const {
     }
 
     return {fId, lId};
+}
+
+FrameRange Animator::prp_nextNonUnaryIdenticalRelRange(const int relFrame) const {
+    if(anim_mKeys.count() <= 1) return FrameRange::EMINMAX;
+    const auto pn = anim_getPrevAndNextKeyId(relFrame);
+    const int prevId = pn.first;
+    const int nextId = pn.second;
+
+    Key *nextKey = anim_getKeyAtIndex(nextId);
+    const bool adjKeys = nextId - prevId == 1;
+    Key * const keyAtRelFrame = adjKeys ? nullptr :
+                                          anim_getKeyAtIndex(pn.first + 1);
+    Key *prevKey = keyAtRelFrame ? keyAtRelFrame : anim_getKeyAtIndex(prevId);
+
+    int i = relFrame;
+
+    int idIt = nextId;
+    while(true) {
+        if(!nextKey || (prevKey && !nextKey->differsFromKey(prevKey))) {
+            i = prevKey->getRelFrame();
+            break;
+        }
+        prevKey = nextKey;
+        nextKey = anim_getKeyAtIndex(++idIt);
+    }
+
+    return prp_getIdenticalRelRange(i);
 }
 
 void Animator::anim_saveCurrentValueAsKey() {

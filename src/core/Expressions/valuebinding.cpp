@@ -34,7 +34,12 @@ QJSValue ValueBinding::getJSValue(QJSEngine& e, const qreal relFrame) {
     else return QJSValue::NullValue;
 }
 
-FrameRange ValueBinding::identicalRange(const int absFrame) {
+FrameRange ValueBinding::identicalRelRange(const int absFrame) {
     Q_UNUSED(absFrame)
     return FrameRange::EMINMAX;
+}
+
+FrameRange ValueBinding::nextNonUnaryIdenticalRelRange(const int absFrame) {
+    const int relFrame = mContext->prp_absFrameToRelFrame(absFrame);
+    return mContext->prp_nextNonUnaryIdenticalRelRange(relFrame);
 }

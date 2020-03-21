@@ -243,6 +243,7 @@ SOURCES += \
     ReadWrite/ereadstream.cpp \
     ReadWrite/ewritestream.cpp \
     ReadWrite/filefooter.cpp \
+    Segments/fitcurves.cpp \
     ShaderEffects/shadereffect.cpp \
     ShaderEffects/shadereffectcaller.cpp \
     ShaderEffects/shadereffectcreator.cpp \
@@ -555,6 +556,7 @@ HEADERS += \
     ReadWrite/evformat.h \
     ReadWrite/ewritestream.h \
     ReadWrite/filefooter.h \
+    Segments/fitcurves.h \
     ShaderEffects/PropertyCreators/coloranimatorcreator.h \
     ShaderEffects/PropertyCreators/intanimatorcreator.h \
     ShaderEffects/PropertyCreators/qpointfanimatorcreator.h \

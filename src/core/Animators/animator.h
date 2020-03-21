@@ -1,4 +1,4 @@
-// enve - 2D animations software
+﻿// enve - 2D animations software
 // Copyright (C) 2016-2020 Maurycy Liebner
 
 // This program is free software: you can redistribute it and/or modify
@@ -84,10 +84,12 @@ public:
     void prp_afterChangedAbsRange(const FrameRange &range,
                                   const bool clip = true);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
+    FrameRange prp_nextNonUnaryIdenticalRelRange(const int relFrame) const;
 public:
     void anim_saveCurrentValueAsKey();
     void anim_appendKey(const stdsptr<Key> &newKey);
     void anim_removeKey(const stdsptr<Key>& keyToRemove);
+    void anim_removeKeys(const FrameRange& relRange, const bool action);
     void anim_removeAllKeysFromComplexAnimator(ComplexAnimator *target);
     void anim_mergeKeysIfNeeded();
     void anim_updateAfterChangedKey(Key * const key);

@@ -154,6 +154,10 @@ public:
 
     void setExpression(const qsptr<Expression>& expression);
     void setExpressionAction(const qsptr<Expression>& expression);
+    void applyExpression(const FrameRange& relRange,
+                         const qreal sampleInc,
+                         const bool action,
+                         const qreal accuracy = 1);
 
     void saveQrealSVG(SvgExporter& exp,
                       QDomElement& parent,
@@ -169,6 +173,10 @@ private:
     bool updateCurrentBaseValue();
     bool updateCurrentEffectiveValue();
     bool assignCurrentBaseValue(const qreal newValue);
+
+    void applyExpressionSub(const FrameRange& relRange,
+                            const qreal sampleInc, const bool action,
+                            const qreal accuracy);
 
     bool mGraphMinMaxValuesFixed = false;
     bool mTransformed = false;

@@ -62,6 +62,12 @@ extern qreal gSolveForP2(const qreal p0, const qreal p1,
                          const qreal p3, const qreal t,
                          const qreal value);
 
+extern CtrlsMode gGuessCtrlsMode(const QPointF& c0,
+                                 const QPointF& p1,
+                                 const QPointF& c2,
+                                 const bool c0Enabled,
+                                 const bool c2Enabled);
+
 extern bool gIsSymmetric(const QPointF& startPos,
                          const QPointF& centerPos,
                          const QPointF& endPos,

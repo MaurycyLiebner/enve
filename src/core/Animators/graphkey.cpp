@@ -272,6 +272,15 @@ void GraphKey::setCtrlsModeAction(const CtrlsMode mode) {
     setCtrlsMode(mode);
 }
 
+void GraphKey::guessCtrlsMode() {
+    QPointF c0Pos(getC0Frame(), getC0Value());
+    const QPointF pos(mRelFrame, getValueForGraph());
+    QPointF c1Pos(getC1Frame(), getC1Value());
+    const auto ctrlsMode = gGuessCtrlsMode(c0Pos, pos, c1Pos,
+                                           mC0Enabled, mC1Enabled);
+    setCtrlsMode(ctrlsMode);
+}
+
 void GraphKey::setCtrlsMode(const CtrlsMode mode) {
     mCtrlsMode = mode;
 }

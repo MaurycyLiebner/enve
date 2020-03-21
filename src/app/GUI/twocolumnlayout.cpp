@@ -35,3 +35,8 @@ void TwoColumnLayout::addPair(QWidget *column1, QWidget *column2) {
     addWidgetToFirstColumn(column1);
     addWidgetToSecondColumn(column2);
 }
+
+void TwoColumnLayout::addSpacing(const int size) {
+    mLayout1->addSpacing(size);
+    mLayout2->addSpacing(size);
+}

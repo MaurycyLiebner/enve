@@ -91,6 +91,22 @@ FrameRange ComplexAnimator::prp_getIdenticalRelRange(const int relFrame) const {
     return range;
 }
 
+FrameRange ComplexAnimator::prp_nextNonUnaryIdenticalRelRange(const int relFrame) const {
+    for(int i = relFrame; i < FrameRange::EMAX; i++) {
+        FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
+        int lowestMax = INT_MAX;
+        for(const auto& child : ca_mChildren) {
+            const auto childRange = child->prp_nextNonUnaryIdenticalRelRange(i);
+            lowestMax = qMin(lowestMax, childRange.fMax);
+            range *= childRange;
+        }
+        if(!range.isUnary()) return range;
+        i = lowestMax;
+    }
+
+    return FrameRange::EMINMAX;
+}
+
 
 bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                           const bool parentSatisfies,

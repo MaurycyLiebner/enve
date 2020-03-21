@@ -35,6 +35,8 @@ public:
             const QString& name, const ShaderOptions& options) const = 0;
     virtual void showExpressionDialog(
             QrealAnimator* const target, QWidget* const parent) const = 0;
+    virtual void showApplyExpressionDialog(
+            QrealAnimator* const target, QWidget* const parent) const = 0;
     virtual void showDurationSettingsDialog(
             DurationRectangle* const target, QWidget* const parent) const = 0;
     virtual bool execAnimationToPaint(

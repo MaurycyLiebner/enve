@@ -14,22 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef VALUEBINDING_H
-#define VALUEBINDING_H
+#ifndef APPLYEXPRESSIONDIALOG_H
+#define APPLYEXPRESSIONDIALOG_H
 
-#include "propertybindingbase.h"
+#include <QDialog>
 
-class ValueBinding : public PropertyBindingBase {
-    ValueBinding(const Property* const context);
+#include <QDoubleSpinBox>
+
+#include "Animators/qrealanimator.h"
+
+class ApplyExpressionDialog : public QDialog {
 public:
-    static qsptr<ValueBinding> sCreate(const Property* const context);
+    ApplyExpressionDialog(QrealAnimator* const target,
+                          QWidget * const parent = nullptr);
 
-    QJSValue getJSValue(QJSEngine& e);
-    QJSValue getJSValue(QJSEngine& e, const qreal relFrame);
+private:
+    QrealAnimator* const mTarget;
 
-    FrameRange identicalRelRange(const int absFrame);
-    FrameRange nextNonUnaryIdenticalRelRange(const int absFrame);
-    QString path() const { return "$value"; }
+    QSpinBox* mFirstFrame;
+    QSpinBox* mLastFrame;
+
+    QDoubleSpinBox* mAccuracy;
 };
 
-#endif // VALUEBINDING_H
+#endif // APPLYEXPRESSIONDIALOG_H

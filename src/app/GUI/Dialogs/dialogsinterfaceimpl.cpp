@@ -27,6 +27,7 @@
 #include "GUI/Expressions/expressiondialog.h"
 #include "GUI/Dialogs/durationrectsettingsdialog.h"
 #include "GUI/Dialogs/animationtopaintdialog.h"
+#include "GUI/Dialogs/applyexpressiondialog.h"
 
 DialogsInterfaceImpl DialogsInterfaceImpl::sInstance;
 
@@ -80,6 +81,14 @@ stdsptr<ShaderEffectCreator> DialogsInterfaceImpl::execShaderChooser(
 void DialogsInterfaceImpl::showExpressionDialog(
         QrealAnimator* const target, QWidget* const parent) const {
     const auto dialog = new ExpressionDialog(target, parent);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
+}
+
+void DialogsInterfaceImpl::showApplyExpressionDialog(
+        QrealAnimator* const target, QWidget* const parent) const {
+    const auto dialog = new ApplyExpressionDialog(target, parent);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
 

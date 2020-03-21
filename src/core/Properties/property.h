@@ -104,6 +104,11 @@ public:
         return {FrameRange::EMIN, FrameRange::EMAX};
     }
 
+    virtual FrameRange prp_nextNonUnaryIdenticalRelRange(const int relFrame) const {
+        Q_UNUSED(relFrame)
+        return {FrameRange::EMIN, FrameRange::EMAX};
+    }
+
     virtual void prp_drawTimelineControls(
             QPainter * const p, const qreal pixelsPerFrame,
             const FrameRange &absFrameRange, const int rowHeight) {
@@ -167,6 +172,7 @@ public:
     { return prp_getIdenticalAbsRange(relFrame).adjusted(-1, 0).fMin; }
 
     FrameRange prp_getIdenticalAbsRange(const int relFrame) const;
+    FrameRange prp_nextNonUnaryIdenticalAbsRange(const int relFrame) const;
     FrameRange prp_relRangeToAbsRange(const FrameRange &range) const;
     FrameRange prp_absRangeToRelRange(const FrameRange &range) const;
     int prp_absFrameToRelFrame(const int absFrame) const;

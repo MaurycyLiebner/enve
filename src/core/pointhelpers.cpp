@@ -1441,3 +1441,18 @@ QList<SkPath> gBreakApart(const SkPath &src) {
         }
     }
 }
+
+CtrlsMode gGuessCtrlsMode(const QPointF& c0,
+                          const QPointF& p1,
+                          const QPointF& c2,
+                          const bool c0Enabled,
+                          const bool c2Enabled) {
+    if(!c0Enabled || !c2Enabled ||
+       isZero2Dec(pointToLen(c0 - p1)) ||
+       isZero2Dec(pointToLen(c2 - p1))) {
+        return CtrlsMode::corner;
+    }
+    if(gIsSymmetric(c0, p1, c2)) return CtrlsMode::symmetric;
+    else if(gIsSmooth(c0, p1, c2)) return CtrlsMode::smooth;
+    else return CtrlsMode::corner;
+}

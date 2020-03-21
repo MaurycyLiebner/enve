@@ -276,7 +276,6 @@ void addBasicDefs(QsciAPIs* const target) {
 ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
                                    QWidget * const parent) :
     QDialog(parent), mTarget(target) {
-    setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Expression " + target->prp_getName());
 
     const auto windowLayout = new QVBoxLayout(this);

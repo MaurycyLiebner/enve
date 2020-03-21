@@ -19,6 +19,7 @@
 #include "Animators/qrealanimator.h"
 #include "mainwindow.h"
 #include "Expressions/expressiondialog.h"
+#include "GUI/dialogsinterface.h"
 
 QrealAnimatorValueSlider::QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
                                                    qreal prefferedStep,
@@ -250,11 +251,17 @@ void QrealAnimatorValueSlider::openContextMenu(
 
     const auto setExpression = menu.addAction("Set Expression");
 
-    connect(setExpression, &QAction::triggered,
-            this, [this, aTarget]() {
-        const auto dialog = new ExpressionDialog(aTarget, this);
-        dialog->show();
+    connect(setExpression, &QAction::triggered, this, [this, aTarget]() {
+        DialogsInterface::instance().showExpressionDialog(aTarget, this);
     });
+
+    const auto applyExpression = menu.addAction("Apply Expression...");
+    connect(applyExpression, &QAction::triggered, this, [this, aTarget]() {
+        const auto& interface = DialogsInterface::instance();
+        interface.showApplyExpressionDialog(aTarget, this);
+    });
+    applyExpression->setEnabled(aTarget->hasExpression());
+
 
     const auto clearExpression = menu.addAction(
                 "Clear Expression", aTarget,

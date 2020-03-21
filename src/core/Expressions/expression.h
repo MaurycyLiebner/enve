@@ -58,7 +58,12 @@ public:
     QJSValue evaluate();
     QJSValue evaluate(const qreal relFrame);
 
-    FrameRange identicalRange(const int absFrame);
+    int nextDifferentRelFrame(const int absFrame) const
+    { return identicalRelRange(absFrame).adjusted(0, 1).fMax; }
+    int prevDifferentRelFrame(const int absFrame) const
+    { return identicalRelRange(absFrame).adjusted(-1, 0).fMin; }
+    FrameRange identicalRelRange(const int absFrame) const;
+    FrameRange nextNonUnaryIdenticalRelRange(const int absFrame) const;
 
     QString bindingsString() const;
     const QString& definitionsString() const { return mDefinitionsStr; }

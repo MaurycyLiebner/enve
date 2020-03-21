@@ -76,6 +76,7 @@ public:
     void updateCtrlFromCtrl(const QrealPointType type);
     void setCtrlsMode(const CtrlsMode mode);
     void setCtrlsModeAction(const CtrlsMode mode);
+    void guessCtrlsMode();
     CtrlsMode getCtrlsMode() const;
 
     void constrainC0MinFrame(const qreal minRelFrame);

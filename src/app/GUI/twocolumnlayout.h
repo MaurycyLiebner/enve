@@ -22,10 +22,10 @@ public:
     TwoColumnLayout();
 
     void addWidgetToFirstColumn(QWidget *wid);
-
     void addWidgetToSecondColumn(QWidget *wid);
-
     void addPair(QWidget *column1, QWidget *column2);
+
+    void addSpacing(const int size);
 protected:
     QVBoxLayout *mLayout1 = nullptr;
     QVBoxLayout *mLayout2 = nullptr;

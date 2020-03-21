@@ -81,6 +81,10 @@ FrameRange Property::prp_getIdenticalAbsRange(const int relFrame) const {
     return prp_relRangeToAbsRange(prp_getIdenticalRelRange(relFrame));
 }
 
+FrameRange Property::prp_nextNonUnaryIdenticalAbsRange(const int relFrame) const {
+    return prp_relRangeToAbsRange(prp_nextNonUnaryIdenticalRelRange(relFrame));
+}
+
 const QString &Property::prp_getName() const {
     return prp_mName;
 }

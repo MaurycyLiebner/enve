@@ -44,7 +44,9 @@ public:
     QJSValue getJSValue(QJSEngine& e);
     QJSValue getJSValue(QJSEngine& e, const qreal relFrame);
 
-    FrameRange identicalRange(const int absFrame);
+    FrameRange identicalRelRange(const int absFrame);
+    FrameRange nextNonUnaryIdenticalRelRange(const int absFrame);
+
     QString path() const { return mPath; }
 
     bool dependsOn(const Property* const prop);

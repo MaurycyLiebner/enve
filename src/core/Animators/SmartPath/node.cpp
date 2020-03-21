@@ -113,17 +113,7 @@ void Node::disableUnnecessaryCtrls() {
 }
 
 void Node::guessCtrlsMode() {
-    if(isZero2Dec(pointToLen(mC0 - mP1)) ||
-            isZero2Dec(pointToLen(mC2 - mP1)) ||
-            !mC0Enabled || !mC2Enabled) {
-        mCtrlsMode = CtrlsMode::corner;
-        return;
-    }
-    if(gIsSymmetric(mC0, mP1, mC2))
-        mCtrlsMode = CtrlsMode::symmetric;
-    else if(gIsSmooth(mC0, mP1, mC2))
-        mCtrlsMode = CtrlsMode::smooth;
-    else mCtrlsMode = CtrlsMode::corner;
+    mCtrlsMode = gGuessCtrlsMode(mC0, mP1, mC2, mC0Enabled, mC2Enabled);
 }
 
 void Node::setCtrlsMode(const CtrlsMode ctrlsMode) {

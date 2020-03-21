@@ -77,10 +77,19 @@ bool PropertyBinding::dependsOn(const Property* const prop) {
     return mBindProperty == prop || mBindProperty->prp_dependsOn(prop);
 }
 
-FrameRange PropertyBinding::identicalRange(const int absFrame) {
+FrameRange PropertyBinding::identicalRelRange(const int absFrame) {
     if(mBindPathValid && mBindProperty && mContext) {
         const int relFrame = mBindProperty->prp_absFrameToRelFrame(absFrame);
         const auto absRange = mBindProperty->prp_getIdenticalAbsRange(relFrame);
+        return mContext->prp_absRangeToRelRange(absRange);
+    }
+    return FrameRange::EMINMAX;
+}
+
+FrameRange PropertyBinding::nextNonUnaryIdenticalRelRange(const int absFrame) {
+    if(mBindPathValid && mBindProperty && mContext) {
+        const int relFrame = mBindProperty->prp_absFrameToRelFrame(absFrame);
+        const auto absRange = mBindProperty->prp_nextNonUnaryIdenticalAbsRange(relFrame);
         return mContext->prp_absRangeToRelRange(absRange);
     }
     return FrameRange::EMINMAX;

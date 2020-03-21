@@ -22,6 +22,7 @@
 #include "../simpletask.h"
 #include "typemenu.h"
 #include "GUI/dialogsinterface.h"
+#include "Segments/fitcurves.h"
 
 QrealAnimator::QrealAnimator(const qreal iniVal,
                              const qreal minVal,
@@ -49,6 +50,13 @@ void QrealAnimator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
         interface.showExpressionDialog(aTarget, parentWidget);
     };
     menu->addPlainAction("Set Expression", sOp);
+
+    const PropertyMenu::PlainSelectedOp<QrealAnimator> aOp =
+    [parentWidget](QrealAnimator * aTarget) {
+        const auto& interface = DialogsInterface::instance();
+        interface.showApplyExpressionDialog(aTarget, parentWidget);
+    };
+    menu->addPlainAction("Apply Expression...", aOp)->setEnabled(hasExpression());
 
     const PropertyMenu::PlainSelectedOp<QrealAnimator> cOp =
     [](QrealAnimator * aTarget) {
@@ -273,6 +281,105 @@ void QrealAnimator::setExpressionAction(const qsptr<Expression> &expression) {
         prp_addUndoRedo(ur);
     }
     setExpression(expression);
+}
+
+void QrealAnimator::applyExpressionSub(const FrameRange& relRange,
+                                       const qreal sampleInc,
+                                       const bool action,
+                                       const qreal accuracy) {
+    const int count = qCeil(relRange.span()/sampleInc);
+    QVector<QPointF> pts;
+    pts.reserve(count);
+
+    const qreal frameMultiplier = 100;
+    const qreal frameDivider = 1/frameMultiplier;
+
+    qreal valSum = 0;
+    for(int i = 0; i < count; i++) {
+        const qreal relFrame = relRange.fMin + i*sampleInc;
+        const qreal value = mExpression->evaluate(relFrame).toNumber();
+        pts << QPointF{relFrame*frameMultiplier, value};
+        valSum += value;
+    }
+
+    anim_removeKeys(relRange, action);
+
+    const qreal valAvg = valSum/count;
+    const auto pt2Data = reinterpret_cast<Point2*>(pts.data());
+
+    QrealKey* prevKey = nullptr;
+    const auto adder = [this, frameDivider, &prevKey, action](
+                       const int n, const BezierCurve curve) {
+        Q_UNUSED(n)
+        const auto qptData = reinterpret_cast<QPointF*>(curve);
+        const QPointF& p0 = qptData[0];
+        const QPointF& c1 = qptData[1];
+        const QPointF& c2 = qptData[2];
+        const QPointF& p3 = qptData[3];
+
+        const int frame0 = qRound(p0.x()*frameDivider);
+        const qreal frame1 = c1.x()*frameDivider;
+        const qreal frame2 = c2.x()*frameDivider;
+        const int frame3 = qRound(p3.x()*frameDivider);
+
+        stdsptr<QrealKey> key0Ref;
+        QrealKey* key0 = nullptr;
+        if(prevKey) {
+            key0 = prevKey;
+        } else {
+            key0Ref = enve::make_shared<QrealKey>(p0.y(), frame0, this);
+            if(action) anim_appendKeyAction(key0Ref);
+            else anim_appendKey(key0Ref);
+            key0 = key0Ref.get();
+        }
+        const auto key1 = enve::make_shared<QrealKey>(p3.y(), frame3, this);
+        if(action) anim_appendKeyAction(key1);
+        else anim_appendKey(key1);
+
+        key0->setC1Enabled(true);
+        key0->setC1Frame(frame1);
+        key0->setC1Value(c1.y());
+        key0->guessCtrlsMode();
+
+        key1->setC0Enabled(true);
+        key1->setCtrlsMode(CtrlsMode::corner);
+        key1->setC0Frame(frame2);
+        key1->setC0Value(c2.y());
+
+        prevKey = key1.get();
+    };
+
+    FitCurves::FitCurve(pt2Data, count, 0.01*valAvg/accuracy, adder);
+}
+
+void QrealAnimator::applyExpression(const FrameRange& relRange,
+                                    const qreal sampleInc,
+                                    const bool action,
+                                    const qreal accuracy) {
+    if(!hasValidExpression()) return;
+    if(isZero4Dec(sampleInc) || sampleInc < 0) return;
+    if(!relRange.isValid()) return;
+    if(isZero4Dec(accuracy)) return;
+
+    const auto absRange = prp_relRangeToAbsRange(relRange);
+    QList<FrameRange> ranges;
+    for(int i = relRange.fMin; i < relRange.fMax; i++) {
+        const int absFrame = absRange.fMin + i - relRange.fMin;
+        const auto nextNonUnary = mExpression->nextNonUnaryIdenticalRelRange(absFrame);
+        if(!nextNonUnary.inRange(i)) {
+            ranges << relRange*FrameRange{i, nextNonUnary.fMin};
+        }
+        i = nextNonUnary.fMax;
+    }
+
+    prp_pushUndoRedoName("Apply Expression");
+
+    for(const auto& range : ranges) {
+        applyExpressionSub(range, sampleInc, action, accuracy);
+    }
+
+    if(action) setExpressionAction(nullptr);
+    else setExpression(nullptr);
 }
 
 void QrealAnimator::setExpression(const qsptr<Expression>& expression) {
@@ -598,7 +705,7 @@ void QrealAnimator::prp_cancelTransform() {
 
 FrameRange QrealAnimator::prp_getIdenticalRelRange(const int relFrame) const {
     const auto base = Animator::prp_getIdenticalRelRange(relFrame);
-    if(mExpression) return base * mExpression->identicalRange(relFrame);
+    if(mExpression) return base * mExpression->identicalRelRange(relFrame);
     else return base;
 }
 

@@ -56,6 +56,7 @@ public:
                                     const FrameRange& newAbsRange);
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
+    FrameRange prp_nextNonUnaryIdenticalRelRange(const int relFrame) const;
 
     stdsptr<Key> anim_createKey() final
     { return nullptr; }

@@ -23,7 +23,7 @@ bool PropertyBindingBase::setAbsFrame(const int absFrame) {
     if(mContext) {
         const qreal oldRelFrame = mRelFrame;
         mRelFrame = mContext->prp_absFrameToRelFrameF(absFrame);
-        const auto idRange = identicalRange(absFrame);
+        const auto idRange = identicalRelRange(absFrame);
         if(idRange.inRange(oldRelFrame)) return false;
         emit currentValueChanged();
         return true;
