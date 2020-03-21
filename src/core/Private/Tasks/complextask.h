@@ -21,7 +21,7 @@
 
 #include "Tasks/updatable.h"
 
-class ComplexTask : public QObject {
+class ComplexTask : public QObject, public eTaskBase {
     Q_OBJECT
     friend class TaskScheduler;
 public:
@@ -35,7 +35,7 @@ public:
     const QString& name() const { return mName; }
     int finishValue() const { return mFinishValue; }
     int value() const { return mValue; }
-    bool done() const { return mDone || mFinishValue <= mValue; }
+    bool done() const { return mDone || mValue >= mFinishValue; }
 signals:
     void finished(const int value);
     void finishedAll();
@@ -43,6 +43,7 @@ signals:
 protected:
     eTask* addEmptyTask();
     void addTask(const stdsptr<eTask>& task);
+    void addTask(const qsptr<ComplexTask>& task);
 private:
     bool finishedEmitters();
 
@@ -51,6 +52,7 @@ private:
     int mValue = 0;
     const QString mName;
     QList<stdsptr<eTask>> mTasks;
+    QList<qsptr<ComplexTask>> mComplexTasks;
 };
 
 #endif // COMPLEXTASK_H

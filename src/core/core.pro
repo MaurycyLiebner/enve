@@ -259,6 +259,7 @@ SOURCES += \
     Sound/soundcomposition.cpp \
     Sound/soundmerger.cpp \
     Tasks/etask.cpp \
+    Tasks/etaskbase.cpp \
     Tasks/updatable.cpp \
     Timeline/animationrect.cpp \
     Timeline/durationrectangle.cpp \
@@ -574,6 +575,7 @@ HEADERS += \
     Sound/soundcomposition.h \
     Sound/soundmerger.h \
     Tasks/etask.h \
+    Tasks/etaskbase.h \
     Tasks/updatable.h \
     Timeline/animationrect.h \
     Timeline/durationrectangle.h \

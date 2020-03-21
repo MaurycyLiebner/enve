@@ -34,13 +34,17 @@ void ComplexTask::addTask(const stdsptr<eTask> &task) {
     mTasks << task;
 }
 
+void ComplexTask::addTask(const qsptr<ComplexTask>& task) {
+    const QPointer<ComplexTask> ptr = this;
+    task->addDependent({[ptr]() { if(ptr) ptr->nextStep(); },
+                        [ptr]() { if(ptr) ptr->cancel(); }});
+    mComplexTasks << task;
+}
+
 void ComplexTask::cancel() {
     if(mDone) return;
     mDone = true;
-    for(const auto& task : mTasks) {
-        const eTaskState state = task->getState();
-        if(state <= eTaskState::processing) task->cancel();
-    }
+    eTaskBase::cancel();
     emit canceled();
 }
 
@@ -54,6 +58,7 @@ bool ComplexTask::finishedEmitters() {
     emit finished(mValue);
     if(mValue >= finishValue()) {
         mDone = true;
+        finishedProcessing();
         emit finishedAll();
         return true;
     }

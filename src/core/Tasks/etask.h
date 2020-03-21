@@ -17,25 +17,16 @@
 #ifndef ETASK_H
 #define ETASK_H
 
-#include "smartPointers/ememory.h"
-
 #include "glhelpers.h"
 #include "hardwareenums.h"
 #include "switchablecontext.h"
 #include "../ReadWrite/basicreadwrite.h"
+#include "etaskbase.h"
 
-enum class eTaskState {
-    created,
-    qued,
-    processing,
-    finished,
-    canceled,
-    waiting
-};
-
-class eTask : public StdSelfRef {
+class eTask : public StdSelfRef, public eTaskBase {
     friend class TaskScheduler;
     friend class Que;
+    friend class eTaskBase;
     template <typename T> friend class TaskCollection;
 protected:
     eTask() {}
@@ -43,17 +34,7 @@ protected:
     virtual void queTaskNow() = 0;
     virtual void afterQued() {}
     virtual void beforeProcessing(const Hardware) {}
-    virtual void afterProcessing() {}
-    virtual void afterCanceled() {}
-    virtual void handleException() {}
 public:
-    ~eTask() { cancelDependent(); }
-
-    struct Dependent {
-        std::function<void()> fFinished;
-        std::function<void()> fCanceled;
-    };
-
     virtual HardwareSupport hardwareSupport() const = 0;
     virtual void processGpu(QGL33 * const gl,
                             SwitchableContext &context) = 0;
@@ -62,40 +43,8 @@ public:
     virtual bool nextStep() { return false; }
 
     bool queTask();
-    bool isQued() { return mState == eTaskState::qued; }
-
-    bool isActive() { return mState != eTaskState::created &&
-                             mState != eTaskState::finished; }
 
     void aboutToProcess(const Hardware hw);
-    void finishedProcessing();
-    bool readyToBeProcessed();
-
-    void addDependent(eTask * const task);
-    void addDependent(const Dependent& func);
-
-    bool finished();
-    eTaskState getState() const { return mState; }
-
-    bool waitingToCancel() const { return mCancel; }
-    void cancel();
-
-    void setException(const std::exception_ptr& exception);
-    bool unhandledException() const;
-    std::exception_ptr takeException();
-protected:
-    eTaskState mState = eTaskState::created;
-private:
-    void decDependencies();
-    void incDependencies();
-    void tellDependentThatFinished();
-    void cancelDependent();
-
-    bool mCancel = false;
-    int mNDependancies = 0;
-    QList<stdptr<eTask>> mDependent;
-    QList<Dependent> mDependentF;
-    std::exception_ptr mUpdateException;
 };
 
 Q_DECLARE_METATYPE(stdsptr<eTask>);
