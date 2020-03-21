@@ -377,6 +377,7 @@ void KeysView::graphDeletePressed() {
         } else if(mGPressedPoint->isC0Pt()) {
             parentKey->setC0EnabledAction(false);
         }
+        mGPressedPoint->setSelected(false);
         parentKey->afterKeyChanged();
     } else {
         deleteSelectedKeys();

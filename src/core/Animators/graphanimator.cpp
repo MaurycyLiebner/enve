@@ -158,40 +158,49 @@ void GraphAnimator::graph_getFrameConstraints(
     }
     const qreal keyFrame = key->getRelFrame();
 
-    qreal startMinMoveFrame;
-    qreal endMaxMoveFrame;
+    qreal prevMinFrame;
+    qreal nextMaxFrame;
     const int keyId = anim_getKeyIndex(key);
 
     const auto& keys = anim_getKeys();
     if(keyId == keys.count() - 1) {
-        endMaxMoveFrame = keyFrame + 5000;
+        nextMaxFrame = keyFrame + 5000;
     } else {
-        endMaxMoveFrame = keys.atId(keyId + 1)->getRelFrame();
+        const auto nextKey = keys.atId(keyId + 1);
+        nextMaxFrame = nextKey->getRelFrame();
     }
 
     if(keyId == 0) {
-        startMinMoveFrame = keyFrame - 5000;
+        prevMinFrame = keyFrame - 5000;
     } else {
-        const auto& prevKey = keys.atId(keyId - 1);
-        startMinMoveFrame = prevKey->getRelFrame();
+        const auto prevKey = keys.atId(keyId - 1);
+        prevMinFrame = prevKey->getRelFrame();
     }
 
     if(key->getCtrlsMode() == CtrlsMode::symmetric) {
         if(type == QrealPointType::c1Pt) {
             minMoveFrame = keyFrame;
-            maxMoveFrame = 2*keyFrame - startMinMoveFrame;
-            maxMoveFrame = qMin(endMaxMoveFrame, maxMoveFrame);
+            if(key->getC0Enabled()) {
+                const qreal prevMaxFrame = 2*keyFrame - prevMinFrame;
+                maxMoveFrame = qMin(prevMaxFrame, nextMaxFrame);
+            } else {
+                maxMoveFrame = nextMaxFrame;
+            }
         } else {
-            minMoveFrame = 2*keyFrame - endMaxMoveFrame;
-            minMoveFrame = qMax(startMinMoveFrame, minMoveFrame);
             maxMoveFrame = keyFrame;
+            if(key->getC1Enabled()) {
+                const qreal nextMinFrame = 2*keyFrame - nextMaxFrame;
+                minMoveFrame = qMax(prevMinFrame, nextMinFrame);
+            } else {
+                minMoveFrame = prevMinFrame;
+            }
         }
     } else {
         if(type == QrealPointType::c1Pt) {
             minMoveFrame = keyFrame;
-            maxMoveFrame = endMaxMoveFrame;
+            maxMoveFrame = nextMaxFrame;
         } else {
-            minMoveFrame = startMinMoveFrame;
+            minMoveFrame = prevMinFrame;
             maxMoveFrame = keyFrame;
         }
     }

@@ -212,7 +212,7 @@ void KeysView::cancelTransform() {
 void KeysView::finishTransform() {
     if(!mFirstMove) {
         if(mGraphViewed) {
-            if(mGPressedPoint) {
+            if(mGPressedPoint && mGPressedPoint->isCtrlPt()) {
                 mGPressedPoint->finishTransform();
             } else {
                 for(const auto& anim : mGraphAnimators) {
@@ -228,7 +228,6 @@ void KeysView::finishTransform() {
 
     releaseMouseAndDontTrack();
 }
-
 
 TimelineMovable *KeysView::getRectangleMovableAtPos(
         const int pressX, const int pressY,
