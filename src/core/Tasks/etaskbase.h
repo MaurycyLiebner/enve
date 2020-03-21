@@ -39,8 +39,10 @@ protected:
     virtual void handleException() {}
 public:
     struct Dependent {
-        std::function<void()> fFinished;
-        std::function<void()> fCanceled;
+        using Func = std::function<void()>;
+
+        Func fFinished;
+        Func fCanceled;
     };
 
     void addDependent(const Dependent& func);

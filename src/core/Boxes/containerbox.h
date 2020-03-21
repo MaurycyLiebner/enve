@@ -113,7 +113,7 @@ public:
 
     bool shouldScheduleUpdate() { return isLayer(); }
 
-    QDomElement saveSVG(SvgExporter& exp) const;
+    void saveSVG(SvgExporter& exp, DomEleTask* const eleTask) const;
 
     void queChildrenTasks();
     void queTasks();

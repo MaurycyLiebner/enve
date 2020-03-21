@@ -41,6 +41,7 @@
 #include "GUI/propertynamedialog.h"
 #include "BlendEffects/blendeffectcollection.h"
 #include "GUI/dialogsinterface.h"
+#include "svgexporter.h"
 
 int BoundingBox::sNextDocumentId = 0;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
@@ -1249,7 +1250,16 @@ void BoundingBox::renderDataFinished(BoxRenderData *renderData) {
 
 void BoundingBox::saveSVGWithTransform(SvgExporter& exp,
                                        QDomElement& parent) const {
-    const auto child = saveSVG(exp);
-    if(child.isNull()) return;
-    mTransformAnimator->saveSVG(exp, parent, child);
+    const auto task = enve::make_shared<DomEleTask>(exp);
+    const auto taskPtr = task.get();
+    const QPointer<const BoundingBox> ptr = this;
+    const auto expPtr = &exp;
+    const auto parentPtr = &parent;
+    taskPtr->addDependent({[ptr, taskPtr, expPtr, parentPtr]() {
+        const auto& ele = taskPtr->element();
+        if(ptr) ptr->mTransformAnimator->saveSVG(*expPtr, *parentPtr, ele);
+    }, nullptr});
+    saveSVG(exp, taskPtr);
+    taskPtr->queTask();
+    exp.addNextTask(task);
 }

@@ -26,6 +26,7 @@
 #include "MovablePoints/segment.h"
 #include "Animators/qcubicsegment1danimator.h"
 #include "BlendEffects/blendeffect.h"
+#include "Tasks/domeletask.h"
 
 class Canvas;
 
@@ -221,9 +222,9 @@ public:
     virtual SkBlendMode getBlendMode() const
     { return mBlendMode; }
 
-    virtual QDomElement saveSVG(SvgExporter& exp) const {
+    virtual void saveSVG(SvgExporter& exp, DomEleTask* const task) const {
         Q_UNUSED(exp)
-        return QDomElement();
+        Q_UNUSED(task)
     }
 
     virtual void updateIfUsesProgram(const ShaderEffectProgram * const program) const;

@@ -65,6 +65,8 @@ class ImgLoader : public TmpLoader {
     e_OBJECT
 public:
     typedef std::function<void(sk_sp<SkImage> img)> Func;
+
+    const sk_sp<SkImage>& image() const { return mImage; }
 protected:
     ImgLoader(const qsptr<QTemporaryFile> &file,
               ImageCacheContainer* const target,

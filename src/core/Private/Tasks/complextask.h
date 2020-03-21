@@ -44,6 +44,7 @@ protected:
     eTask* addEmptyTask();
     void addTask(const stdsptr<eTask>& task);
     void addTask(const qsptr<ComplexTask>& task);
+    void finish() { setValue(finishValue()); }
 private:
     bool finishedEmitters();
 

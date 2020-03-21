@@ -16,6 +16,8 @@
 
 #include "animatedsurface.h"
 
+#include "Tasks/domeletask.h"
+
 AnimatedSurface::AnimatedSurface() : Animator("canvas"),
     mBaseValue(enve::make_shared<DrawableAutoTiledSurface>()),
     mCurrent_d(mBaseValue.get()) {
@@ -132,102 +134,179 @@ void AnimatedSurface::addUndoRedo(const QString& name, const QRect& roi) {
 #include "svgexporthelpers.h"
 #include "Private/Tasks/taskscheduler.h"
 
-bool AnimatedSurface::savePaintSVG(SvgExporter& exp, QDomElement& parent) {
-    const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
-    const auto idRange = prp_getIdenticalRelRange(relRange.fMin);
-    const int span = exp.fAbsRange.span();
-    const qreal div = span - 1;
-    const qreal dur = div/exp.fFps;
-    const auto taskScheduler = TaskScheduler::instance();
+class ASurfaceSaverSVG : public ComplexTask {
+public:
+    ASurfaceSaverSVG(AnimatedSurface* const src,
+                     SvgExporter& exp, QDomElement& parent,
+                     const qreal div, const FrameRange& relRange) :
+        ComplexTask(relRange.fMax, "SVG Paint Object"),
+        mSrc(src), mExp(exp), mParent(parent),
+        mRelRange(relRange), mDiv(div),
+        mKeyRelFrame(relRange.fMin - 1) {}
 
-    auto use = exp.createElement("use");
+    void nextStep() override {
+        if(!mSrc) return cancel();
+        if(setValue(mKeyRelFrame)) return finish();
+        if(done()) return;
 
-    QStringList hrefValues;
-    QStringList xValues;
-    QStringList yValues;
-    QStringList keyTimes;
+        bool first = mKeyId == 0;
+        if(first) {
+            const auto idRange = mSrc->prp_getIdenticalRelRange(mRelRange.fMin);
+            const int span = mExp.fAbsRange.span();
 
-    const auto useCreator = [&](const int relFrame,
-                                DrawableAutoTiledSurface* surf) {
-        if(!surf) surf = getSurface(relFrame);
-        sk_sp<SkImage> image;
-        const auto task = getFrameImage(relFrame, image);
-        if(task) taskScheduler->waitTillFinished();
-
-        const qreal t = (relFrame - relRange.fMin)/div;
-        keyTimes << QString::number(t);
-
-        const QString imageId = SvgExportHelpers::ptrToStr(surf);
-        SvgExportHelpers::defImage(exp, image, imageId);
-        hrefValues << "#" + imageId;
-
-        const QPoint pos = -surf->zeroTilePos();
-        xValues << QString::number(pos.x());
-        yValues << QString::number(pos.y());
-    };
-
-    if(idRange.inRange(relRange) || span == 1) {
-        useCreator(relRange.fMin, nullptr);
-    } else {
-        ASKey* prevKey = nullptr;
-
-        const auto& keys = anim_getKeys();
-        bool first = true;
-        for(const auto &i : keys) {
-            const auto key = static_cast<ASKey*>(i);
-            const int keyRelFrame = key->getRelFrame();
-            if(keyRelFrame >= relRange.fMax) break;
-            if(keyRelFrame >= relRange.fMin) {
-                const bool keyOnFirstFrame = keyRelFrame == relRange.fMin;
-                if(first) {
-                    first = false;
-                    const auto firstKey = keyOnFirstFrame ? key : prevKey;
-                    useCreator(keyRelFrame, &firstKey->dSurface());
-                } else useCreator(keyRelFrame, &key->dSurface());
+            if(idRange.inRange(mRelRange) || span == 1) {
+                addSurface(mRelRange.fMin, nullptr);
+                mKeyRelFrame = mRelRange.fMax;
+                return nextStep();
             }
-            prevKey = key;
+        }
+
+        const auto& keys = mSrc->anim_getKeys();
+        if(mKeyId >= keys.count()) {
+            mKeyRelFrame = mRelRange.fMax;
+            return nextStep();
+        }
+        const auto key = static_cast<ASKey*>(keys.atId(mKeyId++));
+        mKeyRelFrame = key->getRelFrame();
+        if(mKeyRelFrame >= mRelRange.fMax) return nextStep();
+        if(mKeyRelFrame >= mRelRange.fMin) {
+            DrawableAutoTiledSurface* surf = nullptr;
+            if(first) {
+                first = false;
+                const int prevId = mKeyId - 2;
+                const auto null = static_cast<Key*>(nullptr);
+                const auto prevKey = prevId >= 0 ? keys.atId(prevId) : null;
+                const auto prevASKey = static_cast<ASKey*>(prevKey);
+                const bool keyOnFirstFrame = mKeyRelFrame == mRelRange.fMin;
+                const bool useKey = keyOnFirstFrame || !prevKey;
+                const auto firstKey = useKey ? key : prevASKey;
+                surf = &firstKey->dSurface();
+            } else surf = &key->dSurface();
+            const bool wait = addSurface(mKeyRelFrame, surf);
+            if(!wait) addEmptyTask();
+        } else nextStep();
+    }
+
+private:
+    //! @brief Returns true if there is a task, does have to wait.
+    bool addSurface(const int relFrame, DrawableAutoTiledSurface* surf) {
+        if(!surf) surf = mSrc->getSurface(relFrame);
+        const QString imageId = SvgExportHelpers::ptrToStr(surf);
+        const QPoint pos = -surf->zeroTilePos();
+        sk_sp<SkImage> image;
+        const auto task = mSrc->getFrameImage(relFrame, image);
+        if(task) {
+            const auto imgTask = static_cast<ImgLoader*>(task);
+            const QPointer<ASurfaceSaverSVG> ptr = this;
+            task->addDependent({[ptr, imgTask, relFrame, imageId, pos]() {
+                if(!ptr) return;
+                const auto image = imgTask->image();
+                ptr->saveSurfaceValues(relFrame, image, imageId, pos);
+            }, nullptr});
+            addTask(task->ref<eTask>());
+            return true;
+        } else {
+            saveSurfaceValues(relFrame, image, imageId, pos);
+            return false;
         }
     }
 
-    if(hrefValues.isEmpty()) return false;
+    void saveSurfaceValues(const int relFrame, const sk_sp<SkImage>& image,
+                           const QString& imageId, const QPoint& pos) {
+        const qreal t = (relFrame - mRelRange.fMin)/mDiv;
+        mKeyTimes << QString::number(t);
 
-    hrefValues << hrefValues.last();
-    xValues << xValues.last();
-    yValues << yValues.last();
-    keyTimes << "1";
+        SvgExportHelpers::defImage(mExp, image, imageId);
+        mHrefValues << "#" + imageId;
 
-    const auto durStr = QString::number(dur)  + 's';
-    const auto keyTimesStr = keyTimes.join(';');
-    {
-        auto anim = exp.createElement("animate");
-        anim.setAttribute("attributeName", "href");
-        anim.setAttribute("dur", durStr);
-        anim.setAttribute("values", hrefValues.join(';'));
-        anim.setAttribute("keyTimes", keyTimesStr);
-        SvgExportHelpers::assignLoop(anim, exp.fLoop);
-        use.appendChild(anim);
-    }
-    {
-        auto anim = exp.createElement("animate");
-        anim.setAttribute("attributeName", "x");
-        anim.setAttribute("dur", durStr);
-        anim.setAttribute("values", xValues.join(';'));
-        anim.setAttribute("keyTimes", keyTimesStr);
-        SvgExportHelpers::assignLoop(anim, exp.fLoop);
-        use.appendChild(anim);
-    }
-    {
-        auto anim = exp.createElement("animate");
-        anim.setAttribute("attributeName", "y");
-        anim.setAttribute("dur", durStr);
-        anim.setAttribute("values", yValues.join(';'));
-        anim.setAttribute("keyTimes", keyTimesStr);
-        SvgExportHelpers::assignLoop(anim, exp.fLoop);
-        use.appendChild(anim);
+        mXValues << QString::number(pos.x());
+        mYValues << QString::number(pos.y());
     }
 
-    parent.appendChild(use);
-    return true;
+    void finish() {
+        if(mHrefValues.isEmpty()) return;
+
+        auto use = mExp.createElement("use");
+
+        if(mHrefValues.count() == 1) {
+            const QString href = mHrefValues.first();
+            const QString x = mXValues.first();
+            const QString y = mYValues.first();
+            use.setAttribute("href", href);
+            use.setAttribute("x", x);
+            use.setAttribute("y", y);
+        } else {
+            if(mKeyTimes.last() != "1") {
+                mHrefValues << mHrefValues.last();
+                mXValues << mXValues.last();
+                mYValues << mYValues.last();
+                mKeyTimes << "1";
+            }
+
+            const qreal dur = mDiv/mExp.fFps;
+            const auto durStr = QString::number(dur)  + 's';
+            const auto keyTimesStr = mKeyTimes.join(';');
+            {
+                auto anim = mExp.createElement("animate");
+                anim.setAttribute("attributeName", "href");
+                anim.setAttribute("dur", durStr);
+                anim.setAttribute("values", mHrefValues.join(';'));
+                anim.setAttribute("keyTimes", keyTimesStr);
+                SvgExportHelpers::assignLoop(anim, mExp.fLoop);
+                use.appendChild(anim);
+            }
+            {
+                auto anim = mExp.createElement("animate");
+                anim.setAttribute("attributeName", "x");
+                anim.setAttribute("dur", durStr);
+                anim.setAttribute("values", mXValues.join(';'));
+                anim.setAttribute("keyTimes", keyTimesStr);
+                SvgExportHelpers::assignLoop(anim, mExp.fLoop);
+                use.appendChild(anim);
+            }
+            {
+                auto anim = mExp.createElement("animate");
+                anim.setAttribute("attributeName", "y");
+                anim.setAttribute("dur", durStr);
+                anim.setAttribute("values", mYValues.join(';'));
+                anim.setAttribute("keyTimes", keyTimesStr);
+                SvgExportHelpers::assignLoop(anim, mExp.fLoop);
+                use.appendChild(anim);
+            }
+        }
+
+        mParent.appendChild(use);
+    }
+
+    const QPointer<AnimatedSurface> mSrc;
+    SvgExporter& mExp;
+    QDomElement& mParent;
+    const FrameRange mRelRange;
+    const qreal mDiv;
+
+    int mKeyRelFrame = 0;
+    int mKeyId = 0;
+
+    QStringList mHrefValues;
+    QStringList mXValues;
+    QStringList mYValues;
+    QStringList mKeyTimes;
+};
+
+void AnimatedSurface::savePaintSVG(SvgExporter& exp, DomEleTask* const eleTask) {
+    const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
+    const int span = exp.fAbsRange.span();
+    const qreal div = span - 1;
+
+    auto& parent = eleTask->element();
+    const auto task = new ASurfaceSaverSVG(this, exp, parent, div, relRange);
+    const auto taskSPtr = QSharedPointer<ASurfaceSaverSVG>(
+                              task, &QObject::deleteLater);
+    task->nextStep();
+
+    if(task->done()) return;
+    TaskScheduler::instance()->addComplexTask(taskSPtr);
+    task->addDependent(eleTask);
 }
 
 ASKey::ASKey(AnimatedSurface * const parent) :

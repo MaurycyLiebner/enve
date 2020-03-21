@@ -45,7 +45,7 @@ bool SmartVectorPath::differenceInEditPathBetweenFrames(
     return mPathAnimator->prp_differencesBetweenRelFrames(frame1, frame2);
 }
 
-QDomElement SmartVectorPath::saveSVG(SvgExporter& exp) const {
+void SmartVectorPath::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
     const bool baseEffects = hasBasePathEffects();
     const bool outlineBaseEffects = hasOutlineBaseEffects();
     const bool outlineEffects = hasOutlineEffects();
@@ -53,9 +53,8 @@ QDomElement SmartVectorPath::saveSVG(SvgExporter& exp) const {
     const bool splitFillStroke = fillEffects ||
                                  outlineBaseEffects ||
                                  outlineEffects;
-    QDomElement result;
     if(splitFillStroke) {
-        result = exp.createElement("g");
+        auto& ele = task->initialize("g");
 
         auto fill = exp.createElement("path");
         SmartPathCollection::EffectApplier fillApplier;
@@ -69,7 +68,7 @@ QDomElement SmartVectorPath::saveSVG(SvgExporter& exp) const {
                                     baseEffects || fillEffects);
         saveFillSettingsSVG(exp, fill);
         fill.setAttribute("stroke", "none");
-        result.appendChild(fill);
+        ele.appendChild(fill);
         switch(mPathAnimator->getFillType()) {
         case SkPathFillType::kEvenOdd:
             fill.setAttribute("fill-rule", "evenodd");
@@ -99,19 +98,18 @@ QDomElement SmartVectorPath::saveSVG(SvgExporter& exp) const {
         stroke.setAttribute(outlineEffects ? "stroke" : "fill", "none");
         if(outlineEffects) stroke.setAttribute("fill-rule", "nonzero");
 
-        result.appendChild(stroke);
+        ele.appendChild(stroke);
     } else {
-        result = exp.createElement("path");
+        auto& ele = task->initialize("path");
         SmartPathCollection::EffectApplier applier;
         if(baseEffects) {
             applier = [this](const int relFrame, SkPath& path) {
                 applyBasePathEffects(relFrame, path);
             };
         };
-        mPathAnimator->savePathsSVG(exp, result, applier, baseEffects);
-        savePathBoxSVG(exp, result);
+        mPathAnimator->savePathsSVG(exp, ele, applier, baseEffects);
+        savePathBoxSVG(exp, ele);
     }
-    return result;
 }
 
 void SmartVectorPath::loadSkPath(const SkPath &path) {

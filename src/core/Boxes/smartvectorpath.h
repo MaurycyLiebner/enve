@@ -42,7 +42,7 @@ public:
     bool differenceInEditPathBetweenFrames(const int frame1,
                                            const int frame2) const;
 
-    QDomElement saveSVG(SvgExporter& exp) const;
+    void saveSVG(SvgExporter& exp, DomEleTask* const task) const;
 
     void applyCurrentTransform();
 

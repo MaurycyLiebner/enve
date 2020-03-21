@@ -418,8 +418,8 @@ void saveTextAttributesSVG(QDomElement& ele,
     }
 }
 
-QDomElement TextBox::saveSVG(SvgExporter& exp) const {
-    auto ele = exp.createElement("g");
+void TextBox::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
+    auto& ele = task->initialize("g");
     saveTextAttributesSVG(ele, mFont);
     savePathBoxSVG(exp, ele);
     QString textAnchor;
@@ -430,5 +430,4 @@ QDomElement TextBox::saveSVG(SvgExporter& exp) const {
     }
     ele.setAttribute("text-anchor", textAnchor);
     mText->saveSVG(exp, ele);
-    return ele;
 }

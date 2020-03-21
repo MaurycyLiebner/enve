@@ -36,7 +36,7 @@ public:
 
     void setupCanvasMenu(PropertyMenu * const menu);
 
-    QDomElement saveSVG(SvgExporter& exp) const;
+    void saveSVG(SvgExporter& exp, DomEleTask* const task) const;
 
     AnimatedSurface * getSurface() const
     { return mSurface.get(); }

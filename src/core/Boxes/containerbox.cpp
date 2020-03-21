@@ -30,6 +30,7 @@
 #include "BlendEffects/blendeffectcollection.h"
 #include "BlendEffects/blendeffectboxshadow.h"
 #include "svgexporter.h"
+#include "Private/Tasks/taskscheduler.h"
 
 ContainerBox::ContainerBox(const eBoxType type) :
     BoxWithPathEffects(type == eBoxType::group ? "Group" : "Layer",
@@ -122,15 +123,45 @@ OutlineSettingsAnimator *ContainerBox::getStrokeSettings() const {
     return mContainedBoxes.last()->getStrokeSettings();
 }
 
-QDomElement ContainerBox::saveSVG(SvgExporter& exp) const {
-    auto ele = exp.createElement("g");
-    const auto& boxes = getContainedBoxes();
-    for(int i = boxes.count() - 1; i >= 0; i--) {
-        const auto& box = boxes.at(i);
-        if(!box->isVisible()) continue;
-        box->saveSVGWithTransform(exp, ele);
+class GroupSaverSVG : public ComplexTask {
+public:
+    GroupSaverSVG(const ContainerBox* const src, SvgExporter& exp,
+                  QDomElement& ele) :
+        ComplexTask(src->getContainedBoxesCount(),
+                    "SVG " + src->prp_getName()),
+        mSrc(src), mExp(exp), mEle(ele) {}
+
+    void nextStep() override {
+        if(!mSrc) return cancel();
+        if(setValue(mI)) return;
+        if(done()) return;
+
+        const auto& boxes = mSrc->getContainedBoxes();
+        const int id = boxes.count() - ++mI;
+        if(id >= boxes.count()) return finish();
+        const auto& box = boxes.at(id);
+        if(!box->isVisible()) return nextStep();
+        box->saveSVGWithTransform(mExp, mEle);
+        addEmptyTask();
     }
-    return ele;
+private:
+    const QPointer<const ContainerBox> mSrc;
+    SvgExporter& mExp;
+    QDomElement& mEle;
+
+    int mI = 0;
+};
+
+void ContainerBox::saveSVG(SvgExporter& exp, DomEleTask* const eleTask) const {
+    auto& ele = eleTask->initialize("g");
+    const auto task = new GroupSaverSVG(this, exp, ele);
+    const auto taskSPtr = QSharedPointer<GroupSaverSVG>(
+                              task, &QObject::deleteLater);
+    task->nextStep();
+
+    if(task->done()) return;
+    TaskScheduler::instance()->addComplexTask(taskSPtr);
+    task->addDependent(eleTask);
 }
 
 void ContainerBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {

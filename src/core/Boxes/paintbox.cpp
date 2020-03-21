@@ -126,8 +126,7 @@ void PaintBox::setupCanvasMenu(PropertyMenu * const menu) {
     BoundingBox::setupCanvasMenu(menu);
 }
 
-QDomElement PaintBox::saveSVG(SvgExporter& exp) const {
-    auto ele = exp.createElement("g");
-    mSurface->savePaintSVG(exp, ele);
-    return ele;
+void PaintBox::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
+    auto& ele = task->initialize("g");
+    mSurface->savePaintSVG(exp, task);
 }

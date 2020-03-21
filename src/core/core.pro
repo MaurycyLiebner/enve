@@ -258,6 +258,7 @@ SOURCES += \
     Sound/evideosound.cpp \
     Sound/soundcomposition.cpp \
     Sound/soundmerger.cpp \
+    Tasks/domeletask.cpp \
     Tasks/etask.cpp \
     Tasks/etaskbase.cpp \
     Tasks/updatable.cpp \
@@ -574,6 +575,7 @@ HEADERS += \
     Sound/evideosound.h \
     Sound/soundcomposition.h \
     Sound/soundmerger.h \
+    Tasks/domeletask.h \
     Tasks/etask.h \
     Tasks/etaskbase.h \
     Tasks/updatable.h \

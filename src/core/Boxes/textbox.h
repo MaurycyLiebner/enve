@@ -61,7 +61,7 @@ public:
 
     void setCurrentValue(const QString &text);
 
-    QDomElement saveSVG(SvgExporter& doc) const;
+    void saveSVG(SvgExporter& doc, DomEleTask* const task) const;
 private:
     Qt::Alignment mHAlignment = Qt::AlignLeft;
     Qt::Alignment mVAlignment = Qt::AlignTop;

@@ -122,7 +122,7 @@ bool Rectangle::differenceInEditPathBetweenFrames(
 #include "Expressions/expression.h"
 #include "svgexporter.h"
 
-QDomElement Rectangle::saveSVG(SvgExporter& exp) const {
+void Rectangle::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
     const auto copy = enve::make_shared<Rectangle>();
     BoxClipboard::sCopyAndPaste(this, copy.get());
     getParentGroup()->addContained(copy);
@@ -159,7 +159,7 @@ QDomElement Rectangle::saveSVG(SvgExporter& exp) const {
     cW->setExpression(wExpr);
     cH->setExpression(hExpr);
 
-    auto ele = exp.createElement("rect");
+    auto& ele = task->initialize("rect");
     const auto xAnim = copy->mTopLeftAnimator->getXAnimator();
     const auto yAnim = copy->mTopLeftAnimator->getYAnimator();
 
@@ -177,5 +177,4 @@ QDomElement Rectangle::saveSVG(SvgExporter& exp) const {
     savePathBoxSVG(exp, ele);
 
     copy->removeFromParent_k();
-    return ele;
 }

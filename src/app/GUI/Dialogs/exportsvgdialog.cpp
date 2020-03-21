@@ -126,7 +126,8 @@ ExportSvgDialog::ExportSvgDialog(const QString& path,
 
             const auto task = new SvgExporter(mPath, scene, frameRange, fps,
                                               background, fixedSize, loop);
-            const auto taskSPtr = QSharedPointer<SvgExporter>(task);
+            const auto taskSPtr = QSharedPointer<SvgExporter>(
+                                      task, &QObject::deleteLater);
             task->nextStep();
             TaskScheduler::instance()->addComplexTask(taskSPtr);
         } catch(const std::exception& e) {

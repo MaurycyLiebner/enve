@@ -269,7 +269,8 @@ void AnimationBox::createPaintObject(const int firstAbsFrame,
 
     const auto task = new AnimationToPaint(firstAbsFrame, firstRelFrame, iMax,
                                            increment, this, src, loader);
-    const auto taskSPtr = QSharedPointer<AnimationToPaint>(task);
+    const auto taskSPtr = QSharedPointer<AnimationToPaint>(
+                              task, &QObject::deleteLater);
     task->nextStep();
 
     if(task->done()) {

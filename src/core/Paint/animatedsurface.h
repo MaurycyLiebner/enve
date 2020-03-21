@@ -23,7 +23,11 @@
 #include "CacheHandlers/hddcachablecachehandler.h"
 #include "CacheHandlers/imagecachecontainer.h"
 #include "onionskin.h"
+
 class AnimatedSurface;
+class ComplexTask;
+class DomEleTask;
+
 class ASKey : public Key {
     e_OBJECT
 protected:
@@ -246,7 +250,7 @@ public:
     void afterChangedCurrentContent();
     void addUndoRedo(const QString &name, const QRect &roi);
 
-    bool savePaintSVG(SvgExporter& exp, QDomElement& parent);
+    void savePaintSVG(SvgExporter& exp, DomEleTask* const eleTask);
 signals:
     void currentSurfaceChanged(DrawableAutoTiledSurface*);
 private:
