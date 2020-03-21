@@ -249,7 +249,7 @@ qreal qCubicSegment1D::tWithBiggestValue() const {
     qreal t1, t2, t3;
     solveDerivativeZero(t1, t2, t3);
 
-    qreal maxVal = DBL_MIN;
+    qreal maxVal = -DBL_MAX;
     qreal bestT = 0;
     for(const qreal& t : { 0., 1., t1, t2, t3}) {
         const qreal valT = valAtT(t);

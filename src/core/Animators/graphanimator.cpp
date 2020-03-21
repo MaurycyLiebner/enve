@@ -152,7 +152,7 @@ void GraphAnimator::graph_getFrameConstraints(
         GraphKey *key, const QrealPointType type,
         qreal &minMoveFrame, qreal &maxMoveFrame) const {
     if(type == QrealPointType::keyPt) {
-        minMoveFrame = DBL_MIN;
+        minMoveFrame = -DBL_MAX;
         maxMoveFrame = DBL_MAX;
         return;
     }
