@@ -20,7 +20,7 @@
 #include <QtCore>
 #include <QDomElement>
 
-#include "include/core/SkImage.h"
+#include "skia/skiaincludes.h"
 
 #include "framerange.h"
 #include "svgexporter.h"
