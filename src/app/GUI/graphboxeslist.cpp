@@ -42,19 +42,16 @@ int KeysView::graphGetAnimatorId(GraphAnimator * const anim) {
 }
 
 void KeysView::graphSetSmoothCtrlAction() {
-    graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CtrlsMode::smooth);
     Document::sInstance->actionFinished();
 }
 
 void KeysView::graphSetSymmetricCtrlAction() {
-    graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CtrlsMode::symmetric);
     Document::sInstance->actionFinished();
 }
 
 void KeysView::graphSetCornerCtrlAction() {
-    graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CtrlsMode::corner);
     Document::sInstance->actionFinished();
 }
@@ -71,17 +68,17 @@ void KeysView::graphMakeSegmentsSmoothAction(const bool smooth) {
         Q_ASSERT(segment.length() > 1);
         auto firstKey = segment.first();
         auto lastKey = segment.last();
-        firstKey->setC1Enabled(smooth);
+        firstKey->setC1EnabledAction(smooth);
         if(smooth) firstKey->makeC0C1Smooth();
         //firstKey->keyChanged();
         for(int i = 1; i < segment.length() - 1; i++) {
             auto innerKey = segment.at(i);
-            innerKey->setC1Enabled(smooth);
-            innerKey->setC0Enabled(smooth);
+            innerKey->setC1EnabledAction(smooth);
+            innerKey->setC0EnabledAction(smooth);
             if(smooth) innerKey->makeC0C1Smooth();
             //innerKey->keyChanged();
         }
-        lastKey->setC0Enabled(smooth);
+        lastKey->setC0EnabledAction(smooth);
         if(smooth) lastKey->makeC0C1Smooth();
         lastKey->afterKeyChanged();
     }
@@ -364,16 +361,10 @@ void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode mode) {
 
     for(const auto& anim : mGraphAnimators) {
         if(!anim->anim_hasSelectedKeys()) continue;
-        anim->graph_setCtrlsModeForSelectedKeys(mode);
-    }
-    graphConstrainAnimatorCtrlsFrameValues();
-}
-
-void KeysView::graphSetTwoSideCtrlForSelected() {
-    if(mSelectedKeysAnimators.isEmpty()) return;
-    for(const auto& anim : mGraphAnimators) {
-        if(!anim->anim_hasSelectedKeys()) continue;
+        anim->graph_startSelectedKeysTransform();
         anim->graph_enableCtrlPtsForSelected();
+        anim->graph_setCtrlsModeForSelectedKeys(mode);
+        anim->graph_finishSelectedKeysTransform();
     }
     graphConstrainAnimatorCtrlsFrameValues();
 }
@@ -382,9 +373,9 @@ void KeysView::graphDeletePressed() {
     if(mGPressedPoint && mGPressedPoint->isCtrlPt()) {
         const auto parentKey = mGPressedPoint->getParentKey();
         if(mGPressedPoint->isC1Pt()) {
-            parentKey->setC1Enabled(false);
+            parentKey->setC1EnabledAction(false);
         } else if(mGPressedPoint->isC0Pt()) {
-            parentKey->setC0Enabled(false);
+            parentKey->setC0EnabledAction(false);
         }
         parentKey->afterKeyChanged();
     } else {

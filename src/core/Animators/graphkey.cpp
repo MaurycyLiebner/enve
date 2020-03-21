@@ -51,17 +51,28 @@ void GraphKey::startCtrlPointsValueTransform() {
 
 void GraphKey::finishCtrlPointsValueTransform() {
     UndoRedo ur;
+
+    const bool oldC0 = mSavedC0Enabled;
+    const bool oldC1 = mSavedC0Enabled;
     const qreal oldC0Value = c0Clamped().getRawSavedYValue();
     const qreal oldC1Value = c1Clamped().getRawSavedYValue();
+
+    const bool newC0 = mC0Enabled;
+    const bool newC1 = mC0Enabled;
     const qreal newC0Value = c0Clamped().getRawYValue();
     const qreal newC1Value = c1Clamped().getRawYValue();
-    ur.fUndo = [this, oldC0Value, oldC1Value]() {
-        setC0ValueVar(oldC0Value);
-        setC1ValueVar(oldC1Value);
+
+    ur.fUndo = [this, oldC0, oldC1, oldC0Value, oldC1Value]() {
+        setC0Enabled(oldC0);
+        setC1Enabled(oldC1);
+        setC0Value(oldC0Value);
+        setC1Value(oldC1Value);
     };
-    ur.fRedo = [this, newC0Value, newC1Value]() {
-        setC0ValueVar(newC0Value);
-        setC1ValueVar(newC1Value);
+    ur.fRedo = [this, newC0, newC1, newC0Value, newC1Value]() {
+        setC0Enabled(newC0);
+        setC1Enabled(newC1);
+        setC0Value(newC0Value);
+        setC1Value(newC1Value);
     };
     addUndoRedo(ur);
 }
@@ -160,9 +171,9 @@ void GraphKey::scaleFrameAndUpdateParentAnimator(
                                    (thisRelFrame - relPivot);
     const bool switchCtrls = actualScale < 0;
     setC0Enabled(switchCtrls ? mSavedC1Enabled :
-                                          mSavedC0Enabled);
+                               mSavedC0Enabled);
     setC1Enabled(switchCtrls ? mSavedC0Enabled :
-                                        mSavedC1Enabled);
+                               mSavedC1Enabled);
 
     const qreal newc0 = relPivot + (c0RelFrame - relPivot)*actualScale;
     const qreal newc1 = relPivot + (c1RelFrame - relPivot)*actualScale;
@@ -230,8 +241,8 @@ void GraphKey::updateCtrlFromCtrl(const QrealPointType type) {
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
-void GraphKey::setCtrlsMode(const CtrlsMode mode) {
-    mCtrlsMode = mode;
+void GraphKey::setCtrlsModeAction(const CtrlsMode mode) {
+    if(mCtrlsMode == mode) return;
     const QPointF pos(mRelFrame, getValueForGraph());
     QPointF c0Pos(getC0Frame(), getC0Value());
     QPointF c1Pos(getC1Frame(), getC1Value());
@@ -244,6 +255,25 @@ void GraphKey::setCtrlsMode(const CtrlsMode mode) {
     setC0Value(c0Pos.y());
     setC1Frame(c1Pos.x());
     setC1Value(c1Pos.y());
+
+    {
+        UndoRedo ur;
+        const auto oldValue = mCtrlsMode;
+        const auto newValue = mode;
+        ur.fUndo = [this, oldValue]() {
+            setCtrlsMode(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setCtrlsMode(newValue);
+        };
+        addUndoRedo(ur);
+    }
+
+    setCtrlsMode(mode);
+}
+
+void GraphKey::setCtrlsMode(const CtrlsMode mode) {
+    mCtrlsMode = mode;
 }
 
 CtrlsMode GraphKey::getCtrlsMode() const {
@@ -383,26 +413,34 @@ void GraphKey::makeC0C1Smooth() {
     setC1Value(newc1Val);
 }
 
-void GraphKey::setC0Enabled(const bool bT) {
-    mC0Enabled = bT;
+void GraphKey::setC0Enabled(const bool enabled) {
+    mC0Enabled = enabled;
 }
 
-void GraphKey::setC1Enabled(const bool bT) {
-    mC1Enabled = bT;
+void GraphKey::setC1Enabled(const bool enabled) {
+    mC1Enabled = enabled;
 }
 
 qreal GraphKey::getC0Frame() const {
     if(mC0Enabled) {
-        const QPointF relTo{qreal(mRelFrame), getValueForGraph()};
-        return mC0Clamped.getClampedValue(relTo).x();
+        if(mC1Enabled) {
+            const QPointF relTo{qreal(mRelFrame), getValueForGraph()};
+            return mC0Clamped.getClampedValue(relTo).x();
+        } else {
+            return mC0Clamped.getRawXValue();
+        }
     }
     return mRelFrame;
 }
 
 qreal GraphKey::getC1Frame() const {
     if(mC1Enabled) {
-        const QPointF relTo{qreal(mRelFrame), getValueForGraph()};
-        return mC1Clamped.getClampedValue(relTo).x();
+        if(mC0Enabled) {
+            const QPointF relTo{qreal(mRelFrame), getValueForGraph()};
+            return mC1Clamped.getClampedValue(relTo).x();
+        } else {
+            return mC1Clamped.getRawXValue();
+        }
     }
     return mRelFrame;
 }
@@ -413,6 +451,40 @@ qreal GraphKey::getC0AbsFrame() const {
 
 qreal GraphKey::getC1AbsFrame() const {
     return relFrameToAbsFrameF(getC1Frame());
+}
+
+void GraphKey::setC0EnabledAction(const bool enabled) {
+    if(mC0Enabled == enabled) return;
+    {
+        UndoRedo ur;
+        const auto oldValue = mC0Enabled;
+        const auto newValue = enabled;
+        ur.fUndo = [this, oldValue]() {
+            setC0Enabled(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setC0Enabled(newValue);
+        };
+        addUndoRedo(ur);
+    }
+    setC0Enabled(enabled);
+}
+
+void GraphKey::setC1EnabledAction(const bool enabled) {
+    if(mC1Enabled == enabled) return;
+    {
+        UndoRedo ur;
+        const auto oldValue = mC1Enabled;
+        const auto newValue = enabled;
+        ur.fUndo = [this, oldValue]() {
+            setC1Enabled(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setC1Enabled(newValue);
+        };
+        addUndoRedo(ur);
+    }
+    setC1Enabled(enabled);
 }
 
 bool GraphKey::getC0Enabled() const {

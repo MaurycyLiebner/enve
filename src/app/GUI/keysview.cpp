@@ -212,8 +212,12 @@ void KeysView::cancelTransform() {
 void KeysView::finishTransform() {
     if(!mFirstMove) {
         if(mGraphViewed) {
-            for(const auto& anim : mGraphAnimators) {
-                anim->graph_finishSelectedKeysTransform();
+            if(mGPressedPoint) {
+                mGPressedPoint->finishTransform();
+            } else {
+                for(const auto& anim : mGraphAnimators) {
+                    anim->graph_finishSelectedKeysTransform();
+                }
             }
         } else {
             for(const auto& anim : mSelectedKeysAnimators) {
@@ -817,16 +821,11 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
         mScrollTimer->stop();
     }
     if(mGraphViewed && mGPressedPoint) {
-        if(mGPressedPoint->isKeyPt()) {
-            if(mFirstMove) {
-                if(!(e->modifiers() & Qt::SHIFT)) {
-                    clearKeySelection();
-                    addKeyToSelection(mGPressedPoint->getParentKey());
-                }
-            } else {
-                finishTransform();
-            }
-        }
+        const bool shiftPressed = e->modifiers() & Qt::SHIFT;
+        if(mGPressedPoint->isKeyPt() && mFirstMove && !shiftPressed) {
+            clearKeySelection();
+            addKeyToSelection(mGPressedPoint->getParentKey());
+        } else if(!mFirstMove) finishTransform();
         mGPressedPoint->setSelected(false);
         mGPressedPoint = nullptr;
 

@@ -75,6 +75,7 @@ public:
 
     void updateCtrlFromCtrl(const QrealPointType type);
     void setCtrlsMode(const CtrlsMode mode);
+    void setCtrlsModeAction(const CtrlsMode mode);
     CtrlsMode getCtrlsMode() const;
 
     void constrainC0MinFrame(const qreal minRelFrame);
@@ -95,8 +96,11 @@ public:
     qreal getC0AbsFrame() const;
     qreal getC1AbsFrame() const;
 
-    void setC0Enabled(const bool bT);
-    void setC1Enabled(const bool bT);
+    void setC0EnabledAction(const bool enabled);
+    void setC1EnabledAction(const bool enabled);
+
+    void setC0Enabled(const bool enabled);
+    void setC1Enabled(const bool enabled);
 
     bool getC1Enabled() const;
     bool getC0Enabled() const;

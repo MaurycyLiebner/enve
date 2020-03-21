@@ -139,7 +139,6 @@ public:
     void graphSetSmoothCtrlAction();
     void graphSetSymmetricCtrlAction();
     void graphSetCornerCtrlAction();
-    void graphSetTwoSideCtrlForSelected();
 
     void setViewedVerticalRange(const int top, const int bottom);
     void clearHovered();
