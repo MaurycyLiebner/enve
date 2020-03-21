@@ -224,6 +224,7 @@ void InterOptimalAnimatorT<T, K>::anim_addKeyAtRelFrame(const int relFrame) {
     const auto newKey = enve::make_shared<K>(this);
     newKey->setRelFrame(relFrame);
     deepCopyValue(relFrame, newKey->getValue());
+    graph_adjustCtrlsForKeyAdd(newKey.get());
     anim_appendKeyAction(newKey);
 }
 

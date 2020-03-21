@@ -424,6 +424,47 @@ qreal GraphAnimator::graph_prevKeyWeight(const GraphKey * const prevKey,
     return pWeight;
 }
 
+void GraphAnimator::graph_adjustCtrlsForKeyAdd(GraphKey* const key) {
+    const int relFrame = key->getRelFrame();
+    const auto prevKey = anim_getPrevKey<GraphKey>(relFrame);
+    const auto nextKey = anim_getNextKey<GraphKey>(relFrame);
+    if(!prevKey || !nextKey) return;
+    if(prevKey->getRelFrame() >= relFrame ||
+       nextKey->getRelFrame() <= relFrame) return;
+
+    const bool smooth = prevKey->getC1Enabled() ||
+                        nextKey->getC0Enabled();
+    if(!smooth) return;
+
+    const auto xSeg = getGraphXSegment(prevKey, nextKey);
+    const auto ySeg = getGraphYSegment(prevKey, nextKey);
+
+    qreal t;
+    const auto xSegs = gDividedAtX(xSeg, relFrame, &t);
+    const auto ySegs = ySeg.dividedAtT(t);
+
+    prevKey->startFrameAndValueTransform();
+    nextKey->startFrameAndValueTransform();
+
+    prevKey->setC1Frame(xSegs.first.c1());
+    prevKey->setC1Value(ySegs.first.c1());
+    key->setC0Frame(xSegs.first.c2());
+    key->setC0Value(ySegs.first.c2());
+
+    key->setC1Frame(xSegs.second.c1());
+    key->setC1Value(ySegs.second.c1());
+    nextKey->setC0Frame(xSegs.second.c2());
+    nextKey->setC0Value(ySegs.second.c2());
+
+    prevKey->setC1Enabled(smooth);
+    key->setC0Enabled(smooth);
+    key->setC1Enabled(smooth);
+    nextKey->setC0Enabled(smooth);
+
+    prevKey->finishFrameAndValueTransform();
+    nextKey->finishFrameAndValueTransform();
+}
+
 QList<qCubicSegment1D::Pair> splitSegmentOnExtremas(const qCubicSegment1D& segX,
                                                     const qCubicSegment1D& segY) {
     QList<qCubicSegment1D::Pair> result;

@@ -419,6 +419,7 @@ void QrealAnimator::anim_addKeyAtRelFrame(const int relFrame) {
     if(anim_getKeyAtRelFrame(relFrame)) return;
     const qreal value = getBaseValue(relFrame);
     const auto newKey = enve::make_shared<QrealKey>(value, relFrame, this);
+    graph_adjustCtrlsForKeyAdd(newKey.get());
     anim_appendKeyAction(newKey);
 }
 

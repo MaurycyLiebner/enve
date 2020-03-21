@@ -1,4 +1,4 @@
-// enve - 2D animations software
+﻿// enve - 2D animations software
 // Copyright (C) 2016-2020 Maurycy Liebner
 
 // This program is free software: you can redistribute it and/or modify
@@ -86,6 +86,7 @@ protected:
     qreal graph_prevKeyWeight(const GraphKey * const prevKey,
                               const GraphKey * const nextKey,
                               const qreal  frame) const;
+    void graph_adjustCtrlsForKeyAdd(GraphKey* const key);
 private:
     IdRange graph_relFrameRangeToGraphPathIdRange(
             const FrameRange &relFrameRange) const;

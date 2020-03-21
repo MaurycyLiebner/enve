@@ -383,7 +383,6 @@ void GraphKey::makeC0C1Smooth() {
     setC1Value(newc1Val);
 }
 
-
 void GraphKey::setC0Enabled(const bool bT) {
     mC0Enabled = bT;
 }
