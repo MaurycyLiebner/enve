@@ -21,7 +21,6 @@
 #include "transformvalues.h"
 
 #include <QMatrix>
-#include <QDomDocument>
 
 class TransformUpdater;
 class BoxPathPoint;

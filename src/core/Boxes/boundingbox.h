@@ -27,8 +27,6 @@
 #include "Animators/qcubicsegment1danimator.h"
 #include "BlendEffects/blendeffect.h"
 
-#include <QDomDocument>
-
 class Canvas;
 
 class QrealAction;

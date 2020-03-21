@@ -65,10 +65,10 @@ sk_sp<SkData> asDataUri(SkImage* image) {
     return dataUri;
 }
 
-void SvgExportHelpers::defImage(QDomDocument& doc, QDomElement& defs,
+void SvgExportHelpers::defImage(SvgExporter& exp,
                                 const sk_sp<SkImage>& image,
                                 const QString id) {
-    auto def = doc.createElement("image");
+    auto def = exp.createElement("image");
     def.setAttribute("id", id);
     def.setAttribute("x", 0);
     def.setAttribute("y", 0);
@@ -76,7 +76,7 @@ void SvgExportHelpers::defImage(QDomDocument& doc, QDomElement& defs,
     def.setAttribute("height", image->height());
     const auto dataUri = asDataUri(image.get());
     def.setAttribute("xlink:href", static_cast<const char*>(dataUri->data()));
-    defs.appendChild(def);
+    exp.addToDefs(def);
 }
 
 void SvgExportHelpers::assignVisibility(SvgExporter& exp,

@@ -26,7 +26,6 @@
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QPushButton>
-#include <QDomDocument>
 #include <QMenuBar>
 
 ExportSvgDialog::ExportSvgDialog(const QString& path,

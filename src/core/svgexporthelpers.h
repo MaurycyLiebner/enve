@@ -28,7 +28,7 @@
 namespace SvgExportHelpers {
     QString ptrToStr(const void* const ptr);
     void assignLoop(QDomElement& ele, const bool loop);
-    void defImage(QDomDocument& doc, QDomElement& defs,
+    void defImage(SvgExporter& exp,
                   const sk_sp<SkImage>& image,
                   const QString id);
     void assignVisibility(SvgExporter& exp,

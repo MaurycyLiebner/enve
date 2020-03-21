@@ -132,18 +132,15 @@ void AnimatedSurface::addUndoRedo(const QString& name, const QRect& roi) {
 #include "svgexporthelpers.h"
 #include "Private/Tasks/taskscheduler.h"
 
-bool AnimatedSurface::savePaintSVG(
-        QDomDocument& doc, QDomElement& defs,
-        QDomElement& parent, const FrameRange& absRange,
-        const qreal fps, const bool loop) {
-    const auto relRange = prp_absRangeToRelRange(absRange);
+bool AnimatedSurface::savePaintSVG(SvgExporter& exp, QDomElement& parent) {
+    const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
     const auto idRange = prp_getIdenticalRelRange(relRange.fMin);
-    const int span = absRange.span();
+    const int span = exp.fAbsRange.span();
     const qreal div = span - 1;
-    const qreal dur = div/fps;
+    const qreal dur = div/exp.fFps;
     const auto taskScheduler = TaskScheduler::instance();
 
-    auto use = doc.createElement("use");
+    auto use = exp.createElement("use");
 
     QStringList hrefValues;
     QStringList xValues;
@@ -161,7 +158,7 @@ bool AnimatedSurface::savePaintSVG(
         keyTimes << QString::number(t);
 
         const QString imageId = SvgExportHelpers::ptrToStr(surf);
-        SvgExportHelpers::defImage(doc, defs, image, imageId);
+        SvgExportHelpers::defImage(exp, image, imageId);
         hrefValues << "#" + imageId;
 
         const QPoint pos = -surf->zeroTilePos();
@@ -202,30 +199,30 @@ bool AnimatedSurface::savePaintSVG(
     const auto durStr = QString::number(dur)  + 's';
     const auto keyTimesStr = keyTimes.join(';');
     {
-        auto anim = doc.createElement("animate");
+        auto anim = exp.createElement("animate");
         anim.setAttribute("attributeName", "href");
         anim.setAttribute("dur", durStr);
         anim.setAttribute("values", hrefValues.join(';'));
         anim.setAttribute("keyTimes", keyTimesStr);
-        SvgExportHelpers::assignLoop(anim, loop);
+        SvgExportHelpers::assignLoop(anim, exp.fLoop);
         use.appendChild(anim);
     }
     {
-        auto anim = doc.createElement("animate");
+        auto anim = exp.createElement("animate");
         anim.setAttribute("attributeName", "x");
         anim.setAttribute("dur", durStr);
         anim.setAttribute("values", xValues.join(';'));
         anim.setAttribute("keyTimes", keyTimesStr);
-        SvgExportHelpers::assignLoop(anim, loop);
+        SvgExportHelpers::assignLoop(anim, exp.fLoop);
         use.appendChild(anim);
     }
     {
-        auto anim = doc.createElement("animate");
+        auto anim = exp.createElement("animate");
         anim.setAttribute("attributeName", "y");
         anim.setAttribute("dur", durStr);
         anim.setAttribute("values", yValues.join(';'));
         anim.setAttribute("keyTimes", keyTimesStr);
-        SvgExportHelpers::assignLoop(anim, loop);
+        SvgExportHelpers::assignLoop(anim, exp.fLoop);
         use.appendChild(anim);
     }
 

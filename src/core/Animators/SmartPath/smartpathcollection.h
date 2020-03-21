@@ -21,8 +21,6 @@
 #include "smartpathanimator.h"
 #include "../../MovablePoints/segment.h"
 
-#include <QDomDocument>
-
 class SmartPathAnimator;
 class SmartNodePoint;
 typedef DynamicComplexAnimator<SmartPathAnimator> SmartPathCollectionBase;
