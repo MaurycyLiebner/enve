@@ -211,7 +211,13 @@ QrealPoint *GraphKey::mousePress(const qreal frame,
     return nullptr;
 }
 
-void GraphKey::updateCtrlFromCtrl(const QrealPointType type) {
+QPointF operator*(const QPointF& p1, const QPointF& p2) {
+    return {p1.x()*p2.x(), p1.y()*p2.y()};
+}
+
+void GraphKey::updateCtrlFromCtrl(const QrealPointType type,
+                                  const qreal pixelsPerFrame,
+                                  const qreal pixelsPerValue) {
     if(mCtrlsMode == CtrlsMode::corner) return;
     QPointF fromPt;
     QPointF toPt;
@@ -228,10 +234,12 @@ void GraphKey::updateCtrlFromCtrl(const QrealPointType type) {
     QPointF newFrameValue;
     const QPointF graphPt(mRelFrame, getValueForGraph());
     if(mCtrlsMode == CtrlsMode::smooth) {
-        // mFrame and mValue are of different units chence len is wrong
-        newFrameValue = symmetricToPosNewLen(fromPt, graphPt,
-                                             pointToLen(toPt - graphPt));
+        const QPointF pMult{pixelsPerFrame, pixelsPerValue};
+        const auto dP = (toPt - graphPt)*pMult;
+        const qreal len = pointToLen(dP);
 
+        newFrameValue = symmetricToPosNewLen(fromPt*pMult, graphPt*pMult, len);
+        newFrameValue = newFrameValue*QPointF{1/pixelsPerFrame, 1/pixelsPerValue};
     } else if(mCtrlsMode == CtrlsMode::symmetric) {
         newFrameValue = symmetricToPos(fromPt, graphPt);
     }

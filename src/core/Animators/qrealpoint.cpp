@@ -75,7 +75,9 @@ bool QrealPoint::isNear(const qreal absFrame, const qreal value,
     return true;
 }
 
-void QrealPoint::moveBy(const qreal dFrame, const qreal dValue) {
+void QrealPoint::moveBy(const qreal dFrame, const qreal dValue,
+                        const qreal pixelsPerFrame,
+                        const qreal pixelsPerValue) {
     if(mType == QrealPointType::keyPt) {
         mParentKey->changeFrameAndValueBy({dFrame, dValue});
     } else if(mType == QrealPointType::c0Pt) {
@@ -83,21 +85,23 @@ void QrealPoint::moveBy(const qreal dFrame, const qreal dValue) {
         const auto relTo = pt.getRawSavedValue();
         mParentKey->setC0FrameVar(relTo.x() + dFrame);
         mParentKey->setC0ValueVar(relTo.y() + dValue);
-        mParentKey->updateCtrlFromCtrl(mType);
+        mParentKey->updateCtrlFromCtrl(mType, pixelsPerFrame, pixelsPerValue);
     } else if(mType == QrealPointType::c1Pt) {
         const auto& pt = mParentKey->c1Clamped();
         const auto relTo = pt.getRawSavedValue();
         mParentKey->setC1FrameVar(relTo.x() + dFrame);
         mParentKey->setC1ValueVar(relTo.y() + dValue);
-        mParentKey->updateCtrlFromCtrl(mType);
+        mParentKey->updateCtrlFromCtrl(mType, pixelsPerFrame, pixelsPerValue);
     }
 }
 
-void QrealPoint::moveTo(const qreal frame, const qreal value) {
+void QrealPoint::moveTo(const qreal frame, const qreal value,
+                        const qreal pixelsPerFrame,
+                        const qreal pixelsPerValue) {
     setAbsFrame(frame);
     setValue(value);
     if(isKeyPt()) return;
-    mParentKey->updateCtrlFromCtrl(mType);
+    mParentKey->updateCtrlFromCtrl(mType, pixelsPerFrame, pixelsPerValue);
 }
 
 qreal QrealPoint::getAbsFrame() {
@@ -126,11 +130,13 @@ qreal QrealPoint::getSavedValue() const {
     return getSavedFrameAndValue().y();
 }
 
-void QrealPoint::setFrameAndValue(const qreal relFrame, const qreal value) {
+void QrealPoint::setFrameAndValue(const qreal relFrame, const qreal value,
+                                  const qreal pixelsPerFrame,
+                                  const qreal pixelsPerValue) {
     setRelFrame(relFrame);
     setValue(value);
     if(isKeyPt()) return;
-    mParentKey->updateCtrlFromCtrl(mType);
+    mParentKey->updateCtrlFromCtrl(mType, pixelsPerFrame, pixelsPerValue);
 }
 
 void QrealPoint::draw(QPainter * const p, const QColor &paintColor) {

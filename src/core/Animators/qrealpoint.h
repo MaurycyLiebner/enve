@@ -41,8 +41,9 @@ public:
     qreal getSavedFrame() const;
     qreal getSavedValue() const;
 
-    void setFrameAndValue(const qreal relFrame,
-                          const qreal value);
+    void setFrameAndValue(const qreal relFrame, const qreal value,
+                          const qreal pixelsPerFrame,
+                          const qreal pixelsPerValue);
 
     void setRelFrame(const qreal frame);
     void setAbsFrame(const qreal absFrame);
@@ -54,10 +55,15 @@ public:
     bool isSelected();
 
     bool isNear(const qreal absFrame, const qreal value,
-                const qreal pixelsPerFrame, const qreal pixelsPerValue);
+                const qreal pixelsPerFrame,
+                const qreal pixelsPerValue);
 
-    void moveBy(const qreal dFrame, const qreal dValue);
-    void moveTo(const qreal frameT, const qreal value);
+    void moveBy(const qreal dFrame, const qreal dValue,
+                const qreal pixelsPerFrame,
+                const qreal pixelsPerValue);
+    void moveTo(const qreal frameT, const qreal value,
+                const qreal pixelsPerFrame,
+                const qreal pixelsPerValue);
 
     void draw(QPainter * const p, const QColor &paintColor);
 

@@ -700,7 +700,9 @@ void KeysView::handleMouseMove(const QPoint &pos,
             const qreal rawValue = saved.y() + dValue;
             const qreal newFrame = qBound(mMinMoveFrame, rawFrame, mMaxMoveFrame);
             const qreal newValue = qBound(mMinMoveVal, rawValue, mMaxMoveVal);
-            mGPressedPoint->setFrameAndValue(newFrame, newValue);
+            mGPressedPoint->setFrameAndValue(newFrame, newValue,
+                                             mPixelsPerFrame,
+                                             mPixelsPerValUnit);
         } else if(mMovingKeys) {
             if(mFirstMove) {
                 if(mGraphViewed) {

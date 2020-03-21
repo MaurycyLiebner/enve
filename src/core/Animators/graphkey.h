@@ -73,7 +73,9 @@ public:
                            const qreal pixelsPerFrame,
                            const qreal pixelsPerValue);
 
-    void updateCtrlFromCtrl(const QrealPointType type);
+    void updateCtrlFromCtrl(const QrealPointType type,
+                            const qreal pixelsPerFrame,
+                            const qreal pixelsPerValue);
     void setCtrlsMode(const CtrlsMode mode);
     void setCtrlsModeAction(const CtrlsMode mode);
     void guessCtrlsMode();
