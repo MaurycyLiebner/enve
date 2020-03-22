@@ -287,6 +287,7 @@ void QrealAnimator::applyExpressionSub(const FrameRange& relRange,
                                        const qreal sampleInc,
                                        const bool action,
                                        const qreal accuracy) {
+    if(!relRange.isValid()) return;
     const int count = qCeil(relRange.span()/sampleInc);
     QVector<QPointF> pts;
     pts.reserve(count);
@@ -366,7 +367,9 @@ void QrealAnimator::applyExpression(const FrameRange& relRange,
     for(int i = relRange.fMin; i < relRange.fMax; i++) {
         const int absFrame = absRange.fMin + i - relRange.fMin;
         const auto nextNonUnary = mExpression->nextNonUnaryIdenticalRelRange(absFrame);
-        if(!nextNonUnary.inRange(i)) {
+        if(nextNonUnary == FrameRange::EMINMAX) {
+            ranges << relRange;
+        } else if(!nextNonUnary.inRange(i)) {
             ranges << relRange*FrameRange{i, nextNonUnary.fMin};
         }
         i = nextNonUnary.fMax;

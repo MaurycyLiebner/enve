@@ -159,6 +159,12 @@ void Rectangle::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
     cW->setExpression(wExpr);
     cH->setExpression(hExpr);
 
+    const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
+    cX->applyExpression(relRange, 1, false, 10);
+    cY->applyExpression(relRange, 1, false, 10);
+    cW->applyExpression(relRange, 1, false, 10);
+    cH->applyExpression(relRange, 1, false, 10);
+
     auto& ele = task->initialize("rect");
     const auto xAnim = copy->mTopLeftAnimator->getXAnimator();
     const auto yAnim = copy->mTopLeftAnimator->getYAnimator();
