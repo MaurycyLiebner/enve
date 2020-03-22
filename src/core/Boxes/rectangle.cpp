@@ -135,35 +135,28 @@ void Rectangle::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
     const auto cW = cProps->addPropertyOfType<QrealAnimator>("width");
     const auto cH = cProps->addPropertyOfType<QrealAnimator>("height");
 
-    const QString bindings = "left = top left.x;"
-                             "top = top left.y;"
-                             "right = bottom right.x;"
-                             "bottom = bottom right.y;";
-
+    const QString xbindings = "left = top left.x;"
+                              "right = bottom right.x;";
+    const QString ybindings = "top = top left.y;"
+                              "bottom = bottom right.y;";
     const auto xScript = "return Math.min(left, right);";
     const auto yScript = "return Math.min(top, bottom);";
     const auto wScript = "return Math.abs(left - right);";
     const auto hScript = "return Math.abs(top - bottom);";
 
-    const auto xExpr = Expression::sCreate(bindings, "", xScript, cX,
+    const auto xExpr = Expression::sCreate(xbindings, "", xScript, cX,
                                            Expression::sQrealAnimatorTester);
-    const auto yExpr = Expression::sCreate(bindings, "", yScript, cY,
+    const auto yExpr = Expression::sCreate(ybindings, "", yScript, cY,
                                            Expression::sQrealAnimatorTester);
-    const auto wExpr = Expression::sCreate(bindings, "", wScript, cW,
+    const auto wExpr = Expression::sCreate(xbindings, "", wScript, cW,
                                            Expression::sQrealAnimatorTester);
-    const auto hExpr = Expression::sCreate(bindings, "", hScript, cH,
+    const auto hExpr = Expression::sCreate(ybindings, "", hScript, cH,
                                            Expression::sQrealAnimatorTester);
 
     cX->setExpression(xExpr);
     cY->setExpression(yExpr);
     cW->setExpression(wExpr);
     cH->setExpression(hExpr);
-
-    const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
-    cX->applyExpression(relRange, 1, false, 10);
-    cY->applyExpression(relRange, 1, false, 10);
-    cW->applyExpression(relRange, 1, false, 10);
-    cH->applyExpression(relRange, 1, false, 10);
 
     auto& ele = task->initialize("rect");
     const auto xAnim = copy->mTopLeftAnimator->getXAnimator();
