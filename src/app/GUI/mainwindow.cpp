@@ -1321,16 +1321,9 @@ void MainWindow::saveBackup() {
 }
 
 void MainWindow::exportSVG() {
-    const QString fileType = tr("SVG Files %1", "ExportDialog_FileType");
-    QString saveAs = eDialogs::saveFile("Export SVG",
-                                        mDocument.projectDirectory(),
-                                        fileType.arg("(*.svg)"));
-    if(!saveAs.isEmpty()) {
-        if(saveAs.right(4) != ".svg") saveAs += ".svg";
-        const auto dialog = new ExportSvgDialog(saveAs, this);
-        dialog->show();
-        dialog->setAttribute(Qt::WA_DeleteOnClose);
-    }
+    const auto dialog = new ExportSvgDialog(this);
+    dialog->show();
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
 }
 
 bool MainWindow::closeProject() {

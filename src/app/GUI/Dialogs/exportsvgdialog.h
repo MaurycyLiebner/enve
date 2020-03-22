@@ -21,15 +21,23 @@
 
 #include <QSpinBox>
 #include <QCheckBox>
+#include <QTemporaryFile>
 
+class QWebEngineView;
 class SceneChooser;
+class ComplexTask;
 
 class ExportSvgDialog : public QDialog {
 public:
-    ExportSvgDialog(const QString& path,
-                    QWidget* const parent = nullptr);
+    ExportSvgDialog(QWidget* const parent = nullptr);
 
 private:
+    ComplexTask* exportTo(const QString& file);
+
+    QSharedPointer<QTemporaryFile> mPreviewFile;
+    QWebEngineView* mPreview;
+    QPushButton* mPreviewButton;
+
     SceneChooser* mScene;
 
     QSpinBox* mFirstFrame;
@@ -38,8 +46,6 @@ private:
     QCheckBox* mBackground;
     QCheckBox* mFixedSize;
     QCheckBox* mLoop;
-
-    const QString mPath;
 };
 
 #endif // EXPORTSVGDIALOG_H

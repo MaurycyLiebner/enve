@@ -21,30 +21,42 @@
 #include "GUI/global.h"
 #include "canvas.h"
 #include "svgexporter.h"
+#include "GUI/edialogs.h"
+#include "GUI/twocolumnlayout.h"
 
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include <QMenuBar>
+#include <QWebEngineView>
 
-ExportSvgDialog::ExportSvgDialog(const QString& path,
-                                 QWidget* const parent) :
-    QDialog(parent), mPath(path) {
+class SvgPreview : public QWebEngineView {
+public:
+    SvgPreview(QWidget* const parent = nullptr) : QWebEngineView(parent) {
+        setSizePolicy(QSizePolicy::MinimumExpanding,
+                      QSizePolicy::MinimumExpanding);
+        setMinimumSize(10*MIN_WIDGET_DIM, 10*MIN_WIDGET_DIM);
+    }
+protected:
+    void contextMenuEvent(QContextMenuEvent *e) {
+        QMenu* menu = new QMenu(this);
+        const auto action = menu->addAction("Restart");
+        action->setIcon(QIcon::fromTheme(QStringLiteral("view-refresh")));
+        connect(action, &QAction::triggered, this, &SvgPreview::reload);
+        menu->popup(e->globalPos());
+        connect(menu, &QMenu::aboutToHide, menu, &QObject::deleteLater);
+    }
+};
 
-    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+ExportSvgDialog::ExportSvgDialog(QWidget* const parent) :
+    QDialog(parent) {
 
     setWindowTitle("Export SVG");
 
-    const auto mainLayout = new QVBoxLayout(this);
-    setLayout(mainLayout);
+    const auto settingsLayout = new QVBoxLayout();
 
-    const auto layout = new QHBoxLayout();
-    mainLayout->addLayout(layout);
-    const auto labelLayout = new QVBoxLayout();
-    const auto spinLayout = new QVBoxLayout();
-    layout->addLayout(labelLayout);
-    layout->addLayout(spinLayout);
+    const auto twoColLayout = new TwoColumnLayout();
 
     const auto document = Document::sInstance;
     mScene = new SceneChooser(*document, false, this);
@@ -80,26 +92,22 @@ ExportSvgDialog::ExportSvgDialog(const QString& path,
     mLoop = new QCheckBox("Loop", this);
     mLoop->setChecked(true);
 
-    spinLayout->addWidget(sceneButton);
-    spinLayout->addSpacing(MIN_WIDGET_DIM);
-    spinLayout->addWidget(mFirstFrame);
-    spinLayout->addWidget(mLastFrame);
+    twoColLayout->addPair(new QLabel("Scene:"), sceneButton);
+    twoColLayout->addSpacing(MIN_WIDGET_DIM);
+    twoColLayout->addPair(new QLabel("First Frame:"), mFirstFrame);
+    twoColLayout->addPair(new QLabel("Last Frame:"), mLastFrame);
 
-    mainLayout->addSpacing(MIN_WIDGET_DIM);
-    mainLayout->addWidget(mBackground);
-    mainLayout->addWidget(mFixedSize);
-    mainLayout->addWidget(mLoop);
-    mainLayout->addSpacing(MIN_WIDGET_DIM);
+    settingsLayout->addLayout(twoColLayout);
+    settingsLayout->addSpacing(MIN_WIDGET_DIM);
+    settingsLayout->addWidget(mBackground, 0, Qt::AlignTop);
+    settingsLayout->addWidget(mFixedSize, 0, Qt::AlignTop);
+    settingsLayout->addWidget(mLoop, 0, Qt::AlignTop);
+    settingsLayout->addSpacing(MIN_WIDGET_DIM);
 
     connect(mFirstFrame, qOverload<int>(&QSpinBox::valueChanged),
             mLastFrame, &QSpinBox::setMinimum);
     connect(mLastFrame, qOverload<int>(&QSpinBox::valueChanged),
             mFirstFrame, &QSpinBox::setMaximum);
-
-    labelLayout->addWidget(new QLabel("Scene:"));
-    labelLayout->addSpacing(MIN_WIDGET_DIM);
-    labelLayout->addWidget(new QLabel("First Frame:"));
-    labelLayout->addWidget(new QLabel("Last Frame:"));
 
     const auto buttons = new QDialogButtonBox(QDialogButtonBox::Ok |
                                               QDialogButtonBox::Cancel);
@@ -111,34 +119,76 @@ ExportSvgDialog::ExportSvgDialog(const QString& path,
     });
 
     connect(buttons, &QDialogButtonBox::accepted, this, [this]() {
-        try {
-            const auto scene = mScene->getCurrentScene();
-            if(!scene) RuntimeThrow("No scene selected");
-            const int firstFrame = mFirstFrame->value();
-            const int lastFrame = mLastFrame->value();
-
-            const bool background = mBackground->isChecked();
-            const bool fixedSize = mFixedSize->isChecked();
-            const bool loop = mLoop->isChecked();
-
-            const FrameRange frameRange{firstFrame, lastFrame};
-            const qreal fps = scene->getFps();
-
-            const auto task = new SvgExporter(mPath, scene, frameRange, fps,
-                                              background, fixedSize, loop);
-            const auto taskSPtr = QSharedPointer<SvgExporter>(
-                                      task, &QObject::deleteLater);
-            task->nextStep();
-            TaskScheduler::instance()->addComplexTask(taskSPtr);
-        } catch(const std::exception& e) {
-            gPrintExceptionCritical(e);
-            return;
-        }
-
-        accept();
+        const QString dir = Document::sInstance->projectDirectory();
+        const QString fileType = tr("SVG Files %1", "ExportDialog_FileType");
+        QString saveAs = eDialogs::saveFile("Export SVG", dir,
+                                            fileType.arg("(*.svg)"));
+        if(saveAs.isEmpty()) return;
+        if(saveAs.right(4) != ".svg") saveAs += ".svg";
+        const bool success = exportTo(saveAs);
+        if(success) accept();
     });
 
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
-    mainLayout->addWidget(buttons);
+    settingsLayout->addWidget(buttons, 0, Qt::AlignBottom);
+
+    mPreview = new SvgPreview(this);
+    mPreviewButton = new QPushButton("Preview", this);
+    buttons->addButton(mPreviewButton, QDialogButtonBox::ActionRole);
+    connect(mPreviewButton, &QPushButton::released, this, [this]() {
+        if(!mPreviewFile) {
+            const QString templ = "enve_svg_preview_XXXXXX.svg";
+            mPreviewFile = qsptr<QTemporaryFile>::create(templ);
+            mPreviewFile->open();
+            mPreviewFile->close();
+        }
+        const auto task = exportTo(mPreviewFile->fileName());
+        if(!task) return;
+        QPointer<ExportSvgDialog> ptr = this;
+        task->addDependent(
+        {[ptr]() {
+            if(ptr) {
+                const auto fileName = ptr->mPreviewFile->fileName();
+                ptr->mPreview->load(QUrl::fromLocalFile(fileName));
+            }
+        }, nullptr});
+    });
+
+    const auto settingsWidget = new QWidget(this);
+    settingsWidget->setLayout(settingsLayout);
+    settingsWidget->setSizePolicy(QSizePolicy::Fixed,
+                                  QSizePolicy::MinimumExpanding);
+
+    const auto mainLayout = new QHBoxLayout(this);
+    mainLayout->addWidget(mPreview);
+    mainLayout->addSpacing(MIN_WIDGET_DIM/2);
+    mainLayout->addWidget(settingsWidget);
+    setLayout(mainLayout);
+}
+
+ComplexTask* ExportSvgDialog::exportTo(const QString& file) {
+    try {
+        const auto scene = mScene->getCurrentScene();
+        if(!scene) RuntimeThrow("No scene selected");
+        const int firstFrame = mFirstFrame->value();
+        const int lastFrame = mLastFrame->value();
+
+        const bool background = mBackground->isChecked();
+        const bool fixedSize = mFixedSize->isChecked();
+        const bool loop = mLoop->isChecked();
+
+        const FrameRange frameRange{firstFrame, lastFrame};
+        const qreal fps = scene->getFps();
+
+        const auto task = new SvgExporter(file, scene, frameRange, fps,
+                                          background, fixedSize, loop);
+        const auto taskSPtr = qsptr<SvgExporter>(task, &QObject::deleteLater);
+        task->nextStep();
+        TaskScheduler::instance()->addComplexTask(taskSPtr);
+        return task;
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+        return nullptr;
+    }
 }

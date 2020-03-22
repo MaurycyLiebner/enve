@@ -22,7 +22,7 @@
 
 VERSION = 0.0.0
 
-QT += multimedia core gui svg opengl sql qml xml concurrent
+QT += multimedia core gui svg opengl sql qml xml concurrent webenginewidgets
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample
 CONFIG += c++14
 DEFINES += QT_NO_FOREACH
