@@ -362,23 +362,25 @@ void QrealAnimator::applyExpression(const FrameRange& relRange,
     if(!relRange.isValid()) return;
     if(isZero4Dec(accuracy)) return;
 
-    const auto absRange = prp_relRangeToAbsRange(relRange);
-    QList<FrameRange> ranges;
-    for(int i = relRange.fMin; i < relRange.fMax; i++) {
-        const int absFrame = absRange.fMin + i - relRange.fMin;
-        const auto nextNonUnary = mExpression->nextNonUnaryIdenticalRelRange(absFrame);
-        if(nextNonUnary == FrameRange::EMINMAX) {
-            ranges << relRange;
-        } else if(!nextNonUnary.inRange(i)) {
-            ranges << relRange*FrameRange{i, nextNonUnary.fMin};
-        }
-        i = nextNonUnary.fMax;
-    }
-
     prp_pushUndoRedoName("Apply Expression");
 
-    for(const auto& range : ranges) {
-        applyExpressionSub(range, sampleInc, action, accuracy);
+    const bool isStatic = mExpression->isStatic();
+    if(isStatic) {
+        const qreal value = mExpression->evaluate(relRange.fMin).toNumber();
+        setCurrentBaseValue(value);
+    } else {
+        const auto absRange = prp_relRangeToAbsRange(relRange);
+        QList<FrameRange> ranges;
+        for(int i = relRange.fMin; i < relRange.fMax; i++) {
+            const int absFrame = absRange.fMin + i - relRange.fMin;
+            const auto nextNonUnary = mExpression->nextNonUnaryIdenticalRelRange(absFrame);
+            ranges << relRange*FrameRange{i, nextNonUnary.fMin};
+            i = nextNonUnary.fMax;
+        }
+
+        for(const auto& range : ranges) {
+            applyExpressionSub(range, sampleInc, action, accuracy);
+        }
     }
 
     if(action) setExpressionAction(nullptr);

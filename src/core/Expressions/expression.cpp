@@ -120,6 +120,10 @@ bool Expression::setAbsFrame(const int absFrame) {
     return changed;
 }
 
+bool Expression::isStatic() const {
+    return identicalRelRange(0) == FrameRange::EMINMAX;
+}
+
 bool Expression::isValid() {
     for(const auto& binding : mBindings) {
         const bool valid = binding.second->isValid();

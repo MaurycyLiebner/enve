@@ -52,6 +52,7 @@ public:
 
     bool setAbsFrame(const int absFrame);
 
+    bool isStatic() const;
     bool isValid();
     bool dependsOn(const Property* const prop);
 
