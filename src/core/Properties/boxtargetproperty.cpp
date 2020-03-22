@@ -27,7 +27,7 @@ BoundingBox* BoxTargetProperty::getTarget() const {
     return mTarget_d;
 }
 
-void BoxTargetProperty::setTarget(BoundingBox* const box) {
+void BoxTargetProperty::setTargetAction(BoundingBox* const box) {
     if(box == mTarget_d) return;
     {
         prp_pushUndoRedoName("Set Box Target");
@@ -43,13 +43,19 @@ void BoxTargetProperty::setTarget(BoundingBox* const box) {
         prp_addUndoRedo(ur);
     }
 
+    setTarget(box);
+}
+
+void BoxTargetProperty::setTarget(BoundingBox* const box) {
+    if(box == mTarget_d) return;
+
     mTarget_d.assign(box);
     if(box) {
         mTarget_d << connect(box, &BoundingBox::prp_ancestorChanged,
                              this, [this]() {
             SimpleTask::sScheduleContexted(this, [this]() {
                 if(mTarget_d && mTarget_d->getParentScene()) return;
-                setTarget(nullptr);
+                setTargetAction(nullptr);
             });
         });
     }
@@ -68,7 +74,7 @@ bool BoxTargetProperty::SWT_drop(const QMimeData * const data) {
     const auto eData = static_cast<const eMimeData*>(data);
     const auto bData = static_cast<const eDraggedObjects*>(eData);
     const auto obj = bData->getObject<BoundingBox>(0);
-    setTarget(obj);
+    setTargetAction(obj);
     return true;
 }
 

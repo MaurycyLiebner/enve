@@ -42,7 +42,7 @@ void BoxTargetWidget::dropEvent(QDropEvent *event) {
         const auto box = boxMimeData->getObjects<BoundingBox>().first();
         const auto& validator = mProperty->validator();
         if(box && (!validator || validator(box))) {
-            mProperty->setTarget(box);
+            mProperty->setTargetAction(box);
         }
         mDragging = false;
         update();
@@ -91,7 +91,7 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
         {
             const auto act = menu.addAction("-none-");
             connect(act, &QAction::triggered, this, [this]() {
-                mProperty->setTarget(nullptr);
+                mProperty->setTargetAction(nullptr);
                 Document::sInstance->actionFinished();
             });
             if(!currentTarget) {
@@ -106,7 +106,7 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
             if(validator && !validator(box)) continue;
             const auto act = menu.addAction(box->prp_getName());
             connect(act, &QAction::triggered, this, [this, box]() {
-                mProperty->setTarget(box);
+                mProperty->setTargetAction(box);
                 Document::sInstance->actionFinished();
             });
             if(currentTarget == box) {

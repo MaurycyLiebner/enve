@@ -63,7 +63,7 @@ void InternalLinkGroupBox::insertInnerLinkFor(
 
 void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
     removeAllContained();
-    mBoxTarget->setTarget(linkTarget);
+    mBoxTarget->setTargetAction(linkTarget);
     auto& conn = assignLinkTarget(linkTarget);
     if(linkTarget) {
         conn << connect(linkTarget->getTransformAnimator(),

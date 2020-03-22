@@ -35,7 +35,7 @@ InternalLinkBox::InternalLinkBox(BoundingBox * const linkTarget,
 void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
     mSound.reset();
     auto& conn = assignLinkTarget(linkTarget);
-    mBoxTarget->setTarget(linkTarget);
+    mBoxTarget->setTargetAction(linkTarget);
     if(const auto vidBox = enve_cast<VideoBox*>(linkTarget)) {
         mSound = vidBox->sound()->createLink();
         conn << connect(this, &eBoxOrSound::parentChanged,

@@ -38,6 +38,7 @@ public:
 
     BoundingBox *getTarget() const;
     void setTarget(BoundingBox * const box);
+    void setTargetAction(BoundingBox * const box);
 
     using Validator = std::function<bool(BoundingBox*)>;
 
