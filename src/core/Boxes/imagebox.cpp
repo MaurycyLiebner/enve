@@ -24,6 +24,8 @@
 #include "GUI/edialogs.h"
 #include "typemenu.h"
 #include "paintbox.h"
+#include "svgexporter.h"
+#include "svgexporthelpers.h"
 
 ImageFileHandler* imageFileHandlerGetter(const QString& path) {
     return FilesHandler::sInstance->getFileHandler<ImageFileHandler>(path);
@@ -145,6 +147,34 @@ void ImageBox::setupRenderData(const qreal relFrame,
 
 stdsptr<BoxRenderData> ImageBox::createRenderData() {
     return enve::make_shared<ImageBoxRenderData>(mFileHandler, this);
+}
+
+void ImageBox::saveSVG(SvgExporter& exp, DomEleTask* const eleTask) const {
+    eleTask->initialize("use");
+    const QString imageId = SvgExportHelpers::ptrToStr(mFileHandler.data());
+    const auto expPtr = &exp;
+    const auto generate = [expPtr, eleTask, imageId](const sk_sp<SkImage>& image) {
+        if(!image) return;
+        SvgExportHelpers::defImage(*expPtr, image, imageId);
+        auto& use = eleTask->element();
+        use.setAttribute("href", "#" + imageId);
+    };
+    if(mFileHandler->hasImage()) {
+        const auto image = mFileHandler->getImage();
+        generate(image);
+    } else {
+        const auto task = mFileHandler->scheduleLoad();
+        if(!task) return;
+        const qptr<const ImageBox> thisPtr = this;
+        const stdptr<DomEleTask> eleTaskPtr = eleTask;
+        task->addDependent(
+        {[thisPtr, eleTaskPtr, imageId, generate]() {
+             if(!eleTaskPtr || !thisPtr) return;
+             const auto image = thisPtr->mFileHandler->getImage();
+             generate(image);
+         }, nullptr});
+        task->addDependent(eleTask);
+    }
 }
 
 void ImageBoxRenderData::loadImageFromHandler() {

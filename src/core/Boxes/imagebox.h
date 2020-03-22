@@ -47,6 +47,7 @@ public:
     stdsptr<BoxRenderData> createRenderData();
     void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);
+    void saveSVG(SvgExporter& exp, DomEleTask* const eleTask) const;
 
     void changeSourceFile();
     void setFilePath(const QString &path);
