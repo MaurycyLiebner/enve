@@ -26,6 +26,7 @@ class Expression;
 class QrealAnimator :  public GraphAnimator {
     Q_OBJECT
     e_OBJECT
+    friend class QPointFAnimator;
 protected:
     QrealAnimator(const QString& name);
     QrealAnimator(const qreal iniVal,
@@ -61,6 +62,7 @@ public:
     void prp_cancelTransform();
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
+    FrameRange prp_nextNonUnaryIdenticalRelRange(const int relFrame) const;
 
     void prp_afterChangedAbsRange(const FrameRange& range,
                                   const bool clip = true);
@@ -155,16 +157,16 @@ public:
     void setExpression(const qsptr<Expression>& expression);
     void setExpressionAction(const qsptr<Expression>& expression);
     void applyExpression(const FrameRange& relRange,
-                         const qreal sampleInc,
-                         const bool action,
-                         const qreal accuracy = 1);
+                         const qreal accuracy,
+                         const bool action);
 
     void saveQrealSVG(SvgExporter& exp,
                       QDomElement& parent,
                       const QString& attrName,
                       const qreal multiplier = 1.,
                       const bool transform = false,
-                      const QString& type = "") const;
+                      const QString& type = "",
+                      const QString& templ = "%1");
 private:
     qreal calculateBaseValueAtRelFrame(const qreal frame) const;
     void startBaseValueTransform();
@@ -175,7 +177,8 @@ private:
     bool assignCurrentBaseValue(const qreal newValue);
 
     void applyExpressionSub(const FrameRange& relRange,
-                            const qreal sampleInc, const bool action,
+                            const int sampleInc,
+                            const bool action,
                             const qreal accuracy);
 
     bool mGraphMinMaxValuesFixed = false;

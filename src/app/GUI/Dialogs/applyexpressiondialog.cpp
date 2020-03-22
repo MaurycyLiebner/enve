@@ -54,8 +54,8 @@ ApplyExpressionDialog::ApplyExpressionDialog(QrealAnimator* const target,
             mFirstFrame, &QSpinBox::setMaximum);
 
     mAccuracy = new QDoubleSpinBox(this);
-    mAccuracy->setRange(0.1, 10);
-    mAccuracy->setValue(100);
+    mAccuracy->setRange(0.1, 100);
+    mAccuracy->setValue(10);
 
     layout->addPair(new QLabel("First Frame:"), mFirstFrame);
     layout->addPair(new QLabel("Last Frame:"), mLastFrame);
@@ -71,8 +71,7 @@ ApplyExpressionDialog::ApplyExpressionDialog(QrealAnimator* const target,
         const qreal accuracy = mAccuracy->value();
         const FrameRange absRange{firstFrame, lastFrame};
         const auto relRange = mTarget->prp_absRangeToRelRange(absRange);
-        const qreal sampleInc = qMax(1. , sqrt(1/accuracy));
-        mTarget->applyExpression(relRange, sampleInc, true, accuracy);
+        mTarget->applyExpression(relRange, accuracy, true);
         accept();
         Document::sInstance->actionFinished();
     });

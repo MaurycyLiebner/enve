@@ -1,4 +1,4 @@
-// enve - 2D animations software
+﻿// enve - 2D animations software
 // Copyright (C) 2016-2020 Maurycy Liebner
 
 // This program is free software: you can redistribute it and/or modify
@@ -545,21 +545,14 @@ QDomElement saveSVG_Split(QPointFAnimator* const anim,
     const auto animX = anim->getXAnimator();
     const auto animY = anim->getYAnimator();
 
-    if(animX->anim_hasKeys() && animY->anim_hasKeys()) {
-        auto unpivotX = exp.createElement("g");
-        anim->saveQPointFSVGX(exp, unpivotX, "transform", def,
-                              multiplier, true, type);
-        auto unpivotY = exp.createElement("g");
-        anim->saveQPointFSVGY(exp, unpivotY, "transform", def,
-                              multiplier, true, type);
+    const bool xStatic = !animX->anim_hasKeys() &&
+                         !animX->hasExpression();
+    const bool yStatic = !animY->anim_hasKeys() &&
+                         !animY->hasExpression();
 
-        unpivotY.appendChild(child);
-        unpivotX.appendChild(unpivotY);
-        return unpivotX;
-    } else {
+    if(xStatic || yStatic) {
         auto unpivot = exp.createElement("g");
-        const bool xAnim = animX->anim_hasKeys();
-        if(xAnim) {
+        if(yStatic) {
             const qreal y = multiplier*animY->getEffectiveValue();
             anim->saveQPointFSVGX(exp, unpivot, "transform", y,
                                   multiplier, true, type);
@@ -570,6 +563,17 @@ QDomElement saveSVG_Split(QPointFAnimator* const anim,
         }
         unpivot.appendChild(child);
         return unpivot;
+    } else {
+        auto xEle = exp.createElement("g");
+        anim->saveQPointFSVGX(exp, xEle, "transform", def,
+                              multiplier, true, type);
+        auto yEle = exp.createElement("g");
+        anim->saveQPointFSVGY(exp, yEle, "transform", def,
+                              multiplier, true, type);
+
+        yEle.appendChild(child);
+        xEle.appendChild(yEle);
+        return xEle;
     }
 }
 

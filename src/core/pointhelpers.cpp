@@ -77,8 +77,14 @@ qCubicSegment1D::Pair gDividedAtX(const qCubicSegment1D& seg,
                                   const qreal x, qreal* t) {
     const qreal min = qMin4(seg.p0(), seg.c1(), seg.c2(), seg.p1());
     const qreal max = qMax4(seg.p0(), seg.c1(), seg.c2(), seg.p1());
-    if(x < min) return {qCubicSegment1D(seg.p0()), seg};
-    if(x > max) return {seg, qCubicSegment1D(seg.p1())};
+    if(x < min || isZero4Dec(x - min)) {
+        if(t) *t = 0;
+        return {qCubicSegment1D(seg.p0()), seg};
+    }
+    if(x > max || isZero4Dec(x - max)) {
+        if(t) *t = 1;
+        return {seg, qCubicSegment1D(seg.p1())};
+    }
     qreal tTmp;
     if(!t) t = &tTmp;
     *t = gTFromX(seg, x);

@@ -478,7 +478,7 @@ QList<qCubicSegment1D::Pair> splitSegmentOnExtremas(const qCubicSegment1D& segX,
                                                     const qCubicSegment1D& segY) {
     QList<qCubicSegment1D::Pair> result;
     const bool maxExtr = segY.maxPointValue() > qMax(segY.p0(), segY.p1());
-    const bool minExtr = segY.maxPointValue() > qMax(segY.p0(), segY.p1());
+    const bool minExtr = segY.minPointValue() < qMin(segY.p0(), segY.p1());
     if(minExtr && maxExtr) {
         const qreal minValT = segY.tWithSmallestValue();
         const qreal maxValT = segY.tWithBiggestValue();
@@ -504,6 +504,13 @@ QList<qCubicSegment1D::Pair> splitSegmentOnExtremas(const qCubicSegment1D& segX,
                                         segY.tFragment(maxValT, 1)};
     } else result << qCubicSegment1D::Pair{segX, segY};
     return result;
+}
+
+QDebug operator<<(QDebug out, const qCubicSegment1D& seg) {
+    out << QString("{ %1, %2, %3, %4 }").
+           arg(seg.p0()).arg(seg.c1()).
+           arg(seg.c2()).arg(seg.p1());
+    return out;
 }
 
 void GraphAnimator::graph_saveSVG(SvgExporter& exp,
@@ -568,7 +575,7 @@ void GraphAnimator::graph_saveSVG(SvgExporter& exp,
                     auto yKeySplines = subSeg.second.normalized();
                     const bool yInv = yKeySplines.p0() > yKeySplines.p1();
                     qreal yC1 = yKeySplines.c1();
-                    qreal yC2 = yKeySplines.c1();
+                    qreal yC2 = yKeySplines.c2();
                     if(yInv) {
                         yC1 = 1 - yC1;
                         yC2 = 1 - yC2;
@@ -576,9 +583,10 @@ void GraphAnimator::graph_saveSVG(SvgExporter& exp,
 
                     keySplines << ks.arg(xKeySplines.c1()).arg(yC1).
                                      arg(xKeySplines.c2()).arg(yC2);
-                    const qreal t = (nextRelFrame - relRange.fMin)/div;
+                    const qreal relFrame = subSeg.first.p1();
+                    const qreal t = (relFrame - relRange.fMin)/div;
                     keyTimes << QString::number(t);
-                    values << valueGetter(nextRelFrame);
+                    values << valueGetter(relFrame);
                 }
                 if(nextKeyRelFrame >= relRange.fMax) break;
             }

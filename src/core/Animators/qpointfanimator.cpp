@@ -15,8 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "qpointfanimator.h"
+
 #include "qrealanimator.h"
 #include "qrealkey.h"
+#include "svgexporter.h"
+#include "clipboardcontainer.h"
 
 QPointFAnimator::QPointFAnimator(const QString &name) :
     StaticComplexAnimator(name) {
@@ -244,12 +247,9 @@ void QPointFAnimator::saveQPointFSVGX(SvgExporter& exp,
                                       const qreal multiplier,
                                       const bool transform,
                                       const QString& type) const {
-    mXAnimator->graph_saveSVG(exp, parent, name,
-                              [this, y, multiplier](const int relFrame) {
-        const auto value = getEffectiveValue(relFrame);
-        return QString::number(multiplier*value.x()) + " " +
-               QString::number(y);
-    }, transform, type);
+    const QString templ = "%1 " + QString::number(y);
+    mXAnimator->saveQrealSVG(exp, parent, name, multiplier,
+                             transform, type, templ);
 }
 
 void QPointFAnimator::saveQPointFSVGY(SvgExporter& exp,
@@ -259,10 +259,7 @@ void QPointFAnimator::saveQPointFSVGY(SvgExporter& exp,
                                       const qreal multiplier,
                                       const bool transform,
                                       const QString& type) const {
-    mYAnimator->graph_saveSVG(exp, parent, name,
-                              [this, x, multiplier](const int relFrame) {
-        const auto value = getEffectiveValue(relFrame);
-        return QString::number(x) + " " +
-               QString::number(multiplier*value.y());
-    }, transform, type);
+    const QString templ = QString::number(x) + " %1";
+    mYAnimator->saveQrealSVG(exp, parent, name, multiplier,
+                             transform, type, templ);
 }

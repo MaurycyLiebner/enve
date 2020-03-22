@@ -23,6 +23,8 @@
 #include "typemenu.h"
 #include "GUI/dialogsinterface.h"
 #include "Segments/fitcurves.h"
+#include "svgexporter.h"
+#include "Properties/namedproperty.h"
 
 QrealAnimator::QrealAnimator(const qreal iniVal,
                              const qreal minVal,
@@ -284,11 +286,11 @@ void QrealAnimator::setExpressionAction(const qsptr<Expression> &expression) {
 }
 
 void QrealAnimator::applyExpressionSub(const FrameRange& relRange,
-                                       const qreal sampleInc,
+                                       const int sampleInc,
                                        const bool action,
                                        const qreal accuracy) {
     if(!relRange.isValid()) return;
-    const int count = qCeil(relRange.span()/sampleInc);
+    const int count = qCeil(relRange.span()/qreal(sampleInc));
     QVector<QPointF> pts;
     pts.reserve(count);
 
@@ -354,13 +356,12 @@ void QrealAnimator::applyExpressionSub(const FrameRange& relRange,
 }
 
 void QrealAnimator::applyExpression(const FrameRange& relRange,
-                                    const qreal sampleInc,
-                                    const bool action,
-                                    const qreal accuracy) {
+                                    const qreal accuracy,
+                                    const bool action) {
     if(!hasValidExpression()) return;
-    if(isZero4Dec(sampleInc) || sampleInc < 0) return;
     if(!relRange.isValid()) return;
-    if(isZero4Dec(accuracy)) return;
+    if(isZero4Dec(accuracy) || accuracy < 0) return;
+    const int sampleInc = qMax(1, qRound(1/accuracy));
 
     prp_pushUndoRedoName("Apply Expression");
 
@@ -374,7 +375,9 @@ void QrealAnimator::applyExpression(const FrameRange& relRange,
         for(int i = relRange.fMin; i < relRange.fMax; i++) {
             const int absFrame = absRange.fMin + i - relRange.fMin;
             const auto nextNonUnary = mExpression->nextNonUnaryIdenticalRelRange(absFrame);
-            ranges << relRange*FrameRange{i, nextNonUnary.fMin};
+            if(!nextNonUnary.inRange(i)) {
+                ranges << relRange*FrameRange{i, nextNonUnary.fMin};
+            }
             i = nextNonUnary.fMax;
         }
 
@@ -714,6 +717,31 @@ FrameRange QrealAnimator::prp_getIdenticalRelRange(const int relFrame) const {
     else return base;
 }
 
+FrameRange QrealAnimator::prp_nextNonUnaryIdenticalRelRange(const int relFrame) const {
+    if(hasExpression()) {
+        for(int i = relFrame; i < FrameRange::EMAX; i++) {
+            FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
+            int lowestMax = INT_MAX;
+
+            {
+                const auto childRange = Animator::prp_nextNonUnaryIdenticalRelRange(i);
+                lowestMax = qMin(lowestMax, childRange.fMax);
+                range *= childRange;
+            }
+            {
+                const auto childRange = mExpression->nextNonUnaryIdenticalRelRange(i);
+                lowestMax = qMin(lowestMax, childRange.fMax);
+                range *= childRange;
+            }
+
+            if(!range.isUnary()) return range;
+            i = lowestMax;
+        }
+
+        return FrameRange::EMINMAX;
+    } return Animator::prp_nextNonUnaryIdenticalRelRange(relFrame);
+}
+
 void QrealAnimator::prp_afterChangedAbsRange(const FrameRange &range,
                                              const bool clip) {
     if(range.inRange(anim_getCurrentAbsFrame()))
@@ -734,16 +762,27 @@ void QrealAnimator::saveQrealSVG(SvgExporter& exp,
                                  const QString& attrName,
                                  const qreal multiplier,
                                  const bool transform,
-                                 const QString& type) const {
+                                 const QString& type,
+                                 const QString& templ) {
     if(hasExpression()) {
-        Animator::saveSVG(exp, parent, attrName,
-                          [this, multiplier](const int relFrame) {
-            return QString::number(getEffectiveValue(relFrame)*multiplier);
-        }, transform, type);
+//        Animator::saveSVG(exp, parent, attrName,
+//                          [this, multiplier, &templ](const int relFrame) {
+//            const qreal val = getEffectiveValue(relFrame)*multiplier;
+//            return templ.arg(val);
+//        }, transform, type);
+        const auto copy = enve::make_shared<QrealAnimator>("");
+        const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
+        copy->prp_setInheritedFrameShift(prp_getTotalFrameShift(), nullptr);
+        copy->setExpression(mExpression.sptr());
+        copy->applyExpression(relRange, 10, false);
+        copy->saveQrealSVG(exp, parent, attrName, multiplier,
+                           transform, type, templ);
+        setExpression(mExpression.sptr());
     } else {
         graph_saveSVG(exp, parent, attrName,
-                      [this, multiplier](const int relFrame) {
-            return QString::number(getEffectiveValue(relFrame)*multiplier);
+                      [this, multiplier, &templ](const int relFrame) {
+            const qreal val = getEffectiveValue(relFrame)*multiplier;
+            return templ.arg(val);
         }, transform, type);
     }
 }
