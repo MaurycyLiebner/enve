@@ -40,7 +40,7 @@ before_install:
     - eval "${MATRIX_EVAL}"
     - wget https://raw.githubusercontent.com/qbs/qbs/master/scripts/install-qt.sh
     - chmod +x install-qt.sh
-    - ./install-qt.sh -d ${QT_INSTALL_DIR} --version ${QT_VERSION} qtbase qttools qtsvg qtmultimedia qtdeclarative icu
+    - ./install-qt.sh -d ${QT_INSTALL_DIR} --version ${QT_VERSION} qtbase qttools qtsvg qtmultimedia qtdeclarative qtwebenginewidgets icu
 install:
     - # skia dependencies
     - cd third_party
