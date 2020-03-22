@@ -349,8 +349,6 @@ static void parseNumbersArray(const QChar *&str,
     }
 }
 
-#include "include/utils/SkParsePath.h"
-
 bool parsePolylineData(const QString &dataStr,
                        VectorPathSvgAttributes &attributes) {
     float x0 = 0, y0 = 0;              // starting point
@@ -425,11 +423,13 @@ qsptr<ContainerBox> loadBoxesGroup(const QDomElement &groupElement,
     return boxesGroup;
 }
 
+#include "include/utils/SkParsePath.h"
+
 void loadVectorPath(const QDomElement &pathElement,
                     ContainerBox *parentGroup,
                     VectorPathSvgAttributes& attributes) {
     const QString pathStr = pathElement.attribute("d");
-    SkParsePath::FromSVGString(pathStr.toUtf8().data(), &attributes.path());
+    SkParsePath::FromSVGString(pathStr.toStdString().data(), &attributes.path());
     if(attributes.isEmpty()) return;
     const auto vectorPath = enve::make_shared<SmartVectorPath>();
     vectorPath->planCenterPivotPosition();

@@ -63,6 +63,7 @@ int main(int argc, char *argv[]) {
     setDefaultFormat();
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QApplication app(argc, argv);
+    setlocale(LC_NUMERIC, "C");
 
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
