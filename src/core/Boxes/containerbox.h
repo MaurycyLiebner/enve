@@ -216,6 +216,9 @@ public:
             QList<BlendEffect::Delayed> &delayed) const;
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
+protected:
+    void saveBoxesSVG(SvgExporter& exp, eTask* const eleTask,
+                      QDomElement& ele) const;
 private:
     void clearBlendEffectUI();
     void afterChildBlendEffectChanged();

@@ -141,8 +141,9 @@ public:
         if(id >= boxes.count()) return finish();
         const auto& box = boxes.at(id);
         if(!box->isVisible()) return nextStep();
-        box->saveSVGWithTransform(mExp, mEle);
-        addEmptyTask();
+        const auto task = box->saveSVGWithTransform(mExp, mEle);
+        const auto nextTask = addEmptyTask();
+        task->addDependent(nextTask);
     }
 private:
     const QPointer<const ContainerBox> mSrc;
@@ -152,8 +153,8 @@ private:
     int mI = 0;
 };
 
-void ContainerBox::saveSVG(SvgExporter& exp, DomEleTask* const eleTask) const {
-    auto& ele = eleTask->initialize("g");
+void ContainerBox::saveBoxesSVG(SvgExporter& exp, eTask* const eleTask,
+                                QDomElement& ele) const {
     const auto task = new GroupSaverSVG(this, exp, ele);
     const auto taskSPtr = QSharedPointer<GroupSaverSVG>(
                               task, &QObject::deleteLater);
@@ -162,6 +163,11 @@ void ContainerBox::saveSVG(SvgExporter& exp, DomEleTask* const eleTask) const {
     if(task->done()) return;
     TaskScheduler::instance()->addComplexTask(taskSPtr);
     task->addDependent(eleTask);
+}
+
+void ContainerBox::saveSVG(SvgExporter& exp, DomEleTask* const eleTask) const {
+    auto& ele = eleTask->initialize("g");
+    saveBoxesSVG(exp, eleTask, ele);
 }
 
 void ContainerBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
