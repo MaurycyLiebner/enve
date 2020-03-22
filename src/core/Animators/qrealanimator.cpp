@@ -299,7 +299,7 @@ void QrealAnimator::applyExpressionSub(const FrameRange& relRange,
         const qreal relFrame = relRange.fMin + i*sampleInc;
         const qreal value = mExpression->evaluate(relFrame).toNumber();
         pts << QPointF{relFrame*frameMultiplier, value};
-        valSum += value;
+        valSum += qAbs(value);
     }
 
     anim_removeKeys(relRange, action);
@@ -349,7 +349,7 @@ void QrealAnimator::applyExpressionSub(const FrameRange& relRange,
         prevKey = key1.get();
     };
 
-    FitCurves::FitCurve(pt2Data, count, 0.01*valAvg/accuracy, adder);
+    FitCurves::FitCurve(pt2Data, count, 0.01*(1 + valAvg/accuracy), adder);
 }
 
 void QrealAnimator::applyExpression(const FrameRange& relRange,
