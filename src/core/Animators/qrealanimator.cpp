@@ -358,31 +358,33 @@ void QrealAnimator::applyExpressionSub(const FrameRange& relRange,
 void QrealAnimator::applyExpression(const FrameRange& relRange,
                                     const qreal accuracy,
                                     const bool action) {
-    if(!hasValidExpression()) return;
-    if(!relRange.isValid()) return;
-    if(isZero4Dec(accuracy) || accuracy < 0) return;
-    const int sampleInc = qMax(1, qRound(1/accuracy));
+    if(!hasValidExpression()) {}
+    else if(!relRange.isValid()) {}
+    else if(isZero4Dec(accuracy) || accuracy < 0) {}
+    else {
+        const int sampleInc = qMax(1, qRound(1/accuracy));
 
-    prp_pushUndoRedoName("Apply Expression");
+        prp_pushUndoRedoName("Apply Expression");
 
-    const bool isStatic = mExpression->isStatic();
-    if(isStatic) {
-        const qreal value = mExpression->evaluate(relRange.fMin).toNumber();
-        setCurrentBaseValue(value);
-    } else {
-        const auto absRange = prp_relRangeToAbsRange(relRange);
-        QList<FrameRange> ranges;
-        for(int i = relRange.fMin; i < relRange.fMax; i++) {
-            const int absFrame = absRange.fMin + i - relRange.fMin;
-            const auto nextNonUnary = mExpression->nextNonUnaryIdenticalRelRange(absFrame);
-            if(!nextNonUnary.inRange(i)) {
-                ranges << relRange*FrameRange{i, nextNonUnary.fMin};
+        const bool isStatic = mExpression->isStatic();
+        if(isStatic) {
+            const qreal value = mExpression->evaluate(relRange.fMin).toNumber();
+            setCurrentBaseValue(value);
+        } else {
+            const auto absRange = prp_relRangeToAbsRange(relRange);
+            QList<FrameRange> ranges;
+            for(int i = relRange.fMin; i < relRange.fMax; i++) {
+                const int absFrame = absRange.fMin + i - relRange.fMin;
+                const auto nextNonUnary = mExpression->nextNonUnaryIdenticalRelRange(absFrame);
+                if(!nextNonUnary.inRange(i)) {
+                    ranges << relRange*FrameRange{i, nextNonUnary.fMin};
+                }
+                i = nextNonUnary.fMax;
             }
-            i = nextNonUnary.fMax;
-        }
 
-        for(const auto& range : ranges) {
-            applyExpressionSub(range, sampleInc, action, accuracy);
+            for(const auto& range : ranges) {
+                applyExpressionSub(range, sampleInc, action, accuracy);
+            }
         }
     }
 
@@ -764,7 +766,7 @@ void QrealAnimator::saveQrealSVG(SvgExporter& exp,
                                  const bool transform,
                                  const QString& type,
                                  const QString& templ) {
-    if(hasExpression()) {
+    if(hasValidExpression()) {
 //        Animator::saveSVG(exp, parent, attrName,
 //                          [this, multiplier, &templ](const int relFrame) {
 //            const qreal val = getEffectiveValue(relFrame)*multiplier;
