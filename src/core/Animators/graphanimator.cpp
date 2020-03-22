@@ -566,9 +566,16 @@ void GraphAnimator::graph_saveSVG(SvgExporter& exp,
                 for(const auto& subSeg : subSegs) {
                     const auto xKeySplines = subSeg.first.normalized();
                     auto yKeySplines = subSeg.second.normalized();
-                    if(yKeySplines.p0() > yKeySplines.p1()) yKeySplines.reverse();
-                    keySplines << ks.arg(xKeySplines.c1()).arg(yKeySplines.c1()).
-                                     arg(xKeySplines.c2()).arg(yKeySplines.c2());
+                    const bool yInv = yKeySplines.p0() > yKeySplines.p1();
+                    qreal yC1 = yKeySplines.c1();
+                    qreal yC2 = yKeySplines.c1();
+                    if(yInv) {
+                        yC1 = 1 - yC1;
+                        yC2 = 1 - yC2;
+                    }
+
+                    keySplines << ks.arg(xKeySplines.c1()).arg(yC1).
+                                     arg(xKeySplines.c2()).arg(yC2);
                     const qreal t = (nextRelFrame - relRange.fMin)/div;
                     keyTimes << QString::number(t);
                     values << valueGetter(nextRelFrame);
