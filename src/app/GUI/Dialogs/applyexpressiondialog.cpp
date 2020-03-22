@@ -55,7 +55,7 @@ ApplyExpressionDialog::ApplyExpressionDialog(QrealAnimator* const target,
 
     mAccuracy = new QDoubleSpinBox(this);
     mAccuracy->setRange(0.1, 10);
-    mAccuracy->setValue(10);
+    mAccuracy->setValue(100);
 
     layout->addPair(new QLabel("First Frame:"), mFirstFrame);
     layout->addPair(new QLabel("Last Frame:"), mLastFrame);
