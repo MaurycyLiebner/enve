@@ -63,12 +63,14 @@ void PropertyBinding::setPath(const QString& path) {
 }
 
 QJSValue PropertyBinding::getJSValue(QJSEngine& e) {
-    if(mBindProperty) return mBindProperty->prp_getEffectiveJSValue(e);
+    if(mBindPathValid && mBindProperty)
+        return mBindProperty->prp_getEffectiveJSValue(e);
     else return QJSValue::NullValue;
 }
 
 QJSValue PropertyBinding::getJSValue(QJSEngine& e, const qreal relFrame) {
-    if(mBindProperty) return mBindProperty->prp_getEffectiveJSValue(e, relFrame);
+    if(mBindPathValid && mBindProperty)
+        return mBindProperty->prp_getEffectiveJSValue(e, relFrame);
     else return QJSValue::NullValue;
 }
 
