@@ -1248,9 +1248,10 @@ void BoundingBox::renderDataFinished(BoxRenderData *renderData) {
 //    }
 //}
 
-void BoundingBox::saveSVGWithTransform(SvgExporter& exp,
-                                       QDomElement& parent) const {
+eTask* BoundingBox::saveSVGWithTransform(SvgExporter& exp,
+                                         QDomElement& parent) const {
     const auto task = enve::make_shared<DomEleTask>(exp);
+    exp.addNextTask(task);
     const auto taskPtr = task.get();
     const QPointer<const BoundingBox> ptr = this;
     const auto expPtr = &exp;
@@ -1261,5 +1262,5 @@ void BoundingBox::saveSVGWithTransform(SvgExporter& exp,
     }, nullptr});
     saveSVG(exp, taskPtr);
     taskPtr->queTask();
-    exp.addNextTask(task);
+    return task.get();
 }

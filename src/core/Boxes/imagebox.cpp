@@ -150,13 +150,12 @@ stdsptr<BoxRenderData> ImageBox::createRenderData() {
 }
 
 void ImageBox::saveSVG(SvgExporter& exp, DomEleTask* const eleTask) const {
-    eleTask->initialize("use");
     const QString imageId = SvgExportHelpers::ptrToStr(mFileHandler.data());
     const auto expPtr = &exp;
     const auto generate = [expPtr, eleTask, imageId](const sk_sp<SkImage>& image) {
         if(!image) return;
         SvgExportHelpers::defImage(*expPtr, image, imageId);
-        auto& use = eleTask->element();
+        auto& use = eleTask->initialize("use");
         use.setAttribute("href", "#" + imageId);
     };
     if(mFileHandler->hasImage()) {

@@ -293,20 +293,19 @@ private:
     QStringList mKeyTimes;
 };
 
-void AnimatedSurface::savePaintSVG(SvgExporter& exp, DomEleTask* const eleTask) {
+eTaskBase* AnimatedSurface::savePaintSVG(SvgExporter& exp, QDomElement& parent) {
     const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
     const int span = exp.fAbsRange.span();
     const qreal div = span - 1;
 
-    auto& parent = eleTask->element();
     const auto task = new ASurfaceSaverSVG(this, exp, parent, div, relRange);
     const auto taskSPtr = QSharedPointer<ASurfaceSaverSVG>(
                               task, &QObject::deleteLater);
     task->nextStep();
 
-    if(task->done()) return;
+    if(task->done()) return nullptr;
     TaskScheduler::instance()->addComplexTask(taskSPtr);
-    task->addDependent(eleTask);
+    return task;
 }
 
 ASKey::ASKey(AnimatedSurface * const parent) :

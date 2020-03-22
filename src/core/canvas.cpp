@@ -470,12 +470,10 @@ void Canvas::saveSceneSVG(SvgExporter& exp) const {
         svg.appendChild(bg);
     }
 
-    const auto& boxes = getContainedBoxes();
-    for(int i = boxes.count() - 1; i >= 0; i--) {
-        const auto& box = boxes.at(i);
-        if(!box->isVisible()) continue;
-        box->saveSVGWithTransform(exp, svg);
-    }
+    const auto task = enve::make_shared<DomEleTask>(exp);
+    exp.addNextTask(task);
+    saveBoxesSVG(exp, task.get(), svg);
+    task->queTask();
 }
 
 qsptr<BoundingBox> Canvas::createLink(const bool inner) {
