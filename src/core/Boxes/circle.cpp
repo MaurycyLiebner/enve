@@ -146,6 +146,28 @@ void Circle::setCenter(const QPointF &center) {
     mCenterAnimator->setBaseValue(center);
 }
 
+
+#include "simpletask.h"
+#include "Animators/customproperties.h"
+#include "Expressions/expression.h"
+#include "svgexporter.h"
+
+void Circle::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
+    auto& ele = task->initialize("ellipse");
+    const auto cX = mCenterAnimator->getXAnimator();
+    const auto cY = mCenterAnimator->getYAnimator();
+
+    const auto rX = mHorizontalRadiusAnimator->getXAnimator();
+    const auto rY = mVerticalRadiusAnimator->getYAnimator();
+
+    cX->saveQrealSVG(exp, ele, "cx");
+    cY->saveQrealSVG(exp, ele, "cy");
+    rX->saveQrealSVG(exp, ele, "rx");
+    rY->saveQrealSVG(exp, ele, "ry");
+
+    savePathBoxSVG(exp, ele);
+}
+
 CircleRadiusPoint::CircleRadiusPoint(QPointFAnimator * const associatedAnimator,
                                      BasicTransformAnimator * const parent,
                                      AnimatedPoint * const centerPoint,
