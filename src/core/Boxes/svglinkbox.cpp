@@ -56,7 +56,7 @@ void SvgLinkBox::updateContent() {
             return grad.get();
         };
         const auto imported = ImportSVG::loadSVGFile(obj->path(), gradientCreator);
-        addContained(imported);
+        if(imported) addContained(imported);
     }
 }
 
