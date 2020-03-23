@@ -668,16 +668,16 @@ int Animator::anim_getLowestAbsFrameForSelectedKey() {
 
 void Animator::saveSVG(SvgExporter& exp,
                        QDomElement& parent,
+                       const FrameRange& visRange,
                        const QString& attrName,
                        const ValueGetter& valueGetter,
                        const bool transform,
                        const QString& type) const {
     Q_ASSERT(!transform || attrName == "transform");
-    const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
-    const auto idRange = prp_getIdenticalRelRange(relRange.fMin);
+    const auto idRange = prp_getIdenticalRelRange(visRange.fMin);
     const int span = exp.fAbsRange.span();
-    if(idRange.inRange(relRange) || span == 1) {
-        auto value = valueGetter(relRange.fMin);
+    if(idRange.inRange(visRange) || span == 1) {
+        auto value = valueGetter(visRange.fMin);
         if(transform) {
             value = parent.attribute(attrName) + " " +
                     type + "(" + value + ")";
@@ -691,7 +691,7 @@ void Animator::saveSVG(SvgExporter& exp,
         const qreal div = span - 1;
         const qreal dur = div/exp.fFps;
         anim.setAttribute("dur", QString::number(dur)  + 's');
-        int i = relRange.fMin;
+        int i = visRange.fMin;
         QStringList values;
         QStringList keyTimes;
         while(true) {
@@ -705,7 +705,7 @@ void Animator::saveSVG(SvgExporter& exp,
                 const qreal maxTime = (iRange.fMax - exp.fAbsRange.fMin)/div;
                 keyTimes << QString::number(maxTime);
             }
-            if(iRange.fMax >= relRange.fMax) break;
+            if(iRange.fMax >= visRange.fMax) break;
             i = prp_nextDifferentRelFrame(i);
         }
         anim.setAttribute("values", values.join(';'));
@@ -717,7 +717,8 @@ void Animator::saveSVG(SvgExporter& exp,
 
 void Animator::saveSVG(SvgExporter& exp,
                        QDomElement& parent,
+                       const FrameRange& visRange,
                        const QString& attrName,
                        const ValueGetter& valueGetter) const {
-    saveSVG(exp, parent, attrName, valueGetter, false, "");
+    saveSVG(exp, parent, visRange, attrName, valueGetter, false, "");
 }

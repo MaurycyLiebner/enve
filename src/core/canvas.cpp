@@ -466,11 +466,11 @@ void Canvas::saveSceneSVG(SvgExporter& exp) const {
         auto bg = exp.createElement("rect");
         bg.setAttribute("width", mWidth);
         bg.setAttribute("height", mHeight);
-        mBackgroundColor->saveColorSVG(exp, bg, "fill");
+        mBackgroundColor->saveColorSVG(exp, bg, exp.fAbsRange, "fill");
         svg.appendChild(bg);
     }
 
-    const auto task = enve::make_shared<DomEleTask>(exp);
+    const auto task = enve::make_shared<DomEleTask>(exp, exp.fAbsRange);
     exp.addNextTask(task);
     saveBoxesSVG(exp, task.get(), svg);
     task->queTask();

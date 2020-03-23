@@ -162,6 +162,7 @@ public:
 
     void saveQrealSVG(SvgExporter& exp,
                       QDomElement& parent,
+                      const FrameRange& visRange,
                       const QString& attrName,
                       const qreal multiplier = 1.,
                       const bool transform = false,

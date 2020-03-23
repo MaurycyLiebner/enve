@@ -65,8 +65,9 @@ void SmartVectorPath::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
             };
         };
         mPathAnimator->savePathsSVG(exp, fill, fillApplier,
-                                    baseEffects || fillEffects);
-        saveFillSettingsSVG(exp, fill);
+                                    baseEffects || fillEffects,
+                                    task->visRange());
+        saveFillSettingsSVG(exp, fill, task->visRange());
         fill.setAttribute("stroke", "none");
         ele.appendChild(fill);
         switch(mPathAnimator->getFillType()) {
@@ -93,8 +94,8 @@ void SmartVectorPath::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
         };
         mPathAnimator->savePathsSVG(exp, stroke, strokeApplier,
                                     baseEffects || outlineBaseEffects ||
-                                    outlineEffects);
-        saveStrokeSettingsSVG(exp, stroke, outlineEffects);
+                                    outlineEffects, task->visRange());
+        saveStrokeSettingsSVG(exp, stroke, task->visRange(), outlineEffects);
         stroke.setAttribute(outlineEffects ? "stroke" : "fill", "none");
         if(outlineEffects) stroke.setAttribute("fill-rule", "nonzero");
 
@@ -107,8 +108,9 @@ void SmartVectorPath::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
                 applyBasePathEffects(relFrame, path);
             };
         };
-        mPathAnimator->savePathsSVG(exp, ele, applier, baseEffects);
-        savePathBoxSVG(exp, ele);
+        mPathAnimator->savePathsSVG(exp, ele, applier, baseEffects,
+                                    task->visRange());
+        savePathBoxSVG(exp, ele, task->visRange());
     }
 }
 

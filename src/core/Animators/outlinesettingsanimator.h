@@ -99,6 +99,7 @@ public:
 
     void saveSVG(SvgExporter& exp,
                  QDomElement& parent,
+                 const FrameRange& visRange,
                  const bool asFill = false) const;
 private:
     SkPaint::Cap mCapStyle = SkPaint::kRound_Cap;

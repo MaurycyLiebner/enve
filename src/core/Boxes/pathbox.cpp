@@ -298,21 +298,21 @@ bool PathBox::differenceInOutlinePathBetweenFrames(const int frame1, const int f
     return BoxWithPathEffects::differenceInOutlinePathBetweenFrames(frame1, frame2);
 }
 
-void PathBox::saveFillSettingsSVG(SvgExporter& exp,
-                                  QDomElement& ele) const {
-    mFillSettings->saveSVG(exp, ele);
+void PathBox::saveFillSettingsSVG(SvgExporter& exp, QDomElement& ele,
+                                  const FrameRange& visRange) const {
+    mFillSettings->saveSVG(exp, ele, visRange);
 }
 
-void PathBox::saveStrokeSettingsSVG(SvgExporter& exp,
-                                    QDomElement& ele,
+void PathBox::saveStrokeSettingsSVG(SvgExporter& exp, QDomElement& ele,
+                                    const FrameRange& visRange,
                                     const bool asFill) const {
-    mStrokeSettings->saveSVG(exp, ele, asFill);
+    mStrokeSettings->saveSVG(exp, ele, visRange, asFill);
 }
 
-void PathBox::savePathBoxSVG(SvgExporter& exp,
-                             QDomElement& ele) const {
-    saveFillSettingsSVG(exp, ele);
-    saveStrokeSettingsSVG(exp, ele);
+void PathBox::savePathBoxSVG(SvgExporter& exp, QDomElement& ele,
+                             const FrameRange& visRange) const {
+    saveFillSettingsSVG(exp, ele, visRange);
+    saveStrokeSettingsSVG(exp, ele, visRange);
 }
 
 SmartVectorPath *PathBox::objectToVectorPathBox() {

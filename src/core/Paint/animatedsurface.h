@@ -250,7 +250,8 @@ public:
     void afterChangedCurrentContent();
     void addUndoRedo(const QString &name, const QRect &roi);
 
-    eTaskBase* savePaintSVG(SvgExporter& exp, QDomElement& parent);
+    eTaskBase* savePaintSVG(SvgExporter& exp, QDomElement& parent,
+                            const FrameRange& visRelRange);
 signals:
     void currentSurfaceChanged(DrawableAutoTiledSurface*);
 private:

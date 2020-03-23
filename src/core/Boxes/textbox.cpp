@@ -421,7 +421,7 @@ void saveTextAttributesSVG(QDomElement& ele,
 void TextBox::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
     auto& ele = task->initialize("g");
     saveTextAttributesSVG(ele, mFont);
-    savePathBoxSVG(exp, ele);
+    savePathBoxSVG(exp, ele, task->visRange());
     QString textAnchor;
     switch(mHAlignment) {
     case Qt::AlignLeft: textAnchor = "start"; break;

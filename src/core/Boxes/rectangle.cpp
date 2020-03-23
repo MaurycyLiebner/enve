@@ -174,12 +174,12 @@ void Rectangle::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
     xAnim->anim_coordinateKeysWith(rightAnim);
     yAnim->anim_coordinateKeysWith(bottomAnim);
 
-    cX->saveQrealSVG(exp, ele, "x");
-    cY->saveQrealSVG(exp, ele, "y");
-    cW->saveQrealSVG(exp, ele, "width");
-    cH->saveQrealSVG(exp, ele, "height");
+    cX->saveQrealSVG(exp, ele, task->visRange(), "x");
+    cY->saveQrealSVG(exp, ele, task->visRange(), "y");
+    cW->saveQrealSVG(exp, ele, task->visRange(), "width");
+    cH->saveQrealSVG(exp, ele, task->visRange(), "height");
 
-    savePathBoxSVG(exp, ele);
+    savePathBoxSVG(exp, ele, task->visRange());
 
     copy->removeFromParent_k();
 }

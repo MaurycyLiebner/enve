@@ -217,7 +217,8 @@ public:
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
 protected:
-    void saveBoxesSVG(SvgExporter& exp, eTask* const eleTask,
+    void saveBoxesSVG(SvgExporter& exp,
+                      DomEleTask* const eleTask,
                       QDomElement& ele) const;
 private:
     void clearBlendEffectUI();

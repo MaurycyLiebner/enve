@@ -126,10 +126,10 @@ OutlineSettingsAnimator *ContainerBox::getStrokeSettings() const {
 class GroupSaverSVG : public ComplexTask {
 public:
     GroupSaverSVG(const ContainerBox* const src, SvgExporter& exp,
-                  QDomElement& ele) :
+                  QDomElement& ele, const FrameRange& visRange) :
         ComplexTask(src->getContainedBoxesCount(),
                     "SVG " + src->prp_getName()),
-        mSrc(src), mExp(exp), mEle(ele) {}
+        mSrc(src), mExp(exp), mEle(ele), mVisRange(visRange) {}
 
     void nextStep() override {
         if(!mSrc) return cancel();
@@ -141,7 +141,7 @@ public:
         if(id >= boxes.count()) return finish();
         const auto& box = boxes.at(id);
         if(!box->isVisible()) return nextStep();
-        const auto task = box->saveSVGWithTransform(mExp, mEle);
+        const auto task = box->saveSVGWithTransform(mExp, mEle, mVisRange);
         const auto nextTask = addEmptyTask();
         task->addDependent(nextTask);
     }
@@ -149,15 +149,16 @@ private:
     const QPointer<const ContainerBox> mSrc;
     SvgExporter& mExp;
     QDomElement& mEle;
+    const FrameRange mVisRange;
 
     int mI = 0;
 };
 
-void ContainerBox::saveBoxesSVG(SvgExporter& exp, eTask* const eleTask,
+void ContainerBox::saveBoxesSVG(SvgExporter& exp,
+                                DomEleTask* const eleTask,
                                 QDomElement& ele) const {
-    const auto task = new GroupSaverSVG(this, exp, ele);
-    const auto taskSPtr = QSharedPointer<GroupSaverSVG>(
-                              task, &QObject::deleteLater);
+    const auto task = new GroupSaverSVG(this, exp, ele, eleTask->visRange());
+    const auto taskSPtr = qsptr<GroupSaverSVG>(task, &QObject::deleteLater);
     task->nextStep();
 
     if(task->done()) return;

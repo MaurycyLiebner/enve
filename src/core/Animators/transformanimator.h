@@ -193,6 +193,7 @@ protected:
 public:
     void saveSVG(SvgExporter& exp,
                  QDomElement& parent,
+                 const FrameRange& visRange,
                  const QDomElement& child) const;
 };
 

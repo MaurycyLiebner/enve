@@ -82,6 +82,8 @@ void SvgExportHelpers::defImage(SvgExporter& exp,
 void SvgExportHelpers::assignVisibility(SvgExporter& exp,
                                         QDomElement& ele,
                                         const FrameRange& visRange) {
+    if(visRange.inRange(exp.fAbsRange)) return;
+
     const qreal div = exp.fAbsRange.span() - 1;
     const qreal dur = div/exp.fFps;
 

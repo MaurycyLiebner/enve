@@ -190,10 +190,12 @@ public:
     using ValueGetter = std::function<QString(const int relFrane)>;
     void saveSVG(SvgExporter& exp,
                  QDomElement& parent,
+                 const FrameRange& visRange,
                  const QString& attrName,
                  const ValueGetter& valueGetter) const;
     void saveSVG(SvgExporter& exp,
                  QDomElement& parent,
+                 const FrameRange& visRange,
                  const QString& attrName,
                  const ValueGetter& valueGetter,
                  const bool transform,

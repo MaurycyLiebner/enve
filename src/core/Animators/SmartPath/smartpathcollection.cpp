@@ -59,10 +59,11 @@ void SmartPathCollection::prp_readProperty(eReadStream &src) {
 void SmartPathCollection::savePathsSVG(SvgExporter& exp,
                                        QDomElement& parent,
                                        const EffectApplier& applier,
-                                       const bool forceDumbIncrement) {
+                                       const bool forceDumbIncrement,
+                                       const FrameRange& visRange) {
     if(!forceDumbIncrement && ca_getNumberOfChildren() == 1) {
         const auto path0 = getChild(0);
-        path0->graph_saveSVG(exp, parent, "d",
+        path0->graph_saveSVG(exp, parent, visRange, "d",
                              [path0, &applier](const int relFrame) {
             auto path = path0->getPathAtRelFrame(relFrame);
             if(applier) applier(relFrame, path);
@@ -72,7 +73,7 @@ void SmartPathCollection::savePathsSVG(SvgExporter& exp,
             return QString(pathStr.c_str());
         });
     } else {
-        Animator::saveSVG(exp, parent, "d",
+        Animator::saveSVG(exp, parent, visRange, "d",
                           [this, &applier](const int relFrame) {
             auto path = getPathAtRelFrame(relFrame);
             if(applier) applier(relFrame, path);

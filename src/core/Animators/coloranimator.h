@@ -81,6 +81,7 @@ public:
 
     void saveColorSVG(SvgExporter& exp,
                       QDomElement& parent,
+                      const FrameRange& visRange,
                       const QString& name) const;
 private:
     ColorMode mColorMode = ColorMode::rgb;

@@ -230,10 +230,12 @@ void QPointFAnimator::applyTransform(const QMatrix &transform) {
 
 void QPointFAnimator::saveQPointFSVG(SvgExporter& exp,
                                      QDomElement& parent,
+                                     const FrameRange& visRange,
                                      const QString& name,
                                      const bool transform,
                                      const QString& type) const {
-    Animator::saveSVG(exp, parent, name, [this](const int relFrame) {
+    Animator::saveSVG(exp, parent, visRange, name,
+                      [this](const int relFrame) {
         const auto value = getEffectiveValue(relFrame);
         return QString::number(value.x()) + " " +
                QString::number(value.y());
@@ -242,24 +244,26 @@ void QPointFAnimator::saveQPointFSVG(SvgExporter& exp,
 
 void QPointFAnimator::saveQPointFSVGX(SvgExporter& exp,
                                       QDomElement& parent,
+                                      const FrameRange& visRange,
                                       const QString& name,
                                       const qreal y,
                                       const qreal multiplier,
                                       const bool transform,
                                       const QString& type) const {
     const QString templ = "%1 " + QString::number(y);
-    mXAnimator->saveQrealSVG(exp, parent, name, multiplier,
+    mXAnimator->saveQrealSVG(exp, parent, visRange, name, multiplier,
                              transform, type, templ);
 }
 
 void QPointFAnimator::saveQPointFSVGY(SvgExporter& exp,
                                       QDomElement& parent,
+                                      const FrameRange& visRange,
                                       const QString& name,
                                       const qreal x,
                                       const qreal multiplier,
                                       const bool transform,
                                       const QString& type) const {
     const QString templ = QString::number(x) + " %1";
-    mYAnimator->saveQrealSVG(exp, parent, name, multiplier,
+    mYAnimator->saveQrealSVG(exp, parent, visRange, name, multiplier,
                              transform, type, templ);
 }

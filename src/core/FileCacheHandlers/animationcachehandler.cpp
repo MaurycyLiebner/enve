@@ -30,11 +30,12 @@ class AnimationSaverSVG : public ComplexTask {
 public:
     AnimationSaverSVG(AnimationFrameHandler* const src,
                       SvgExporter& exp, QDomElement& parent,
-                      const qreal div, const FrameRange& relRange) :
-        ComplexTask(relRange.fMax, "SVG Paint Object"),
+                      const qreal div, const FrameRange& relRange,
+                      const FrameRange& visRelRange) :
+        ComplexTask(visRelRange.fMax, "SVG Paint Object"),
         mSrc(src), mExp(exp), mParent(parent),
-        mRelRange(relRange), mDiv(div),
-        mRelFrame(relRange.fMin - 1) {}
+        mRelRange(relRange), mVisRange(visRelRange),
+        mDiv(div), mRelFrame(relRange.fMin - 1) {}
 
     void nextStep() override {
         if(!mSrc) return cancel();
@@ -45,23 +46,23 @@ public:
         mFirst = false;
 
         if(first) {
-            const FrameRange idRange{qMin(mRelRange.fMin, 0), 0};
+            const FrameRange idRange{qMin(mVisRange.fMin, 0), 0};
             const int span = mExp.fAbsRange.span();
 
-            if(idRange.inRange(mRelRange) || span == 1) {
-                addSurface(0, mRelRange.fMin);
-                mRelFrame = mRelRange.fMax;
+            if(idRange.inRange(mVisRange) || span == 1) {
+                addSurface(0, mVisRange.fMin);
+                mRelFrame = mVisRange.fMax;
                 return nextStep();
             }
         }
 
         if(mRelFrame >= mSrc->getFrameCount()) {
-            mRelFrame = mRelRange.fMax;
+            mRelFrame = mVisRange.fMax;
             return nextStep();
         }
         mRelFrame++;
-        if(mRelFrame >= mRelRange.fMax) return nextStep();
-        if(mRelFrame >= mRelRange.fMin) {
+        if(mRelFrame >= mVisRange.fMax) return nextStep();
+        if(mRelFrame >= mVisRange.fMin) {
             bool wait;
             if(mRelFrame < 0) {
                 wait = addSurface(0, mRelFrame);
@@ -137,6 +138,7 @@ private:
     SvgExporter& mExp;
     QDomElement& mParent;
     const FrameRange mRelRange;
+    const FrameRange mVisRange;
     const qreal mDiv;
 
     bool mFirst = true;
@@ -148,11 +150,13 @@ private:
 
 eTaskBase* AnimationFrameHandler::saveAnimationSVG(
         SvgExporter& exp, QDomElement& parent,
-        const FrameRange& relRange) {
+        const FrameRange& relRange,
+        const FrameRange& visRelRange) {
     const int span = exp.fAbsRange.span();
     const qreal div = span - 1;
 
-    const auto task = new AnimationSaverSVG(this, exp, parent, div, relRange);
+    const auto task = new AnimationSaverSVG(this, exp, parent, div,
+                                            relRange, visRelRange);
     const auto taskSPtr = QSharedPointer<AnimationSaverSVG>(
                               task, &QObject::deleteLater);
     task->nextStep();

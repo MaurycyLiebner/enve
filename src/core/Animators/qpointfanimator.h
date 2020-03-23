@@ -89,11 +89,13 @@ public:
 
     void saveQPointFSVG(SvgExporter& exp,
                         QDomElement& parent,
+                        const FrameRange& visRange,
                         const QString& name,
                         const bool transform = false,
                         const QString& type = "") const;
     void saveQPointFSVGX(SvgExporter& exp,
                          QDomElement& parent,
+                         const FrameRange& visRange,
                          const QString& name,
                          const qreal y,
                          const qreal multiplier,
@@ -101,6 +103,7 @@ public:
                          const QString& type = "") const;
     void saveQPointFSVGY(SvgExporter& exp,
                          QDomElement& parent,
+                         const FrameRange& visRange,
                          const QString& name,
                          const qreal x,
                          const qreal multiplier,

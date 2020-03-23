@@ -39,7 +39,8 @@ public:
     void savePathsSVG(SvgExporter& exp,
                       QDomElement& parent,
                       const EffectApplier& applier,
-                      const bool forceDumbIncrement);
+                      const bool forceDumbIncrement,
+                      const FrameRange& visRange);
 
     SmartNodePoint * createNewSubPathAtRelPos(const QPointF &relPos);
     SmartNodePoint * createNewSubPathAtPos(const QPointF &absPos);

@@ -256,8 +256,9 @@ void ColorAnimator::setCurrentAlphaValue(const qreal alpha) {
 
 void ColorAnimator::saveColorSVG(SvgExporter& exp,
                                  QDomElement& parent,
+                                 const FrameRange& visRange,
                                  const QString& name) const {
-    Animator::saveSVG(exp, parent, name, [this](const int relFrame) {
+    Animator::saveSVG(exp, parent, visRange, name, [this](const int relFrame) {
         return getColor(relFrame).name();
     });
 }

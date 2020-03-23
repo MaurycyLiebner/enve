@@ -515,16 +515,17 @@ QDebug operator<<(QDebug out, const qCubicSegment1D& seg) {
 
 void GraphAnimator::graph_saveSVG(SvgExporter& exp,
                                   QDomElement& parent,
+                                  const FrameRange& visRange,
                                   const QString& attrName,
                                   const ValueGetter& valueGetter,
                                   const bool transform,
                                   const QString& type) const {
     Q_ASSERT(!transform || attrName == "transform");
     const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
-    const auto idRange = prp_getIdenticalRelRange(relRange.fMin);
+    const auto idRange = prp_getIdenticalRelRange(visRange.fMin);
     const int span = exp.fAbsRange.span();
-    if(idRange.inRange(relRange) || span == 1) {
-        auto value = valueGetter(relRange.fMin);
+    if(idRange.inRange(visRange) || span == 1) {
+        auto value = valueGetter(visRange.fMin);
         if(transform) {
             value = parent.attribute(attrName) + " " +
                     type + "(" + value + ")";
@@ -553,10 +554,10 @@ void GraphAnimator::graph_saveSVG(SvgExporter& exp,
             if(nextKeyRelFrame > relRange.fMin && prevKey) {
                 if(first) {
                     first = false;
-                    if(nextKeyRelFrame != relRange.fMin) {
+                    if(nextKeyRelFrame != visRange.fMin) {
                         keySplines << ks.arg(0).arg(0).arg(1).arg(1);
                         keyTimes << QString::number(0);
-                        values << valueGetter(relRange.fMin);
+                        values << valueGetter(visRange.fMin);
                     }
                     const int prevRelFrame = prevKey->getRelFrame();
                     const qreal t = (prevRelFrame - relRange.fMin)/div;
@@ -565,7 +566,7 @@ void GraphAnimator::graph_saveSVG(SvgExporter& exp,
                 }
                 const auto xSeg = getGraphXSegment(prevKey, nextKey);
                 const auto ySeg = getGraphYSegment(prevKey, nextKey);
-                const int nextRelFrame = qMin(nextKeyRelFrame, relRange.fMax);
+                const int nextRelFrame = qMin(nextKeyRelFrame, visRange.fMax);
                 qreal divT;
                 const auto boundXSeg = gDividedAtX(xSeg, nextRelFrame, &divT).first;
                 const auto boundYSeg = ySeg.dividedAtT(divT).first;
@@ -588,14 +589,14 @@ void GraphAnimator::graph_saveSVG(SvgExporter& exp,
                     keyTimes << QString::number(t);
                     values << valueGetter(relFrame);
                 }
-                if(nextKeyRelFrame >= relRange.fMax) break;
+                if(nextKeyRelFrame >= visRange.fMax) break;
             }
             prevKey = nextKey;
         }
-        if(nextKey && nextKey->getRelFrame() < relRange.fMax) {
+        if(nextKey && nextKey->getRelFrame() < visRange.fMax) {
             keySplines << ks.arg(0).arg(0).arg(1).arg(1);
             keyTimes << QString::number(1);
-            values << valueGetter(relRange.fMax);
+            values << valueGetter(visRange.fMax);
         }
 
         anim.setAttribute("calcMode", "spline");

@@ -39,7 +39,8 @@ public:
     virtual void reload() = 0;
 
     eTaskBase* saveAnimationSVG(SvgExporter& exp, QDomElement& parent,
-                                const FrameRange& relRange);
+                                const FrameRange& relRange,
+                                const FrameRange& visRelRange);
 };
 
 #endif // ANIMATIONCACHEHANDLER_H

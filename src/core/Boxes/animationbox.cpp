@@ -305,7 +305,9 @@ void AnimationBox::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
     if(!mSrcFramesCache) return BoundingBox::saveSVG(exp, task);
     auto& ele = task->initialize("g");
     const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
-    const auto aTask = mSrcFramesCache->saveAnimationSVG(exp, ele, relRange);
+    const auto visRelRange = prp_absRangeToRelRange(task->visRange());
+    const auto aTask = mSrcFramesCache->saveAnimationSVG(exp, ele, relRange,
+                                                         visRelRange);
     if(aTask) aTask->addDependent(task);
 }
 

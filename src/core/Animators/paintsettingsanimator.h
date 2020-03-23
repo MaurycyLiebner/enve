@@ -76,6 +76,7 @@ public:
 protected:
     void saveSVG(SvgExporter& exp,
                  QDomElement& parent,
+                 const FrameRange& visRange,
                  const QString& name) const;
 private:
     void setGradientVar(Gradient * const grad);
@@ -98,8 +99,9 @@ protected:
     FillSettingsAnimator(BoundingBox * const parent) :
         PaintSettingsAnimator("fill", parent) {}
 public:
-    void saveSVG(SvgExporter& exp, QDomElement& parent) const {
-        PaintSettingsAnimator::saveSVG(exp, parent, "fill");
+    void saveSVG(SvgExporter& exp, QDomElement& parent,
+                 const FrameRange& visRange) const {
+        PaintSettingsAnimator::saveSVG(exp, parent, visRange, "fill");
     }
 };
 

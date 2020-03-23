@@ -160,12 +160,12 @@ void Circle::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
     const auto rX = mHorizontalRadiusAnimator->getXAnimator();
     const auto rY = mVerticalRadiusAnimator->getYAnimator();
 
-    cX->saveQrealSVG(exp, ele, "cx");
-    cY->saveQrealSVG(exp, ele, "cy");
-    rX->saveQrealSVG(exp, ele, "rx");
-    rY->saveQrealSVG(exp, ele, "ry");
+    cX->saveQrealSVG(exp, ele, task->visRange(), "cx");
+    cY->saveQrealSVG(exp, ele, task->visRange(), "cy");
+    rX->saveQrealSVG(exp, ele, task->visRange(), "rx");
+    rY->saveQrealSVG(exp, ele, task->visRange(), "ry");
 
-    savePathBoxSVG(exp, ele);
+    savePathBoxSVG(exp, ele, task->visRange());
 }
 
 CircleRadiusPoint::CircleRadiusPoint(QPointFAnimator * const associatedAnimator,

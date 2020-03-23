@@ -42,6 +42,7 @@
 #include "BlendEffects/blendeffectcollection.h"
 #include "GUI/dialogsinterface.h"
 #include "svgexporter.h"
+#include "svgexporthelpers.h"
 
 int BoundingBox::sNextDocumentId = 0;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
@@ -1248,17 +1249,22 @@ void BoundingBox::renderDataFinished(BoxRenderData *renderData) {
 //    }
 //}
 
-eTask* BoundingBox::saveSVGWithTransform(SvgExporter& exp,
-                                         QDomElement& parent) const {
-    const auto task = enve::make_shared<DomEleTask>(exp);
+eTask* BoundingBox::saveSVGWithTransform(SvgExporter& exp, QDomElement& parent,
+                                         const FrameRange& parentVisRange) const {
+    const auto visRange = parentVisRange*prp_absInfluenceRange();
+    const auto task = enve::make_shared<DomEleTask>(exp, visRange);
     exp.addNextTask(task);
     const auto taskPtr = task.get();
     const QPointer<const BoundingBox> ptr = this;
     const auto expPtr = &exp;
     const auto parentPtr = &parent;
-    taskPtr->addDependent({[ptr, taskPtr, expPtr, parentPtr]() {
-        const auto& ele = taskPtr->element();
-        if(ptr) ptr->mTransformAnimator->saveSVG(*expPtr, *parentPtr, ele);
+    taskPtr->addDependent({[ptr, taskPtr, expPtr, parentPtr, visRange]() {
+        auto& ele = taskPtr->element();
+        if(ptr) {
+            SvgExportHelpers::assignVisibility(*expPtr, ele, visRange);
+            const auto transform = ptr->mTransformAnimator.get();
+            transform->saveSVG(*expPtr, *parentPtr, visRange, ele);
+        }
     }, nullptr});
     saveSVG(exp, taskPtr);
     taskPtr->queTask();

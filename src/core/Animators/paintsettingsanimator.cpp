@@ -180,6 +180,7 @@ void PaintSettingsAnimator::applyTransform(const QMatrix &transform) {
 
 void PaintSettingsAnimator::saveSVG(SvgExporter& exp,
                                     QDomElement& parent,
+                                    const FrameRange& visRange,
                                     const QString& name) const {
     if(mPaintType == NOPAINT) {
         parent.setAttribute(name, "none");
@@ -203,18 +204,18 @@ void PaintSettingsAnimator::saveSVG(SvgExporter& exp,
             case GradientType::LINEAR: {
                 grad = exp.createElement("linearGradient");
 
-                x1->saveQrealSVG(exp, grad, "x1");
-                y1->saveQrealSVG(exp, grad, "y1");
-                x2->saveQrealSVG(exp, grad, "x2");
-                y2->saveQrealSVG(exp, grad, "y2");
+                x1->saveQrealSVG(exp, grad, visRange, "x1");
+                y1->saveQrealSVG(exp, grad, visRange, "y1");
+                x2->saveQrealSVG(exp, grad, visRange, "x2");
+                y2->saveQrealSVG(exp, grad, visRange, "y2");
             } break;
             case GradientType::RADIAL: {
                 grad = exp.createElement("radialGradient");
 
 //                const QPointF distPt = p2 - p1;
 //                const qreal radius = qSqrt(pow2(distPt.x()) + pow2(distPt.y()));
-                x1->saveQrealSVG(exp, grad, "cx");
-                y1->saveQrealSVG(exp, grad, "cy");
+                x1->saveQrealSVG(exp, grad, visRange, "cx");
+                y1->saveQrealSVG(exp, grad, visRange, "cy");
 
                 PropertyBindingMap bindings;
 
@@ -238,7 +239,7 @@ void PaintSettingsAnimator::saveSVG(SvgExporter& exp,
                 const auto rAnim = enve::make_shared<QrealAnimator>("");
                 rAnim->setExpression(rExpr);
 
-                rAnim->saveQrealSVG(exp, grad, "r");
+                rAnim->saveQrealSVG(exp, grad, visRange, "r");
             } break;
             }
             grad.setAttribute("gradientUnits", "userSpaceOnUse");
@@ -250,7 +251,7 @@ void PaintSettingsAnimator::saveSVG(SvgExporter& exp,
             parent.setAttribute(name, "black");
         }
     } else {
-        mColor->saveColorSVG(exp, parent, name);
+        mColor->saveColorSVG(exp, parent, visRange, name);
     }
 }
 

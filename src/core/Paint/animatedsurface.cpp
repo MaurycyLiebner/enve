@@ -138,11 +138,12 @@ class ASurfaceSaverSVG : public ComplexTask {
 public:
     ASurfaceSaverSVG(AnimatedSurface* const src,
                      SvgExporter& exp, QDomElement& parent,
-                     const qreal div, const FrameRange& relRange) :
+                     const qreal div, const FrameRange& relRange,
+                     const FrameRange& visRelRange) :
         ComplexTask(relRange.fMax, "SVG Paint Object"),
         mSrc(src), mExp(exp), mParent(parent),
-        mRelRange(relRange), mDiv(div),
-        mKeyRelFrame(relRange.fMin - 1) {}
+        mRelRange(relRange), mVisRage(visRelRange),
+        mDiv(div), mKeyRelFrame(relRange.fMin - 1) {}
 
     void nextStep() override {
         if(!mSrc) return cancel();
@@ -151,25 +152,25 @@ public:
 
         bool first = mKeyId == 0;
         if(first) {
-            const auto idRange = mSrc->prp_getIdenticalRelRange(mRelRange.fMin);
+            const auto idRange = mSrc->prp_getIdenticalRelRange(mVisRage.fMin);
             const int span = mExp.fAbsRange.span();
 
-            if(idRange.inRange(mRelRange) || span == 1) {
-                addSurface(mRelRange.fMin, nullptr);
-                mKeyRelFrame = mRelRange.fMax;
+            if(idRange.inRange(mVisRage) || span == 1) {
+                addSurface(mVisRage.fMin, nullptr);
+                mKeyRelFrame = mVisRage.fMax;
                 return nextStep();
             }
         }
 
         const auto& keys = mSrc->anim_getKeys();
         if(mKeyId >= keys.count()) {
-            mKeyRelFrame = mRelRange.fMax;
+            mKeyRelFrame = mVisRage.fMax;
             return nextStep();
         }
         const auto key = static_cast<ASKey*>(keys.atId(mKeyId++));
         mKeyRelFrame = key->getRelFrame();
-        if(mKeyRelFrame >= mRelRange.fMax) return nextStep();
-        if(mKeyRelFrame >= mRelRange.fMin) {
+        if(mKeyRelFrame >= mVisRage.fMax) return nextStep();
+        if(mKeyRelFrame >= mVisRage.fMin) {
             DrawableAutoTiledSurface* surf = nullptr;
             if(first) {
                 first = false;
@@ -177,7 +178,7 @@ public:
                 const auto null = static_cast<Key*>(nullptr);
                 const auto prevKey = prevId >= 0 ? keys.atId(prevId) : null;
                 const auto prevASKey = static_cast<ASKey*>(prevKey);
-                const bool keyOnFirstFrame = mKeyRelFrame == mRelRange.fMin;
+                const bool keyOnFirstFrame = mKeyRelFrame == mVisRage.fMin;
                 const bool useKey = keyOnFirstFrame || !prevKey;
                 const auto firstKey = useKey ? key : prevASKey;
                 surf = &firstKey->dSurface();
@@ -282,6 +283,7 @@ private:
     SvgExporter& mExp;
     QDomElement& mParent;
     const FrameRange mRelRange;
+    const FrameRange mVisRage;
     const qreal mDiv;
 
     int mKeyRelFrame = 0;
@@ -293,12 +295,14 @@ private:
     QStringList mKeyTimes;
 };
 
-eTaskBase* AnimatedSurface::savePaintSVG(SvgExporter& exp, QDomElement& parent) {
+eTaskBase* AnimatedSurface::savePaintSVG(SvgExporter& exp, QDomElement& parent,
+                                         const FrameRange& visRelRange) {
     const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
     const int span = exp.fAbsRange.span();
     const qreal div = span - 1;
 
-    const auto task = new ASurfaceSaverSVG(this, exp, parent, div, relRange);
+    const auto task = new ASurfaceSaverSVG(this, exp, parent, div,
+                                           relRange, visRelRange);
     const auto taskSPtr = QSharedPointer<ASurfaceSaverSVG>(
                               task, &QObject::deleteLater);
     task->nextStep();

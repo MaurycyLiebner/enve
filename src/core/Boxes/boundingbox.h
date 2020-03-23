@@ -405,8 +405,8 @@ public:
 
     ContainerBox* getFirstParentLayer() const;
 
-    eTask* saveSVGWithTransform(SvgExporter& exp,
-                                QDomElement& parent) const;
+    eTask* saveSVGWithTransform(SvgExporter& exp, QDomElement& parent,
+                                const FrameRange& parentVisRange) const;
 private:
     void cancelWaitingTasks();
     void afterTotalTransformChanged(const UpdateReason reason);

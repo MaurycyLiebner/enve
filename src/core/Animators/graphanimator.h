@@ -78,6 +78,7 @@ public:
 
     void graph_saveSVG(SvgExporter& exp,
                        QDomElement& parent,
+                       const FrameRange& visRange,
                        const QString& attrName,
                        const ValueGetter& valueGetter,
                        const bool transform = false,

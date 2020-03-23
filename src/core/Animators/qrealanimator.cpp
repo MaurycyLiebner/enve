@@ -761,6 +761,7 @@ qreal QrealAnimator::getSavedBaseValue() {
 
 void QrealAnimator::saveQrealSVG(SvgExporter& exp,
                                  QDomElement& parent,
+                                 const FrameRange& visRange,
                                  const QString& attrName,
                                  const qreal multiplier,
                                  const bool transform,
@@ -777,11 +778,11 @@ void QrealAnimator::saveQrealSVG(SvgExporter& exp,
         copy->prp_setInheritedFrameShift(prp_getTotalFrameShift(), nullptr);
         copy->setExpression(mExpression.sptr());
         copy->applyExpression(relRange, 10, false);
-        copy->saveQrealSVG(exp, parent, attrName, multiplier,
-                           transform, type, templ);
+        copy->saveQrealSVG(exp, parent, visRange, attrName,
+                           multiplier, transform, type, templ);
         setExpression(mExpression.sptr());
     } else {
-        graph_saveSVG(exp, parent, attrName,
+        graph_saveSVG(exp, parent, visRange, attrName,
                       [this, multiplier, &templ](const int relFrame) {
             const qreal val = getEffectiveValue(relFrame)*multiplier;
             return templ.arg(val);
