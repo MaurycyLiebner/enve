@@ -211,7 +211,7 @@ bool TaskScheduler::processNextQuedGpuTask() {
     if(!tasks.isEmpty()) GpuTaskExecutor::sAddTasks(tasks);
     if(finished) processNextTasks();
 
-    emit gpuUsageChanged(!allQuedGpuTasksFinished());
+    emit gpuUsageChanged(GpuTaskExecutor::sUsageCount() > 0);
     return !tasks.isEmpty();
 }
 
