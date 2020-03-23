@@ -16,10 +16,17 @@
 
 #ifndef ANIMATIONCACHEHANDLER_H
 #define ANIMATIONCACHEHANDLER_H
+
 #include "smartPointers/selfref.h"
+
 #include "skia/skiahelpers.h"
+#include "framerange.h"
+
 class eTask;
+class eTaskBase;
 class ImageCacheContainer;
+class SvgExporter;
+class QDomElement;
 
 class AnimationFrameHandler : public SelfRef {
 protected:
@@ -30,6 +37,9 @@ public:
     virtual eTask* scheduleFrameLoad(const int frame) = 0;
     virtual int getFrameCount() const = 0;
     virtual void reload() = 0;
+
+    eTaskBase* saveAnimationSVG(SvgExporter& exp, QDomElement& parent,
+                                const FrameRange& relRange);
 };
 
 #endif // ANIMATIONCACHEHANDLER_H

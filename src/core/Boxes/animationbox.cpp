@@ -30,6 +30,7 @@
 #include "Private/Tasks/complextask.h"
 #include "Private/Tasks/taskscheduler.h"
 #include "GUI/dialogsinterface.h"
+#include "svgexporter.h"
 
 AnimationBox::AnimationBox(const QString &name, const eBoxType type) :
     BoundingBox(name, type) {
@@ -300,7 +301,16 @@ stdsptr<BoxRenderData> AnimationBox::createRenderData() {
     return enve::make_shared<AnimationBoxRenderData>(mSrcFramesCache.get(), this);
 }
 
-AnimationBoxRenderData::AnimationBoxRenderData(AnimationFrameHandler *cacheHandler, BoundingBox *parentBox) :
+void AnimationBox::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
+    if(!mSrcFramesCache) return BoundingBox::saveSVG(exp, task);
+    auto& ele = task->initialize("g");
+    const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
+    const auto aTask = mSrcFramesCache->saveAnimationSVG(exp, ele, relRange);
+    if(aTask) aTask->addDependent(task);
+}
+
+AnimationBoxRenderData::AnimationBoxRenderData(
+        AnimationFrameHandler *cacheHandler, BoundingBox *parentBox) :
     ImageContainerRenderData(parentBox),
     fSrcCacheHandler(cacheHandler) {}
 

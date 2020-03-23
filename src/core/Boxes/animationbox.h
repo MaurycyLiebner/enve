@@ -58,6 +58,7 @@ public:
                          Canvas * const scene);
     stdsptr<BoxRenderData> createRenderData();
     bool shouldScheduleUpdate();
+    void saveSVG(SvgExporter& exp, DomEleTask* const task) const;
 
     FixedLenAnimationRect *getAnimationDurationRect() const;
     void updateAnimationRange();
