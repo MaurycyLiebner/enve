@@ -1423,6 +1423,10 @@ void MainWindow::lockFinished() {
     }
 }
 
+void MainWindow::resizeEvent(QResizeEvent* e) {
+    if(statusBar()) statusBar()->setMaximumWidth(e->size().width());
+}
+
 void MainWindow::updateRecentMenu() {
     mRecentMenu->clear();
     const auto homePath = QDir::homePath();

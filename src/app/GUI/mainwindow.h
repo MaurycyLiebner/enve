@@ -173,6 +173,7 @@ public:
     void revert();
 protected:
     void lockFinished();
+    void resizeEvent(QResizeEvent* e);
 private:
     QWidget * mWelcomeDialog = nullptr;
     CentralWidget * mCentralWidget = nullptr;
