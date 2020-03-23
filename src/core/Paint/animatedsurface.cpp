@@ -137,11 +137,11 @@ void AnimatedSurface::addUndoRedo(const QString& name, const QRect& roi) {
 class ASurfaceSaverSVG : public ComplexTask {
 public:
     ASurfaceSaverSVG(AnimatedSurface* const src,
-                     SvgExporter& exp, QDomElement& parent,
+                     SvgExporter& exp, QDomElement& use,
                      const qreal div, const FrameRange& relRange,
                      const FrameRange& visRelRange) :
         ComplexTask(relRange.fMax, "SVG Paint Object"),
-        mSrc(src), mExp(exp), mParent(parent),
+        mSrc(src), mExp(exp), mUse(use),
         mRelRange(relRange), mVisRage(visRelRange),
         mDiv(div), mKeyRelFrame(relRange.fMin - 1) {}
 
@@ -227,15 +227,13 @@ private:
     void finish() {
         if(mHrefValues.isEmpty()) return;
 
-        auto use = mExp.createElement("use");
-
         if(mHrefValues.count() == 1) {
             const QString href = mHrefValues.first();
             const QString x = mXValues.first();
             const QString y = mYValues.first();
-            use.setAttribute("href", href);
-            use.setAttribute("x", x);
-            use.setAttribute("y", y);
+            mUse.setAttribute("href", href);
+            mUse.setAttribute("x", x);
+            mUse.setAttribute("y", y);
         } else {
             if(mKeyTimes.last() != "1") {
                 mHrefValues << mHrefValues.last();
@@ -254,7 +252,7 @@ private:
                 anim.setAttribute("values", mHrefValues.join(';'));
                 anim.setAttribute("keyTimes", keyTimesStr);
                 SvgExportHelpers::assignLoop(anim, mExp.fLoop);
-                use.appendChild(anim);
+                mUse.appendChild(anim);
             }
             {
                 auto anim = mExp.createElement("animate");
@@ -263,7 +261,7 @@ private:
                 anim.setAttribute("values", mXValues.join(';'));
                 anim.setAttribute("keyTimes", keyTimesStr);
                 SvgExportHelpers::assignLoop(anim, mExp.fLoop);
-                use.appendChild(anim);
+                mUse.appendChild(anim);
             }
             {
                 auto anim = mExp.createElement("animate");
@@ -272,16 +270,14 @@ private:
                 anim.setAttribute("values", mYValues.join(';'));
                 anim.setAttribute("keyTimes", keyTimesStr);
                 SvgExportHelpers::assignLoop(anim, mExp.fLoop);
-                use.appendChild(anim);
+                mUse.appendChild(anim);
             }
         }
-
-        mParent.appendChild(use);
     }
 
     const QPointer<AnimatedSurface> mSrc;
     SvgExporter& mExp;
-    QDomElement& mParent;
+    QDomElement& mUse;
     const FrameRange mRelRange;
     const FrameRange mVisRage;
     const qreal mDiv;
@@ -295,13 +291,14 @@ private:
     QStringList mKeyTimes;
 };
 
-eTaskBase* AnimatedSurface::savePaintSVG(SvgExporter& exp, QDomElement& parent,
+eTaskBase* AnimatedSurface::savePaintSVG(SvgExporter& exp,
+                                         QDomElement& use,
                                          const FrameRange& visRelRange) {
     const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
     const int span = exp.fAbsRange.span();
     const qreal div = span - 1;
 
-    const auto task = new ASurfaceSaverSVG(this, exp, parent, div,
+    const auto task = new ASurfaceSaverSVG(this, exp, use, div,
                                            relRange, visRelRange);
     const auto taskSPtr = QSharedPointer<ASurfaceSaverSVG>(
                               task, &QObject::deleteLater);

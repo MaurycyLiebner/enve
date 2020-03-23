@@ -29,11 +29,11 @@ AnimationFrameHandler::AnimationFrameHandler() {}
 class AnimationSaverSVG : public ComplexTask {
 public:
     AnimationSaverSVG(AnimationFrameHandler* const src,
-                      SvgExporter& exp, QDomElement& parent,
+                      SvgExporter& exp, QDomElement& use,
                       const qreal div, const FrameRange& relRange,
                       const FrameRange& visRelRange) :
         ComplexTask(visRelRange.fMax, "SVG Paint Object"),
-        mSrc(src), mExp(exp), mParent(parent),
+        mSrc(src), mExp(exp), mUse(use),
         mRelRange(relRange), mVisRange(visRelRange),
         mDiv(div), mRelFrame(relRange.fMin - 1) {}
 
@@ -107,10 +107,8 @@ private:
     void finish() {
         if(mHrefValues.isEmpty()) return;
 
-        auto use = mExp.createElement("use");
-
         const QString href = mHrefValues.first();
-        use.setAttribute("href", href);
+        mUse.setAttribute("href", href);
         if(mHrefValues.count() > 1) {
             if(mKeyTimes.last() != "1") {
                 mHrefValues << mHrefValues.last();
@@ -127,16 +125,14 @@ private:
                 anim.setAttribute("values", mHrefValues.join(';'));
                 anim.setAttribute("keyTimes", keyTimesStr);
                 SvgExportHelpers::assignLoop(anim, mExp.fLoop);
-                use.appendChild(anim);
+                mUse.appendChild(anim);
             }
         }
-
-        mParent.appendChild(use);
     }
 
     const QPointer<AnimationFrameHandler> mSrc;
     SvgExporter& mExp;
-    QDomElement& mParent;
+    QDomElement& mUse;
     const FrameRange mRelRange;
     const FrameRange mVisRange;
     const qreal mDiv;

@@ -303,7 +303,7 @@ stdsptr<BoxRenderData> AnimationBox::createRenderData() {
 
 void AnimationBox::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
     if(!mSrcFramesCache) return BoundingBox::saveSVG(exp, task);
-    auto& ele = task->initialize("g");
+    auto& ele = task->initialize("use");
     const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
     const auto visRelRange = prp_absRangeToRelRange(task->visRange());
     const auto aTask = mSrcFramesCache->saveAnimationSVG(exp, ele, relRange,

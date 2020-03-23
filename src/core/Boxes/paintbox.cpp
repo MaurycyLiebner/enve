@@ -127,7 +127,7 @@ void PaintBox::setupCanvasMenu(PropertyMenu * const menu) {
 }
 
 void PaintBox::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
-    auto& ele = task->initialize("g");
+    auto& ele = task->initialize("use");
     const auto visRelRange = prp_absRangeToRelRange(task->visRange());
     const auto pTask = mSurface->savePaintSVG(exp, ele, visRelRange);
     if(pTask) pTask->addDependent(task);
