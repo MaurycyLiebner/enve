@@ -327,6 +327,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mSculptModeTargetSeperator = mToolBar->addSeparator();
     setupSculptTargetButtons(iconsDir);
     setupSculptValueSpins();
+    setupDrawPathSpins();
 
     mColorLabel->setObjectName("colorLabel");
 
@@ -545,57 +546,71 @@ void TimelineDockWidget::setupSculptTargetButtons(const QString& iconsDir) {
     mColorTargetAct = mToolBar->addWidget(mColorTarget);
 }
 
+QAction* addSlider(const QString& name,
+                   QDoubleSlider* const slider,
+                   QToolBar* const toolBar) {
+    const auto widget = new QWidget;
+    widget->setObjectName("transparentWidget");
+    const auto layout = new QHBoxLayout;
+    widget->setLayout(layout);
+    const auto label = new QLabel(name + ": ");
+
+    layout->addWidget(label);
+    layout->addWidget(slider);
+    return toolBar->addWidget(widget);
+}
+
 void TimelineDockWidget::setupSculptValueSpins() {
     mSculptSpace0 = addSpaceToToolbar();
 
-    const auto valueWidget = new QWidget;
-    valueWidget->setObjectName("transparentWidget");
-    const auto valueLayout = new QHBoxLayout;
-    valueWidget->setLayout(valueLayout);
-    const auto valueLabel = new QLabel("value: ");
     mValue = new QDoubleSlider(0, 1, 0.1, this);
     mValue->setDisplayedValue(mDocument.fSculptBrush.value());
     connect(mValue, &QDoubleSlider::valueEdited,
             this, [this](const qreal value) {
         mDocument.fSculptBrush.setValue(value);
     });
-    valueLayout->addWidget(valueLabel);
-    valueLayout->addWidget(mValue);
-    mValueAct = mToolBar->addWidget(valueWidget);
+    mValueAct = addSlider("value", mValue, mToolBar);
 
     mSculptSpace1 = addSpaceToToolbar();
 
-    const auto hardnessWidget = new QWidget;
-    hardnessWidget->setObjectName("transparentWidget");
-    const auto hardnessLayout = new QHBoxLayout;
-    hardnessWidget->setLayout(hardnessLayout);
-    const auto hardnessLabel = new QLabel("hardness: ");
     mHardness = new QDoubleSlider(0, 1, 0.1, this);
     mHardness->setDisplayedValue(mDocument.fSculptBrush.hardness());
     connect(mHardness, &QDoubleSlider::valueEdited,
             this, [this](const qreal value) {
         mDocument.fSculptBrush.setHardness(value);
     });
-    hardnessLayout->addWidget(hardnessLabel);
-    hardnessLayout->addWidget(mHardness);
-    mHardnessAct = mToolBar->addWidget(hardnessWidget);
+    mHardnessAct = addSlider("hardness", mHardness, mToolBar);
+
 
     mSculptSpace2 = addSpaceToToolbar();
 
-    const auto opacityWidget = new QWidget;
-    opacityWidget->setObjectName("transparentWidget");
-    const auto opacityLayout = new QHBoxLayout;
-    opacityWidget->setLayout(opacityLayout);
-    const auto opacityLabel = new QLabel("opacity: ");
     mOpacity = new QDoubleSlider(0, 1, 0.1, this);
     mOpacity->setDisplayedValue(mDocument.fSculptBrush.opacity());
     connect(mOpacity, &QDoubleSlider::valueEdited,
             this, [this](const qreal value) {
         mDocument.fSculptBrush.setOpacity(value);
     });
-    opacityLayout->addWidget(opacityLabel);
-    opacityLayout->addWidget(mOpacity);
-    mOpacityAct = mToolBar->addWidget(opacityWidget);
+    mOpacityAct = addSlider("opacity", mOpacity, mToolBar);
+}
+
+void TimelineDockWidget::setupDrawPathSpins() {
+    mDrawPathMaxError = new QDoubleSlider(1, 100, 1, this);
+    mDrawPathMaxError->setNumberDecimals(0);
+    mDrawPathMaxError->setDisplayedValue(mDocument.fDrawPathMaxError);
+    connect(mDrawPathMaxError, &QDoubleSlider::valueEdited,
+            this, [this](const qreal value) {
+        mDocument.fDrawPathMaxError = qFloor(value);
+    });
+    mDrawPathMaxErrorAct = addSlider("max error", mDrawPathMaxError, mToolBar);
+
+    mDrawPathSmooth = new QDoubleSlider(1, 100, 1, this);
+    mDrawPathSmooth->setNumberDecimals(0);
+    mDrawPathSmooth->setDisplayedValue(mDocument.fDrawPathSmooth);
+    connect(mDrawPathSmooth, &QDoubleSlider::valueEdited,
+            this, [this](const qreal value) {
+        mDocument.fDrawPathSmooth = qFloor(value);
+    });
+    mDrawPathSmoothAct = addSlider("smooth", mDrawPathSmooth, mToolBar);
 }
 
 void TimelineDockWidget::updateSculptPositionEnabled() {
@@ -790,6 +805,10 @@ void TimelineDockWidget::updateButtonsVisibility(const CanvasMode mode) {
     mHardnessAct->setVisible(sculptMode);
     mSculptSpace2->setVisible(sculptMode);
     mOpacityAct->setVisible(sculptMode);
+
+    const bool drawPathMode = mode == CanvasMode::drawPath;
+    mDrawPathMaxErrorAct->setVisible(drawPathMode);
+    mDrawPathSmoothAct->setVisible(drawPathMode);
 }
 
 void setSomeBrushColor(const int height,

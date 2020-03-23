@@ -308,7 +308,6 @@ void QrealAnimator::applyExpressionSub(const FrameRange& relRange,
     anim_removeKeys(relRange, action);
 
     const qreal valAvg = valSum/count;
-    const auto pt2Data = reinterpret_cast<Point2*>(pts.data());
 
     QrealKey* prevKey = nullptr;
     const auto adder = [this, frameDivider, &prevKey, action](
@@ -352,7 +351,7 @@ void QrealAnimator::applyExpressionSub(const FrameRange& relRange,
         prevKey = key1.get();
     };
 
-    FitCurves::FitCurve(pt2Data, count, 0.01*(0.01 + valAvg/accuracy), adder);
+    FitCurves::FitCurve(pts, 0.01*(0.01 + valAvg/accuracy), adder);
 }
 
 void QrealAnimator::applyExpression(const FrameRange& relRange,

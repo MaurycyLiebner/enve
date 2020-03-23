@@ -123,6 +123,13 @@ static	Vector2		V2SubII(const Vector2& a, const Vector2& b);
  *  FitCurve :
  *  	Fit a Bezier curve to a set of digitized points
  */
+void FitCurves::FitCurve(QVector<QPointF>& data, const double error,
+                         const BezierHandler& bezierHandler)
+{
+    const auto pt2Data = reinterpret_cast<Point2*>(data.data());
+    FitCurve(pt2Data, data.count(), error, bezierHandler);
+}
+
 void FitCurves::FitCurve(Point2* const d, const int nPts, const double error,
                          const BezierHandler& bezierHandler)
 //    Point2	*d;			/*  Array of digitized points	*/

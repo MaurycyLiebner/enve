@@ -244,6 +244,7 @@ SOURCES += \
     ReadWrite/ewritestream.cpp \
     ReadWrite/filefooter.cpp \
     Segments/fitcurves.cpp \
+    Segments/smoothcurves.cpp \
     ShaderEffects/shadereffect.cpp \
     ShaderEffects/shadereffectcaller.cpp \
     ShaderEffects/shadereffectcreator.cpp \
@@ -279,6 +280,7 @@ SOURCES += \
     colorsetting.cpp \
     conncontext.cpp \
     cpurendertools.cpp \
+    drawpath.cpp \
     efiltersettings.cpp \
     etexture.cpp \
     etextureframebuffer.cpp \
@@ -557,6 +559,7 @@ HEADERS += \
     ReadWrite/ewritestream.h \
     ReadWrite/filefooter.h \
     Segments/fitcurves.h \
+    Segments/smoothcurves.h \
     ShaderEffects/PropertyCreators/coloranimatorcreator.h \
     ShaderEffects/PropertyCreators/intanimatorcreator.h \
     ShaderEffects/PropertyCreators/qpointfanimatorcreator.h \
@@ -597,6 +600,7 @@ HEADERS += \
     cpurendertools.h \
     customhandler.h \
     customidentifier.h \
+    drawpath.h \
     efiltersettings.h \
     etexture.h \
     etextureframebuffer.h \

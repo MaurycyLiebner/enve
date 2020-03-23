@@ -39,11 +39,14 @@ enum class CanvasMode : short {
     boxTransform,
     pointTransform,
     pathCreate,
+    drawPath,
+
     paint,
-    sculptPath,
     circleCreate,
     rectCreate,
     textCreate,
+
+    sculptPath,
     pickFillStroke
 };
 

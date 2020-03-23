@@ -293,6 +293,23 @@ void Canvas::renderSk(SkCanvas * const canvas,
         } else if(!mouseGrabbing || mRotPivot->isSelected()) {
             mRotPivot->drawSk(canvas, mCurrentMode, invZoom, false, false);
         }
+    } else if(mCurrentMode == CanvasMode::drawPath) {
+        const SkScalar nodeSize = 0.1f*MIN_WIDGET_DIM*invZoom;
+        SkPaint paint;
+        paint.setARGB(255, 255, 0, 0);
+        paint.setStyle(SkPaint::kFill_Style);
+        paint.setAntiAlias(true);
+        const auto& fitted = mDrawPath.getFitted();
+        for(const auto& seg : fitted) {
+            const auto path = seg.toSkPath();
+            SkiaHelpers::drawOutlineOverlay(canvas, path, invZoom, SK_ColorWHITE);
+            const auto& p0 = seg.p0();
+            canvas->drawCircle(p0.x(), p0.y(), nodeSize, paint);
+        }
+        if(!mDrawPathTmp.isEmpty()) {
+            SkiaHelpers::drawOutlineOverlay(canvas, mDrawPathTmp,
+                                            invZoom, SK_ColorCYAN);
+        }
     }
 
     if(mPaintTarget.isValid()) {

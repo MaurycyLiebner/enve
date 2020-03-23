@@ -759,6 +759,10 @@ void Actions::setAddPointMode() {
     mDocument.setCanvasMode(CanvasMode::pathCreate);
 }
 
+void Actions::setDrawPathMode() {
+    mDocument.setCanvasMode(CanvasMode::drawPath);
+}
+
 void Actions::setRectangleMode() {
     mDocument.setCanvasMode(CanvasMode::rectCreate);
 }

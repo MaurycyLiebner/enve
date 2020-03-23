@@ -195,6 +195,10 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
         handleAddSmartPointMousePress(e);
     } else if(mCurrentMode == CanvasMode::pointTransform) {
         handleMovePointMousePressEvent(e);
+    } else if(mCurrentMode == CanvasMode::drawPath) {
+        mDrawPathFit = 0;
+        mDrawPath.clear();
+        mDrawPath.lineTo(e.fPos);
     } else if(mCurrentMode == CanvasMode::pickFillStroke) {
         mPressedBox = getBoxAtFromAllDescendents(e.fPos);
     } else if(mCurrentMode == CanvasMode::circleCreate) {

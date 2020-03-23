@@ -96,13 +96,14 @@ public:
     void setMovePathMode();
     void setMovePointMode();
     void setAddPointMode();
-    void setPaintMode();
+    void setDrawPathMode();
 
-    void setSculptMode();
+    void setPaintMode();
     void setRectangleMode();
     void setCircleMode();
     void setTextMode();
 
+    void setSculptMode();
     void setPickPaintSettingsMode();
 //
     bool smoothChange() const { return mSmoothChange; }

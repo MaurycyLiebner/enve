@@ -129,6 +129,19 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
             } else {
                 handleMovePathMouseMove(e);
             }
+        } else if(mCurrentMode == CanvasMode::drawPath) {
+            mDrawPath.lineTo(e.fPos);
+            if(mDrawPathFit++ % 10 == 0) {
+                mDrawPath.fit(mDocument.fDrawPathSmooth,
+                              mDocument.fDrawPathMaxError);
+                mDrawPathTmp.reset();
+                const auto& fitted = mDrawPath.getFitted();
+                QPointF moveTo;
+                if(fitted.isEmpty()) moveTo = e.fPos;
+                else moveTo = fitted.last().p3();
+                mDrawPathTmp.moveTo(toSkPoint(moveTo));
+                mDrawPathTmp.lineTo(toSkPoint(e.fPos));
+            } else mDrawPathTmp.lineTo(toSkPoint(e.fPos));
         } else if(mCurrentMode == CanvasMode::pathCreate) {
             handleAddSmartPointMouseMove(e);
         } else if(mCurrentMode == CanvasMode::circleCreate) {
@@ -160,6 +173,8 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
         if(mCurrentMode == CanvasMode::paint) {
         } else if(mCurrentMode == CanvasMode::sculptPath) {
             sculptCancel();
+        } else if(mCurrentMode == CanvasMode::drawPath) {
+            mDrawPath.clear();
         } else {
             handleRightButtonMouseRelease(e);
         }
@@ -176,6 +191,12 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
             mPaintTarget.cropRelease(e.fPos);
         }
         return;
+    } else if(mCurrentMode == CanvasMode::drawPath) {
+        mDrawPath.fit(mDocument.fDrawPathSmooth,
+                      mDocument.fDrawPathMaxError);
+
+        mDrawPath.clear();
+        mDrawPathTmp.reset();
     } else if(mCurrentMode == CanvasMode::sculptPath)
         return sculptRelease(e.fPos, 1);
 

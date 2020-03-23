@@ -36,6 +36,7 @@
 #include "CacheHandlers/usepointer.h"
 #include "CacheHandlers/sceneframecontainer.h"
 #include "undoredo.h"
+#include "drawpath.h"
 
 class AnimatedSurface;
 class PaintBox;
@@ -704,6 +705,10 @@ protected:
     stdsptr<PathPivot> mRotPivot;
 
     stdptr<SmartNodePoint> mLastEndPoint;
+
+    int mDrawPathFit = 0;
+    SkPath mDrawPathTmp;
+    DrawPath mDrawPath;
 
     NormalSegment mHoveredNormalSegment;
     NormalSegment mCurrentNormalSegment;

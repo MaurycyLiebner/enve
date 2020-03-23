@@ -80,6 +80,9 @@ public:
     SculptTarget fSculptTarget = SculptTarget::position;
     SculptMode fSculptMode = SculptMode::drag;
 
+    int fDrawPathSmooth = 25;
+    qreal fDrawPathMaxError = 15;
+
     QColor fBrushColor;
     SimpleBrushWrapper* fBrush = nullptr;
     bool fOnionVisible = false;

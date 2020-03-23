@@ -88,6 +88,8 @@ private:
 private:
     QAction *addSpaceToToolbar();
 
+    void setupDrawPathSpins();
+
     void setBrushColor(const QColor& color);
     void setBrush(BrushContexedWrapper* const brush);
 
@@ -204,6 +206,11 @@ private:
 
     QDoubleSlider* mOpacity;
     QAction* mOpacityAct;
+    //
+    QDoubleSlider* mDrawPathSmooth;
+    QAction* mDrawPathSmoothAct;
+    QDoubleSlider* mDrawPathMaxError;
+    QAction* mDrawPathMaxErrorAct;
     //
     QAction *mTimelineAction;
     QAction *mRenderAction;

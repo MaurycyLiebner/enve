@@ -19,6 +19,7 @@
         <file alias="cursor-rect.xpm">pixmaps/cursor-rect.xpm</file>
         <file alias="cursor-text.xpm">pixmaps/cursor-text.xpm</file>
         <file alias="cursor-pen.xpm">pixmaps/cursor-pen.xpm</file>
+        <file alias="cursor-pencil.xpm">pixmaps/cursor-pencil.xpm</file>
     </qresource>
     <qresource prefix="/colorwidgetshaders">
         <file alias="alpha.frag">GUI/ColorWidgets/colorwidgetshaders/alpha.frag</file>
