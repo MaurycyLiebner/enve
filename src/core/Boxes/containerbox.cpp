@@ -142,8 +142,11 @@ public:
         const auto& box = boxes.at(id);
         if(!box->isVisible()) return nextStep();
         const auto task = box->saveSVGWithTransform(mExp, mEle, mVisRange);
-        const auto nextTask = addEmptyTask();
-        task->addDependent(nextTask);
+        if(task) {
+            addTask(task->ref<eTask>());
+        } else {
+            addEmptyTask();
+        }
     }
 private:
     const QPointer<const ContainerBox> mSrc;

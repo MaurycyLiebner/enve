@@ -708,6 +708,15 @@ void Animator::saveSVG(SvgExporter& exp,
             if(iRange.fMax >= visRange.fMax) break;
             i = prp_nextDifferentRelFrame(i);
         }
+        if(keyTimes.isEmpty()) return;
+        if(keyTimes.last() != "1") {
+            values << values.last();
+            keyTimes << "1";
+        }
+        if(keyTimes.first() != "0") {
+            values.prepend(values.first());
+            keyTimes.prepend("0");
+        }
         anim.setAttribute("values", values.join(';'));
         anim.setAttribute("keyTimes", keyTimes.join(';'));
         SvgExportHelpers::assignLoop(anim, exp.fLoop);

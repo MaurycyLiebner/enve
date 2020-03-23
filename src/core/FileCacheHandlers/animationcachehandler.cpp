@@ -35,7 +35,7 @@ public:
         ComplexTask(visRelRange.fMax, "SVG Paint Object"),
         mSrc(src), mExp(exp), mUse(use),
         mRelRange(relRange), mVisRange(visRelRange),
-        mDiv(div), mRelFrame(relRange.fMin - 1) {}
+        mDiv(div), mRelFrame(visRelRange.fMin - 1) {}
 
     void nextStep() override {
         if(!mSrc) return cancel();
@@ -113,6 +113,10 @@ private:
             if(mKeyTimes.last() != "1") {
                 mHrefValues << mHrefValues.last();
                 mKeyTimes << "1";
+            }
+            if(mKeyTimes.first() != "0") {
+                mHrefValues.prepend(mHrefValues.first());
+                mKeyTimes.prepend("0");
             }
 
             const qreal dur = mDiv/mExp.fFps;

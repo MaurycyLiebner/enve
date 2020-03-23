@@ -140,7 +140,7 @@ public:
                      SvgExporter& exp, QDomElement& use,
                      const qreal div, const FrameRange& relRange,
                      const FrameRange& visRelRange) :
-        ComplexTask(relRange.fMax, "SVG Paint Object"),
+        ComplexTask(relRange.fMax, "SVG Animation"),
         mSrc(src), mExp(exp), mUse(use),
         mRelRange(relRange), mVisRage(visRelRange),
         mDiv(div), mKeyRelFrame(relRange.fMin - 1) {}
@@ -227,19 +227,24 @@ private:
     void finish() {
         if(mHrefValues.isEmpty()) return;
 
-        if(mHrefValues.count() == 1) {
-            const QString href = mHrefValues.first();
-            const QString x = mXValues.first();
-            const QString y = mYValues.first();
-            mUse.setAttribute("href", href);
-            mUse.setAttribute("x", x);
-            mUse.setAttribute("y", y);
-        } else {
+        const QString href = mHrefValues.first();
+        const QString x = mXValues.first();
+        const QString y = mYValues.first();
+        mUse.setAttribute("href", href);
+        mUse.setAttribute("x", x);
+        mUse.setAttribute("y", y);
+        if(mHrefValues.count() > 1) {
             if(mKeyTimes.last() != "1") {
                 mHrefValues << mHrefValues.last();
                 mXValues << mXValues.last();
                 mYValues << mYValues.last();
                 mKeyTimes << "1";
+            }
+            if(mKeyTimes.first() != "0") {
+                mHrefValues.prepend(mHrefValues.first());
+                mXValues.prepend(mXValues.first());
+                mYValues.prepend(mYValues.first());
+                mKeyTimes.prepend("0");
             }
 
             const qreal dur = mDiv/mExp.fFps;
