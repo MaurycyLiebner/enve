@@ -15,22 +15,33 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "canvas.h"
-#include <QMouseEvent>
-#include <QMenu>
-#include "MovablePoints/pathpivot.h"
+
+#include "Private/document.h"
+#include "GUI/newcanvasdialog.h"
+
 #include "Boxes/circle.h"
 #include "Boxes/rectangle.h"
 #include "Boxes/imagebox.h"
 #include "Boxes/textbox.h"
 #include "Boxes/internallinkbox.h"
+#include "Boxes/containerbox.h"
+#include "Boxes/smartvectorpath.h"
+#include "Boxes/paintbox.h"
+
+#include "pointtypemenu.h"
 #include "pointhelpers.h"
 #include "clipboardcontainer.h"
-#include "Boxes/paintbox.h"
+
+#include "PathEffects/patheffect.h"
 #include "PathEffects/patheffectsinclude.h"
 #include "RasterEffects/rastereffect.h"
+
 #include "MovablePoints/smartnodepoint.h"
-#include "pointtypemenu.h"
-#include "Boxes/containerbox.h"
+#include "MovablePoints/pathpivot.h"
+
+#include <QMouseEvent>
+#include <QMenu>
+#include <QInputDialog>
 
 void Canvas::handleMovePathMousePressEvent(const MouseEvent& e) {
     mPressedBox = mCurrentContainer->getBoxAt(e.fPos);
@@ -39,11 +50,6 @@ void Canvas::handleMovePathMousePressEvent(const MouseEvent& e) {
         clearBoxesSelection();
     }
 }
-
-#include <QInputDialog>
-#include "PathEffects/patheffect.h"
-#include "GUI/newcanvasdialog.h"
-#include "Private/document.h"
 
 void Canvas::addActionsToMenu(QMenu *const menu) {
     const auto clipboard = mDocument.getBoxesClipboard();
@@ -377,6 +383,23 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
         }
     } else if(mCurrentMode == CanvasMode::pathCreate) {
         handleAddSmartPointMouseRelease(e);
+    } else if(mCurrentMode == CanvasMode::drawPath) {
+        mDrawPath.fit(mDocument.fDrawPathSmooth,
+                      mDocument.fDrawPathMaxError);
+
+        const auto& fitted = mDrawPath.getFitted();
+        if(!fitted.isEmpty()) {
+            CubicList fittedList(fitted);
+            const auto newPath = enve::make_shared<SmartVectorPath>();
+            newPath->loadSkPath(fittedList.toSkPath());
+            newPath->planCenterPivotPosition();
+            mCurrentContainer->addContained(newPath);
+            clearBoxesSelection();
+            addBoxToSelection(newPath.get());
+        }
+
+        mDrawPath.clear();
+        mDrawPathTmp.reset();
     } else if(mCurrentMode == CanvasMode::pickFillStroke) {
         if(mPressedBox && enve_cast<PathBox*>(mPressedBox)) {
             const auto srcPathBox = static_cast<PathBox*>(mPressedBox.data());

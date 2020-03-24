@@ -197,4 +197,6 @@ void gGetValuesForNodeRemoval(
 
 QList<SkPath> gBreakApart(const SkPath& src);
 
+bool gIsClockwise(const QList<qCubicSegment2D>& segs);
+
 #endif // POINTHELPERS_H

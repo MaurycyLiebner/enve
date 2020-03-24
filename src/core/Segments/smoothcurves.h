@@ -23,6 +23,7 @@ namespace SmoothCurves {
     extern void movingAverage(const QVector<QPointF>& data,
                               QVector<QPointF>& smooth,
                               const bool fixedStart,
+                              const bool fixedEnd,
                               const int window);
 };
 

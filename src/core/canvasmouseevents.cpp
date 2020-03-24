@@ -131,7 +131,7 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
             }
         } else if(mCurrentMode == CanvasMode::drawPath) {
             mDrawPath.lineTo(e.fPos);
-            if(mDrawPathFit++ % 10 == 0) {
+            if(mDrawPathFit++ % 3 == 0) {
                 mDrawPath.fit(mDocument.fDrawPathSmooth,
                               mDocument.fDrawPathMaxError);
                 mDrawPathTmp.reset();
@@ -191,12 +191,6 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
             mPaintTarget.cropRelease(e.fPos);
         }
         return;
-    } else if(mCurrentMode == CanvasMode::drawPath) {
-        mDrawPath.fit(mDocument.fDrawPathSmooth,
-                      mDocument.fDrawPathMaxError);
-
-        mDrawPath.clear();
-        mDrawPathTmp.reset();
     } else if(mCurrentMode == CanvasMode::sculptPath)
         return sculptRelease(e.fPos, 1);
 

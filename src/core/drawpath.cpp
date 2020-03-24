@@ -45,7 +45,7 @@ QPointF operator/(const QPointF& p1, const QPointF& p2) {
 void DrawPath::fit(const int window, const qreal maxError) {
     mFitted.clear();
     QVector<QPointF> smooth;
-    SmoothCurves::movingAverage(mPts, smooth, true, window);
+    SmoothCurves::movingAverage(mPts, smooth, true, true, window);
     if(smooth.count() < 2) return;
 
     const auto adder = [this](const int n, const BezierCurve curve) {

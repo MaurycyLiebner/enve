@@ -1462,3 +1462,19 @@ CtrlsMode gGuessCtrlsMode(const QPointF& c0,
     else if(gIsSmooth(c0, p1, c2)) return CtrlsMode::smooth;
     else return CtrlsMode::corner;
 }
+
+bool gIsClockwise(const QList<qCubicSegment2D>& segs) {
+    if(segs.isEmpty()) return false;
+    QPointF prevPos = segs.first().p0();
+    qreal sum = 0;
+    const auto lineTo = [&prevPos, &sum](const QPointF& pos) {
+        sum += (pos.x() - prevPos.x()) * (pos.y() + prevPos.y());
+        prevPos = pos;
+    };
+    for(const auto& seg : segs) {
+        lineTo(seg.c1());
+        lineTo(seg.c2());
+        lineTo(seg.p3());
+    }
+    return sum > 0;
+}

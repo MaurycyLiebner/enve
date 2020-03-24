@@ -61,6 +61,7 @@ const QPointF& MovingAverage::average() const {
 void SmoothCurves::movingAverage(const QVector<QPointF>& data,
                                  QVector<QPointF>& smooth,
                                  const bool fixedStart,
+                                 const bool fixedEnd,
                                  const int window) {
     smooth.clear();
     if(data.isEmpty()) return;
@@ -81,5 +82,11 @@ void SmoothCurves::movingAverage(const QVector<QPointF>& data,
     for(int i = iMin; i < data.count(); i++) {
         ma.add(data.at(i));
         smooth << ma.average();
+    }
+    if(fixedEnd) {
+        for(int i = 0; i < window; i++) {
+            ma.add(data.last());
+            smooth << ma.average();
+        }
     }
 }
