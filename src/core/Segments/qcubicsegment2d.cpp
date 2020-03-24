@@ -257,6 +257,11 @@ qreal qCubicSegment2D::minDistanceTo(const QPointF &p,
     return minError;
 }
 
+void qCubicSegment2D::reverse() {
+    std::swap(mP0, mP3);
+    std::swap(mC1, mC2);
+}
+
 qreal qCubicSegment2D::tFurthestInDirection(const qreal deg) const {
     auto rotSeg = rotated(deg);
     return rotSeg.xSeg().tWithBiggestValue();

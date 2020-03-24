@@ -63,17 +63,22 @@ public:
     void actionDemoteToDissolved(const int nodeId, const bool approx);
     void actionPromoteToNormal(const int nodeId);
 
+    void removeNode(const int nodeId, const bool approx);
     void actionRemoveNode(const int nodeId, const bool approx);
     int actionAddNewAtStart(const QPointF &relPos);
     int actionAddNewAtStart(const NormalNodeData &data);
     int actionAddNewAtEnd(const QPointF &relPos);
     int actionAddNewAtEnd(const NormalNodeData &data);
+    int actionInsertNodeBetween(const int node1Id, const int node2Id, const qreal t);
+    int insertNodeBetween(const int node1Id, const int node2Id, const qreal t);
     int actionInsertNodeBetween(const int node1Id, const int node2Id,
-                                const qreal t);
+                                const qreal t, const NodePointValues& vals);
+    void connectNodes(const int node1Id, const int node2Id);
     void actionConnectNodes(const int node1Id, const int node2Id);
     void actionMergeNodes(const int node1Id, const int node2Id);
     void actionMoveNodeBetween(const int nodeId, const int prevNodeId,
                                const int nextNodeId);
+    void close();
     void actionClose();
     void actionDisconnectNodes(const int node1Id, const int node2Id);
     void actionReverseCurrent();
@@ -81,6 +86,9 @@ public:
 
     void actionAppendMoveAllFrom(SmartPathAnimator * const other);
     void actionPrependMoveAllFrom(SmartPathAnimator * const other);
+
+    void actionReplaceSegments(const int beginNodeId, const int endNodeId,
+                               const QList<qCubicSegment2D>& with);
 
     bool hasDetached() const
     { return baseValue().hasDetached(); }

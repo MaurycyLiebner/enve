@@ -27,7 +27,7 @@ public:
 
     void lineTo(const QPointF& pos);
     void fit(const int window, const qreal maxError);
-    const QList<qCubicSegment2D>& getFitted() const
+    QList<qCubicSegment2D>& getFitted()
     { return mFitted; }
     void clear();
 private:

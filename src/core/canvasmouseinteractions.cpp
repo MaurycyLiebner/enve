@@ -362,6 +362,30 @@ void Canvas::handleMovePathMouseRelease(const MouseEvent &e) {
     }
 }
 
+SmartNodePoint* drawPathAppend(const QList<qCubicSegment2D>& fitted,
+                               SmartNodePoint* endPoint) {
+    for(int i = 0; i < fitted.count(); i++) {
+        const auto& seg = fitted.at(i);
+        endPoint->moveC2ToAbsPos(seg.c1());
+        endPoint = endPoint->actionAddPointAbsPos(seg.p3());
+        endPoint->moveC0ToAbsPos(seg.c2());
+    }
+    return endPoint;
+}
+
+qsptr<SmartVectorPath> drawPathNew(QList<qCubicSegment2D>& fitted) {
+    const QPointF& begin = fitted.first().p0();
+    const QPointF& end = fitted.last().p3();
+    const qreal beginEndDist = pointToLen(end - begin);
+    const bool close = beginEndDist < 7 && fitted.count() > 1;
+    if(close) fitted.last().setP3(begin);
+    const auto newPath = enve::make_shared<SmartVectorPath>();
+    CubicList fittedList(fitted);
+    newPath->loadSkPath(fittedList.toSkPath());
+    newPath->planCenterPivotPosition();
+    return newPath;
+}
+
 void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
     if(e.fMouseGrabbing) e.fReleaseMouse();
     if(mCurrentNormalSegment.isValid()) {
@@ -387,15 +411,54 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
         mDrawPath.fit(mDocument.fDrawPathSmooth,
                       mDocument.fDrawPathMaxError);
 
-        const auto& fitted = mDrawPath.getFitted();
+        auto& fitted = mDrawPath.getFitted();
         if(!fitted.isEmpty()) {
-            CubicList fittedList(fitted);
-            const auto newPath = enve::make_shared<SmartVectorPath>();
-            newPath->loadSkPath(fittedList.toSkPath());
-            newPath->planCenterPivotPosition();
-            mCurrentContainer->addContained(newPath);
-            clearBoxesSelection();
-            addBoxToSelection(newPath.get());
+            const QPointF& begin = fitted.first().p0();
+            const QPointF& end = fitted.last().p3();
+            const auto beginHover = getPointAtAbsPos(begin, mCurrentMode, 1/e.fScale);
+            const auto beginNode = enve_cast<SmartNodePoint*>(beginHover);
+            const auto endHover = getPointAtAbsPos(end, mCurrentMode, 1/e.fScale);
+            const auto endNode = enve_cast<SmartNodePoint*>(endHover);
+            const bool beginEndPoint = beginNode ? beginNode->isEndPoint() : false;
+            const bool endEndPoint = endNode ? endNode->isEndPoint() : false;
+            bool createNew = false;
+            if(beginNode && endNode && beginNode != endNode) {
+                const auto beginParent = beginNode->getTargetAnimator();
+                const auto endParent = endNode->getTargetAnimator();
+                const bool reverse = beginEndPoint && endEndPoint ?
+                                         endNode->hasNextPoint() :
+                                         false; //beginNode->getNodeId() > endNode->getNodeId();
+                if(reverse) {
+                    std::reverse(fitted.begin(), fitted.end());
+                    std::for_each(fitted.begin(), fitted.end(),
+                                  [](qCubicSegment2D& seg) { seg.reverse(); });
+                }
+                const auto orderedBegin = reverse ? endNode : beginNode;
+                const auto orderedEnd = reverse ? beginNode : endNode;
+                if(beginEndPoint && endEndPoint) {
+                    const auto& lastSeg = fitted.last();
+                    const auto mid = fitted.mid(0, fitted.count() - 1);
+
+                    const auto last = drawPathAppend(mid, orderedEnd);
+                    last->moveC2ToAbsPos(lastSeg.c1());
+                    orderedBegin->moveC0ToAbsPos(lastSeg.c2());
+                    last->actionConnectToNormalPoint(orderedBegin);
+                } else if(beginParent == endParent) {
+                    const int beginId = beginNode->getNodeId();
+                    const int endId = endNode->getNodeId();
+                    beginParent->actionReplaceSegments(beginId, endId, fitted);
+                } else createNew = true;
+            } else if(beginNode && beginEndPoint) {
+                drawPathAppend(fitted, beginNode);
+            } else if(endNode && endEndPoint) {
+                drawPathAppend(fitted, endNode);
+            } else createNew = true;
+            if(createNew) {
+                const auto newPath = drawPathNew(fitted);
+                mCurrentContainer->addContained(newPath);
+                clearBoxesSelection();
+                addBoxToSelection(newPath.get());
+            }
         }
 
         mDrawPath.clear();

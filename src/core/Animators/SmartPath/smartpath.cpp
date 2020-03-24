@@ -127,6 +127,11 @@ int SmartPath::actionInsertNodeBetween(
     return insertNodeBetween(prevId, nextId, Node(c0, p1, c2));
 }
 
+int SmartPath::actionInsertNodeBetween(const int prevId, const int nextId,
+                                       const NodePointValues& vals) {
+    return actionInsertNodeBetween(prevId, nextId, vals.fC0, vals.fP1, vals.fC2);
+}
+
 void SmartPath::actionPromoteDissolvedNodeToNormal(const int nodeId) {
     mNodesList.promoteDissolvedNodeToNormal(nodeId);
 }
@@ -336,6 +341,25 @@ NodeList SmartPath::getAndClearLastDetached() {
     NodeList detached;
     mLastDetached.swap(detached);
     return detached;
+}
+
+bool SmartPath::isClockwise() const {
+    if(mNodesList.isEmpty()) return false;
+    QPointF prevPos = mNodesList.at(0)->p1();
+    qreal sum = 0;
+    const auto lineTo = [&prevPos, &sum](const QPointF& pos) {
+        sum += (pos.x() - prevPos.x()) * (pos.y() + prevPos.y());
+        prevPos = pos;
+    };
+    const int nNodes = mNodesList.count();
+    for(int i = 0; i < nNodes; i++) {
+        const auto node = mNodesList.at(i);
+        if(node->isDissolved()) continue;
+        if(i != 0 || isClosed()) lineTo(node->c0());
+        lineTo(node->p1());
+        if(i != nNodes - 1 || isClosed()) lineTo(node->c2());
+    }
+    return sum > 0;
 }
 
 eWriteStream &operator<<(eWriteStream &dst, const SmartPath &path) {

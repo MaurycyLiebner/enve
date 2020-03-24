@@ -16,10 +16,35 @@
 
 #ifndef NODE_H
 #define NODE_H
+
 #include "pointhelpers.h"
 #include "exceptions.h"
+#include "nodepointvalues.h"
 
 struct NormalNodeData {
+    NormalNodeData(const bool c0Enabled,
+                   const bool c2Enabled,
+                   const CtrlsMode ctrlsMode,
+                   const QPointF c0,
+                   const QPointF p1,
+                   const QPointF c2) {
+        fC0Enabled = c0Enabled;
+        fC2Enabled = c2Enabled;
+        fC0 = c0;
+        fP1 = p1;
+        fC2 = c2;
+        fCtrlsMode = ctrlsMode;
+    }
+
+    NormalNodeData(const NodePointValues& values) {
+        fC0Enabled = true;
+        fC2Enabled = true;
+        fC0 = values.fC0;
+        fP1 = values.fP1;
+        fC2 = values.fC2;
+        fCtrlsMode = gGuessCtrlsMode(fC0, fP1, fC2, true, true);
+    }
+
     bool fC0Enabled;
     bool fC2Enabled;
     CtrlsMode fCtrlsMode;

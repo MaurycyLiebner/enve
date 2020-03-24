@@ -154,8 +154,12 @@ bool SmartNodePoint::isVisible(const CanvasMode mode) const {
         if(isNormal() && nodeVis == NodeVisiblity::dissolvedOnly) return false;
         if(isDissolved() && nodeVis == NodeVisiblity::normalOnly) return false;
         return true;
-    } else if(mode == CanvasMode::pathCreate)
+    } else if(mode == CanvasMode::pathCreate) {
         return isEndPoint() || isSelected();
+    } else if(mode == CanvasMode::drawPath) {
+        return isNormal();
+    }
+
     return false;
 }
 
@@ -168,9 +172,9 @@ MovablePoint *SmartNodePoint::getPointAtAbsPos(const QPointF &absPos,
         } else if(mC2Pt->isPointAtAbsPos(absPos, mode, invScale)) {
             return mC2Pt.get();
         }
-    } else if(!isEndPoint() || mode != CanvasMode::pathCreate) {
-        return nullptr;
-    }
+    } else if(isEndPoint() && mode == CanvasMode::pathCreate) {
+    } else if(isNormal() && mode == CanvasMode::drawPath) {
+    } else return nullptr;
     return MovablePoint::getPointAtAbsPos(absPos, mode, invScale);
 }
 

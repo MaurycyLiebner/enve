@@ -16,6 +16,17 @@
 
 #include "smartpathanimator.h"
 
+#include "node.h"
+
+void SmartPathAnimator::removeNode(const int nodeId, const bool approx) {
+    const auto& keys = anim_getKeys();
+    for(const auto &key : keys) {
+        const auto spKey = static_cast<SmartPathKey*>(key);
+        spKey->getValue().actionRemoveNode(nodeId, approx);
+    }
+    baseValue().actionRemoveNode(nodeId, approx);
+}
+
 void SmartPathAnimator::actionRemoveNode(const int nodeId, const bool approx) {
     prp_pushUndoRedoName("Remove Node");
 
@@ -23,12 +34,12 @@ void SmartPathAnimator::actionRemoveNode(const int nodeId, const bool approx) {
 
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
-        const auto spKey = static_cast<SmartPathKey*>(key);
         key->startValueTransform();
-        spKey->getValue().actionRemoveNode(nodeId, approx);
+    }
+    removeNode(nodeId, approx);
+    for(const auto &key : keys) {
         key->finishValueTransform();
     }
-    baseValue().actionRemoveNode(nodeId, approx);
     prp_finishTransform();
 
     if(baseValue().isEmpty()) emit emptied();
@@ -92,7 +103,8 @@ int SmartPathAnimator::actionAddNewAtEnd(const NormalNodeData &data) {
 }
 
 int SmartPathAnimator::actionInsertNodeBetween(
-        const int node1Id, const int node2Id, const qreal t) {
+        const int node1Id, const int node2Id,
+        const qreal t, const NodePointValues& vals) {
     prp_pushUndoRedoName("Add New Node");
 
     prp_startTransform();
@@ -105,6 +117,26 @@ int SmartPathAnimator::actionInsertNodeBetween(
     }
 
     const auto curr = getCurrentlyEdited();
+    if(&baseValue() != curr) {
+        baseValue().actionInsertNodeBetween(node1Id, node2Id, t);
+    }
+    const int id = curr->actionInsertNodeBetween(node1Id, node2Id, vals);
+
+    prp_finishTransform();
+
+    prp_afterWholeInfluenceRangeChanged();
+    return id;
+}
+
+int SmartPathAnimator::insertNodeBetween(
+        const int node1Id, const int node2Id, const qreal t) {
+    const auto& keys = anim_getKeys();
+    for(const auto &key : keys) {
+        const auto spKey = static_cast<SmartPathKey*>(key);
+        spKey->getValue().actionInsertNodeBetween(node1Id, node2Id, t);
+    }
+
+    const auto curr = getCurrentlyEdited();
     if(curr->getNodePtr(node1Id)->getCtrlsMode() == CtrlsMode::symmetric) {
         curr->actionSetNormalNodeCtrlsMode(node1Id, CtrlsMode::smooth);
     }
@@ -113,10 +145,37 @@ int SmartPathAnimator::actionInsertNodeBetween(
     }
     const int id = baseValue().actionInsertNodeBetween(node1Id, node2Id, t);
     curr->actionPromoteDissolvedNodeToNormal(id);
+    return id;
+}
+
+int SmartPathAnimator::actionInsertNodeBetween(
+        const int node1Id, const int node2Id, const qreal t) {
+    prp_pushUndoRedoName("Add New Node");
+
+    prp_startTransform();
+    const auto& keys = anim_getKeys();
+    for(const auto &key : keys) {
+        key->startValueTransform();
+    }
+    const int id = insertNodeBetween(node1Id, node2Id, t);
+    for(const auto &key : keys) {
+        key->finishValueTransform();
+    }
     prp_finishTransform();
 
     prp_afterWholeInfluenceRangeChanged();
     return id;
+}
+
+void SmartPathAnimator::connectNodes(
+        const int node1Id, const int node2Id) {
+    const auto& keys = anim_getKeys();
+    for(const auto &key : keys) {
+        const auto spKey = static_cast<SmartPathKey*>(key);
+        spKey->getValue().actionConnectNodes(node1Id, node2Id);
+    }
+
+    baseValue().actionConnectNodes(node1Id, node2Id);
 }
 
 void SmartPathAnimator::actionConnectNodes(
@@ -126,13 +185,15 @@ void SmartPathAnimator::actionConnectNodes(
     prp_startTransform();
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
-        const auto spKey = static_cast<SmartPathKey*>(key);
-        spKey->startValueTransform();
-        spKey->getValue().actionConnectNodes(node1Id, node2Id);
-        spKey->finishValueTransform();
+        key->startValueTransform();
     }
 
-    baseValue().actionConnectNodes(node1Id, node2Id);
+    connectNodes(node1Id, node2Id);
+
+    for(const auto &key : keys) {
+        key->finishValueTransform();
+    }
+
     prp_finishTransform();
 
     prp_afterWholeInfluenceRangeChanged();
@@ -164,6 +225,10 @@ void SmartPathAnimator::actionMoveNodeBetween(
                 nodeId, prevNodeId, nextNodeId);
     prp_finishTransform();
     changed();
+}
+
+void SmartPathAnimator::close() {
+    connectNodes(0, baseValue().getNodeCount() - 1);
 }
 
 void SmartPathAnimator::actionClose() {
@@ -263,6 +328,99 @@ void SmartPathAnimator::actionPrependMoveAllFrom(SmartPathAnimator * const other
 
     prp_afterWholeInfluenceRangeChanged();
     other->prp_afterWholeInfluenceRangeChanged();
+}
+
+void SmartPathAnimator::actionReplaceSegments(
+        const int beginNodeId, const int endNodeId,
+        const QList<qCubicSegment2D>& with) {
+    if(with.isEmpty() || beginNodeId == endNodeId) return;
+
+    prp_pushUndoRedoName("Replace Nodes");
+
+    const auto edit = getCurrentlyEdited();
+
+    prp_startTransform();
+
+    const bool reverse = endNodeId < beginNodeId;
+    const bool close = reverse && !isClosed();
+    int totalCount = edit->getNodeCount();
+    const int currentCount = reverse ? beginNodeId - endNodeId - 1 :
+                                       endNodeId - beginNodeId - 1;
+    const int replaceCount = with.count() - 1;
+    const bool changeAll = replaceCount != currentCount;
+
+    const auto& keys = anim_getKeys();
+    if(changeAll) {
+        for(const auto &key : keys) {
+            key->startValueTransform();
+        }
+    }
+
+    if(close) this->close();
+
+    const auto& firstSeg = with.first();
+    const auto& lastSeg = with.last();
+    edit->actionSetNormalNodeC2(beginNodeId, firstSeg.c1());
+    edit->actionSetNormalNodeC0(endNodeId, lastSeg.c2());
+
+    const auto edited = getCurrentlyEdited();
+
+    const int iInc = reverse ? -1 : 1;
+    const int iMin = (beginNodeId + iInc) % totalCount;
+    for(int i = iMin; i != endNodeId; i = (i + iInc) % totalCount) {
+        const auto iNode = edited->getNodePtr(i);
+        if(iNode->isDissolved()) {
+            edited->actionPromoteDissolvedNodeToNormal(i);
+        }
+    }
+
+    if(replaceCount < currentCount) {
+        const bool remove = !anim_hasKeys();
+        const int dissolveCount = currentCount - replaceCount;
+        for(int i = 0; i < dissolveCount; i++) {
+            const int nodeId = (beginNodeId + iInc + iInc*i) % totalCount;
+            if(remove) {
+                removeNode(nodeId, false);
+                totalCount--;
+            } else {
+                edited->actionDemoteToDissolved(nodeId, false);
+            }
+        }
+    } else if(replaceCount > currentCount) {
+        const int newCount = replaceCount - currentCount;;
+        const int nextId = (beginNodeId + iInc) % totalCount;
+        for(int i = 0; i < newCount; i++) {
+            insertNodeBetween(beginNodeId, nextId, 0.5);
+            totalCount++;
+            edited->actionPromoteDissolvedNodeToNormal(nextId);
+        }
+    }
+
+    int skipped = 0;
+    for(int i = 0; i < replaceCount + skipped; i++) {
+        int nodeId = (beginNodeId + iInc + iInc*i) % totalCount;
+        if(nodeId < 0) nodeId += totalCount;a
+        const auto node = edited->getNodePtr(nodeId);
+        if(node->isDissolved()) {
+            skipped++;
+            continue;
+        }
+        const int segId = i - skipped;
+        const auto& seg = with.at(segId);
+        const auto& nextSeg = with.at(segId + 1);
+        edited->actionSetNormalNodeValues(nodeId, seg.c2(),
+                                          seg.p3(), nextSeg.c1());
+    }
+
+    if(changeAll) {
+        for(const auto &key : keys) {
+            key->finishValueTransform();
+        }
+    }
+    prp_finishTransform();
+
+    if(changeAll) prp_afterWholeInfluenceRangeChanged();
+    else changed();
 }
 
 int SmartPathAnimator::actionAddFirstNode(const QPointF &relPos) {

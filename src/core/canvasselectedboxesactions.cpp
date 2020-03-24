@@ -531,11 +531,13 @@ void Canvas::deselectAllBoxes() {
 MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
                                        const CanvasMode mode,
                                        const qreal invScale) {
-    if(mode == CanvasMode::pointTransform || mode == CanvasMode::pathCreate ||
-       mode == CanvasMode::pathCreate ||  mode == CanvasMode::boxTransform) {
+    if(mode == CanvasMode::boxTransform) {
         if(mRotPivot->isPointAtAbsPos(absPos, mode, invScale)) {
             return mRotPivot.get();
         }
+    }
+    if(mode == CanvasMode::pointTransform || mode == CanvasMode::pathCreate ||
+       mode == CanvasMode::drawPath || mode == CanvasMode::boxTransform) {
         for(const auto &box : mSelectedBoxes) {
             const auto pointAtPos = box->getPointAtAbsPos(absPos, mode, invScale);
             if(pointAtPos) return pointAtPos;

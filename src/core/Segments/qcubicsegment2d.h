@@ -116,6 +116,8 @@ struct qCubicSegment2D {
                         qreal * const pBestT = nullptr,
                         QPointF * const pBestPos = nullptr) const;
 
+    void reverse();
+
     qCubicSegment2D rotated(const qreal deg) const {
         qCubicSegment2D result(*this);
         result.rotate(deg);

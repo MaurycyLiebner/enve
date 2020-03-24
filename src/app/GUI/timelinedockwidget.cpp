@@ -594,7 +594,7 @@ void TimelineDockWidget::setupSculptValueSpins() {
 }
 
 void TimelineDockWidget::setupDrawPathSpins() {
-    mDrawPathMaxError = new QDoubleSlider(1, 100, 1, this);
+    mDrawPathMaxError = new QDoubleSlider(1, 200, 1, this);
     mDrawPathMaxError->setNumberDecimals(0);
     mDrawPathMaxError->setDisplayedValue(mDocument.fDrawPathMaxError);
     connect(mDrawPathMaxError, &QDoubleSlider::valueEdited,
@@ -603,7 +603,7 @@ void TimelineDockWidget::setupDrawPathSpins() {
     });
     mDrawPathMaxErrorAct = addSlider("max error", mDrawPathMaxError, mToolBar);
 
-    mDrawPathSmooth = new QDoubleSlider(1, 100, 1, this);
+    mDrawPathSmooth = new QDoubleSlider(1, 200, 1, this);
     mDrawPathSmooth->setNumberDecimals(0);
     mDrawPathSmooth->setDisplayedValue(mDocument.fDrawPathSmooth);
     connect(mDrawPathSmooth, &QDoubleSlider::valueEdited,

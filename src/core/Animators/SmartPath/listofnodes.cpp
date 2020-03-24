@@ -55,7 +55,7 @@ void ListOfNodes::deepCopyFrom(const ListOfNodes &other) {
         insert(i, *other.at(i));
     }
     for(; i < thisCount; i++) {
-        removeAt(i);
+        removeAt(otherCount);
     }
 }
 

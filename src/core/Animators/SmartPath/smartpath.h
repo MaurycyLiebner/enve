@@ -56,6 +56,8 @@ public:
                                 const QPointF &c0,
                                 const QPointF &p1,
                                 const QPointF &c2);
+    int actionInsertNodeBetween(const int prevId, const int nextId,
+                                const NodePointValues &vals);
     int actionInsertNodeBetween(const int prevId,
                                 const int nextId,
                                 const qreal t);
@@ -140,6 +142,8 @@ public:
 
     const NodeList& getNodesRef() const
     { return mNodesList; }
+
+    bool isClockwise() const;
 private:
     int insertNodeBetween(const int prevId, const int nextId,
                           const Node &nodeBlueprint);
