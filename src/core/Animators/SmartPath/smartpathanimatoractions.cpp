@@ -406,6 +406,27 @@ private:
     int mWrapVal;
 };
 
+QVector<int> replaceNodeIds(const int count1, const int count2) {
+    const int min = qMin(count1, count2);
+    const int max = qMax(count1, count2);
+    QVector<int> result;
+    result.reserve(min);
+    for(int i = 0; i < min; i++) {
+        const qreal t = (1. + i)/(min + 1.);
+        const bool secondHalf = t > 0.5;
+        qreal targetF = (max - 1)*(secondHalf ? 1 - t : t);
+        int target;
+        if(isInteger4Dec(targetF) || isZero4Dec(t - 0.5)) {
+            target = qRound(targetF);
+        } else {
+            target = qFloor(targetF);
+            if(secondHalf) target = max - 1 - target;
+        }
+        result << target;
+    }
+    return result;
+}
+
 void SmartPathAnimator::actionReplaceSegments(
         int beginNodeId, int endNodeId,
         const QList<qCubicSegment2D>& with) {
@@ -424,6 +445,8 @@ void SmartPathAnimator::actionReplaceSegments(
                                        endNodeId - beginNodeId - 1;
     const int replaceCount = with.count() - 1;
     const bool changeAll = replaceCount != currentCount;
+
+    const auto replaceIds = replaceNodeIds(currentCount, replaceCount);
 
     const auto& keys = anim_getKeys();
     if(changeAll) {
@@ -459,31 +482,47 @@ void SmartPathAnimator::actionReplaceSegments(
 
     if(replaceCount < currentCount) {
         const bool remove = !anim_hasKeys();
-        const int dissolveCount = currentCount - replaceCount;
-        for(int i = 0; i < dissolveCount; i++) {
-            const int idValue = beginNodeId + iInc + (remove ? 0 : iInc*i);
-            const int nodeId = WrappedInt(idValue, totalCount, reverse).toInt();
-            if(remove) {
+        if(remove) {
+            const int removeCount = currentCount - replaceCount;
+            for(int i = 0; i < removeCount; i++) {
+                const int idValue = beginNodeId + iInc;
+                const int nodeId = WrappedInt(idValue, totalCount, reverse).toInt();
                 removeNode(nodeId, false);
                 totalCount--;
-                if(reverse) beginNodeId--;
-                else endNodeId--;
-            } else {
+                if(beginNodeId > nodeId) beginNodeId--;
+                if(endNodeId > nodeId)  endNodeId--;
+            }
+        } else {
+            QVector<int> removeIds;
+            for(int i = 0; i < replaceCount; i++) {
+                if(replaceIds.contains(i)) continue;
+                removeIds << i;
+            }
+            for(int relId : removeIds) {
+                const int idValue = beginNodeId + iInc + iInc*relId;
+                const int nodeId = WrappedInt(idValue, totalCount, reverse).toInt();
                 edited->actionDemoteToDissolved(nodeId, false);
             }
         }
     } else if(replaceCount > currentCount) {
-        const int newCount = replaceCount - currentCount;
-        const int prevId = beginNodeId;
-        const int nextId = WrappedInt(beginNodeId + iInc,
-                                      totalCount, reverse).toInt();
-        for(int i = 0; i < newCount; i++) {
-            if(reverse) insertNodeBetween(nextId, prevId, 0.5);
-            else insertNodeBetween(prevId, nextId, 0.5);
-            totalCount++;
-            if(reverse) beginNodeId++;
-            else endNodeId++;
+        QVector<int> insertIds;
+        for(int i = 0; i < replaceCount; i++) {
+            if(replaceIds.contains(i)) continue;
+            insertIds << i;
+        }
+        std::sort(insertIds.begin(), insertIds.end());
+        for(const int insertId : insertIds) {
+            const int prevId = WrappedInt(beginNodeId + iInc*insertId,
+                                          totalCount, reverse).toInt();
+            const int nextId = WrappedInt(prevId + iInc,
+                                          totalCount, reverse).toInt();
+            const int orderedPrevId = qMin(prevId, nextId);
+            const int orderedNextId = qMax(prevId, nextId);
+            insertNodeBetween(orderedPrevId, orderedNextId, 0.5);
             edited->actionPromoteDissolvedNodeToNormal(nextId);
+            totalCount++;
+            if(beginNodeId > orderedPrevId) beginNodeId++;
+            if(endNodeId > orderedPrevId) endNodeId++;
         }
     }
 

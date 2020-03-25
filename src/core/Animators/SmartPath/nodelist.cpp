@@ -304,12 +304,16 @@ void NodeList::promoteDissolvedNodeToNormal(const int nodeId,
     const bool segmentNotLinear = prevNormalV->getC2Enabled() ||
                                   nextNormalV->getC0Enabled();
     if(segmentNotLinear) {
+        const CtrlsMode prevMode = prevNormalV->getCtrlsMode();
         const bool makePrevSmooth = prevNormalV->getC0Enabled() &&
-                                    prevNormal(prevNormalV);
+                                    prevNormal(prevNormalV) &&
+                                    prevMode == CtrlsMode::symmetric;
         if(makePrevSmooth) setNodeCtrlsMode(prevNormalV, CtrlsMode::smooth);
         setNodeCtrlsMode(node, CtrlsMode::smooth);
+        const CtrlsMode nextMode = nextNormalV->getCtrlsMode();
         const bool makeNextSmooth = nextNormalV->getC2Enabled() &&
-                                    nextNormal(nextNormalV);
+                                    nextNormal(nextNormalV) &&
+                                    nextMode == CtrlsMode::symmetric;
         if(makeNextSmooth) setNodeCtrlsMode(nextNormalV, CtrlsMode::smooth);
     } else {
         node->setC0Enabled(false);
