@@ -124,6 +124,8 @@ struct qCubicSegment2D {
         return result;
     }
 
+    void transform(const QMatrix& transform);
+
     void rotate(const qreal deg) {
         if(isZero6Dec(deg)) return;
         mP0 = gRotPt(p0(), deg);

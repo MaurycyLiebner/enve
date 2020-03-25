@@ -461,8 +461,8 @@ void SmartPathAnimator::actionReplaceSegments(
         const bool remove = !anim_hasKeys();
         const int dissolveCount = currentCount - replaceCount;
         for(int i = 0; i < dissolveCount; i++) {
-            const int nodeId = WrappedInt(beginNodeId + iInc + iInc*i,
-                                          totalCount, reverse).toInt();
+            const int idValue = beginNodeId + iInc + (remove ? 0 : iInc*i);
+            const int nodeId = WrappedInt(idValue, totalCount, reverse).toInt();
             if(remove) {
                 removeNode(nodeId, false);
                 totalCount--;

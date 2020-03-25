@@ -422,6 +422,7 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
             const bool beginEndPoint = beginNode ? beginNode->isEndPoint() : false;
             const bool endEndPoint = endNode ? endNode->isEndPoint() : false;
             bool createNew = false;
+
             if(beginNode && endNode && beginNode != endNode) {
                 const auto beginParent = beginNode->getTargetAnimator();
                 const auto endParent = endNode->getTargetAnimator();
@@ -444,6 +445,13 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
                     orderedBegin->moveC0ToAbsPos(lastSeg.c2());
                     last->actionConnectToNormalPoint(orderedBegin);
                 } else if(beginParent == endParent) {
+                    const auto transform = beginNode->getTransform();
+                    const auto matrix = transform->getCurrentTransform();
+                    const auto invMatrix = matrix.inverted();
+                    std::for_each(fitted.begin(), fitted.end(),
+                                  [&invMatrix](qCubicSegment2D& seg) {
+                        seg.transform(invMatrix);
+                    });
                     const int beginId = beginNode->getNodeId();
                     const int endId = endNode->getNodeId();
                     beginParent->actionReplaceSegments(beginId, endId, fitted);

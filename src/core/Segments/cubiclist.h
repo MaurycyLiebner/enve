@@ -108,6 +108,7 @@ struct CubicList {
                          toSkPoint(cubic.p3()));
             lastPos = cubic.p3();
         }
+        if(mClosed) path.close();
         return path;
     }
 

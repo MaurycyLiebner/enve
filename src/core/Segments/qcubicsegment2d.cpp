@@ -262,6 +262,14 @@ void qCubicSegment2D::reverse() {
     std::swap(mC1, mC2);
 }
 
+void qCubicSegment2D::transform(const QMatrix& transform) {
+    mP0 = transform.map(p0());
+    mC1 = transform.map(c1());
+    mC2 = transform.map(c2());
+    mP3 = transform.map(p3());
+    mLengthUpToDate = false;
+}
+
 qreal qCubicSegment2D::tFurthestInDirection(const qreal deg) const {
     auto rotSeg = rotated(deg);
     return rotSeg.xSeg().tWithBiggestValue();
