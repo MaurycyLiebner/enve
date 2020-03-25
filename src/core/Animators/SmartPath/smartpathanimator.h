@@ -87,7 +87,7 @@ public:
     void actionAppendMoveAllFrom(SmartPathAnimator * const other);
     void actionPrependMoveAllFrom(SmartPathAnimator * const other);
 
-    void actionReplaceSegments(const int beginNodeId, const int endNodeId,
+    void actionReplaceSegments(const int beginNodeId, int endNodeId,
                                const QList<qCubicSegment2D>& with);
 
     bool hasDetached() const

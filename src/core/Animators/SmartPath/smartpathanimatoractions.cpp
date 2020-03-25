@@ -1,4 +1,4 @@
-// enve - 2D animations software
+﻿// enve - 2D animations software
 // Copyright (C) 2016-2020 Maurycy Liebner
 
 // This program is free software: you can redistribute it and/or modify
@@ -330,8 +330,84 @@ void SmartPathAnimator::actionPrependMoveAllFrom(SmartPathAnimator * const other
     other->prp_afterWholeInfluenceRangeChanged();
 }
 
+class WrappedInt {
+public:
+    WrappedInt(const int value, const int wrapValue, const bool reverse) :
+        mSign(reverse ? -1 : 1), mWrapVal(wrapValue) {
+        setValue(value);
+    }
+
+    void setValue(const int value) {
+        if(value < 0) {
+            mVal = mWrapVal + value % mWrapVal;
+        } else {
+            mVal = value % mWrapVal;
+        }
+    }
+
+    WrappedInt& operator+=(const int val) {
+        setValue(mVal + mSign*val);
+        return *this;
+    }
+
+    WrappedInt& operator-=(const int val) {
+        setValue(mVal - mSign*val);
+        return *this;
+    }
+
+    WrappedInt& operator++() {
+        setValue(mVal + mSign);
+        return *this;
+    }
+
+    WrappedInt& operator--() {
+        setValue(mVal - mSign);
+        return *this;
+    }
+
+    WrappedInt operator++(int) {
+        WrappedInt result = *this;
+        setValue(mVal + mSign);
+        return result;
+    }
+
+    WrappedInt operator--(int) {
+        WrappedInt result = *this;
+        setValue(mVal - mSign);
+        return result;
+    }
+
+    WrappedInt operator-(const int val) {
+        return WrappedInt(mVal - val, mWrapVal, mSign == -1);
+    }
+
+    WrappedInt operator+(const int val) {
+        return WrappedInt(mVal + val, mWrapVal, mSign == -1);
+    }
+
+    bool operator==(const int val) const {
+        return mVal == val;
+    }
+
+    bool operator!=(const int val) const {
+        return mVal != val;
+    }
+
+    void setWrapValue(const int wrapVal) {
+        mWrapVal = wrapVal;
+        setValue(mVal);
+    }
+
+    int toInt() const { return mVal; }
+    bool isReverse() const { return mSign == -1; }
+private:
+    const int mSign;
+    int mVal;
+    int mWrapVal;
+};
+
 void SmartPathAnimator::actionReplaceSegments(
-        const int beginNodeId, const int endNodeId,
+        int beginNodeId, int endNodeId,
         const QList<qCubicSegment2D>& with) {
     if(with.isEmpty() || beginNodeId == endNodeId) return;
 
@@ -342,7 +418,7 @@ void SmartPathAnimator::actionReplaceSegments(
     prp_startTransform();
 
     const bool reverse = endNodeId < beginNodeId;
-    const bool close = reverse && !isClosed();
+//    const bool close = reverse && !isClosed();
     int totalCount = edit->getNodeCount();
     const int currentCount = reverse ? beginNodeId - endNodeId - 1 :
                                        endNodeId - beginNodeId - 1;
@@ -356,21 +432,28 @@ void SmartPathAnimator::actionReplaceSegments(
         }
     }
 
-    if(close) this->close();
+//    if(close) this->close();
 
     const auto& firstSeg = with.first();
     const auto& lastSeg = with.last();
-    edit->actionSetNormalNodeC2(beginNodeId, firstSeg.c1());
-    edit->actionSetNormalNodeC0(endNodeId, lastSeg.c2());
+    edit->actionSetNormalNodeCtrlsMode(beginNodeId, CtrlsMode::corner);
+    edit->actionSetNormalNodeCtrlsMode(endNodeId, CtrlsMode::corner);
+    if(reverse) {
+        edit->actionSetNormalNodeC0(beginNodeId, firstSeg.c1());
+        edit->actionSetNormalNodeC2(endNodeId, lastSeg.c2());
+    } else {
+        edit->actionSetNormalNodeC2(beginNodeId, firstSeg.c1());
+        edit->actionSetNormalNodeC0(endNodeId, lastSeg.c2());
+    }
 
     const auto edited = getCurrentlyEdited();
 
     const int iInc = reverse ? -1 : 1;
-    const int iMin = (beginNodeId + iInc) % totalCount;
-    for(int i = iMin; i != endNodeId; i = (i + iInc) % totalCount) {
-        const auto iNode = edited->getNodePtr(i);
+    for(WrappedInt i(beginNodeId + iInc, totalCount, reverse);
+        i != endNodeId; i++) {
+        const auto iNode = edited->getNodePtr(i.toInt());
         if(iNode->isDissolved()) {
-            edited->actionPromoteDissolvedNodeToNormal(i);
+            edited->actionPromoteDissolvedNodeToNormal(i.toInt());
         }
     }
 
@@ -378,28 +461,36 @@ void SmartPathAnimator::actionReplaceSegments(
         const bool remove = !anim_hasKeys();
         const int dissolveCount = currentCount - replaceCount;
         for(int i = 0; i < dissolveCount; i++) {
-            const int nodeId = (beginNodeId + iInc + iInc*i) % totalCount;
+            const int nodeId = WrappedInt(beginNodeId + iInc + iInc*i,
+                                          totalCount, reverse).toInt();
             if(remove) {
                 removeNode(nodeId, false);
                 totalCount--;
+                if(reverse) beginNodeId--;
+                else endNodeId--;
             } else {
                 edited->actionDemoteToDissolved(nodeId, false);
             }
         }
     } else if(replaceCount > currentCount) {
-        const int newCount = replaceCount - currentCount;;
-        const int nextId = (beginNodeId + iInc) % totalCount;
+        const int newCount = replaceCount - currentCount;
+        const int prevId = beginNodeId;
+        const int nextId = WrappedInt(beginNodeId + iInc,
+                                      totalCount, reverse).toInt();
         for(int i = 0; i < newCount; i++) {
-            insertNodeBetween(beginNodeId, nextId, 0.5);
+            if(reverse) insertNodeBetween(nextId, prevId, 0.5);
+            else insertNodeBetween(prevId, nextId, 0.5);
             totalCount++;
+            if(reverse) beginNodeId++;
+            else endNodeId++;
             edited->actionPromoteDissolvedNodeToNormal(nextId);
         }
     }
 
     int skipped = 0;
     for(int i = 0; i < replaceCount + skipped; i++) {
-        int nodeId = (beginNodeId + iInc + iInc*i) % totalCount;
-        if(nodeId < 0) nodeId += totalCount;a
+        const int nodeId = WrappedInt(beginNodeId + iInc + iInc*i,
+                                      totalCount, reverse).toInt();
         const auto node = edited->getNodePtr(nodeId);
         if(node->isDissolved()) {
             skipped++;
@@ -408,8 +499,13 @@ void SmartPathAnimator::actionReplaceSegments(
         const int segId = i - skipped;
         const auto& seg = with.at(segId);
         const auto& nextSeg = with.at(segId + 1);
-        edited->actionSetNormalNodeValues(nodeId, seg.c2(),
-                                          seg.p3(), nextSeg.c1());
+        const QPointF c0 = reverse ? nextSeg.c1() : seg.c2();
+        const QPointF p1 = seg.p3();
+        const QPointF c2 = reverse ? seg.c2() : nextSeg.c1();
+
+        const NormalNodeData values(true, true, CtrlsMode::corner, c0, p1, c2);
+
+        edited->actionSetNormalNodeValues(nodeId, values);
     }
 
     if(changeAll) {
