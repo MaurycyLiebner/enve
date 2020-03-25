@@ -413,14 +413,14 @@ QVector<int> replaceNodeIds(const int count1, const int count2) {
     result.reserve(min);
     for(int i = 0; i < min; i++) {
         const qreal t = (1. + i)/(min + 1.);
-        const bool secondHalf = t > 0.5;
-        qreal targetF = (max - 1)*(secondHalf ? 1 - t : t);
+        qreal targetF = (max - 1)*t;
         int target;
         if(isInteger4Dec(targetF) || isZero4Dec(t - 0.5)) {
             target = qRound(targetF);
-        } else {
+        } else if(t < 0.5) {
             target = qFloor(targetF);
-            if(secondHalf) target = max - 1 - target;
+        } else {
+            target = qCeil(targetF);
         }
         result << target;
     }
@@ -434,19 +434,19 @@ void SmartPathAnimator::actionReplaceSegments(
 
     prp_pushUndoRedoName("Replace Nodes");
 
-    const auto edit = getCurrentlyEdited();
-
     prp_startTransform();
+
+    const auto edit = getCurrentlyEdited();
 
     const bool reverse = endNodeId < beginNodeId;
 //    const bool close = reverse && !isClosed();
     int totalCount = edit->getNodeCount();
-    const int currentCount = reverse ? beginNodeId - endNodeId - 1 :
-                                       endNodeId - beginNodeId - 1;
-    const int replaceCount = with.count() - 1;
-    const bool changeAll = replaceCount != currentCount;
+    const int oldCount = reverse ? beginNodeId - endNodeId - 1 :
+                                   endNodeId - beginNodeId - 1;
+    const int newCount = with.count() - 1;
+    const bool changeAll = newCount != oldCount;
 
-    const auto replaceIds = replaceNodeIds(currentCount, replaceCount);
+    const auto replaceIds = replaceNodeIds(oldCount, newCount);
 
     const auto& keys = anim_getKeys();
     if(changeAll) {
@@ -480,10 +480,10 @@ void SmartPathAnimator::actionReplaceSegments(
         }
     }
 
-    if(replaceCount < currentCount) {
+    if(newCount < oldCount) {
         const bool remove = !anim_hasKeys();
         if(remove) {
-            const int removeCount = currentCount - replaceCount;
+            const int removeCount = oldCount - newCount;
             for(int i = 0; i < removeCount; i++) {
                 const int idValue = beginNodeId + iInc;
                 const int nodeId = WrappedInt(idValue, totalCount, reverse).toInt();
@@ -494,7 +494,7 @@ void SmartPathAnimator::actionReplaceSegments(
             }
         } else {
             QVector<int> removeIds;
-            for(int i = 0; i < replaceCount; i++) {
+            for(int i = 0; i < oldCount; i++) {
                 if(replaceIds.contains(i)) continue;
                 removeIds << i;
             }
@@ -504,9 +504,9 @@ void SmartPathAnimator::actionReplaceSegments(
                 edited->actionDemoteToDissolved(nodeId, false);
             }
         }
-    } else if(replaceCount > currentCount) {
+    } else if(newCount > oldCount) {
         QVector<int> insertIds;
-        for(int i = 0; i < replaceCount; i++) {
+        for(int i = 0; i < newCount; i++) {
             if(replaceIds.contains(i)) continue;
             insertIds << i;
         }
@@ -527,7 +527,7 @@ void SmartPathAnimator::actionReplaceSegments(
     }
 
     int skipped = 0;
-    for(int i = 0; i < replaceCount + skipped; i++) {
+    for(int i = 0; i < newCount + skipped; i++) {
         const int nodeId = WrappedInt(beginNodeId + iInc + iInc*i,
                                       totalCount, reverse).toInt();
         const auto node = edited->getNodePtr(nodeId);
