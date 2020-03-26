@@ -495,12 +495,15 @@ void SmartPathAnimator::actionReplaceSegments(
             int prevJ = i;
             for(int j = i + 1; j < insertIds.count(); j++) {
                 if(j == prevJ + 1) count++;
-                prevJ = i;
+                else break;
+                prevJ = j;
             }
             qreal lastAbs = 0;
             for(int k = 0; k < count; k++) {
                 const qreal abs = qreal(k + 1)/(count + 1);
-                insertTs << gMapTToFragment(lastAbs, 1, abs);
+                qreal t = gMapTToFragment(lastAbs, 1, abs);
+                if(reverse) t = 1 - t;
+                insertTs << t;
                 lastAbs = abs;
             }
             i += count - 1;
