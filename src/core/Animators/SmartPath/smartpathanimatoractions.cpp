@@ -385,6 +385,17 @@ void SmartPathAnimator::actionReplaceSegments(
             sum += minDist;
             count++;
         }
+        for(qreal t2 = 0.1; t2 < 0.95; t2 += 0.1) {
+            const QPointF oldPos = oldSegs.posAtLength(t2*len2);
+            qreal minDist = 100000;
+            for(qreal t1 = 0; t1 < 1.01; t1 += 0.05) {
+                const QPointF pos = withSegs.posAtLength(t1*len1);
+                const qreal dist = pointToLen(oldPos - pos);
+                if(dist < minDist) minDist = dist;
+            }
+            sum += minDist;
+            count++;
+        }
 
         if(count == 0) return 0.;
         return sum/count;
