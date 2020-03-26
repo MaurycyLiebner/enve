@@ -144,6 +144,8 @@ public:
     { return mNodesList; }
 
     bool isClockwise() const;
+
+    NodeList mid(const int first, const int last) const;
 private:
     int insertNodeBetween(const int prevId, const int nextId,
                           const Node &nodeBlueprint);

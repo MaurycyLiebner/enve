@@ -32,6 +32,15 @@ public:
     Node* operator[](const int i) const
     { return mNodes[i]; }
 
+    typedef QList<stdsptr<Node>>::const_iterator const_iterator;
+    typedef QList<stdsptr<Node>>::iterator iterator;
+
+    const_iterator begin() const
+    { return mNodes.begin(); }
+
+    const_iterator end() const
+    { return mNodes.end(); }
+
     Node* at(const int i) const
     { return mNodes[i]; }
 
@@ -107,6 +116,8 @@ public:
 
     void normalize();
     Q_REQUIRED_RESULT NodeList normalized() const;
+
+    NodeList mid(int first, int last) const;
 protected:
     void append(NodeList&& other);
     void prepend(NodeList&& other);

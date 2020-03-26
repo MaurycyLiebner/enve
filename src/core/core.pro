@@ -370,6 +370,7 @@ SOURCES += \
     MovablePoints/pathpointshandler.cpp \
     canvasbase.cpp \
     typemenu.cpp \
+    wrappedint.cpp \
     zipfileloader.cpp \
     zipfilesaver.cpp
 
@@ -699,6 +700,7 @@ HEADERS += \
     canvasbase.h \
     typemenu.h \
     pointtypemenu.h \
+    wrappedint.h \
     zipfileloader.h \
     zipfilesaver.h
 

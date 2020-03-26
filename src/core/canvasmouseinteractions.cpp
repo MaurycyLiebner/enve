@@ -428,25 +428,9 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
             if(beginNode && endNode && beginNode != endNode) {
                 const auto beginParent = beginNode->getTargetAnimator();
                 const auto endParent = endNode->getTargetAnimator();
-                const bool reverse = beginEndPoint && endEndPoint ?
-                                         endNode->hasNextPoint() :
-                                         false; //beginNode->getNodeId() > endNode->getNodeId();
-                if(reverse) {
-                    std::reverse(fitted.begin(), fitted.end());
-                    std::for_each(fitted.begin(), fitted.end(),
-                                  [](qCubicSegment2D& seg) { seg.reverse(); });
-                }
-                const auto orderedBegin = reverse ? endNode : beginNode;
-                const auto orderedEnd = reverse ? beginNode : endNode;
-                if(beginEndPoint && endEndPoint) {
-                    const auto& lastSeg = fitted.last();
-                    const auto mid = fitted.mid(0, fitted.count() - 1);
+                const bool sampeParent = beginParent == endParent;
 
-                    const auto last = drawPathAppend(mid, orderedEnd);
-                    last->moveC2ToAbsPos(lastSeg.c1());
-                    orderedBegin->moveC0ToAbsPos(lastSeg.c2());
-                    last->actionConnectToNormalPoint(orderedBegin);
-                } else if(beginParent == endParent) {
+                if(sampeParent) {
                     const auto transform = beginNode->getTransform();
                     const auto matrix = transform->getCurrentTransform();
                     const auto invMatrix = matrix.inverted();
@@ -457,6 +441,24 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
                     const int beginId = beginNode->getNodeId();
                     const int endId = endNode->getNodeId();
                     beginParent->actionReplaceSegments(beginId, endId, fitted);
+                } else if(beginEndPoint && endEndPoint) {
+                    const bool reverse = endNode->hasNextPoint();
+
+                    const auto orderedBegin = reverse ? endNode : beginNode;
+                    const auto orderedEnd = reverse ? beginNode : endNode;
+
+                    if(orderedEnd->hasNextPoint() || !endNode->hasNextPoint()) {
+                        std::reverse(fitted.begin(), fitted.end());
+                        std::for_each(fitted.begin(), fitted.end(),
+                                      [](qCubicSegment2D& seg) { seg.reverse(); });
+                    }
+
+                    const auto& lastSeg = fitted.last();
+                    const auto mid = fitted.mid(0, fitted.count() - 1);
+                    const auto last = drawPathAppend(mid, orderedEnd);
+                    last->moveC2ToAbsPos(lastSeg.c1());
+                    orderedBegin->moveC0ToAbsPos(lastSeg.c2());
+                    last->actionConnectToNormalPoint(orderedBegin);
                 } else createNew = true;
             } else if(beginNode && beginEndPoint) {
                 drawPathAppend(fitted, beginNode);

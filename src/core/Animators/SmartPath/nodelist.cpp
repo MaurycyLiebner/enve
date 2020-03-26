@@ -19,6 +19,7 @@
 #include "pointhelpers.h"
 #include "exceptions.h"
 #include "smartPointers/ememory.h"
+#include "wrappedint.h"
 
 NodeList::NodeList(ListOfNodes &&other) : mNodes(std::move(other)) {}
 
@@ -88,6 +89,20 @@ void NodeList::normalize() {
 NodeList NodeList::normalized() const {
     NodeList result = *this;
     result.normalize();
+    return result;
+}
+
+NodeList NodeList::mid(int first, int last) const {
+    first = WrappedInt(first, count(), false).toInt();
+    last = WrappedInt(last, count(), false).toInt();
+    if(first == last) return *this;
+    NodeList result;
+    for(WrappedInt i(first, count(), false);; i++) {
+        const int id = i.toInt();
+        result.appendNode(*at(id));
+        if(id == last) break;
+    }
+
     return result;
 }
 

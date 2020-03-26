@@ -362,6 +362,10 @@ bool SmartPath::isClockwise() const {
     return sum > 0;
 }
 
+NodeList SmartPath::mid(const int first, const int last) const {
+    return mNodesList.mid(first, last);
+}
+
 eWriteStream &operator<<(eWriteStream &dst, const SmartPath &path) {
     path.write(dst);
     return dst;

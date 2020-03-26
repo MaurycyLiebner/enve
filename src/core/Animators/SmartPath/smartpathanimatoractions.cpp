@@ -17,6 +17,7 @@
 #include "smartpathanimator.h"
 
 #include "node.h"
+#include "wrappedint.h"
 
 void SmartPathAnimator::removeNode(const int nodeId, const bool approx) {
     const auto& keys = anim_getKeys();
@@ -330,82 +331,6 @@ void SmartPathAnimator::actionPrependMoveAllFrom(SmartPathAnimator * const other
     other->prp_afterWholeInfluenceRangeChanged();
 }
 
-class WrappedInt {
-public:
-    WrappedInt(const int value, const int wrapValue, const bool reverse) :
-        mSign(reverse ? -1 : 1), mWrapVal(wrapValue) {
-        setValue(value);
-    }
-
-    void setValue(const int value) {
-        if(value < 0) {
-            mVal = mWrapVal + value % mWrapVal;
-        } else {
-            mVal = value % mWrapVal;
-        }
-    }
-
-    WrappedInt& operator+=(const int val) {
-        setValue(mVal + mSign*val);
-        return *this;
-    }
-
-    WrappedInt& operator-=(const int val) {
-        setValue(mVal - mSign*val);
-        return *this;
-    }
-
-    WrappedInt& operator++() {
-        setValue(mVal + mSign);
-        return *this;
-    }
-
-    WrappedInt& operator--() {
-        setValue(mVal - mSign);
-        return *this;
-    }
-
-    WrappedInt operator++(int) {
-        WrappedInt result = *this;
-        setValue(mVal + mSign);
-        return result;
-    }
-
-    WrappedInt operator--(int) {
-        WrappedInt result = *this;
-        setValue(mVal - mSign);
-        return result;
-    }
-
-    WrappedInt operator-(const int val) {
-        return WrappedInt(mVal - val, mWrapVal, mSign == -1);
-    }
-
-    WrappedInt operator+(const int val) {
-        return WrappedInt(mVal + val, mWrapVal, mSign == -1);
-    }
-
-    bool operator==(const int val) const {
-        return mVal == val;
-    }
-
-    bool operator!=(const int val) const {
-        return mVal != val;
-    }
-
-    void setWrapValue(const int wrapVal) {
-        mWrapVal = wrapVal;
-        setValue(mVal);
-    }
-
-    int toInt() const { return mVal; }
-    bool isReverse() const { return mSign == -1; }
-private:
-    const int mSign;
-    int mVal;
-    int mWrapVal;
-};
-
 QVector<int> replaceNodeIds(const int count1, const int count2) {
     const int min = qMin(count1, count2);
     const int max = qMax(count1, count2);
@@ -430,6 +355,60 @@ QVector<int> replaceNodeIds(const int count1, const int count2) {
 void SmartPathAnimator::actionReplaceSegments(
         int beginNodeId, int endNodeId,
         const QList<qCubicSegment2D>& with) {
+    const auto edit = getCurrentlyEdited();
+    const auto forward = edit->mid(beginNodeId, endNodeId);
+    const auto backward = edit->mid(endNodeId, beginNodeId);
+
+    CubicList withSegs(with);
+
+    const auto calcAvgDist = [&withSegs](const NodeList& to) {
+        QList<qCubicSegment2D> oldSegList;
+        for(int i = 0; i < to.count() - 1; i++) {
+            const auto iNode = to.at(i);
+            const auto nextNode = to.at(i + 1);
+            oldSegList << qCubicSegment2D{iNode->p1(), iNode->c2(),
+                                          nextNode->c0(), nextNode->p1()};
+        }
+        CubicList oldSegs(oldSegList);
+        qreal sum = 0;
+        int count = 0;
+        const qreal len1 = withSegs.getTotalLength();
+        const qreal len2 = oldSegs.getTotalLength();
+        for(qreal t1 = 0.1; t1 < 0.95; t1 += 0.1) {
+            const QPointF pos = withSegs.posAtLength(t1*len1);
+            qreal minDist = 100000;
+            for(qreal t2 = 0; t2 < 1.01; t2 += 0.05) {
+                const QPointF oldPos = oldSegs.posAtLength(t2*len2);
+                const qreal dist = pointToLen(oldPos - pos);
+                if(dist < minDist) minDist = dist;
+            }
+            sum += minDist;
+            count++;
+        }
+
+        if(count == 0) return 0.;
+        return sum/count;
+    };
+    const qreal forwardDist = calcAvgDist(forward);
+    const qreal backwardDist = calcAvgDist(backward);
+    bool reverse;
+    const bool sameDist = isZero4Dec(forwardDist - backwardDist);
+    if(sameDist) {
+        const bool bConnect = beginNodeId == 0 &&
+                              endNodeId == edit->getNodeCount() - 1;
+        const bool eConnect = beginNodeId == edit->getNodeCount() - 1 &&
+                              endNodeId == 0;
+        reverse = bConnect || (!eConnect && beginNodeId > endNodeId);
+    } else {
+        reverse = forwardDist > backwardDist;
+    }
+    return actionReplaceSegments(beginNodeId, endNodeId, with, reverse);
+}
+
+void SmartPathAnimator::actionReplaceSegments(
+        int beginNodeId, int endNodeId,
+        const QList<qCubicSegment2D>& with,
+        const bool reverse) {
     if(with.isEmpty() || beginNodeId == endNodeId) return;
 
     prp_pushUndoRedoName("Replace Nodes");
@@ -437,12 +416,11 @@ void SmartPathAnimator::actionReplaceSegments(
     prp_startTransform();
 
     const auto edit = getCurrentlyEdited();
-
-    const bool reverse = endNodeId < beginNodeId;
-//    const bool close = reverse && !isClosed();
+    const bool close = !isClosed() && ((endNodeId < beginNodeId && !reverse) ||
+                                       (beginNodeId < endNodeId && reverse));
     int totalCount = edit->getNodeCount();
-    const int oldCount = reverse ? beginNodeId - endNodeId - 1 :
-                                   endNodeId - beginNodeId - 1;
+    const int oldCount = WrappedInt::sCount(beginNodeId, endNodeId,
+                                            totalCount, reverse) - 2;
     const int newCount = with.count() - 1;
     const bool changeAll = newCount != oldCount;
 
@@ -455,7 +433,7 @@ void SmartPathAnimator::actionReplaceSegments(
         }
     }
 
-//    if(close) this->close();
+    if(close) this->close();
 
     const auto& firstSeg = with.first();
     const auto& lastSeg = with.last();
@@ -511,13 +489,17 @@ void SmartPathAnimator::actionReplaceSegments(
             insertIds << i;
         }
         std::sort(insertIds.begin(), insertIds.end());
+        const bool twoEndNodes = (beginNodeId == 0 && reverse) ||
+                                 (endNodeId == 0 && beginNodeId == totalCount - 1 && !reverse);
         for(const int insertId : insertIds) {
             const int prevId = WrappedInt(beginNodeId + iInc*insertId,
                                           totalCount, reverse).toInt();
             const int nextId = WrappedInt(prevId + iInc,
                                           totalCount, reverse).toInt();
-            const int orderedPrevId = qMin(prevId, nextId);
-            const int orderedNextId = qMax(prevId, nextId);
+            int orderedPrevId = qMin(prevId, nextId);
+            int orderedNextId = qMax(prevId, nextId);
+            if(twoEndNodes) std::swap(orderedPrevId, orderedNextId);
+
             insertNodeBetween(orderedPrevId, orderedNextId, 0.5);
             edited->actionPromoteDissolvedNodeToNormal(nextId);
             totalCount++;

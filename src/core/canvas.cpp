@@ -312,12 +312,12 @@ void Canvas::renderSk(SkCanvas * const canvas,
         }
         if(mHoveredPoint_d && mHoveredPoint_d->isSmartNodePoint()) {
             const QPointF pos = mHoveredPoint_d->getAbsolutePos();
-            const qreal r = 0.75*mHoveredPoint_d->getRadius();
+            const qreal r = 0.5*qInvZoom*mHoveredPoint_d->getRadius();
             canvas->drawCircle(pos.x(), pos.y(), r, paint);
         }
         if(mDrawPathFirst) {
             const QPointF pos = mDrawPathFirst->getAbsolutePos();
-            const qreal r = 0.75*mDrawPathFirst->getRadius();
+            const qreal r = 0.5*qInvZoom*mDrawPathFirst->getRadius();
             canvas->drawCircle(pos.x(), pos.y(), r, paint);
         }
     }

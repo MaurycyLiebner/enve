@@ -89,6 +89,9 @@ public:
 
     void actionReplaceSegments(const int beginNodeId, int endNodeId,
                                const QList<qCubicSegment2D>& with);
+    void actionReplaceSegments(const int beginNodeId, int endNodeId,
+                               const QList<qCubicSegment2D>& with,
+                               const bool reverse);
 
     bool hasDetached() const
     { return baseValue().hasDetached(); }
