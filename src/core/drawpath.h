@@ -21,17 +21,35 @@
 
 #include "Segments/cubiclist.h"
 
+enum class ManualDrawPathState {
+    none, drawn, fitted
+};
+
 class DrawPath {
 public:
     DrawPath();
 
     void lineTo(const QPointF& pos);
-    void fit(const int window, const qreal maxError);
+    void smooth(const int window);
+    void fit(const qreal maxError);
     QList<qCubicSegment2D>& getFitted()
     { return mFitted; }
     void clear();
+
+    void addForceSplit(const int id);
+    void removeForceSplit(const int id);
+
+    int nearestSmoothPt(const QPointF& pos, qreal* const dist) const;
+    int nearestForceSplit(const QPointF& pos, qreal* const dist) const;
+
+    const QVector<QPointF>& smoothPts() const
+    { return mSmoothPts; }
+    const QList<int>& forceSplits() const
+    { return mForceSplits; }
 private:
+    QList<int> mForceSplits;
     QList<qCubicSegment2D> mFitted;
+    QVector<QPointF> mSmoothPts;
     QVector<QPointF> mPts;
 };
 

@@ -544,7 +544,8 @@ void SmartPathAnimator::actionReplaceSegments(
         const QPointF p1 = seg.p3();
         const QPointF c2 = reverse ? seg.c2() : nextSeg.c1();
 
-        const NormalNodeData values(true, true, CtrlsMode::corner, c0, p1, c2);
+        const CtrlsMode ctrlsMode = gGuessCtrlsMode(c0, p1, c2, true, true);
+        const NormalNodeData values(true, true, ctrlsMode, c0, p1, c2);
 
         edited->actionSetNormalNodeValues(nodeId, values);
     }

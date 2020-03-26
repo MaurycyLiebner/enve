@@ -130,18 +130,22 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
                 handleMovePathMouseMove(e);
             }
         } else if(mCurrentMode == CanvasMode::drawPath) {
-            mDrawPath.lineTo(e.fPos);
+            const bool manual = mDocument.fDrawPathManual;
+            const bool drawing = mManualDrawPathState == ManualDrawPathState::none;
+            if(!manual || drawing) mDrawPath.lineTo(e.fPos);
             if(mDrawPathFit++ % 3 == 0) {
-                mDrawPath.fit(mDocument.fDrawPathSmooth,
-                              mDocument.fDrawPathMaxError);
-                mDrawPathTmp.reset();
-                const auto& fitted = mDrawPath.getFitted();
-                QPointF moveTo;
-                if(fitted.isEmpty()) moveTo = e.fPos;
-                else moveTo = fitted.last().p3();
-                mDrawPathTmp.moveTo(toSkPoint(moveTo));
-                mDrawPathTmp.lineTo(toSkPoint(e.fPos));
-            } else mDrawPathTmp.lineTo(toSkPoint(e.fPos));
+                mDrawPath.smooth(mDocument.fDrawPathSmooth);
+                if(!manual) {
+                    mDrawPath.fit(mDocument.fDrawPathMaxError);
+                    mDrawPathTmp.reset();
+                    const auto& fitted = mDrawPath.getFitted();
+                    QPointF moveTo;
+                    if(fitted.isEmpty()) moveTo = e.fPos;
+                    else moveTo = fitted.last().p3();
+                    mDrawPathTmp.moveTo(toSkPoint(moveTo));
+                    mDrawPathTmp.lineTo(toSkPoint(e.fPos));
+                }
+            } else if(!manual) mDrawPathTmp.lineTo(toSkPoint(e.fPos));
             updateHoveredPoint(e);
         } else if(mCurrentMode == CanvasMode::pathCreate) {
             handleAddSmartPointMouseMove(e);

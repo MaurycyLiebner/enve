@@ -80,6 +80,7 @@ public:
     SculptTarget fSculptTarget = SculptTarget::position;
     SculptMode fSculptMode = SculptMode::drag;
 
+    bool fDrawPathManual = false;
     int fDrawPathSmooth = 50;
     qreal fDrawPathMaxError = 50;
 

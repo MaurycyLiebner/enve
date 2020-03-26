@@ -14,8 +14,9 @@ typedef std::function<void(const int n, const BezierCurve curve)> BezierHandler;
 namespace FitCurves {
     extern void FitCurve(QVector<QPointF>& data, const double error,
                          const BezierHandler& bezierHandler);
-    extern void FitCurve(Point2* const d, const int nPts, const double error,
-                         const BezierHandler& bezierHandler);
+    extern void FitCurve(QVector<QPointF>& data, const double error,
+                         const BezierHandler& bezierHandler,
+                         const int min, const int max);
 
 };
 

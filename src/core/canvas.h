@@ -659,6 +659,8 @@ private:
     void sculptRelease(const QPointF& pos, const qreal pressure);
     void sculptCancel();
 
+    void drawPathFinish(const qreal invScale);
+
     qreal mLastDRot = 0;
     int mRotHalfCycles = 0;
     TransformMode mTransMode = TransformMode::none;
@@ -707,6 +709,7 @@ protected:
     stdptr<SmartNodePoint> mLastEndPoint;
 
     stdptr<MovablePoint> mDrawPathFirst;
+    ManualDrawPathState mManualDrawPathState = ManualDrawPathState::none;
     int mDrawPathFit = 0;
     SkPath mDrawPathTmp;
     DrawPath mDrawPath;

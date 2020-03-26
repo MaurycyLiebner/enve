@@ -327,7 +327,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mSculptModeTargetSeperator = mToolBar->addSeparator();
     setupSculptTargetButtons(iconsDir);
     setupSculptValueSpins();
-    setupDrawPathSpins();
+    setupDrawPathSpins(iconsDir);
 
     mColorLabel->setObjectName("colorLabel");
 
@@ -593,7 +593,19 @@ void TimelineDockWidget::setupSculptValueSpins() {
     mOpacityAct = addSlider("opacity", mOpacity, mToolBar);
 }
 
-void TimelineDockWidget::setupDrawPathSpins() {
+void TimelineDockWidget::setupDrawPathSpins(const QString& iconsDir) {
+    mDrawPathAuto = SwitchButton::sCreate2Switch(
+                iconsDir + "/drawPathAutoUnchecked.png",
+                iconsDir + "/drawPathAutoChecked.png",
+                gSingleLineTooltip("Manual/Automatic Fitting"), this);
+    mDrawPathAuto->toggle();
+    connect(mDrawPathAuto, &SwitchButton::toggled,
+            &mDocument, [this](const int i) {
+        mDocument.fDrawPathManual = i == 0;
+        mDrawPathMaxErrorAct->setDisabled(i == 0);
+    });
+    mDrawPathAutoAct = mToolBar->addWidget(mDrawPathAuto);
+
     mDrawPathMaxError = new QDoubleSlider(1, 200, 1, this);
     mDrawPathMaxError->setNumberDecimals(0);
     mDrawPathMaxError->setDisplayedValue(mDocument.fDrawPathMaxError);
@@ -807,6 +819,7 @@ void TimelineDockWidget::updateButtonsVisibility(const CanvasMode mode) {
     mOpacityAct->setVisible(sculptMode);
 
     const bool drawPathMode = mode == CanvasMode::drawPath;
+    mDrawPathAutoAct->setVisible(drawPathMode);
     mDrawPathMaxErrorAct->setVisible(drawPathMode);
     mDrawPathSmoothAct->setVisible(drawPathMode);
 }

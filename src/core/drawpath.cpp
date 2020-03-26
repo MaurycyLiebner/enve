@@ -27,7 +27,7 @@ void DrawPath::lineTo(const QPointF& pos) {
         const QPointF& lastPos = mPts.last();
         const QPointF dPos = pos - lastPos;
         const qreal dist = pointToLen(dPos);
-        const int n = qFloor(dist/2);
+        const int n = qFloor(dist/3);
         const qreal div = 1./(1 + n);
         for(int i = 1; i <= n; i++) {
             mPts.append(lastPos + i*dPos*div);
@@ -42,11 +42,14 @@ QPointF operator/(const QPointF& p1, const QPointF& p2) {
     return {p1.x()/p2.x(), p1.y()/p2.y()};
 }
 
-void DrawPath::fit(const int window, const qreal maxError) {
+void DrawPath::smooth(const int window) {
+    mSmoothPts.clear();
+    SmoothCurves::movingAverage(mPts, mSmoothPts, true, true, window);
+}
+
+void DrawPath::fit(const qreal maxError) {
     mFitted.clear();
-    QVector<QPointF> smooth;
-    SmoothCurves::movingAverage(mPts, smooth, true, true, window);
-    if(smooth.count() < 2) return;
+    if(mSmoothPts.count() < 2) return;
 
     const auto adder = [this](const int n, const BezierCurve curve) {
         Q_UNUSED(n)
@@ -58,10 +61,59 @@ void DrawPath::fit(const int window, const qreal maxError) {
 
         mFitted.append(qCubicSegment2D{p0, c1, c2, p3});
     };
-    FitCurves::FitCurve(smooth, maxError, adder);
+    std::sort(mForceSplits.begin(), mForceSplits.end());
+    int min = 0;
+    for(int i = 0; i < mForceSplits.count() + 1; i++) {
+        const bool last = i == mForceSplits.count();
+        int max = last ? mSmoothPts.count() - 1 :
+                         mForceSplits.at(i);
+        FitCurves::FitCurve(mSmoothPts, maxError, adder, min, max);
+        min = max;
+    }
 }
 
 void DrawPath::clear() {
+    mForceSplits.clear();
+    mSmoothPts.clear();
     mPts.clear();
     mFitted.clear();
+}
+
+void DrawPath::addForceSplit(const int id) {
+    removeForceSplit(id);
+    mForceSplits << id;
+}
+
+void DrawPath::removeForceSplit(const int id) {
+    mForceSplits.removeOne(id);
+}
+
+int DrawPath::nearestSmoothPt(const QPointF& pos, qreal* const dist) const {
+    int nearestSmoothId = -1;
+    qreal minDist = DBL_MAX;
+    for(int i = 0; i < mSmoothPts.count(); i++) {
+        const auto& pt = mSmoothPts.at(i);
+        const qreal dist = pointToLen(pos - pt);
+        if(dist < minDist) {
+            minDist = dist;
+            nearestSmoothId = i;
+        }
+    }
+    if(dist) *dist = minDist;
+    return nearestSmoothId;
+}
+
+int DrawPath::nearestForceSplit(const QPointF& pos, qreal* const dist) const {
+    int nearestSplitId = -1;
+    qreal minDist = DBL_MAX;
+    for(const int split : mForceSplits) {
+        const QPointF& splitPos = mSmoothPts.at(split);
+        const qreal dist = pointToLen(pos - splitPos);
+        if(dist < minDist) {
+            minDist = dist;
+            nearestSplitId = split;
+        }
+    }
+    if(dist) *dist = minDist;
+    return nearestSplitId;
 }

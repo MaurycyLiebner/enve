@@ -123,24 +123,34 @@ static	Vector2		V2SubII(const Vector2& a, const Vector2& b);
  *  FitCurve :
  *  	Fit a Bezier curve to a set of digitized points
  */
-void FitCurves::FitCurve(QVector<QPointF>& data, const double error,
-                         const BezierHandler& bezierHandler)
-{
-    const auto pt2Data = reinterpret_cast<Point2*>(data.data());
-    FitCurve(pt2Data, data.count(), error, bezierHandler);
-}
 
-void FitCurves::FitCurve(Point2* const d, const int nPts, const double error,
-                         const BezierHandler& bezierHandler)
+void FitCurve(Point2* const d, const double error,
+              const BezierHandler& bezierHandler,
+              const int min, const int max)
 //    Point2	*d;			/*  Array of digitized points	*/
 //    int		nPts;		/*  Number of digitized points	*/
 //    double	error;		/*  User-defined error squared	*/
 {
     Vector2	tHat1, tHat2;	/*  Unit tangent vectors at endpoints */
 
-    tHat1 = ComputeLeftTangent(d, 0);
-    tHat2 = ComputeRightTangent(d, nPts - 1);
-    FitCubic(d, 0, nPts - 1, tHat1, tHat2, error, bezierHandler);
+    tHat1 = ComputeLeftTangent(d, min);
+    tHat2 = ComputeRightTangent(d, max);
+    FitCubic(d, min, max, tHat1, tHat2, error, bezierHandler);
+}
+
+void FitCurves::FitCurve(QVector<QPointF>& data, const double error,
+                         const BezierHandler& bezierHandler)
+{
+    const auto pt2Data = reinterpret_cast<Point2*>(data.data());
+    FitCurve(pt2Data, error, bezierHandler, 0, data.count() - 1);
+}
+
+void FitCurves::FitCurve(QVector<QPointF>& data, const double error,
+                         const BezierHandler& bezierHandler,
+                         const int min, const int max)
+{
+    const auto pt2Data = reinterpret_cast<Point2*>(data.data());
+    FitCurve(pt2Data, error, bezierHandler, min, max);
 }
 
 
@@ -166,7 +176,7 @@ static void FitCubic(Point2* const d,
     int		splitPoint;	/*  Point to split point set at	 */
     int		nPts;		/*  Number of points in subset  */
     double	iterationError; /*Error below which you try iterating  */
-    int		maxIterations = 4; /*  Max times to try iterating  */
+    int		maxIterations = 8; /*  Max times to try iterating  */
     Vector2	tHatCenter;   	/* Unit tangent vector at splitPoint */
     int		i;
 

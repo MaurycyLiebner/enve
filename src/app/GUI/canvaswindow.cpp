@@ -545,16 +545,19 @@ bool CanvasWindow::KFT_keyPressEvent(QKeyEvent *event) {
     } if(handleSelectAllKeyPress(event)) return true;
     if(handleShiftKeysKeyPress(event)) return true;
 
+    const auto canvasMode = mDocument.fCanvasMode;
     if(e.fKey == Qt::Key_I && !isMouseGrabber()) {
         mActions.invertSelectionAction();
     } else if(e.fKey == Qt::Key_W) {
-        const auto canvasMode = mDocument.fCanvasMode;
         if(canvasMode == CanvasMode::paint) mDocument.incBrushRadius();
         else mDocument.incSculptBrushRadius();
     } else if(e.fKey == Qt::Key_Q) {
-        const auto canvasMode = mDocument.fCanvasMode;
         if(canvasMode == CanvasMode::paint) mDocument.decBrushRadius();
         else mDocument.decSculptBrushRadius();
+    } else if((e.fKey == Qt::Key_Enter || e.fKey == Qt::Key_Return) &&
+              canvasMode == CanvasMode::drawPath) {
+        const bool manual = mDocument.fDrawPathManual;
+        if(manual) mCurrentCanvas->drawPathFinish(1/e.fScale);
     } else return false;
 
     return true;
