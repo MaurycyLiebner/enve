@@ -706,6 +706,7 @@ protected:
 
     stdptr<SmartNodePoint> mLastEndPoint;
 
+    stdptr<MovablePoint> mDrawPathFirst;
     int mDrawPathFit = 0;
     SkPath mDrawPathTmp;
     DrawPath mDrawPath;

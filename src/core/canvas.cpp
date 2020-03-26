@@ -310,6 +310,16 @@ void Canvas::renderSk(SkCanvas * const canvas,
             SkiaHelpers::drawOutlineOverlay(canvas, mDrawPathTmp,
                                             invZoom, SK_ColorCYAN);
         }
+        if(mHoveredPoint_d && mHoveredPoint_d->isSmartNodePoint()) {
+            const QPointF pos = mHoveredPoint_d->getAbsolutePos();
+            const qreal r = 0.75*mHoveredPoint_d->getRadius();
+            canvas->drawCircle(pos.x(), pos.y(), r, paint);
+        }
+        if(mDrawPathFirst) {
+            const QPointF pos = mDrawPathFirst->getAbsolutePos();
+            const qreal r = 0.75*mDrawPathFirst->getRadius();
+            canvas->drawCircle(pos.x(), pos.y(), r, paint);
+        }
     }
 
     if(mPaintTarget.isValid()) {

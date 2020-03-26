@@ -142,6 +142,7 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
                 mDrawPathTmp.moveTo(toSkPoint(moveTo));
                 mDrawPathTmp.lineTo(toSkPoint(e.fPos));
             } else mDrawPathTmp.lineTo(toSkPoint(e.fPos));
+            updateHoveredPoint(e);
         } else if(mCurrentMode == CanvasMode::pathCreate) {
             handleAddSmartPointMouseMove(e);
         } else if(mCurrentMode == CanvasMode::circleCreate) {

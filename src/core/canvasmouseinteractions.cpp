@@ -202,6 +202,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     } else if(mCurrentMode == CanvasMode::pointTransform) {
         handleMovePointMousePressEvent(e);
     } else if(mCurrentMode == CanvasMode::drawPath) {
+        mDrawPathFirst = getPointAtAbsPos(e.fPos, mCurrentMode, invScale);
         mDrawPathFit = 0;
         mDrawPath.clear();
         mDrawPath.lineTo(e.fPos);
@@ -408,6 +409,7 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
     } else if(mCurrentMode == CanvasMode::pathCreate) {
         handleAddSmartPointMouseRelease(e);
     } else if(mCurrentMode == CanvasMode::drawPath) {
+        mDrawPathFirst.clear();
         mDrawPath.fit(mDocument.fDrawPathSmooth,
                       mDocument.fDrawPathMaxError);
 
