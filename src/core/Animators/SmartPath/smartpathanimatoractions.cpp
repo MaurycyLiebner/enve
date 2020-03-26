@@ -488,10 +488,30 @@ void SmartPathAnimator::actionReplaceSegments(
             if(replaceIds.contains(i)) continue;
             insertIds << i;
         }
+        QVector<qreal> insertTs;
+        insertTs.reserve(insertIds.count());
+        for(int i = 0; i < insertIds.count(); i++) {
+            int count = 1;
+            int prevJ = i;
+            for(int j = i + 1; j < insertIds.count(); j++) {
+                if(j == prevJ + 1) count++;
+                prevJ = i;
+            }
+            qreal lastAbs = 0;
+            for(int k = 0; k < count; k++) {
+                const qreal abs = qreal(k + 1)/(count + 1);
+                insertTs << gMapTToFragment(lastAbs, 1, abs);
+                lastAbs = abs;
+            }
+            i += count - 1;
+        }
+
         std::sort(insertIds.begin(), insertIds.end());
         const bool twoEndNodes = (beginNodeId == 0 && reverse) ||
                                  (endNodeId == 0 && beginNodeId == totalCount - 1 && !reverse);
-        for(const int insertId : insertIds) {
+        for(int i = 0; i < insertIds.count(); i++) {
+            const int insertId = insertIds.at(i);
+            const qreal insertT = insertTs.at(i);
             const int prevId = WrappedInt(beginNodeId + iInc*insertId,
                                           totalCount, reverse).toInt();
             const int nextId = WrappedInt(prevId + iInc,
@@ -500,7 +520,7 @@ void SmartPathAnimator::actionReplaceSegments(
             int orderedNextId = qMax(prevId, nextId);
             if(twoEndNodes) std::swap(orderedPrevId, orderedNextId);
 
-            insertNodeBetween(orderedPrevId, orderedNextId, 0.5);
+            insertNodeBetween(orderedPrevId, orderedNextId, insertT);
             edited->actionPromoteDissolvedNodeToNormal(nextId);
             totalCount++;
             if(beginNodeId > orderedPrevId) beginNodeId++;
