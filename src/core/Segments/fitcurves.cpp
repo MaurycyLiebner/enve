@@ -176,7 +176,7 @@ static void FitCubic(Point2* const d,
     int		splitPoint;	/*  Point to split point set at	 */
     int		nPts;		/*  Number of points in subset  */
     double	iterationError; /*Error below which you try iterating  */
-    int		maxIterations = 8; /*  Max times to try iterating  */
+    int		maxIterations = 100; /*  Max times to try iterating  */
     Vector2	tHatCenter;   	/* Unit tangent vector at splitPoint */
     int		i;
 
