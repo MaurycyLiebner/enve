@@ -82,12 +82,18 @@ Vector2 *V2Add(Vector2* const a,
 
 /* Forward declarations */
 
-static	void		FitCubic(Point2* const d,
-                             const int first, const int last,
-                             Vector2 tHat1,
-                             Vector2 tHat2,
-                             const double error,
-                             const BezierHandler& bezierHandler);
+static double FitCubic(Point2* const d,
+                       const int first, const int last,
+                       const double error,
+                       const BezierHandler& bezierHandler,
+                       const bool split);
+static	double FitCubic(Point2* const d,
+                        const int first, const int last,
+                        Vector2 tHat1,
+                        Vector2 tHat2,
+                        const double error,
+                        const BezierHandler& bezierHandler,
+                        const bool split);
 static	double		*Reparameterize(Point2* const d,
                                     const int first, const int last,
                                     double* const u,
@@ -126,31 +132,41 @@ static	Vector2		V2SubII(const Vector2& a, const Vector2& b);
 
 void FitCurve(Point2* const d, const double error,
               const BezierHandler& bezierHandler,
-              const int min, const int max)
+              const int min, const int max,
+              const bool useTangents,
+              const bool split)
 //    Point2	*d;			/*  Array of digitized points	*/
 //    int		nPts;		/*  Number of digitized points	*/
 //    double	error;		/*  User-defined error squared	*/
 {
-    Vector2	tHat1, tHat2;	/*  Unit tangent vectors at endpoints */
+    if(useTangents) {
+        Vector2	tHat1, tHat2;	/*  Unit tangent vectors at endpoints */
 
-    tHat1 = ComputeLeftTangent(d, min);
-    tHat2 = ComputeRightTangent(d, max);
-    FitCubic(d, min, max, tHat1, tHat2, error, bezierHandler);
-}
-
-void FitCurves::FitCurve(QVector<QPointF>& data, const double error,
-                         const BezierHandler& bezierHandler)
-{
-    const auto pt2Data = reinterpret_cast<Point2*>(data.data());
-    FitCurve(pt2Data, error, bezierHandler, 0, data.count() - 1);
+        tHat1 = ComputeLeftTangent(d, min);
+        tHat2 = ComputeRightTangent(d, max);
+        FitCubic(d, min, max, tHat1, tHat2, error, bezierHandler, split);
+    } else {
+        FitCubic(d, min, max, error, bezierHandler, split);
+    }
 }
 
 void FitCurves::FitCurve(QVector<QPointF>& data, const double error,
                          const BezierHandler& bezierHandler,
-                         const int min, const int max)
+                         const bool useTangents,
+                         const bool split)
 {
     const auto pt2Data = reinterpret_cast<Point2*>(data.data());
-    FitCurve(pt2Data, error, bezierHandler, min, max);
+    FitCurve(pt2Data, error, bezierHandler, 0, data.count() - 1, useTangents, split);
+}
+
+void FitCurves::FitCurve(QVector<QPointF>& data, const double error,
+                         const BezierHandler& bezierHandler,
+                         const int min, const int max,
+                         const bool useTangents,
+                         const bool split)
+{
+    const auto pt2Data = reinterpret_cast<Point2*>(data.data());
+    FitCurve(pt2Data, error, bezierHandler, min, max, useTangents, split);
 }
 
 
@@ -158,12 +174,16 @@ void FitCurves::FitCurve(QVector<QPointF>& data, const double error,
  *  FitCubic :
  *  	Fit a Bezier curve to a (sub)set of digitized points
  */
-static void FitCubic(Point2* const d,
-                     const int first, const int last,
-                     Vector2 tHat1,
-                     Vector2 tHat2,
-                     const double error,
-                     const BezierHandler& bezierHandler)
+
+
+static double FitCubic(Point2* const d,
+                       const int first, const int last,
+                       Vector2 tHat1,
+                       Vector2 tHat2,
+                       const double error,
+                       const BezierHandler& bezierHandler,
+                       const bool split,
+                       int& splitPoint)
 //    Point2	*d;			/*  Array of digitized points */
 //    int		first, last;	/* Indices of first and last pts in region */
 //    Vector2	tHat1, tHat2;	/* Unit tangent vectors at endpoints */
@@ -173,10 +193,9 @@ static void FitCubic(Point2* const d,
     double	*u;		/*  Parameter values for point  */
     double	*uPrime;	/*  Improved parameter values */
     double	maxError;	/*  Maximum fitting error	 */
-    int		splitPoint;	/*  Point to split point set at	 */
     int		nPts;		/*  Number of points in subset  */
     double	iterationError; /*Error below which you try iterating  */
-    int		maxIterations = 100; /*  Max times to try iterating  */
+    int		maxIterations = 8; /*  Max times to try iterating  */
     Vector2	tHatCenter;   	/* Unit tangent vector at splitPoint */
     int		i;
 
@@ -194,7 +213,7 @@ static void FitCubic(Point2* const d,
         V2Add(&bezCurve[3], V2Scale(&tHat2, dist), &bezCurve[2]);
         bezierHandler(3, bezCurve);
         free((void *)bezCurve);
-        return;
+        return 0;
     }
 
     /*  Parameterize points, and attempt to fit curve */
@@ -203,42 +222,125 @@ static void FitCubic(Point2* const d,
 
     /*  Find max deviation of points to fitted curve */
     maxError = ComputeMaxError(d, first, last, bezCurve, u, &splitPoint);
-    if (maxError < error) {
-        bezierHandler(3, bezCurve);
-        free((void *)u);
-        free((void *)bezCurve);
-        return;
-    }
-
 
     /*  If error not too large, try some reparameterization  */
     /*  and iteration */
-    if (maxError < iterationError) {
+    if (maxError < iterationError || !split) {
         for (i = 0; i < maxIterations; i++) {
             uPrime = Reparameterize(d, first, last, u, bezCurve);
             free((void *)bezCurve);
             bezCurve = GenerateBezier(d, first, last, uPrime, tHat1, tHat2);
             maxError = ComputeMaxError(d, first, last,
                        bezCurve, uPrime, &splitPoint);
-            if (maxError < error) {
-            bezierHandler(3, bezCurve);
+            if (maxError < error || !split) {
+                bezierHandler(3, bezCurve);
+                free((void *)u);
+                free((void *)bezCurve);
+                free((void *)uPrime);
+                return maxError;
+            }
             free((void *)u);
-            free((void *)bezCurve);
-            free((void *)uPrime);
-            return;
+            u = uPrime;
         }
-        free((void *)u);
-        u = uPrime;
-    }
     }
 
     /* Fitting failed -- split at max error point and fit recursively */
     free((void *)u);
     free((void *)bezCurve);
     tHatCenter = ComputeCenterTangent(d, splitPoint);
-    FitCubic(d, first, splitPoint, tHat1, tHatCenter, error, bezierHandler);
+    const double err1 = FitCubic(d, first, splitPoint, tHat1,
+                                 tHatCenter, error, bezierHandler, true);
     V2Negate(&tHatCenter);
-    FitCubic(d, splitPoint, last, tHatCenter, tHat2, error, bezierHandler);
+    const double err2 = FitCubic(d, splitPoint, last, tHatCenter,
+                                 tHat2, error, bezierHandler, true);
+    return std::max(err1, err2);
+}
+
+static double FitCubic(Point2* const d,
+                       const int first, const int last,
+                       Vector2 tHat1,
+                       Vector2 tHat2,
+                       const double error,
+                       const BezierHandler& bezierHandler,
+                       const bool split)
+//    Point2	*d;			/*  Array of digitized points */
+//    int		first, last;	/* Indices of first and last pts in region */
+//    Vector2	tHat1, tHat2;	/* Unit tangent vectors at endpoints */
+//    double	error;		/*  User-defined error squared	   */
+{
+    int		splitPoint;	/*  Point to split point set at	 */
+    return FitCubic(d, first, last, tHat1, tHat2, error,
+                    bezierHandler, split, splitPoint);
+}
+
+Point2 rotatePoint(const double angle, const Point2& p) {
+  const double  s = std::sin(angle);
+  const double  c = std::cos(angle);
+  const double x = p.x * c - p.y * s;
+  const double y = p.x * s + p.y * c;
+
+  return {x, y};
+}
+
+static double FitCubic(Point2* const d,
+                       const int first, const int last,
+                       const double error,
+                       const BezierHandler& bezierHandler,
+                       const bool split)
+//    Point2	*d;			/*  Array of digitized points */
+//    int		first, last;	/* Indices of first and last pts in region */
+//    double	error;		/*  User-defined error squared	   */
+{
+    double minError = __DBL_MAX__;
+    int minErrorSplitPoint = 0;
+    BezierCurve minErrorBez = (Point2 *)malloc(4 * sizeof(Point2));
+
+    BezierCurve bez = (Point2 *)malloc(4 * sizeof(Point2));
+
+    qreal r1Min = 0;
+    qreal r1Max = 2*M_PI;
+    qreal r2Min = 0;
+    qreal r2Max = 2*M_PI;
+
+    qreal bestR1 = r1Min;
+    qreal bestR2 = r2Min;
+
+    for(int inc = 0; inc < 4; inc++) {
+        const qreal rInc = 0.25*M_PI/(inc + 1);
+        for(qreal r1 = r1Min; r1 < r1Max; r1 += rInc) {
+            for(qreal r2 = r2Min; r2 < r2Max; r2 += rInc) {
+                const Vector2 tHat1 = rotatePoint(r1, Point2{1, 0});
+                const Vector2 tHat2 = rotatePoint(r2, Point2{1, 0});
+                int splitPoint;
+                const auto bezSetter = [bez](const int, BezierCurve curve) {
+                    memcpy(bez, curve, 4*sizeof(Point2));
+                };
+                const double err = FitCubic(d, first, last, tHat1, tHat2, error,
+                                            bezSetter, false, splitPoint);
+                if(err < minError) {
+                    bestR1 = r1;
+                    bestR2 = r2;
+                    minError = err;
+                    minErrorSplitPoint = splitPoint;
+                    memcpy(minErrorBez, bez, 4*sizeof(Point2));
+                }
+            }
+        }
+        r1Min = bestR1 - rInc + rInc/2;
+        r1Max = bestR1 + rInc;
+        r2Min = bestR2 - rInc + rInc/2;
+        r2Max = bestR2 + rInc;
+    }
+    free((void *)bez);
+
+    if(minError < error || !split) {
+        bezierHandler(3, minErrorBez);
+        free((void *)minErrorBez);
+        return minError;
+    } else free((void *)minErrorBez);
+    const double err1 = FitCubic(d, first, minErrorSplitPoint, error, bezierHandler, true);
+    const double err2 = FitCubic(d, minErrorSplitPoint, last, error, bezierHandler, true);
+    return std::max(err1, err2);
 }
 
 

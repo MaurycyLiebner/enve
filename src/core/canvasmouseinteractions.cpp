@@ -215,13 +215,13 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
                     const int smoothPt = mDrawPath.nearestSmoothPt(e.fPos, &dist);
                     if(dist < maxDist) mDrawPath.addForceSplit(smoothPt);
                 }
-                mDrawPath.fit(DBL_MAX/5);
+                mDrawPath.fit(DBL_MAX/5, false);
             }
         } else start = true;
         if(start) {
             mDrawPathFirst = getPointAtAbsPos(e.fPos, mCurrentMode, invScale);
             mDrawPathFit = 0;
-            mDrawPath.clear();
+            drawPathClear();
             mDrawPath.lineTo(e.fPos);
         }
     } else if(mCurrentMode == CanvasMode::pickFillStroke) {
@@ -405,14 +405,19 @@ qsptr<SmartVectorPath> drawPathNew(QList<qCubicSegment2D>& fitted) {
     return newPath;
 }
 
-void Canvas::drawPathFinish(const qreal invScale) {
+void Canvas::drawPathClear() {
     mManualDrawPathState = ManualDrawPathState::none;
+    mDrawPathFirst.clear();
+    mDrawPath.clear();
+    mDrawPathTmp.reset();
+}
 
+void Canvas::drawPathFinish(const qreal invScale) {
     mDrawPath.smooth(mDocument.fDrawPathSmooth);
     const bool manual = mDocument.fDrawPathManual;
     const qreal error = manual ? DBL_MAX/5 :
                                  mDocument.fDrawPathMaxError;
-    mDrawPath.fit(error);
+    mDrawPath.fit(error, !manual);
 
     auto& fitted = mDrawPath.getFitted();
     if(!fitted.isEmpty()) {
@@ -474,9 +479,7 @@ void Canvas::drawPathFinish(const qreal invScale) {
         }
     }
 
-    mDrawPathFirst.clear();
-    mDrawPath.clear();
-    mDrawPathTmp.reset();
+    drawPathClear();
 }
 
 void Canvas::handleLeftMouseRelease(const MouseEvent &e) {

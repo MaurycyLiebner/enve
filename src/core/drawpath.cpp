@@ -47,7 +47,7 @@ void DrawPath::smooth(const int window) {
     SmoothCurves::movingAverage(mPts, mSmoothPts, true, true, window);
 }
 
-void DrawPath::fit(const qreal maxError) {
+void DrawPath::fit(const qreal maxError, const bool split) {
     mFitted.clear();
     if(mSmoothPts.count() < 2) return;
 
@@ -67,7 +67,7 @@ void DrawPath::fit(const qreal maxError) {
         const bool last = i == mForceSplits.count();
         int max = last ? mSmoothPts.count() - 1 :
                          mForceSplits.at(i);
-        FitCurves::FitCurve(mSmoothPts, maxError, adder, min, max);
+        FitCurves::FitCurve(mSmoothPts, maxError, adder, min, max, false, split);
         min = max;
     }
 }

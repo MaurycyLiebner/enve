@@ -13,10 +13,14 @@ typedef std::function<void(const int n, const BezierCurve curve)> BezierHandler;
 
 namespace FitCurves {
     extern void FitCurve(QVector<QPointF>& data, const double error,
-                         const BezierHandler& bezierHandler);
+                         const BezierHandler& bezierHandler,
+                         const bool useTangents,
+                         const bool split);
     extern void FitCurve(QVector<QPointF>& data, const double error,
                          const BezierHandler& bezierHandler,
-                         const int min, const int max);
+                         const int min, const int max,
+                         const bool useTangents,
+                         const bool split);
 
 };
 

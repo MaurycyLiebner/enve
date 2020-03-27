@@ -31,7 +31,7 @@ public:
 
     void lineTo(const QPointF& pos);
     void smooth(const int window);
-    void fit(const qreal maxError);
+    void fit(const qreal maxError, const bool split);
     QList<qCubicSegment2D>& getFitted()
     { return mFitted; }
     void clear();

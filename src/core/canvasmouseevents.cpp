@@ -133,19 +133,7 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
             const bool manual = mDocument.fDrawPathManual;
             const bool drawing = mManualDrawPathState == ManualDrawPathState::none;
             if(!manual || drawing) mDrawPath.lineTo(e.fPos);
-            if(mDrawPathFit++ % 3 == 0) {
-                mDrawPath.smooth(mDocument.fDrawPathSmooth);
-                if(!manual) {
-                    mDrawPath.fit(mDocument.fDrawPathMaxError);
-                    mDrawPathTmp.reset();
-                    const auto& fitted = mDrawPath.getFitted();
-                    QPointF moveTo;
-                    if(fitted.isEmpty()) moveTo = e.fPos;
-                    else moveTo = fitted.last().p3();
-                    mDrawPathTmp.moveTo(toSkPoint(moveTo));
-                    mDrawPathTmp.lineTo(toSkPoint(e.fPos));
-                }
-            } else if(!manual) mDrawPathTmp.lineTo(toSkPoint(e.fPos));
+            mDrawPath.smooth(mDocument.fDrawPathSmooth);
             updateHoveredPoint(e);
         } else if(mCurrentMode == CanvasMode::pathCreate) {
             handleAddSmartPointMouseMove(e);
@@ -179,7 +167,7 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
         } else if(mCurrentMode == CanvasMode::sculptPath) {
             sculptCancel();
         } else if(mCurrentMode == CanvasMode::drawPath) {
-            mDrawPath.clear();
+            drawPathClear();
         } else {
             handleRightButtonMouseRelease(e);
         }

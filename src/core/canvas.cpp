@@ -298,26 +298,23 @@ void Canvas::renderSk(SkCanvas * const canvas,
         SkPaint paint;
         paint.setStyle(SkPaint::kFill_Style);
         paint.setAntiAlias(true);
-        bool drawFitted;
-        if(mDocument.fDrawPathManual) {
-            drawFitted = mManualDrawPathState == ManualDrawPathState::drawn;
-            const auto& pts = mDrawPath.smoothPts();
-            paint.setARGB(255, 0, 125, 255);
-            const SkScalar ptSize = 0.25*nodeSize;
-            for(const auto& pt : pts) {
-                canvas->drawCircle(pt.x(), pt.y(), ptSize, paint);
-            }
 
+        const auto& pts = mDrawPath.smoothPts();
+        paint.setARGB(255, 0, 125, 255);
+        const SkScalar ptSize = 0.25*nodeSize;
+        for(const auto& pt : pts) {
+            canvas->drawCircle(pt.x(), pt.y(), ptSize, paint);
+        }
+
+        const bool drawFitted = mDocument.fDrawPathManual &&
+                                mManualDrawPathState == ManualDrawPathState::drawn;
+        if(drawFitted) {
             paint.setARGB(255, 255, 0, 0);
             const auto& highlightPts = mDrawPath.forceSplits();
             for(const int ptId : highlightPts) {
                 const auto& pt = pts.at(ptId);
                 canvas->drawCircle(pt.x(), pt.y(), nodeSize, paint);
             }
-
-        } else drawFitted = true;
-
-        if(drawFitted) {
             const auto& fitted = mDrawPath.getFitted();
             paint.setARGB(255, 255, 0, 0);
             for(const auto& seg : fitted) {
@@ -331,6 +328,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
                                                 invZoom, SK_ColorWHITE);
             }
         }
+
         paint.setARGB(255, 0, 75, 155);
         if(mHoveredPoint_d && mHoveredPoint_d->isSmartNodePoint()) {
             const QPointF pos = mHoveredPoint_d->getAbsolutePos();

@@ -351,7 +351,7 @@ void QrealAnimator::applyExpressionSub(const FrameRange& relRange,
         prevKey = key1.get();
     };
 
-    FitCurves::FitCurve(pts, 0.01*(0.01 + valAvg/accuracy), adder);
+    FitCurves::FitCurve(pts, 0.01*(0.01 + valAvg/accuracy), adder, true, true);
 }
 
 void QrealAnimator::applyExpression(const FrameRange& relRange,

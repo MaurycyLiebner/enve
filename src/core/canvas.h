@@ -659,6 +659,7 @@ private:
     void sculptRelease(const QPointF& pos, const qreal pressure);
     void sculptCancel();
 
+    void drawPathClear();
     void drawPathFinish(const qreal invScale);
 
     qreal mLastDRot = 0;

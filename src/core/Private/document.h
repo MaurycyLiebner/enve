@@ -81,7 +81,7 @@ public:
     SculptMode fSculptMode = SculptMode::drag;
 
     bool fDrawPathManual = false;
-    int fDrawPathSmooth = 50;
+    int fDrawPathSmooth = 25;
     qreal fDrawPathMaxError = 50;
 
     QColor fBrushColor;
