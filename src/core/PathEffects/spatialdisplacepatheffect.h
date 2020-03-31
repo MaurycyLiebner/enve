@@ -21,7 +21,7 @@ class IntAnimator;
 class RandomGrid;
 class BoolPropertyContainer;
 
-class SpatialDisplacePathEffect : public PathEffect {
+class CORE_EXPORT SpatialDisplacePathEffect : public PathEffect {
     e_OBJECT
 protected:
     SpatialDisplacePathEffect();

@@ -35,7 +35,7 @@ enum class SculptTarget {
     color
 };
 
-class SculptPath {
+class CORE_EXPORT SculptPath {
 public:
     SculptPath();
     SculptPath(const SkPath& path, const qreal spacing);

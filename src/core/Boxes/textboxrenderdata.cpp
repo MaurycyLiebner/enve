@@ -167,7 +167,7 @@ void WordRenderData::queAllLetters() {
         letter->addDependent(this);
     }
 }
-#include "include/core/SkFontMetrics.h"
+
 LineRenderData::LineRenderData(TextBox * const parent) :
     ContainerBoxRenderData(parent) {
     fParentIsTarget = false;

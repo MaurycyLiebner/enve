@@ -23,7 +23,7 @@
 
 class ExecController;
 
-class eCpuTask : public eTask {
+class CORE_EXPORT eCpuTask : public eTask {
     e_OBJECT
 public:
     HardwareSupport hardwareSupport() const final {
@@ -39,7 +39,7 @@ protected:
     void queTaskNow() final;
 };
 
-class eHddTask : public eTask {
+class CORE_EXPORT eHddTask : public eTask {
     e_OBJECT
 public:
     HardwareSupport hardwareSupport() const {
@@ -55,7 +55,7 @@ protected:
     void queTaskNow();
 };
 
-class eCustomCpuTask : public eCpuTask {
+class CORE_EXPORT eCustomCpuTask : public eCpuTask {
     e_OBJECT
 protected:
     using Func = std::function<void()>;
@@ -87,7 +87,7 @@ private:
 };
 
 template <typename T>
-class SPtrDisposer : public eCpuTask {
+class CORE_EXPORT SPtrDisposer : public eCpuTask {
     e_OBJECT
 protected:
     SPtrDisposer(const T& ptr) : mPtr(ptr) {}

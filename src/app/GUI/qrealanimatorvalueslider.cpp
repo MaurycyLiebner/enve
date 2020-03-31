@@ -257,8 +257,8 @@ void QrealAnimatorValueSlider::openContextMenu(
 
     const auto applyExpression = menu.addAction("Apply Expression...");
     connect(applyExpression, &QAction::triggered, this, [this, aTarget]() {
-        const auto& interface = DialogsInterface::instance();
-        interface.showApplyExpressionDialog(aTarget, this);
+        const auto& intrface = DialogsInterface::instance();
+        intrface.showApplyExpressionDialog(aTarget, this);
     });
     applyExpression->setEnabled(aTarget->hasExpression());
 

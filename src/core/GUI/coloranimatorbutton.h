@@ -21,7 +21,7 @@
 #include "conncontextptr.h"
 class ColorAnimator;
 
-class ColorAnimatorButton : public BoxesListActionButton {
+class CORE_EXPORT ColorAnimatorButton : public BoxesListActionButton {
     ColorAnimatorButton(QWidget * const parent = nullptr);
 public:
     ColorAnimatorButton(ColorAnimator * const colorTarget,

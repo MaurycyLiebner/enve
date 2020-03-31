@@ -18,7 +18,7 @@
 #define EEFFECT_H
 #include "staticcomplexanimator.h"
 
-class eEffect : public StaticComplexAnimator {
+class CORE_EXPORT eEffect : public StaticComplexAnimator {
     Q_OBJECT
 public:
     eEffect(const QString &name);

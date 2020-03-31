@@ -22,7 +22,7 @@
 
 struct UpdateStrokeSettings;
 
-class BrushSettingsAnimator : public StaticComplexAnimator {
+class CORE_EXPORT BrushSettingsAnimator : public StaticComplexAnimator {
     typedef qCubicSegment1DAnimator::Action SegAction;
     e_OBJECT
     Q_OBJECT

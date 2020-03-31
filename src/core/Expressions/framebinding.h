@@ -19,7 +19,7 @@
 
 #include "propertybindingbase.h"
 
-class FrameBinding : public PropertyBindingBase {
+class CORE_EXPORT FrameBinding : public PropertyBindingBase {
     FrameBinding(const Property* const context);
 public:
     static qsptr<FrameBinding> sCreate(const Property* const context);

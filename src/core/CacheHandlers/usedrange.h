@@ -3,7 +3,7 @@
 #include "hddcachablerangecont.h"
 class HddCachableCacheHandler;
 
-class UsedRange {
+class CORE_EXPORT UsedRange {
     friend class HddCachableCacheHandler;
     UsedRange(HddCachableCacheHandler * const handler);
 public:

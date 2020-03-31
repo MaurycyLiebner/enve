@@ -19,7 +19,7 @@
 #include "paintsettingsanimator.h"
 #include "Animators/brushsettingsanimator.h"
 
-class OutlineSettingsAnimator : public PaintSettingsAnimator {
+class CORE_EXPORT OutlineSettingsAnimator : public PaintSettingsAnimator {
     typedef qCubicSegment1DAnimator::Action SegAction;
     e_OBJECT
 protected:

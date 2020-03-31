@@ -7,7 +7,7 @@
 #include "Animators/qpointfanimator.h"
 #include "gpurendertools.h"
 
-class ShadowEffect : public RasterEffect {
+class CORE_EXPORT ShadowEffect : public RasterEffect {
 public:
     ShadowEffect();
 

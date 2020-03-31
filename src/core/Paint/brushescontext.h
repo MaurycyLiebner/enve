@@ -3,7 +3,7 @@
 #include <mypaint-brush.h>
 #include "Paint/brushcontexedwrapper.h"
 
-struct BrushCollectionData {
+struct CORE_EXPORT BrushCollectionData {
     QString fName;
     QList<BrushData> fBrushes;
 
@@ -20,14 +20,14 @@ struct BrushCollectionData {
     }
 };
 
-struct BrushContexedCollection {
+struct CORE_EXPORT BrushContexedCollection {
     BrushContexedCollection(BrushesContext* const context,
                             const BrushCollectionData& raw);
     QString fName;
     QList<qsptr<BrushContexedWrapper>> fBrushes;
 };
 
-class BrushesContext : public SelfRef {
+class CORE_EXPORT BrushesContext : public SelfRef {
     Q_OBJECT
 public:
     BrushesContext(const QList<BrushCollectionData>& raw);

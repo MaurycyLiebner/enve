@@ -18,7 +18,7 @@
 #define CLAMPEDVALUE_H
 #include "../pointhelpers.h"
 
-class ClampedValue {
+class CORE_EXPORT ClampedValue {
     qreal mValue;
     qreal mSavedValue;
     qreal mMin = -DBL_MAX;

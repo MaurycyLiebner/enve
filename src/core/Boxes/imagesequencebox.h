@@ -19,7 +19,7 @@
 #include "animationbox.h"
 #include "FileCacheHandlers/imagesequencecachehandler.h"
 
-class ImageSequenceBox : public AnimationBox {
+class CORE_EXPORT ImageSequenceBox : public AnimationBox {
     e_OBJECT
 protected:
     ImageSequenceBox();

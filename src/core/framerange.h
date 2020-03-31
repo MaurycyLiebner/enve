@@ -16,10 +16,13 @@
 
 #ifndef FRAMERANGE_H
 #define FRAMERANGE_H
+
+#include "core_global.h"
 #include <QtCore>
+
 #define TEN_MIL 10000000
 //! @brief Inclusive range
-struct iValueRange {
+struct CORE_EXPORT iValueRange {
     static int EMIN;
     static int EMAX;
     static iValueRange EMINMAX;
@@ -134,7 +137,7 @@ struct iValueRange {
     }
 };
 
-struct qValueRange {
+struct CORE_EXPORT qValueRange {
     qreal fMin;
     qreal fMax;
 

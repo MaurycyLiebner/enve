@@ -28,8 +28,10 @@ class Gradient;
 using GradientCreator = std::function<Gradient*()>;
 
 namespace ImportKRA {
+    CORE_EXPORT
     qsptr<ContainerBox> loadKRAFile(const QString &filename,
                                     const GradientCreator& gradientCreator);
+    CORE_EXPORT
     sk_sp<SkImage> loadMergedKRAFile(const QString &filename,
                                      const bool useContained);
 }

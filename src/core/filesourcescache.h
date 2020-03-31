@@ -16,33 +16,55 @@
 
 #ifndef FILESOURCESCACHE_H
 #define FILESOURCESCACHE_H
-#include <QStringList>
 
+#include <QStringList>
+#include "core_global.h"
+
+CORE_EXPORT
 bool hasVideoExt(const QString &filename);
+CORE_EXPORT
 bool hasSoundExt(const QString &filename);
+CORE_EXPORT
 bool hasVectorExt(const QString &filename);
+CORE_EXPORT
 bool hasImageExt(const QString &filename);
+CORE_EXPORT
 bool hasEvExt(const QString &filename);
 
+CORE_EXPORT
 bool isVideoExt(const QString &extension);
+CORE_EXPORT
 bool isSoundExt(const QString &extension);
+CORE_EXPORT
 bool isVectorExt(const QString &extension);
+CORE_EXPORT
 bool isImageExt(const QString &extension);
+CORE_EXPORT
 bool isEvExt(const QString &extension);
 
+CORE_EXPORT
 bool isLayersExt(const QString& ext);
 
 namespace FileExtensions {
+    CORE_EXPORT
     extern QStringList image;
+    CORE_EXPORT
     extern QStringList sound;
+    CORE_EXPORT
     extern QStringList video;
+    CORE_EXPORT
     extern QStringList layers;
 
+    CORE_EXPORT
     QString filters(const QStringList& exts);
 
+    CORE_EXPORT
     QString imageFilters();
+    CORE_EXPORT
     QString soundFilters();
+    CORE_EXPORT
     QString videoFilters();
+    CORE_EXPORT
     QString layersFilters();
 };
 

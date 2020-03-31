@@ -55,7 +55,7 @@ enum class UpdateReason {
     userChange
 };
 
-struct UndoRedo {
+struct CORE_EXPORT UndoRedo {
     std::function<void()> fUndo;
     std::function<void()> fRedo;
 };
@@ -64,7 +64,7 @@ class Property;
 template<typename T> class TypeMenu;
 typedef TypeMenu<Property> PropertyMenu;
 
-class Property : public SingleWidgetTarget {
+class CORE_EXPORT Property : public SingleWidgetTarget {
     Q_OBJECT
     e_OBJECT
     e_DECLARE_TYPE(Property)

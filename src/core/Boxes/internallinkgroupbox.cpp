@@ -22,9 +22,7 @@
 
 InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget,
                                            const bool innerLink) :
-    InternalLinkBoxBase<ContainerBox>(eBoxType::internalLinkGroup, innerLink) {
-    prp_setName("Link 0");
-
+    InternalLinkBoxBase<ContainerBox>("Link 0", eBoxType::internalLinkGroup, innerLink) {
     mBoxTarget->setValidator<ContainerBox>();
 
     ca_prependChild(mTransformAnimator.data(), mBoxTarget);

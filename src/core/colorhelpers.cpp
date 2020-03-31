@@ -17,7 +17,6 @@
 #include "colorhelpers.h"
 #include <math.h>
 #include <QString>
-#include <sys/sysinfo.h>
 #include "glhelpers.h"
 
 

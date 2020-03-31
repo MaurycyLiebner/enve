@@ -23,37 +23,50 @@
 #include "../ReadWrite/basicreadwrite.h"
 
 namespace SkiaHelpers {
+    CORE_EXPORT
     sk_sp<SkImage> makeCopy(const sk_sp<SkImage>& img);
+    CORE_EXPORT
     SkBitmap makeCopy(const SkBitmap& btmp);
 
+    CORE_EXPORT
     SkImageInfo getPremulRGBAInfo(const int width,
                                   const int height);
+    CORE_EXPORT
     void saveImage(const QString& fileName,
                    const sk_sp<SkImage>& img,
                    const SkEncodedImageFormat& format = SkEncodedImageFormat::kPNG,
                    const int quality = 100);
 
+    CORE_EXPORT
     sk_sp<SkImage> transferDataToSkImage(SkBitmap& bitmap);
 
+    CORE_EXPORT
     void writeImg(const sk_sp<SkImage>& img, eWriteStream &dst);
+    CORE_EXPORT
     sk_sp<SkImage> readImg(eReadStream& src);
 
+    CORE_EXPORT
     SkBitmap readBitmap(eReadStream &src);
+    CORE_EXPORT
     void writeBitmap(const SkBitmap& bitmap, eWriteStream &dst);
 
+    CORE_EXPORT
     void writePixmap(const SkPixmap& pix, eWriteStream &dst);
 
+    CORE_EXPORT
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,
                             const float invScale,
                             const SkColor &color = SK_ColorWHITE);
 
+    CORE_EXPORT
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,
                             const float invScale,
                             const SkMatrix& transform,
                             const SkColor &color = SK_ColorWHITE);
 
+    CORE_EXPORT
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,
                             const float invScale,
@@ -61,6 +74,7 @@ namespace SkiaHelpers {
                             const float intervalSize,
                             const SkColor &color = SK_ColorWHITE);
 
+    CORE_EXPORT
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,
                             const float invScale,
@@ -69,6 +83,7 @@ namespace SkiaHelpers {
                             const float intervalSize,
                             const SkColor &color = SK_ColorWHITE);
 
+    CORE_EXPORT
     void forceLink();
 }
 

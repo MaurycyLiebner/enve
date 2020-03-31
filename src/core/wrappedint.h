@@ -17,7 +17,9 @@
 #ifndef WRAPPEDINT_H
 #define WRAPPEDINT_H
 
-class WrappedInt {
+#include "core_global.h"
+
+class CORE_EXPORT WrappedInt {
 public:
     WrappedInt(const int value, const int wrapValue,
                const bool reverse);

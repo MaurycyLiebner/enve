@@ -31,7 +31,7 @@ class SkStroke;
 class PathEffectCollection;
 class PathEffect;
 
-class PathBox : public BoxWithPathEffects {
+class CORE_EXPORT PathBox : public BoxWithPathEffects {
     typedef qCubicSegment1DAnimator::Action SegAction;
     e_OBJECT
     e_DECLARE_TYPE(PathBox)

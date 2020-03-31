@@ -24,7 +24,7 @@
 
 class FixedLenAnimationRect;
 
-class eSoundObjectBase : public eSound {
+class CORE_EXPORT eSoundObjectBase : public eSound {
 protected:
     eSoundObjectBase(const qsptr<FixedLenAnimationRect> &durRect);
 

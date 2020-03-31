@@ -23,7 +23,7 @@
 #include "framerange.h"
 #include "sculptbrush.h"
 
-class SculptNode : public SculptNodeBase {
+class CORE_EXPORT SculptNode : public SculptNodeBase {
 public:
     SculptNode() {}
     SculptNode(const qreal t, const QPointF& pos,

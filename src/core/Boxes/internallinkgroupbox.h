@@ -20,7 +20,7 @@
 #include "internallinkboxbase.h"
 #include "Properties/boxtargetproperty.h"
 
-class InternalLinkGroupBox : public InternalLinkBoxBase<ContainerBox> {
+class CORE_EXPORT InternalLinkGroupBox : public InternalLinkBoxBase<ContainerBox> {
     e_OBJECT
 protected:
     InternalLinkGroupBox(ContainerBox * const linkTarget = nullptr,

@@ -18,7 +18,7 @@
 #define CUSTOMIDENTIFIER_H
 #include "ReadWrite/basicreadwrite.h"
 
-struct CustomIdentifier {
+struct CORE_EXPORT CustomIdentifier {
     struct Version {
         uint fMajor;
         uint fMinor;

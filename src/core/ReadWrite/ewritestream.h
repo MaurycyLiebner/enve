@@ -9,7 +9,7 @@ class SimpleBrushWrapper;
 struct iValueRange;
 class eWriteStream;
 
-class eWriteFutureTable {
+class CORE_EXPORT eWriteFutureTable {
     friend class eWriteStream;
     eWriteFutureTable(QIODevice * const main) :
         mMain(main) {}
@@ -31,7 +31,7 @@ private:
     QIODevice* const mMain;
 };
 
-class eWriteStream {
+class CORE_EXPORT eWriteStream {
     friend class MainWindow;
 public:
     class FuturePosId {

@@ -22,7 +22,7 @@
 
 typedef DynamicComplexAnimator<SculptPathAnimator> SculptPathCollectionBase;
 
-class SculptPathCollection : public SculptPathCollectionBase {
+class CORE_EXPORT SculptPathCollection : public SculptPathCollectionBase {
     Q_OBJECT
     e_OBJECT
 protected:

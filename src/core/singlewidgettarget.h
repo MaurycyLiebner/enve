@@ -44,7 +44,7 @@ class BlendEffectBoxShadow;
 class eSound;
 class eIndependentSound;
 
-class SingleWidgetTarget : public SelfRef {
+class CORE_EXPORT SingleWidgetTarget : public SelfRef {
     Q_OBJECT
 public:
     SingleWidgetTarget() {}

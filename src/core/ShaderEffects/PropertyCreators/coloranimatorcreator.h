@@ -5,7 +5,7 @@
 #include "Animators/coloranimator.h"
 #include "shaderpropertycreator.h"
 
-class ColorAnimatorCreator : public ShaderPropertyCreator {
+class CORE_EXPORT ColorAnimatorCreator : public ShaderPropertyCreator {
     e_OBJECT
     ColorAnimatorCreator(const QColor iniVal,
                          const bool glValue,

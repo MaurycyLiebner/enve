@@ -16,8 +16,11 @@
 
 #ifndef AUDIOHANDLER_H
 #define AUDIOHANDLER_H
+
 #include <QAudioOutput>
-class eSoundSettingsData;
+#include <QDebug>
+
+struct eSoundSettingsData;
 
 class AudioHandler : public QObject {
 public:

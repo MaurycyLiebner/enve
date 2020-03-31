@@ -32,7 +32,7 @@ typedef DynamicComplexAnimator<
     writeRasterEffectType,
     readIdCreateRasterEffect> RasterEffectCollectionBase;
 
-class RasterEffectCollection : public RasterEffectCollectionBase {
+class CORE_EXPORT RasterEffectCollection : public RasterEffectCollectionBase {
     e_OBJECT
     Q_OBJECT
 protected:

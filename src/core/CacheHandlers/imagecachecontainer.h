@@ -22,7 +22,7 @@
 #include "imagedatahandler.h"
 class Canvas;
 
-class ImageCacheContainer : public HddCachableRangeCont,
+class CORE_EXPORT ImageCacheContainer : public HddCachableRangeCont,
                             public ImageDataHandler {
     e_OBJECT
 protected:
@@ -45,7 +45,7 @@ public:
 #include "CacheHandlers/tmploader.h"
 #include "CacheHandlers/tmpsaver.h"
 
-class ImgSaver : public TmpSaver {
+class CORE_EXPORT ImgSaver : public TmpSaver {
     e_OBJECT
 public:
     typedef std::function<void(const qsptr<QTemporaryFile>&)> Func;
@@ -61,7 +61,7 @@ private:
     const sk_sp<SkImage> mImage;
 };
 
-class ImgLoader : public TmpLoader {
+class CORE_EXPORT ImgLoader : public TmpLoader {
     e_OBJECT
 public:
     typedef std::function<void(sk_sp<SkImage> img)> Func;

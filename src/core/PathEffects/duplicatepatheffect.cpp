@@ -19,7 +19,7 @@
 #include "Animators/intanimator.h"
 
 DuplicatePathEffect::DuplicatePathEffect() :
-    PathEffect("duplicate effect", PathEffectType::DUPLICATE) {
+    PathEffect("duplicate effect", PathEffectType::Duplicate) {
     mTranslation = enve::make_shared<QPointFAnimator>("translation");
     mTranslation->setBaseValue(QPointF(10, 10));
     ca_addChild(mTranslation);

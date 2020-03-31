@@ -20,7 +20,7 @@
 class IntAnimator;
 class QPointFAnimator;
 
-class DuplicatePathEffect : public PathEffect {
+class CORE_EXPORT DuplicatePathEffect : public PathEffect {
     e_OBJECT
 protected:
     DuplicatePathEffect();

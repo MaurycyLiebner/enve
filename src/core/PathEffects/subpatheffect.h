@@ -18,7 +18,7 @@
 #define SUBPATHEFFECT_H
 #include "PathEffects/patheffect.h"
 
-class SubPathEffect : public PathEffect {
+class CORE_EXPORT SubPathEffect : public PathEffect {
     e_OBJECT
 protected:
     SubPathEffect();

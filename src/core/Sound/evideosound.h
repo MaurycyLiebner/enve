@@ -21,7 +21,7 @@
 
 class VideoBox;
 
-class eVideoSound : public eSoundObjectBase {
+class CORE_EXPORT eVideoSound : public eSoundObjectBase {
     e_OBJECT
 protected:
     eVideoSound(const qsptr<FixedLenAnimationRect>& durRect);

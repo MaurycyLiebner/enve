@@ -19,7 +19,7 @@
 #include "imagecachehandler.h"
 #include "animationcachehandler.h"
 
-class ImageSequenceFileHandler : public FileCacheHandler {
+class CORE_EXPORT ImageSequenceFileHandler : public FileCacheHandler {
 protected:
     void afterPathSet(const QString& folderPath);
     void reload();
@@ -34,7 +34,7 @@ private:
     QList<qsptr<ImageFileDataHandler>> mFrameImageHandlers;
 };
 
-class ImageSequenceCacheHandler : public AnimationFrameHandler {
+class CORE_EXPORT ImageSequenceCacheHandler : public AnimationFrameHandler {
     e_OBJECT
 protected:
     ImageSequenceCacheHandler(ImageSequenceFileHandler* fileHandler);

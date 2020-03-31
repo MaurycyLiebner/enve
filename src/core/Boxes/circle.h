@@ -20,7 +20,7 @@
 
 enum class CanvasMode : short;
 
-class CircleRadiusPoint : public AnimatedPoint {
+class CORE_EXPORT CircleRadiusPoint : public AnimatedPoint {
     e_OBJECT
 protected:
     CircleRadiusPoint(QPointFAnimator * const associatedAnimator,
@@ -38,7 +38,7 @@ private:
 
 #include "Boxes/pathbox.h"
 
-class Circle : public PathBox {
+class CORE_EXPORT Circle : public PathBox {
     e_OBJECT
 protected:
     Circle();

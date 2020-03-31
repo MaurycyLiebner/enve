@@ -18,7 +18,7 @@
 #define INTANIMATOR_H
 #include "qrealanimator.h"
 
-class IntAnimator : public QrealAnimator {
+class CORE_EXPORT IntAnimator : public QrealAnimator {
     e_OBJECT
 protected:
     IntAnimator(const QString& name);

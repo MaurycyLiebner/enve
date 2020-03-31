@@ -23,7 +23,7 @@
 #include "simpletask.h"
 #include "smartPointers/ememory.h"
 
-class PropertyBinding : public PropertyBindingBase {
+class CORE_EXPORT PropertyBinding : public PropertyBindingBase {
 public:
     using Validator = std::function<bool(Property*)>;
 private:

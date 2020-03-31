@@ -28,8 +28,10 @@ class Gradient;
 using GradientCreator = std::function<Gradient*()>;
 
 namespace ImportORA {
+    CORE_EXPORT
     qsptr<ContainerBox> loadORAFile(const QString &filename,
                                     const GradientCreator& gradientCreator);
+    CORE_EXPORT
     sk_sp<SkImage> loadMergedORAFile(const QString &filename,
                                      const bool useContained);
 }

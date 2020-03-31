@@ -18,7 +18,7 @@
 #define CPURENDERTOOLS_H
 
 #include "skia/skiahelpers.h"
-struct CpuRenderTools {
+struct CORE_EXPORT CpuRenderTools {
     const SkBitmap fSrcBtmp;
     SkBitmap fDstBtmp;
 };

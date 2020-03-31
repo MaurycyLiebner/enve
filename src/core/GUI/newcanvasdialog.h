@@ -30,7 +30,7 @@ class Canvas;
 class ColorAnimator;
 class ColorAnimatorButton;
 
-class CanvasSettingsDialog : public QDialog {
+class CORE_EXPORT CanvasSettingsDialog : public QDialog {
 public:
     CanvasSettingsDialog(Canvas * const canvas,
                          QWidget * const parent = nullptr);

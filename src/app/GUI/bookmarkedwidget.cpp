@@ -74,9 +74,12 @@ void BookmarkedWidget::updateSize() {
 
 void BookmarkedWidget::updateLayout() {
     if(mWidgets.isEmpty()) return;
-    const auto setPos = mVertical ?
-                [](QWidget* wid, const int y) { wid->move(0, y); } :
-                [](QWidget* wid, const int x) { wid->move(x, 0); };
+    std::function<void(QWidget*, const int)> setPos;
+    if(mVertical) {
+        setPos = [](QWidget* wid, const int y) { wid->move(0, y); };
+    } else {
+        setPos = [](QWidget* wid, const int x) { wid->move(x, 0); };
+    }
     const int dim = mVertical ? height() : width();
     const int minArrowDim = MIN_WIDGET_DIM;
     const bool arrowsVisible = dim - mWidgets.count()*mDimension < 0;

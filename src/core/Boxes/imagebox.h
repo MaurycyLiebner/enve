@@ -22,7 +22,7 @@
 #include "imagerenderdata.h"
 #include "FileCacheHandlers/filehandlerobjref.h"
 
-struct ImageBoxRenderData : public ImageContainerRenderData {
+struct CORE_EXPORT ImageBoxRenderData : public ImageContainerRenderData {
     ImageBoxRenderData(ImageFileHandler * const cacheHandler,
                        BoundingBox * const parentBox) :
         ImageContainerRenderData(parentBox),
@@ -33,7 +33,7 @@ struct ImageBoxRenderData : public ImageContainerRenderData {
     const qptr<ImageFileHandler> fSrcCacheHandler;
 };
 
-class ImageBox : public BoundingBox {
+class CORE_EXPORT ImageBox : public BoundingBox {
     e_OBJECT
 protected:
     ImageBox();

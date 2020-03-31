@@ -18,7 +18,7 @@
 #define NONANIMATEDMOVABLEPOINT_H
 #include "movablepoint.h"
 
-class NonAnimatedMovablePoint : public MovablePoint {
+class CORE_EXPORT NonAnimatedMovablePoint : public MovablePoint {
     e_OBJECT
 protected:
     NonAnimatedMovablePoint(const MovablePointType type);

@@ -17,17 +17,17 @@
 #include "elinearize.h"
 #include "enveCore/Animators/qrealanimator.h"
 
-qsptr<CustomPathEffect> eCreateNewestVersion() {
+void eCreateNewestVersion(qsptr<CustomPathEffect> &result) {
     // Use default, most up to date, version
-    return enve::make_shared<eLinearize000>();
+    result = enve::make_shared<eLinearize000>();
 }
 
-qsptr<CustomPathEffect> eCreate(
-        const CustomIdentifier &identifier) {
+void eCreate(const CustomIdentifier &identifier,
+             qsptr<CustomPathEffect> &result) {
     Q_UNUSED(identifier)
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
-    return enve::make_shared<eLinearize000>();
+    result = enve::make_shared<eLinearize000>();
 }
 
 // Returned value must be unique, lets enve distinguish effects
@@ -35,9 +35,11 @@ QString effectId() {
     return "waer9yv11r3gl10x1qtm";
 }
 
+#define eLName QStringLiteral("eLinearize")
+
 // Name of your effect used in UI
-QString eName() {
-    return "eLinearize";
+void eName(QString &result) {
+    result = eLName;
 }
 
 // here specify your effect's most up to date version
@@ -45,24 +47,24 @@ CustomIdentifier::Version effectVersion() {
     return { 0, 0, 0 };
 }
 
-CustomIdentifier eIdentifier() {
-    return { effectId(), eName(), effectVersion() };
+void eIdentifier(CustomIdentifier& result) {
+    result = { effectId(), eLName, effectVersion() };
 }
 
 bool eSupports(const CustomIdentifier &identifier) {
     if(identifier.fEffectId != effectId()) return false;
-    if(identifier.fEffectName != eName()) return false;
+    if(identifier.fEffectName != eLName) return false;
     return identifier.fVersion == effectVersion();
 }
 
 eLinearize000::eLinearize000() :
-    CustomPathEffect(eName().toLower()) {
+    CustomPathEffect(eLName.toLower()) {
     mInfluence = enve::make_shared<QrealAnimator>(0, 0, 1, 0.1, "influence");
     ca_addChild(mInfluence);
 }
 
 CustomIdentifier eLinearize000::getIdentifier() const {
-    return { effectId(), eName(), { 0, 0, 0 } };
+    return { effectId(), eLName, { 0, 0, 0 } };
 }
 
 class eLinearize000EffectCaller : public PathEffectCaller {

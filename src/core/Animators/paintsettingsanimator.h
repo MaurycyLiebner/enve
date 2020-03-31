@@ -37,7 +37,7 @@ class AdvancedTransformAnimator;
 
 struct UpdatePaintSettings;
 
-class PaintSettingsAnimator : public ComplexAnimator {
+class CORE_EXPORT PaintSettingsAnimator : public ComplexAnimator {
 protected:
     PaintSettingsAnimator(const QString &name,
                           BoundingBox * const parent);
@@ -93,7 +93,7 @@ private:
     qsptr<AdvancedTransformAnimator> mGradientTransform;
 };
 
-class FillSettingsAnimator : public PaintSettingsAnimator {
+class CORE_EXPORT FillSettingsAnimator : public PaintSettingsAnimator {
     e_OBJECT
 protected:
     FillSettingsAnimator(BoundingBox * const parent) :
@@ -105,7 +105,7 @@ public:
     }
 };
 
-struct UpdatePaintSettings {
+struct CORE_EXPORT UpdatePaintSettings {
     UpdatePaintSettings(const QColor &paintColorT,
                         const PaintType paintTypeT);
     UpdatePaintSettings();
@@ -124,7 +124,7 @@ struct UpdatePaintSettings {
     sk_sp<SkShader> fGradient;
 };
 
-struct UpdateStrokeSettings : UpdatePaintSettings {
+struct CORE_EXPORT UpdateStrokeSettings : UpdatePaintSettings {
     UpdateStrokeSettings(
             const qreal width,
             const QColor &paintColorT,

@@ -27,12 +27,16 @@ class QDomDocument;
 using GradientCreator = std::function<Gradient*()>;
 
 namespace ImportSVG {
+    CORE_EXPORT
     qsptr<BoundingBox> loadSVGFile(const QDomDocument& src,
                                    const GradientCreator& gradientCreator);
+    CORE_EXPORT
     qsptr<BoundingBox> loadSVGFile(const QByteArray& src,
                                    const GradientCreator& gradientCreator);
+    CORE_EXPORT
     qsptr<BoundingBox> loadSVGFile(QIODevice* const src,
                                    const GradientCreator& gradientCreator);
+    CORE_EXPORT
     qsptr<BoundingBox> loadSVGFile(const QString &filename,
                                    const GradientCreator& gradientCreator);
 }

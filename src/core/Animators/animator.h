@@ -29,7 +29,7 @@ class QPainter;
 class TimelineMovable;
 class SvgExporter;
 
-class Animator : public Property {
+class CORE_EXPORT Animator : public Property {
     Q_OBJECT
     e_DECLARE_TYPE(Animator)
     friend class OverlappingKeys;

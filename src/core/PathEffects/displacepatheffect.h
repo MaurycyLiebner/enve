@@ -20,7 +20,7 @@
 class IntAnimator;
 class BoolPropertyContainer;
 
-class DisplacePathEffect : public PathEffect {
+class CORE_EXPORT DisplacePathEffect : public PathEffect {
     e_OBJECT
 protected:
     DisplacePathEffect();

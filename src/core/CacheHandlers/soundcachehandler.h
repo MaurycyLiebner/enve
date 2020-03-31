@@ -22,7 +22,7 @@
 #include "FileCacheHandlers/audiostreamsdata.h"
 #include "FileCacheHandlers/soundreader.h"
 
-class SoundDataHandler : public FileDataCacheHandler {
+class CORE_EXPORT SoundDataHandler : public FileDataCacheHandler {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
     e_OBJECT
 public:
@@ -74,7 +74,7 @@ private:
     HddCachableCacheHandler mSecondsCache;
 };
 
-class SoundHandler : public StdSelfRef {
+class CORE_EXPORT SoundHandler : public StdSelfRef {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
     e_OBJECT
 public:
@@ -135,7 +135,7 @@ private:
 
 };
 
-class SoundFileHandler : public FileCacheHandler {
+class CORE_EXPORT SoundFileHandler : public FileCacheHandler {
     e_OBJECT
 protected:
     SoundFileHandler() {}

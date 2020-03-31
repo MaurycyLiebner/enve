@@ -27,7 +27,7 @@ class ComplexKey;
 class QrealAnimator;
 class KeysClipboard;
 
-class QrealKey : public GraphKey {
+class CORE_EXPORT QrealKey : public GraphKey {
     e_OBJECT
 public:
     QrealKey(QrealAnimator * const parentAnimator);

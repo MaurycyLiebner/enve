@@ -24,10 +24,10 @@
 class QPainter;
 class KeyCloner;
 class Animator;
-class UndoRedo;
+struct UndoRedo;
 class KeysClipboard;
 
-class Key : public StdSelfRef {
+class CORE_EXPORT Key : public StdSelfRef {
     friend class Animator;
     friend class KeysClipboard;
     friend class ComplexKey;

@@ -29,7 +29,7 @@ class SmartPathAnimator;
 enum class CanvasMode : short;
 enum class CtrlsMode : short;
 
-class SmartNodePoint : public NonAnimatedMovablePoint {
+class CORE_EXPORT SmartNodePoint : public NonAnimatedMovablePoint {
     e_OBJECT
     friend class NormalSegment;
 protected:

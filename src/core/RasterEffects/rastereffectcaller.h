@@ -24,7 +24,7 @@
 
 enum class HardwareSupport : short;
 
-class RasterEffectCaller : public StdSelfRef {
+class CORE_EXPORT RasterEffectCaller : public StdSelfRef {
     e_OBJECT
 public:
     RasterEffectCaller(const HardwareSupport hwSupport);

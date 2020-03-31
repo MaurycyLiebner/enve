@@ -17,6 +17,12 @@
 #ifndef PAINTSETTINGS_H
 #define PAINTSETTINGS_H
 
+#include "Segments/qcubicsegment1d.h"
+#include "smartPointers/ememory.h"
+#include "skia/skiaincludes.h"
+
+#include <QColor>
+
 enum PaintType : short {
     NOPAINT,
     FLATPAINT,
@@ -25,29 +31,26 @@ enum PaintType : short {
 };
 
 enum class ColorMode : short;
-#include <QColor>
-struct ColorSettings {
+struct CORE_EXPORT ColorSettings {
     QColor fColor;
     ColorMode fMode;
 };
 
 class SceneBoundGradient;
 enum class GradientType : short;
-#include "smartPointers/ememory.h"
-struct GradientSettings {
+struct CORE_EXPORT GradientSettings {
     GradientType fType;
     qptr<SceneBoundGradient> fGradient;
 };
 
-struct FillSettings {
+struct CORE_EXPORT FillSettings {
     PaintType fType;
     ColorSettings fColor;
     GradientSettings fGradient;
 };
 
 class SimpleBrushWrapper;
-#include "Segments/qcubicsegment1d.h"
-struct BrushSettings {
+struct CORE_EXPORT BrushSettings {
     SimpleBrushWrapper* fBrush = nullptr;
     qCubicSegment1D fWidth;
     qCubicSegment1D fPressure;
@@ -55,8 +58,7 @@ struct BrushSettings {
     qCubicSegment1D fTime;
 };
 
-#include "skia/skiaincludes.h"
-struct StrokeSettings : public FillSettings {
+struct CORE_EXPORT StrokeSettings : public FillSettings {
     qreal fWidth;
     SkPaint::Cap fCapStyle;
     SkPaint::Join fJoinStyle;

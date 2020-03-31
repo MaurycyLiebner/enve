@@ -16,10 +16,13 @@
 
 #ifndef CONNCONTEXT_H
 #define CONNCONTEXT_H
+
+#include "core_global.h"
+
 #include <QObject>
 #include <memory>
 
-class ConnContext {
+class CORE_EXPORT ConnContext {
 public:
     ConnContext();
     ConnContext(ConnContext&) = delete;

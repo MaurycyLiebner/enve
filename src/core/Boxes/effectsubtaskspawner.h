@@ -22,6 +22,7 @@ struct BoxRenderData;
 class RasterEffectCaller;
 
 namespace EffectSubTaskSpawner {
+    CORE_EXPORT
     void sSpawn(const stdsptr<RasterEffectCaller>& effect,
                 const stdsptr<BoxRenderData>& data);
 };

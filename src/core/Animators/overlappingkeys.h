@@ -18,7 +18,7 @@
 #define OVERLAPPINGKEYS_H
 #include "key.h"
 
-class OverlappingKeys {
+class CORE_EXPORT OverlappingKeys {
 public:
     OverlappingKeys(const stdsptr<Key>& key,
                     Animator * const animator);

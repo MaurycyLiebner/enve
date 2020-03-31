@@ -30,20 +30,20 @@
 extern "C" {
 
 ELINEARIZESHARED_EXPORT
-    qsptr<CustomPathEffect> eCreateNewestVersion();
+void eCreateNewestVersion(qsptr<CustomPathEffect>& result);
 
 ELINEARIZESHARED_EXPORT
-    qsptr<CustomPathEffect> eCreate(
-        const CustomIdentifier &identifier);
+void eCreate(const CustomIdentifier &identifier,
+             qsptr<CustomPathEffect>& result);
 
 ELINEARIZESHARED_EXPORT
-    QString eName();
+void eName(QString& result);
 
 ELINEARIZESHARED_EXPORT
-    CustomIdentifier eIdentifier();
+void eIdentifier(CustomIdentifier& result);
 
 ELINEARIZESHARED_EXPORT
-    bool eSupports(const CustomIdentifier &identifier);
+bool eSupports(const CustomIdentifier &identifier);
 
 }
 #endif // ELINEARIZE_GLOBAL_H

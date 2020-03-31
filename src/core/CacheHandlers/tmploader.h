@@ -20,7 +20,7 @@
 #include <QTemporaryFile>
 #include "hddcachablecont.h"
 
-class TmpLoader : public eHddTask {
+class CORE_EXPORT TmpLoader : public eHddTask {
 public:
     TmpLoader(const qsptr<QTemporaryFile> &file,
               HddCachableCont * const target);

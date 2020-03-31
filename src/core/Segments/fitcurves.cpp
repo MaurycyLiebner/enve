@@ -12,6 +12,7 @@ from "Graphics Gems", Academic Press, 1990
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <float.h>
 
 /* negates the input vector and returns it */
 Vector2 *V2Negate(Vector2* const v)
@@ -291,7 +292,7 @@ static double FitCubic(Point2* const d,
 //    int		first, last;	/* Indices of first and last pts in region */
 //    double	error;		/*  User-defined error squared	   */
 {
-    double minError = __DBL_MAX__;
+    double minError = DBL_MAX;
     int minErrorSplitPoint = 0;
     BezierCurve minErrorBez = (Point2 *)malloc(4 * sizeof(Point2));
 
@@ -375,8 +376,8 @@ static BezierCurve  GenerateBezier(Point2* const d,
 
     bezCurve = (Point2 *)malloc(4 * sizeof(Point2));
     nPts = last - first + 1;
-    Vector2 	A[nPts][2];	/* Precomputed rhs for eqn	*/
-
+    std::vector<Vector2> A;	/* Precomputed rhs for eqn	*/
+    A.resize(nPts*2);
 
     /* Compute the A's	*/
     for (i = 0; i < nPts; i++) {
@@ -385,8 +386,8 @@ static BezierCurve  GenerateBezier(Point2* const d,
         v2 = tHat2;
         V2Scale(&v1, B1(uPrime[i]));
         V2Scale(&v2, B2(uPrime[i]));
-        A[i][0] = v1;
-        A[i][1] = v2;
+        A[2*i] = v1;
+        A[2*i + 1] = v2;
     }
 
     /* Create the C and X matrices	*/
@@ -398,11 +399,11 @@ static BezierCurve  GenerateBezier(Point2* const d,
     X[1]    = 0.0;
 
     for (i = 0; i < nPts; i++) {
-        C[0][0] += V2Dot(&A[i][0], &A[i][0]);
-        C[0][1] += V2Dot(&A[i][0], &A[i][1]);
+        C[0][0] += V2Dot(&A[2*i], &A[2*i]);
+        C[0][1] += V2Dot(&A[2*i], &A[2*i + 1]);
 /*					C[1][0] += V2Dot(&A[i][0], &A[i][1]);*/
         C[1][0] = C[0][1];
-        C[1][1] += V2Dot(&A[i][1], &A[i][1]);
+        C[1][1] += V2Dot(&A[2*i + 1], &A[2*i + 1]);
 
         tmp = V2SubII(d[first + i],
             V2AddII(
@@ -414,8 +415,8 @@ static BezierCurve  GenerateBezier(Point2* const d,
                                 V2ScaleIII(d[last], B3(uPrime[i]))))));
 
 
-    X[0] += V2Dot(&A[i][0], &tmp);
-    X[1] += V2Dot(&A[i][1], &tmp);
+    X[0] += V2Dot(&A[2*i], &tmp);
+    X[1] += V2Dot(&A[2*i + 1], &tmp);
     }
 
     /* Compute the determinants of C and X	*/

@@ -27,7 +27,7 @@ extern "C" {
 class eWriteStream;
 class eReadStream;
 
-struct Samples : public StdSelfRef {
+struct CORE_EXPORT Samples : public StdSelfRef {
     e_OBJECT
 protected:
     Samples(uchar ** const data,

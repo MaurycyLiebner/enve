@@ -19,7 +19,7 @@
 
 #include "overlappingkeys.h"
 
-class OverlappingKeyList {
+class CORE_EXPORT OverlappingKeyList {
     typedef QList<OverlappingKeys>::const_iterator OKeyListCIter;
     typedef QList<OverlappingKeys>::iterator OKeyListIter;
 public:

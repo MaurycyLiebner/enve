@@ -18,7 +18,7 @@
 #define FILEHANDLEROBJREF_H
 #include "filecachehandler.h"
 
-class FileHandlerObjRefBase : public QObject {
+class CORE_EXPORT FileHandlerObjRefBase : public QObject {
 protected:
     FileHandlerObjRefBase() {}
     void increment(FileCacheHandler* const hadler) const;
@@ -26,7 +26,7 @@ protected:
 };
 
 template <class T>
-class FileHandlerObjRef : private FileHandlerObjRefBase {
+class CORE_EXPORT FileHandlerObjRef : private FileHandlerObjRefBase {
 public:
     using Connector = std::function<void(ConnContext& conn, T* obj)>;
     using Getter = std::function<T*(const QString& path)>;

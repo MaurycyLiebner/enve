@@ -20,7 +20,7 @@
 
 typedef KeyT<QString> QStringKey;
 
-class QStringAnimator : public SteppedAnimator<QString> {
+class CORE_EXPORT QStringAnimator : public SteppedAnimator<QString> {
     e_OBJECT
 protected:
     QStringAnimator(const QString& name);

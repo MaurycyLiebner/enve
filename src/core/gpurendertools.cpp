@@ -16,8 +16,6 @@
 
 #include "gpurendertools.h"
 
-#include "src/gpu/gl/GrGLDefines.h"
-
 GpuRenderTools::GpuRenderTools(QGL33 * const gl,
                                SwitchableContext &context,
                                sk_sp<SkImage> img,

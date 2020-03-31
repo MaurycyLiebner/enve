@@ -18,7 +18,7 @@
 #define MINIMALCACHECONTAINER_H
 #include "smartPointers/stdselfref.h"
 
-class CacheContainer : public StdSelfRef {
+class CORE_EXPORT CacheContainer : public StdSelfRef {
     friend class UsePointerBase;
     friend class UsedRange;
     friend class MemoryHandler;

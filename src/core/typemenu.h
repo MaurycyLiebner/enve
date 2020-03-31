@@ -27,7 +27,7 @@ class MovablePoint;
 class BoundingBox;
 
 template <typename Type>
-class TypeMenu {
+class CORE_EXPORT TypeMenu {
     using TTypeMenu = TypeMenu<Type>;
 public:
     using PlainTriggeredOp = std::function<void()>;

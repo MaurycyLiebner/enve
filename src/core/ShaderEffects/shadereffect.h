@@ -22,7 +22,7 @@
 
 template <typename T> using stduptr = std::unique_ptr<T>;
 
-class ShaderEffect : public RasterEffect {
+class CORE_EXPORT ShaderEffect : public RasterEffect {
     e_OBJECT
     ShaderEffect(const QString &name,
                  const ShaderEffectCreator * const creator,

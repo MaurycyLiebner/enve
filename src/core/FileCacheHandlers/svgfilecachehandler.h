@@ -22,7 +22,7 @@
 class ContainerBox;
 class Gradient;
 
-class SvgFileCacheHandler : public FileCacheHandler {
+class CORE_EXPORT SvgFileCacheHandler : public FileCacheHandler {
     e_OBJECT
 protected:
     SvgFileCacheHandler();

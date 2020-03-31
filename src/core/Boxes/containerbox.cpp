@@ -39,8 +39,12 @@ ContainerBox::ContainerBox(const eBoxType type) :
             &RasterEffectCollection::forcedMarginChanged,
             this, &ContainerBox::forcedMarginMeaningfulChange);
     iniPathEffects();
-    if(type == eBoxType::layer ||
-       type == eBoxType::canvas) promoteToLayer();
+    if(type == eBoxType::layer || type == eBoxType::canvas) promoteToLayer();
+}
+
+ContainerBox::ContainerBox(const QString &name, const eBoxType type) :
+    ContainerBox(type) {
+    prp_setName(name);
 }
 
 bool ContainerBox::SWT_dropSupport(const QMimeData * const data) {
@@ -1345,7 +1349,7 @@ qsptr<BoundingBox> readIdCreateBox(eReadStream& src) {
         case(eBoxType::video):
             return enve::make_shared<VideoBox>();
         case(eBoxType::rectangle):
-            return enve::make_shared<Rectangle>();
+            return enve::make_shared<RectangleBox>();
         case(eBoxType::circle):
             return enve::make_shared<Circle>();
         case(eBoxType::layer):

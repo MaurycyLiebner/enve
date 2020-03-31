@@ -18,7 +18,7 @@
 #define INTERPOLATIONKEY_H
 #include "graphkey.h"
 
-class InterpolationKey : public GraphKey {
+class CORE_EXPORT InterpolationKey : public GraphKey {
 public:
     InterpolationKey(const int frame,
                      Animator * const parentAnimator);

@@ -17,12 +17,14 @@
 #ifndef SIMPLETASK_H
 #define SIMPLETASK_H
 
+#include "core_global.h"
+
 #include <QObject>
 
 #include <functional>
 #include <memory>
 
-class SimpleTask : public QObject {
+class CORE_EXPORT SimpleTask : public QObject {
     Q_OBJECT
     typedef std::function<void(void)> Func;
 
@@ -42,7 +44,7 @@ signals:
     void finished();
 };
 
-class SimpleTaskScheduler : public QObject {
+class CORE_EXPORT SimpleTaskScheduler : public QObject {
     typedef std::function<void(void)> Func;
 public:
     SimpleTaskScheduler(const Func& func);

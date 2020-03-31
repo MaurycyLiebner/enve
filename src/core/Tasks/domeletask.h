@@ -25,7 +25,7 @@
 
 class SvgExporter;
 
-class DomEleTask : public eCpuTask {
+class CORE_EXPORT DomEleTask : public eCpuTask {
 public:
     DomEleTask(SvgExporter& exp, const FrameRange& visRange);
 

@@ -28,7 +28,7 @@ class ImageCacheContainer;
 class SvgExporter;
 class QDomElement;
 
-class AnimationFrameHandler : public SelfRef {
+class CORE_EXPORT AnimationFrameHandler : public SelfRef {
 protected:
     AnimationFrameHandler();
 public:

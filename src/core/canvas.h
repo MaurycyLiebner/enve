@@ -42,7 +42,7 @@ class AnimatedSurface;
 class PaintBox;
 class TextBox;
 class Circle;
-class Rectangle;
+class RectangleBox;
 class PathPivot;
 class SoundComposition;
 class SkCanvas;
@@ -57,7 +57,7 @@ class Document;
 
 enum class CtrlsMode : short;
 
-class MouseEvent {
+class CORE_EXPORT MouseEvent {
 protected:
     MouseEvent(const QPointF& pos,
                const QPointF& lastPos,
@@ -116,7 +116,7 @@ public:
     QWidget* fWidget;
 };
 
-struct KeyEvent : public MouseEvent {
+struct CORE_EXPORT KeyEvent : public MouseEvent {
     KeyEvent(const QPointF& pos,
              const QPointF& lastPos,
              const QPointF& lastPressPos,
@@ -138,7 +138,7 @@ struct KeyEvent : public MouseEvent {
     int fKey;
 };
 
-class Canvas : public CanvasBase {
+class CORE_EXPORT Canvas : public CanvasBase {
     friend class CanvasWindow;
     typedef qCubicSegment1DAnimator::Action SegAction;
     Q_OBJECT
@@ -697,7 +697,7 @@ protected:
 
     qptr<BoundingBox> mCurrentBox;
     qptr<Circle> mCurrentCircle;
-    qptr<Rectangle> mCurrentRectangle;
+    qptr<RectangleBox> mCurrentRectangle;
     qptr<TextBox> mCurrentTextBox;
     qptr<ContainerBox> mCurrentContainer;
 

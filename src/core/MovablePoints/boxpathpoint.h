@@ -18,7 +18,7 @@
 #define BOXPATHPOINT_H
 #include "animatedpoint.h"
 class BoxTransformAnimator;
-class BoxPathPoint : public AnimatedPoint {
+class CORE_EXPORT BoxPathPoint : public AnimatedPoint {
     e_OBJECT
 protected:
     BoxPathPoint(QPointFAnimator * const associatedAnimator,

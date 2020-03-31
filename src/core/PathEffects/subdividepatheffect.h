@@ -19,7 +19,7 @@
 #include "PathEffects/patheffect.h"
 class IntAnimator;
 
-class SubdividePathEffect : public PathEffect {
+class CORE_EXPORT SubdividePathEffect : public PathEffect {
     e_OBJECT
 protected:
     SubdividePathEffect();

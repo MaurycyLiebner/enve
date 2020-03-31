@@ -20,7 +20,7 @@
 #include "smartPointers/ememory.h"
 #include "FileCacheHandlers/filecachehandler.h"
 
-class FilesHandler : public QObject {
+class CORE_EXPORT FilesHandler : public QObject {
     Q_OBJECT
 public:
     FilesHandler();

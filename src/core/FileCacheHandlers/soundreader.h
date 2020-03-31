@@ -32,7 +32,7 @@ extern "C" {
 class SoundHandler;
 struct AudioStreamsData;
 
-class SoundReader : public eHddTask {
+class CORE_EXPORT SoundReader : public eHddTask {
     e_OBJECT
 protected:
     SoundReader(SoundHandler * const cacheHandler,
@@ -63,7 +63,7 @@ private:
 };
 
 #include "Sound/soundmerger.h"
-class SoundReaderForMerger : public SoundReader {
+class CORE_EXPORT SoundReaderForMerger : public SoundReader {
     e_OBJECT
     struct SingleSound {
         int fSampleShift;

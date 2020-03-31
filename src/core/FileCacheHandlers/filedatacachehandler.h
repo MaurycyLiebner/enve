@@ -19,7 +19,7 @@
 #include "smartPointers/selfref.h"
 #include "smartPointers/ememory.h"
 
-class FileDataCacheHandler : public SelfRef {
+class CORE_EXPORT FileDataCacheHandler : public SelfRef {
     Q_OBJECT
 protected:
     FileDataCacheHandler();

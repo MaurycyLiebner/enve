@@ -32,24 +32,39 @@ enum class ColorParameter : short {
     all
 };
 
+CORE_EXPORT
 extern bool shouldValPointerBeLightHSV(const float h,
                                        const float s,
                                        const float v);
+CORE_EXPORT
 extern bool shouldValPointerBeLightHSL(float h, float s, float l);
+CORE_EXPORT
 extern bool shouldValPointerBeLightRGB(float r, float g, float b);
 
+CORE_EXPORT
 extern void rgb_to_hsv_float (float &r_ /*h*/, float &g_ /*s*/, float &b_ /*v*/);
+CORE_EXPORT
 extern void hsv_to_rgb_float (float &h_, float &s_, float &v_);
+CORE_EXPORT
 extern void rgb_to_hsl_float (float &r_, float &g_, float &b_);
+CORE_EXPORT
 extern void hsl_to_rgb_float (float &h_, float &s_, float &l_);
+CORE_EXPORT
 extern void hsv_to_hsl(float &h, float &s, float &v);
+CORE_EXPORT
 extern void hsl_to_hsv(float &h, float &s, float &l);
 
+CORE_EXPORT
 extern void qrgb_to_hsv(qreal &r_ /*h*/, qreal &g_ /*s*/, qreal &b_ /*v*/);
+CORE_EXPORT
 extern void qhsv_to_rgb(qreal &h_, qreal &s_, qreal &v_);
+CORE_EXPORT
 extern void qrgb_to_hsl(qreal &r_, qreal &g_, qreal &b_);
+CORE_EXPORT
 extern void qhsl_to_rgb(qreal &h_, qreal &s_, qreal &l_);
+CORE_EXPORT
 extern void qhsv_to_hsl(qreal &h, qreal &s, qreal &v);
+CORE_EXPORT
 extern void qhsl_to_hsv(qreal &h, qreal &s, qreal &l);
 
 #endif // HELPERS_H

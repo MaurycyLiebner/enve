@@ -23,7 +23,7 @@ class QPointFAnimator;
 class AnimatedPoint;
 class SimpleBrushWrapper;
 
-class PaintBox : public BoundingBox {
+class CORE_EXPORT PaintBox : public BoundingBox {
     e_OBJECT
     e_DECLARE_TYPE(PaintBox)
 protected:

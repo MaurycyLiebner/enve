@@ -16,11 +16,14 @@
 
 #ifndef SCULPTBRUSH_H
 #define SCULPTBRUSH_H
+
+#include "../../core_global.h"
+
 #include <QPointF>
 #include <QMatrix>
 #include <QColor>
 
-class SculptBrush {
+class CORE_EXPORT SculptBrush {
 public:
     SculptBrush(const qreal expRadius,
                 const qreal hardness,

@@ -26,7 +26,7 @@
 
 using SmartPathKey = InterpolationKeyT<SmartPath>;
 
-class SmartPathAnimator : public InterOptimalAnimatorT<SmartPath> {
+class CORE_EXPORT SmartPathAnimator : public InterOptimalAnimatorT<SmartPath> {
     e_OBJECT
     Q_OBJECT
 protected:

@@ -17,7 +17,7 @@
 #ifndef CANVASRENDERDATA_H
 #define CANVASRENDERDATA_H
 #include "layerboxrenderdata.h"
-struct CanvasRenderData : public ContainerBoxRenderData {
+struct CORE_EXPORT CanvasRenderData : public ContainerBoxRenderData {
     CanvasRenderData(BoundingBox * const parentBoxT);
 
     int fCanvasWidth;

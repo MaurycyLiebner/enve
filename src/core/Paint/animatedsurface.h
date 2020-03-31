@@ -28,7 +28,7 @@ class AnimatedSurface;
 class ComplexTask;
 class DomEleTask;
 
-class ASKey : public Key {
+class CORE_EXPORT ASKey : public Key {
     e_OBJECT
 protected:
     ASKey(AnimatedSurface * const parent);
@@ -55,7 +55,7 @@ private:
     const stdsptr<DrawableAutoTiledSurface> mValue;
 };
 
-class AnimatedSurface : public Animator {
+class CORE_EXPORT AnimatedSurface : public Animator {
     Q_OBJECT
     e_OBJECT
     //typedef InterpolationKeyT<AutoTiledSurface> ASKey;

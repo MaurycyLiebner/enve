@@ -33,7 +33,7 @@ extern qreal horizontalAdvance(const SkFont& font, const QString& str,
 extern qreal horizontalAdvance(const SkFont& font, const QString& str,
                                const qreal letterSpacing, const qreal wordSpacing);
 
-class LetterRenderData : public PathBoxRenderData {
+class CORE_EXPORT LetterRenderData : public PathBoxRenderData {
 public:
     LetterRenderData(TextBox* const parent);
 
@@ -58,7 +58,7 @@ public:
     QList<stdsptr<PathEffectCaller>> fOutlineEffects;
 };
 
-class WordRenderData : public ContainerBoxRenderData {
+class CORE_EXPORT WordRenderData : public ContainerBoxRenderData {
 public:
     WordRenderData(TextBox* const parent);
 
@@ -79,7 +79,7 @@ public:
     QList<stdsptr<LetterRenderData>> fLetters;
 };
 
-class LineRenderData : public ContainerBoxRenderData {
+class CORE_EXPORT LineRenderData : public ContainerBoxRenderData {
 public:
     LineRenderData(TextBox* const parent);
 
@@ -101,7 +101,7 @@ public:
     QList<stdsptr<WordRenderData>> fWords;
 };
 
-class TextBoxRenderData : public ContainerBoxRenderData {
+class CORE_EXPORT TextBoxRenderData : public ContainerBoxRenderData {
 public:
     TextBoxRenderData(TextBox* const parent);
 

@@ -22,7 +22,7 @@
 
 class eSound;
 
-class InternalLinkBox : public InternalLinkBoxBase<BoundingBox> {
+class CORE_EXPORT InternalLinkBox : public InternalLinkBoxBase<BoundingBox> {
     e_OBJECT
 protected:
     InternalLinkBox(BoundingBox * const linkTarget,

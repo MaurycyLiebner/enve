@@ -18,7 +18,7 @@
 #define BOOLPROPERTY_H
 #include "property.h"
 
-class BoolProperty : public Property {
+class CORE_EXPORT BoolProperty : public Property {
     Q_OBJECT
     e_OBJECT
 protected:

@@ -21,6 +21,7 @@
 #include <QImage>
 
 #include "../skia/skiaincludes.h"
+#include "../core_global.h"
 
 enum class OraElementType {
     image,
@@ -30,7 +31,7 @@ enum class OraElementType {
     text
 };
 
-struct OraElement {
+struct CORE_EXPORT OraElement {
     OraElement(const QString& name,
                const OraElementType type) :
         fName(name), fType(type) {}
@@ -46,7 +47,7 @@ struct OraElement {
     const OraElementType fType;
 };
 
-struct OraLayer : public OraElement {
+struct CORE_EXPORT OraLayer : public OraElement {
     OraLayer(const OraElementType type) :
         OraElement("Layer", type) {}
 
@@ -64,13 +65,13 @@ struct OraLayerPNG : public OraLayer {
 using OraLayerPNG_Qt = OraLayerPNG<QImage>;
 using OraLayerPNG_Sk = OraLayerPNG<sk_sp<SkImage>>;
 
-struct OraLayerSVG : public OraLayer {
+struct CORE_EXPORT OraLayerSVG : public OraLayer {
     OraLayerSVG() : OraLayer(OraElementType::layerSVG) {}
 
     QByteArray fDocument;
 };
 
-struct OraText : public OraElement {
+struct CORE_EXPORT OraText : public OraElement {
     OraText() : OraElement("Text", OraElementType::text) {}
 
     QString fText;

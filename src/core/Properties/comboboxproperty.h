@@ -19,7 +19,7 @@
 
 #include "property.h"
 
-class ComboBoxProperty : public Property {
+class CORE_EXPORT ComboBoxProperty : public Property {
     Q_OBJECT
     e_OBJECT
 protected:

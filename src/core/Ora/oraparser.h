@@ -20,8 +20,11 @@
 #include "orastructure.h"
 
 namespace ImportORA {
+    CORE_EXPORT
     std::shared_ptr<OraImage_Qt> readOraFileQImage(const QString &filename);
+    CORE_EXPORT
     std::shared_ptr<OraImage_Sk> readOraFileSkImage(const QString &filename);
+    CORE_EXPORT
     sk_sp<SkImage> loadContainedMerged(const QString &filename);
 }
 

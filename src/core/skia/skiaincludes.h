@@ -31,11 +31,14 @@
 #include "include/core/SkImageFilter.h"
 #include "include/core/SkMaskFilter.h"
 #include "include/core/SkColorFilter.h"
+#include "include/core/SkFontMetrics.h"
 
 #include "include/pathops/SkPathOps.h"
 
 #include "include/utils/SkRandom.h"
 #include "include/utils/SkTextUtils.h"
+#include "include/utils/SkParsePath.h"
+#include "include/utils/SkBase64.h"
 
 #include "include/core/SkStrokeRec.h"
 #include "include/effects/SkDashPathEffect.h"
@@ -51,6 +54,9 @@
 
 #include <QtGui/qopengl.h>
 
+#include "src/gpu/gl/GrGLDefines.h"
+
 #include "src/core/SkStroke.h"
+#include "src/core/SkGeometry.h" // for SkAutoConicToQuads
 
 #endif // SKIAINCLUDES_H

@@ -20,7 +20,7 @@
 #include "sculptpath.h"
 #include "../interoptimalanimatort.h"
 
-class SculptPathAnimator : public InterOptimalAnimatorT<SculptPath> {
+class CORE_EXPORT SculptPathAnimator : public InterOptimalAnimatorT<SculptPath> {
     Q_OBJECT
 public:
     SculptPathAnimator();

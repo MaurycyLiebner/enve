@@ -23,7 +23,7 @@
 enum class QrealPointType : short;
 class QrealPoint;
 
-class GraphKey : public Key {
+class CORE_EXPORT GraphKey : public Key {
 public:
     GraphKey(const int frame, Animator * const parentAnimator);
     GraphKey(Animator * const parentAnimator);

@@ -54,8 +54,6 @@ void SmartPathCollection::prp_readProperty(eReadStream &src) {
     src.read(&mFillType, sizeof(SkPathFillType));
 }
 
-#include "include/utils/SkParsePath.h"
-
 void SmartPathCollection::savePathsSVG(SvgExporter& exp,
                                        QDomElement& parent,
                                        const EffectApplier& applier,

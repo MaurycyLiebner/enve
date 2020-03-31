@@ -25,7 +25,7 @@ enum class ManualDrawPathState {
     none, drawn, fitted
 };
 
-class DrawPath {
+class CORE_EXPORT DrawPath {
 public:
     DrawPath();
 

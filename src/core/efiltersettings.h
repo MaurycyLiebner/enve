@@ -16,11 +16,14 @@
 
 #ifndef EFILTERSETTINGS_H
 #define EFILTERSETTINGS_H
+
 #include <QObject>
+
+#include "core_global.h"
 #include "skia/skiaincludes.h"
 #include "simplemath.h"
 
-class eFilterSettings : public QObject {
+class CORE_EXPORT eFilterSettings : public QObject {
     Q_OBJECT
 public:
     eFilterSettings();

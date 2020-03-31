@@ -45,7 +45,7 @@ enum class PaintMode {
     move, crop
 };
 
-class Document : public SingleWidgetTarget {
+class CORE_EXPORT Document : public SingleWidgetTarget {
     Q_OBJECT
 public:
     Document(TaskScheduler& taskScheduler);

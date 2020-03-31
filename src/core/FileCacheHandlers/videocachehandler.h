@@ -23,7 +23,7 @@
 class VideoFrameLoader;
 class VideoFrameHandler;
 
-class VideoDataHandler : public FileDataCacheHandler {
+class CORE_EXPORT VideoDataHandler : public FileDataCacheHandler {
     Q_OBJECT
 public:
     VideoDataHandler() {}
@@ -52,7 +52,7 @@ private:
     HddCachableCacheHandler mFramesCache;
 };
 
-class VideoFrameHandler : public AnimationFrameHandler {
+class CORE_EXPORT VideoFrameHandler : public AnimationFrameHandler {
     e_OBJECT
     friend class VideoFrameLoader;
 protected:
@@ -86,7 +86,7 @@ private:
     stdsptr<VideoStreamsData> mVideoStreamsData;
 };
 #include "CacheHandlers/soundcachehandler.h"
-class VideoFileHandler : public FileCacheHandler {
+class CORE_EXPORT VideoFileHandler : public FileCacheHandler {
     e_OBJECT
 protected:
     VideoFileHandler() {}

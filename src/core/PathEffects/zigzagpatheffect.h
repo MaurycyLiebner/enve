@@ -18,7 +18,7 @@
 #define ZIGZAGPATHEFFECT_H
 #include "PathEffects/patheffect.h"
 
-class ZigZagPathEffect : public PathEffect {
+class CORE_EXPORT ZigZagPathEffect : public PathEffect {
     e_OBJECT
 protected:
     ZigZagPathEffect();

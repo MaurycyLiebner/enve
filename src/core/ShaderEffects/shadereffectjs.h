@@ -17,11 +17,13 @@
 #ifndef SHADEREFFECTJS_H
 #define SHADEREFFECTJS_H
 
+#include "../core_global.h"
+
 #include <memory>
 #include <QJSEngine>
 #include <include/core/SkRect.h>
 
-class ShaderEffectJS {
+class CORE_EXPORT ShaderEffectJS {
 public:
     struct Blueprint;
     ShaderEffectJS(const Blueprint& blueprint);

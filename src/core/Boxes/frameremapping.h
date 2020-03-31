@@ -18,7 +18,7 @@
 #define FRAMEREMAPPING_H
 #include "Animators/qrealanimator.h"
 
-class FrameRemappingBase : public QrealAnimator {
+class CORE_EXPORT FrameRemappingBase : public QrealAnimator {
     Q_OBJECT
 protected:
     FrameRemappingBase();
@@ -41,7 +41,7 @@ private:
     bool mEnabled;
 };
 
-class IntFrameRemapping : public FrameRemappingBase {
+class CORE_EXPORT IntFrameRemapping : public FrameRemappingBase {
     e_OBJECT
 protected:
     IntFrameRemapping();
@@ -49,7 +49,7 @@ public:
     int frame(const qreal relFrame) const;
 };
 
-class QrealFrameRemapping : public FrameRemappingBase {
+class CORE_EXPORT QrealFrameRemapping : public FrameRemappingBase {
     e_OBJECT
 protected:
     QrealFrameRemapping();

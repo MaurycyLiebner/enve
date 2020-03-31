@@ -24,7 +24,7 @@ class AnimationBox;
 
 using ShaderOptions = QList<stdsptr<ShaderEffectCreator>>;
 
-class DialogsInterface {
+class CORE_EXPORT DialogsInterface {
     static const DialogsInterface* sInstance;
 protected:
     DialogsInterface();

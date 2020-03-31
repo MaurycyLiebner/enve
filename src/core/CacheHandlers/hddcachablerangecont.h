@@ -22,7 +22,7 @@
 class eTask;
 class HddCachableCacheHandler;
 
-class HddCachableRangeCont : public HddCachableCont {
+class CORE_EXPORT HddCachableRangeCont : public HddCachableCont {
     friend class SoundContainerTmpFileDataSaver;
 protected:
     HddCachableRangeCont(const FrameRange &range,

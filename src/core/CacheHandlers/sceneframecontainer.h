@@ -17,9 +17,9 @@
 #ifndef SCENEFRAMECONTAINER_H
 #define SCENEFRAMECONTAINER_H
 #include "imagecachecontainer.h"
-class BoxRenderData;
+struct BoxRenderData;
 
-class SceneFrameContainer : public ImageCacheContainer {
+class CORE_EXPORT SceneFrameContainer : public ImageCacheContainer {
 public:
     SceneFrameContainer(Canvas * const scene,
                         const BoxRenderData* const data,

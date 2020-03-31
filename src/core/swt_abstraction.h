@@ -29,7 +29,7 @@ class SWT_Abstraction;
 template <typename T> using stdfunc = std::function<T>;
 typedef stdfunc<void(SWT_Abstraction*, int)> SetAbsFunc;
 
-struct UpdateFuncs {
+struct CORE_EXPORT UpdateFuncs {
     stdfunc<void(const SWT_BoxRule)> fContentUpdateIfIsCurrentRule;
     stdfunc<void(SingleWidgetTarget*, const SWT_Target)>
         fContentUpdateIfIsCurrentTarget;
@@ -38,7 +38,7 @@ struct UpdateFuncs {
     stdfunc<void()> fUpdateVisibleWidgetsContent;
 };
 
-class SWT_Abstraction : public StdSelfRef {
+class CORE_EXPORT SWT_Abstraction : public StdSelfRef {
 public:
     SWT_Abstraction(SingleWidgetTarget * const target,
                     const UpdateFuncs& updateFuncs,

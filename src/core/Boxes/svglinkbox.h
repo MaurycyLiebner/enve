@@ -25,7 +25,7 @@ using SvgLinkBoxBase =
     ExternalLinkBoxT<ContainerBox,
                      SvgFileCacheHandler>;
 
-class SvgLinkBox : public SvgLinkBoxBase {
+class CORE_EXPORT SvgLinkBox : public SvgLinkBoxBase {
 public:
     SvgLinkBox();
 

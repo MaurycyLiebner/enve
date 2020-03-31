@@ -23,7 +23,7 @@
 #include "switchablecontext.h"
 #include "etextureframebuffer.h"
 
-class GpuRenderTools {
+class CORE_EXPORT GpuRenderTools {
     friend class SkiaRenderTools;
     friend class OpenGLRenderTools;
 public:

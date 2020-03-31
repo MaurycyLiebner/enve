@@ -21,7 +21,7 @@
 
 #include "exceptions.h"
 
-class ZipFileLoader {
+class CORE_EXPORT ZipFileLoader {
 public:
     ZipFileLoader();
     ~ZipFileLoader() { mZip.close(); }

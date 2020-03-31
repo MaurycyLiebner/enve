@@ -31,7 +31,7 @@ class PropertyUpdater;
 
 class QPointFAnimator;
 
-class AnimatedPoint : public MovablePoint {
+class CORE_EXPORT AnimatedPoint : public MovablePoint {
     e_OBJECT
 protected:
     AnimatedPoint(QPointFAnimator * const associatedAnimator,

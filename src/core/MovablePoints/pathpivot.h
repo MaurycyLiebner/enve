@@ -23,7 +23,7 @@ class Canvas;
 
 enum class CanvasMode : short;
 
-class PathPivot : public NonAnimatedMovablePoint {
+class CORE_EXPORT PathPivot : public NonAnimatedMovablePoint {
     e_OBJECT
 protected:
     PathPivot(const Canvas* const parent);

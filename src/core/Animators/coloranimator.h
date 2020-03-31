@@ -21,7 +21,7 @@
 #include "../colorhelpers.h"
 #include "qrealanimator.h"
 
-class ColorAnimator : public StaticComplexAnimator {
+class CORE_EXPORT ColorAnimator : public StaticComplexAnimator {
     Q_OBJECT
     e_OBJECT
 protected:

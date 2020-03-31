@@ -74,9 +74,9 @@ bool eTaskBase::unhandledException() const {
     return static_cast<bool>(mUpdateException);
 }
 
-std::__exception_ptr::exception_ptr eTaskBase::takeException() {
+std::exception_ptr eTaskBase::takeException() {
     std::exception_ptr exc;
-    mUpdateException.swap(exc);
+    std::swap(mUpdateException, exc);
     return exc;
 }
 

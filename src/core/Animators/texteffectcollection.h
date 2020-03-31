@@ -21,7 +21,7 @@
 
 #include "texteffect.h"
 
-class TextEffectCollection : public DynamicComplexAnimator<TextEffect> {
+class CORE_EXPORT TextEffectCollection : public DynamicComplexAnimator<TextEffect> {
     e_OBJECT
 protected:
     TextEffectCollection();

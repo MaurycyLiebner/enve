@@ -18,8 +18,8 @@
 #define EFFECTSLOADER_H
 #include "Private/Tasks/offscreenqgl33c.h"
 
-class ShaderEffectProgram;
-class ShaderEffectCreator;
+struct ShaderEffectProgram;
+struct ShaderEffectCreator;
 
 class EffectsLoader : public QObject, protected OffscreenQGL33c {
     Q_OBJECT

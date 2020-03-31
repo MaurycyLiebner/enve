@@ -24,7 +24,7 @@ class Canvas;
 #include "onionskin.h"
 #include "CacheHandlers/usepointer.h"
 
-struct PaintTarget {
+struct CORE_EXPORT PaintTarget {
     PaintTarget(Canvas* const canvas) : mCanvas(canvas) {}
 
     bool needsProcessing() const { return true; }

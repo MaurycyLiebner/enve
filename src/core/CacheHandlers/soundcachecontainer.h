@@ -19,7 +19,7 @@
 #include "hddcachablerangecont.h"
 #include "CacheHandlers/samples.h"
 
-class SoundCacheContainer : public HddCachableRangeCont {
+class CORE_EXPORT SoundCacheContainer : public HddCachableRangeCont {
     e_OBJECT
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
 protected:

@@ -21,7 +21,7 @@
 
 #include "Tasks/updatable.h"
 
-class ComplexTask : public QObject, public eTaskBase {
+class CORE_EXPORT ComplexTask : public QObject, public eTaskBase {
     Q_OBJECT
     friend class TaskScheduler;
 public:

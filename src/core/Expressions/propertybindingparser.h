@@ -22,11 +22,13 @@
 using PropertyBindingMap = std::map<QString, qsptr<PropertyBindingBase>>;
 
 namespace PropertyBindingParser {
+    CORE_EXPORT
     qsptr<PropertyBindingBase> parseBinding(
             QString& name,
             const QString& exp,
             const PropertyBinding::Validator& validator,
             const Property* const context);
+    CORE_EXPORT
     PropertyBindingMap parseBindings(
             QString exp,
             const PropertyBinding::Validator& validator,

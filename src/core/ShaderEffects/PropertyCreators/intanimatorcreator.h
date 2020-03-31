@@ -20,7 +20,7 @@
 #include "Animators/intanimator.h"
 #include "shaderpropertycreator.h"
 
-struct IntAnimatorCreator : public ShaderPropertyCreator {
+struct CORE_EXPORT IntAnimatorCreator : public ShaderPropertyCreator {
     e_OBJECT
     IntAnimatorCreator(const int iniVal,
                        const int minVal,

@@ -24,7 +24,7 @@ class QrealPoint;
 enum class CtrlsMode : short;
 enum class QrealPointType : short;
 
-class GraphAnimator : public Animator {
+class CORE_EXPORT GraphAnimator : public Animator {
     e_OBJECT
 protected:
     GraphAnimator(const QString& name);

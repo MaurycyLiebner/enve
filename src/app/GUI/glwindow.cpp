@@ -20,8 +20,6 @@
 #include <QDebug>
 #include "exceptions.h"
 
-#include "src/gpu/gl/GrGLDefines.h"
-
 GLWindow::GLWindow(QWidget * const parent)
     : QOpenGLWidget(parent) {
     setUpdateBehavior(QOpenGLWidget::NoPartialUpdate);
@@ -89,9 +87,9 @@ void GLWindow::initialize() {
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    const auto interface = GrGLMakeNativeInterface();
-    if(!interface) RuntimeThrow("Failed to make native interface.");
-    mGrContext = GrContext::MakeGL(interface);
+    const auto intrface = GrGLMakeNativeInterface();
+    if(!intrface) RuntimeThrow("Failed to make native intrface.");
+    mGrContext = GrContext::MakeGL(intrface);
     if(!mGrContext) RuntimeThrow("Failed to make GrContext.");
 
     try {

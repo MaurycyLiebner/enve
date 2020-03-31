@@ -18,7 +18,7 @@
 #define ANIMATIONRECT_H
 #include "durationrectangle.h"
 
-class AnimationRect : public DurationRectangle {
+class CORE_EXPORT AnimationRect : public DurationRectangle {
     e_OBJECT
 protected:
     AnimationRect(Property& parentProp) :

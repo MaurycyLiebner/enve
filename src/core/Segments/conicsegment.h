@@ -16,17 +16,21 @@
 
 #ifndef CONICSEGMENT_H
 #define CONICSEGMENT_H
+
+#include "../core_global.h"
+
 #include <QPointF>
+
 template <typename T>
 struct CubicSegment;
 
 template <typename T>
 struct QuadSegment;
 
-class SkPoint;
+struct SkPoint;
 
 template <typename T, typename Tw>
-struct ConicSegment {
+struct CORE_EXPORT ConicSegment {
     T fP0;
     T fP1;
     T fP2;

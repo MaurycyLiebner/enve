@@ -27,7 +27,7 @@ class BoxPathPoint;
 class MovablePoint;
 class QPointFAnimator;
 
-class BasicTransformAnimator : public StaticComplexAnimator {
+class CORE_EXPORT BasicTransformAnimator : public StaticComplexAnimator {
     e_OBJECT
     Q_OBJECT
 protected:
@@ -126,7 +126,7 @@ signals:
     void totalTransformChanged(const UpdateReason);
 };
 
-class AdvancedTransformAnimator : public BasicTransformAnimator {
+class CORE_EXPORT AdvancedTransformAnimator : public BasicTransformAnimator {
     e_OBJECT
 protected:
     AdvancedTransformAnimator();
@@ -186,7 +186,7 @@ private:
     qsptr<QrealAnimator> mOpacityAnimator;
 };
 
-class BoxTransformAnimator : public AdvancedTransformAnimator {
+class CORE_EXPORT BoxTransformAnimator : public AdvancedTransformAnimator {
     e_OBJECT
 protected:
     BoxTransformAnimator();

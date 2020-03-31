@@ -25,7 +25,7 @@
 
 #define DEFAULT_TILT_CURVE qCubicSegment1D{0, 0, 0, 0}
 
-struct BrushStroke {
+struct CORE_EXPORT BrushStroke {
     friend struct BrushStrokeSet;
     qCubicSegment2D fStrokePath;
     qCubicSegment1D fPressure;

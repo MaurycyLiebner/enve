@@ -28,7 +28,7 @@
 class AnimatedSurface;
 class DrawableAutoTiledSurface;
 
-class ExternalPaintAppHandler : public QObject {
+class CORE_EXPORT ExternalPaintAppHandler : public QObject {
 public:
     enum App {
         gimp, mypaint, krita

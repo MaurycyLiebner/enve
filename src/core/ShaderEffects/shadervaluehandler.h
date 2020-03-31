@@ -29,7 +29,7 @@ enum class GLValueType {
     none
 };
 
-class ShaderValueHandler : public StdSelfRef {
+class CORE_EXPORT ShaderValueHandler : public StdSelfRef {
 public:
     ShaderValueHandler(const QString& name, const GLValueType type,
                        const QString& script);

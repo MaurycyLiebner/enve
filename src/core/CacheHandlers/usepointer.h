@@ -4,7 +4,7 @@
 #include "smartPointers/stdpointer.h"
 #include "cachecontainer.h"
 
-class UsePointerBase {
+class CORE_EXPORT UsePointerBase {
 protected:
     UsePointerBase() {}
 
@@ -18,7 +18,7 @@ protected:
 };
 
 template <template<class> class Ptr, class T = CacheContainer>
-class UsePointerT : public UsePointerBase {
+class CORE_EXPORT UsePointerT : public UsePointerBase {
 public:
     UsePointerT() {}
 

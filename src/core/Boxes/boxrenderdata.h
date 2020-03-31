@@ -28,7 +28,7 @@ class ShaderProgramCallerBase;
 #include "effectsrenderer.h"
 
 class RenderDataCustomizerFunctor;
-struct BoxRenderData : public eTask {
+struct CORE_EXPORT BoxRenderData : public eTask {
     e_OBJECT
 protected:
     enum class Step { BOX_IMAGE, EFFECTS };

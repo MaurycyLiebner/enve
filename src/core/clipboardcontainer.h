@@ -41,7 +41,7 @@ enum class ClipboardType : short {
     smartPath
 };
 
-class Clipboard : public StdSelfRef {
+class CORE_EXPORT Clipboard : public StdSelfRef {
 public:
     Clipboard(const ClipboardType type);
     ClipboardType getType() const;
@@ -56,7 +56,7 @@ private:
     const ClipboardType mType;
 };
 
-class SmartPathClipboard : public Clipboard {
+class CORE_EXPORT SmartPathClipboard : public Clipboard {
 public:
     SmartPathClipboard(const SmartPath& path) :
         Clipboard(ClipboardType::smartPath), mPath(path) {}
@@ -66,7 +66,7 @@ private:
     SmartPath mPath;
 };
 
-class BoxesClipboard : public Clipboard {
+class CORE_EXPORT BoxesClipboard : public Clipboard {
     e_OBJECT
 protected:
     BoxesClipboard(const QList<BoundingBox*> &src);
@@ -74,7 +74,7 @@ public:
     void pasteTo(ContainerBox * const parent);
 };
 
-class KeysClipboard : public Clipboard {
+class CORE_EXPORT KeysClipboard : public Clipboard {
     e_OBJECT
 protected:
     KeysClipboard();
@@ -87,7 +87,7 @@ private:
     QList<AnimatorKeyDataPair> mAnimatorData;
 };
 
-class BoxClipboard : public Clipboard {
+class CORE_EXPORT BoxClipboard : public Clipboard {
     e_OBJECT
 protected:
     BoxClipboard(const BoundingBox * const source);
@@ -118,7 +118,7 @@ private:
     const std::type_index mContentType;
 };
 
-class PropertyClipboard : public Clipboard {
+class CORE_EXPORT PropertyClipboard : public Clipboard {
     e_OBJECT
 protected:
     PropertyClipboard(const Property * const source);
@@ -151,7 +151,7 @@ private:
 template <typename T>
 class DynamicComplexAnimatorBase;
 
-class DynamicPropsClipboard : public Clipboard {
+class CORE_EXPORT DynamicPropsClipboard : public Clipboard {
     e_OBJECT
 protected:
     template<typename T>

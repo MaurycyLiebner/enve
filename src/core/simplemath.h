@@ -41,62 +41,96 @@
 #define pow2(val) (val*val)
 #define pow3(val) (val*val*val)
 
-#include <QtCore>
-class SkPoint;
+#include "core_global.h"
 
+#include <QtCore>
+struct SkPoint;
+
+CORE_EXPORT
 extern qreal signedSquare(const qreal val);
 
+CORE_EXPORT
 extern qreal distSign(const QPointF& distPt);
 
+CORE_EXPORT
 extern unsigned char truncateU8(const int val);
+CORE_EXPORT
 extern int clampInt(int val, int min, int max);
 
+CORE_EXPORT
 extern bool isNonZero(const float val);
 
+CORE_EXPORT
 extern bool isZero4Dec(const float val);
+CORE_EXPORT
 extern bool isZero4Dec(const double val);
 
+CORE_EXPORT
 extern double floor4Dec(const double val);
 
+CORE_EXPORT
 extern bool isInteger4Dec(const double val);
 
+CORE_EXPORT
 extern bool isZero6Dec(const double val);
+CORE_EXPORT
 extern bool isZeroOrOne6Dec(const double val);
 
+CORE_EXPORT
 extern bool isOne4Dec(const double val);
+CORE_EXPORT
 extern bool isOne6Dec(const double val);
 
+CORE_EXPORT
 extern bool isZero6Dec(const float val);
+CORE_EXPORT
 extern bool isOne4Dec(const float val);
+CORE_EXPORT
 extern bool isOne6Dec(const float val);
 
+CORE_EXPORT
 extern bool isZero2Dec(const qreal val);
+CORE_EXPORT
 extern bool isZero2Dec(const float val);
 
+CORE_EXPORT
 extern bool isZero1Dec(qreal val);
 
+CORE_EXPORT
 extern qreal qMin4(qreal v1, qreal v2,
                    qreal v3, qreal v4);
+CORE_EXPORT
 extern qreal qMax4(qreal v1, qreal v2,
                    qreal v3, qreal v4);
 
+CORE_EXPORT
 extern QRectF qRectF4Points(QPointF p1, QPointF c1,
                             QPointF c2, QPointF p2);
 
+CORE_EXPORT
 extern bool isNonZero(const double val);
+CORE_EXPORT
 extern void rotate(float rad_t, float *x_t, float *y_t);
+CORE_EXPORT
 extern void rotate(qreal rad_t, qreal *x_t, qreal *y_t);
 
+CORE_EXPORT
 extern void normalize(qreal *x_t, qreal *y_t, qreal dest_len = 1.);
+CORE_EXPORT
 extern float clamp(float val, float min_t, float max_t);
+CORE_EXPORT
 extern double getAngleF(double x1, double y1, double x2, double y2);
+CORE_EXPORT
 extern double getAngleDeg(double x1, double y1, double x2, double y2);
 
+CORE_EXPORT
 extern QPointF rotateVector90Degrees(const QPointF &pt);
 
+CORE_EXPORT
 extern qreal degreesBetweenVectors(const QPointF &pt1,
                                    const QPointF &pt2);
 
+CORE_EXPORT
 extern qreal radiansBetweenVectors(const QPointF &pt1,
                                    const QPointF &pt2);
 
@@ -124,21 +158,33 @@ float clamp(const float val, const T1 &min, const T2 &max) {
     return val;
 }
 
+CORE_EXPORT
 extern int clamp(const int val, const int min, const int max);
 
+CORE_EXPORT
 extern qreal gRandF(const qreal fMin = 0, const qreal fMax = 1);
+CORE_EXPORT
 extern float gSkRandF(const float fMin = 0, const float fMax = 1);
+CORE_EXPORT
 extern QPointF symmetricToPos(const QPointF &toMirror,
                               const QPointF &mirrorCenter);
+CORE_EXPORT
 extern QPointF symmetricToPosNewLen(const QPointF& toMirror,
                                     const QPointF& mirrorCenter,
                                     const qreal newLen);
+CORE_EXPORT
 extern qreal pointToLen(QPointF point);
+CORE_EXPORT
 extern float pointToLen(const SkPoint& point);
+CORE_EXPORT
 extern QPointF scalePointToNewLen(const QPointF &point,
                                   const qreal newLen);
+CORE_EXPORT
 extern QPointF gRotPt(const QPointF& pt, const qreal deg);
+CORE_EXPORT
 extern QPointF gQPointFDisplace(const QPointF& pt, const qreal displ);
 
+CORE_EXPORT
 extern bool isPointZero(QPointF pos);
+
 #endif // SIMPLEMATH_H

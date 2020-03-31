@@ -20,7 +20,7 @@
 #include "exceptions.h"
 #include "smartPointers/ememory.h"
 
-class eDraggedObjects {
+class CORE_EXPORT eDraggedObjects {
 public:
     template <typename T>
     eDraggedObjects(const QList<T*>& objs) :
@@ -62,7 +62,7 @@ private:
     QList<QObject*> mObjects;
 };
 
-class eMimeData : public QMimeData, public eDraggedObjects {
+class CORE_EXPORT eMimeData : public QMimeData, public eDraggedObjects {
 public:
     template <typename T>
     eMimeData(const QList<T*>& objs) : eDraggedObjects(objs) {}

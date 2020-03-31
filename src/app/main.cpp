@@ -39,14 +39,6 @@ extern "C" {
                        const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count(); \
                        qDebug() << name << duration << "us" << endl;
 
-
-int FONT_HEIGHT;
-int MIN_WIDGET_DIM;
-int BUTTON_DIM;
-int KEY_RECT_SIZE;
-
-QPixmap* ALPHA_MESH_PIX;
-
 void setDefaultFormat() {
     QSurfaceFormat format;
     format.setVersion(3, 3);

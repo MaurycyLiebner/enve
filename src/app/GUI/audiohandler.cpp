@@ -42,14 +42,15 @@ void AudioHandler::initializeAudio(const eSoundSettingsData& soundSettings) {
     mAudioDevice = QAudioDeviceInfo::defaultOutputDevice();
     mAudioFormat.setSampleRate(soundSettings.fSampleRate);
     mAudioFormat.setChannelCount(soundSettings.channelCount());
-    mAudioFormat.setSampleSize(soundSettings.bytesPerSample());
+    mAudioFormat.setSampleSize(8*soundSettings.bytesPerSample());
     mAudioFormat.setCodec("audio/pcm");
     mAudioFormat.setByteOrder(QAudioFormat::LittleEndian);
     mAudioFormat.setSampleType(toQtAudioFormat(soundSettings.fSampleFormat));
 
     QAudioDeviceInfo info(mAudioDevice);
     if(!info.isFormatSupported(mAudioFormat)) {
-        //RuntimeThrow("Default format not supported - trying to use nearest");
+        const auto oldFormat = mAudioFormat;
+        RuntimeThrow("Default format not supported - trying to use nearest");
         mAudioFormat = info.nearestFormat(mAudioFormat);
     }
 

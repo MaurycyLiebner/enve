@@ -4,7 +4,7 @@
 
 class BlendEffect;
 
-class BlendEffectBoxShadow : public eBoxOrSound {
+class CORE_EXPORT BlendEffectBoxShadow : public eBoxOrSound {
     e_OBJECT
     e_DECLARE_TYPE(BlendEffectBoxShadow)
 protected:

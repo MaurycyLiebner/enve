@@ -450,8 +450,8 @@ void TimelineDockWidget::setupSculptBrushSizeButtons(const QString& iconsDir) {
 
 void TimelineDockWidget::setupSculptModeButtons(const QString& iconsDir) {
     mDragMode = SwitchButton::sCreate2Switch(
-                iconsDir + "/sculpt<-Unchecked.png",
-                iconsDir + "/sculpt<-Checked.png",
+                iconsDir + "/sculptx-Unchecked.png",
+                iconsDir + "/sculptx-Checked.png",
                 gSingleLineTooltip("Drag Shape"), this);
     connect(mDragMode, &SwitchButton::toggled,
             &mDocument, [this] {

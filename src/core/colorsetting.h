@@ -26,7 +26,7 @@ enum class ColorSettingType : short {
 
 enum class ColorParameter : short;
 
-class ColorSetting {
+class CORE_EXPORT ColorSetting {
 public:
     ColorSetting(const ColorMode settingModeT,
                  const ColorParameter changedValueT,

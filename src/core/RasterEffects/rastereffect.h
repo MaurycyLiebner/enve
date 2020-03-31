@@ -28,9 +28,9 @@ enum class RasterEffectType : short {
     MOTION_BLUR
 };
 
-class BoxRenderData;
+struct BoxRenderData;
 
-class RasterEffect : public eEffect {
+class CORE_EXPORT RasterEffect : public eEffect {
     e_OBJECT
     Q_OBJECT
 protected:

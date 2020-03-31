@@ -18,10 +18,11 @@
 #define IMAGEDATAHANDLER_H
 
 #include "skia/skiaincludes.h"
+#include "../core_global.h"
 
 #include <QList>
 
-class ImageDataHandler {
+class CORE_EXPORT ImageDataHandler {
 protected:
     ImageDataHandler();
     ImageDataHandler(const sk_sp<SkImage>& img);

@@ -21,7 +21,7 @@
 #include "../gpurendertools.h"
 #include "shadereffectjs.h"
 
-class ShaderEffectCaller : public RasterEffectCaller {
+class CORE_EXPORT ShaderEffectCaller : public RasterEffectCaller {
     e_OBJECT
 public:
     ShaderEffectCaller(std::unique_ptr<ShaderEffectJS>&& engine,

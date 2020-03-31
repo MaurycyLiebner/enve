@@ -33,23 +33,32 @@ typedef QOpenGLFunctions_3_3_Core QGL33;
     }
 
 //! @brief Creates a program, compiles, and attaches associated shaders.
+CORE_EXPORT
 extern void iniProgram(QGL33 * const gl,
                        GLuint& program,
                        const QString &vShaderPath,
                        const QString &fShaderPath);
 
+CORE_EXPORT
 extern void iniTexturedVShaderVBO(QGL33 * const gl);
+CORE_EXPORT
 extern void iniTexturedVShaderVAO(QGL33 * const gl, GLuint& VAO);
+CORE_EXPORT
 extern void iniPlainVShaderVBO(QGL33 * const gl);
+CORE_EXPORT
 extern void iniPlainVShaderVAO(QGL33 * const gl, GLuint& VAO);
 
+CORE_EXPORT
 extern QString GL_PLAIN_VERT;
+CORE_EXPORT
 extern GLuint GL_PLAIN_SQUARE_VBO;
 
+CORE_EXPORT
 extern QString GL_TEXTURED_VERT;
+CORE_EXPORT
 extern GLuint GL_TEXTURED_SQUARE_VBO;
 
-struct CpuRenderData {
+struct CORE_EXPORT CpuRenderData {
     //! @brief Tile rect in texture coordinates
     SkIRect fTexTile;
 

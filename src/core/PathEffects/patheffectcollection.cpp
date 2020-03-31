@@ -68,7 +68,7 @@ qsptr<PathEffect> readIdCreatePathEffect(eReadStream &src) {
             return enve::make_shared<DisplacePathEffect>();
         case(PathEffectType::DASH):
             return enve::make_shared<DashPathEffect>();
-        case(PathEffectType::DUPLICATE):
+        case(PathEffectType::Duplicate):
             return enve::make_shared<DuplicatePathEffect>();
         case(PathEffectType::SOLIDIFY):
             return enve::make_shared<SolidifyPathEffect>();

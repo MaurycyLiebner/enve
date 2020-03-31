@@ -16,7 +16,6 @@
 
 #include "memoryhandler.h"
 #include "Boxes/boxrendercontainer.h"
-#include <gperftools/malloc_extension.h>
 #include <malloc.h>
 #include "GUI/mainwindow.h"
 #include <QMetaType>
@@ -81,7 +80,7 @@ void MemoryHandler::freeMemory(const MemoryState newState,
     }
 
     if(minFreeBytes.fValue <= 0) return;
-    long memToFree = minFreeBytes.fValue;
+    qint64 memToFree = minFreeBytes.fValue;
     while(memToFree > 0 && !mDataHandler.isEmpty()) {
         const auto cont = mDataHandler.takeFirst();
         memToFree -= cont->free_RAM_k();

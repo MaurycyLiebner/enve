@@ -19,7 +19,7 @@
 #include "Tasks/updatable.h"
 #include <QTemporaryFile>
 
-class TmpDeleter : public eHddTask {
+class CORE_EXPORT TmpDeleter : public eHddTask {
     e_OBJECT
 protected:
     TmpDeleter(const qsptr<QTemporaryFile> &file);

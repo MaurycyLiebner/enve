@@ -23,7 +23,7 @@
 class QrealKey;
 class Expression;
 
-class QrealAnimator :  public GraphAnimator {
+class CORE_EXPORT QrealAnimator :  public GraphAnimator {
     Q_OBJECT
     e_OBJECT
     friend class QPointFAnimator;
@@ -203,7 +203,7 @@ signals:
     void baseValueChanged(qreal);
 };
 
-class QrealAction {
+class CORE_EXPORT QrealAction {
     enum Type { START, SET, FINISH, CANCEL };
     QrealAction(const qreal value, const Type type) :
         mValue(value), mType(type) {}

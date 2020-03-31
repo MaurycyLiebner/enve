@@ -23,6 +23,12 @@
 
 #define enve_cast enve::cast
 
+#if (defined (_WIN32) || defined (_WIN64))
+    template <bool T> using BoolConstant = std::bool_constant<T>;
+#elif (defined (LINUX) || defined (__linux__))
+    template <bool T> using BoolConstant = std::__bool_constant<T>;
+#endif
+
 class SingleWidgetTarget;
 
 namespace enve {
@@ -82,13 +88,13 @@ namespace enve {
         inline T cast_qobject(U* const u, std::true_type) {
             typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type TO;
             typedef QtPrivate::HasQ_OBJECT_Macro<TO> MacroCheck;
-            return cast_q_object<T>(u, std::__bool_constant<MacroCheck::Value>());
+            return cast_q_object<T>(u, BoolConstant<MacroCheck::Value>());
         }
 
         template <typename T, class U>
         inline T cast_enve(U* const u, std::false_type) {
             typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type TO;
-            return cast_qobject<T>(u, std::__bool_constant<std::is_base_of<QObject, TO>::value>());
+            return cast_qobject<T>(u, BoolConstant<std::is_base_of<QObject, TO>::value>());
         }
 
         template <typename T, class U>
@@ -100,14 +106,14 @@ namespace enve {
         template <typename T, class U>
         inline T cast_swt(U* const u, std::false_type) {
             typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type TO;
-            return cast_qobject<T>(u, std::__bool_constant<std::is_base_of<QObject, TO>::value>());
+            return cast_qobject<T>(u, BoolConstant<std::is_base_of<QObject, TO>::value>());
 
         }
 
         template <typename T, class U>
         inline T cast_swt(U* const u, std::true_type) {
             typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type TO;
-            return cast_enve<T>(u, std::__bool_constant<HasCastMethod<TO, U>::Has>());
+            return cast_enve<T>(u, BoolConstant<HasCastMethod<TO, U>::Has>());
         }
     }
 
@@ -116,7 +122,7 @@ namespace enve {
     template <typename T, class U>
     inline T cast(U* const u) {
         typedef typename std::remove_cv<U>::type UNC;
-        return cast_swt<T>(const_cast<UNC*>(u), std::__bool_constant<std::is_base_of<SingleWidgetTarget, UNC>::value>());
+        return cast_swt<T>(const_cast<UNC*>(u), BoolConstant<std::is_base_of<SingleWidgetTarget, UNC>::value>());
     }
 
     //! @brief Use virtual function call, qobject_cast, or dynamic_cast,

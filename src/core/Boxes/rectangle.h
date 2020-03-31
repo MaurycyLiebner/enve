@@ -19,10 +19,10 @@
 #include "Boxes/pathbox.h"
 class AnimatedPoint;
 class QPointFAnimator;
-class Rectangle : public PathBox {
+class CORE_EXPORT RectangleBox : public PathBox {
     e_OBJECT
 protected:
-    Rectangle();
+    RectangleBox();
 public:
     SkPath getRelativePath(const qreal relFrame) const;
     bool differenceInEditPathBetweenFrames(

@@ -18,7 +18,7 @@
 #define ONIONSKIN_H
 #include "drawableautotiledsurface.h"
 
-struct OnionSkin {
+struct CORE_EXPORT OnionSkin {
     struct Skin {
         DrawableAutoTiledSurface* fSurface;
         float fWeight;

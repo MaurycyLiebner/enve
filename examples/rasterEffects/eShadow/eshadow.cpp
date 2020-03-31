@@ -16,16 +16,17 @@
 
 #include "eshadow.h"
 
-qsptr<CustomRasterEffect> eCreateNewestVersion() {
+void eCreateNewestVersion(qsptr<CustomRasterEffect> &result) {
     // Use default, most up to date, version
-    return enve::make_shared<eShadow>();
+    result = enve::make_shared<eShadow>();
 }
 
-qsptr<CustomRasterEffect> eCreate(const CustomIdentifier &identifier) {
+void eCreate(const CustomIdentifier &identifier,
+             qsptr<CustomRasterEffect>& result) {
     Q_UNUSED(identifier)
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
-    return enve::make_shared<eShadow>();
+    result = enve::make_shared<eShadow>();
 }
 
 // Returned value must be unique, lets enve distinguish effects
@@ -33,9 +34,11 @@ QString effectId() {
     return "iz4784jsvg6fw7bc3clb";
 }
 
+#define eSName QStringLiteral("eShadow")
+
 // Name of your effect used in UI
-QString eName() {
-    return "eShadow";
+void eName(QString& result) {
+    result = eSName;
 }
 
 // here specify your effect's most up to date version
@@ -43,19 +46,19 @@ CustomIdentifier::Version effectVersion() {
     return { 0, 0, 0 };
 }
 
-CustomIdentifier eIdentifier() {
-    return { effectId(), eName(), effectVersion() };
+void eIdentifier(CustomIdentifier &result) {
+    result = { effectId(), eSName, effectVersion() };
 }
 
 bool eSupports(const CustomIdentifier &identifier) {
     if(identifier.fEffectId != effectId()) return false;
-    if(identifier.fEffectName != eName()) return false;
+    if(identifier.fEffectName != eSName) return false;
     return identifier.fVersion == effectVersion();
 }
 
 #include "enveCore/Animators/qrealanimator.h"
 eShadow::eShadow() :
-    CustomRasterEffect(eName().toLower(), HardwareSupport::gpuPreffered, false) {
+    CustomRasterEffect(eSName.toLower(), HardwareSupport::gpuPreffered, false) {
     mBlurRadius = enve::make_shared<QrealAnimator>("blur radius");
     mOpacity = enve::make_shared<QrealAnimator>("opacity");
     mColor = enve::make_shared<ColorAnimator>();
@@ -99,7 +102,7 @@ eShadow::getEffectCaller(const qreal relFrame, const qreal resolution,
 }
 
 CustomIdentifier eShadow::getIdentifier() const {
-    return { effectId(), eName(), { 0, 0, 0 } };
+    return { effectId(), eSName, { 0, 0, 0 } };
 }
 
 void eShadowCaller::setupPaint(SkPaint &paint) const {

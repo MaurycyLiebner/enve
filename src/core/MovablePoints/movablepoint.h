@@ -39,7 +39,7 @@ class MovablePoint;
 template<typename T> class TypeMenu;
 typedef TypeMenu<MovablePoint> PointTypeMenu;
 
-class MovablePoint : public StdSelfRef {
+class CORE_EXPORT MovablePoint : public StdSelfRef {
     e_OBJECT
 protected:
     MovablePoint(const MovablePointType type);

@@ -27,7 +27,7 @@ enum class QrealPointType : short {
     c1Pt
 };
 
-class QrealPoint : public StdSelfRef {
+class CORE_EXPORT QrealPoint : public StdSelfRef {
     e_OBJECT
 public:
     QrealPoint(QrealPointType type,

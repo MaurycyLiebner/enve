@@ -21,7 +21,7 @@
 #include "../simplemath.h"
 #include "../skia/skiaincludes.h"
 
-struct CubicList {
+struct CORE_EXPORT CubicList {
     CubicList();
     CubicList(const QList<qCubicSegment2D>& segs);
     CubicList(const CubicList& src);

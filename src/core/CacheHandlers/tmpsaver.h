@@ -20,7 +20,7 @@
 #include <QTemporaryFile>
 #include "hddcachablecont.h"
 
-class TmpSaver : public eHddTask {
+class CORE_EXPORT TmpSaver : public eHddTask {
     e_OBJECT
 public:
     TmpSaver(HddCachableCont * const target);

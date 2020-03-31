@@ -25,7 +25,7 @@ extern "C" {
     #include <libavutil/opt.h>
     #include <libswresample/swresample.h>
 }
-struct SingleSoundData {
+struct CORE_EXPORT SingleSoundData {
     int fSampleShift;
     SampleRange fSSAbsRange;
     QrealSnapshot fVolume;
@@ -33,7 +33,7 @@ struct SingleSoundData {
     stdsptr<Samples> fSamples;
 };
 
-class SoundMerger : public eCpuTask {
+class CORE_EXPORT SoundMerger : public eCpuTask {
     e_OBJECT
 protected:
     SoundMerger(const int secondId, const SampleRange& sampleRange,

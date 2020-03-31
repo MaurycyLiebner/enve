@@ -18,7 +18,7 @@
 #define DASHPATHEFFECT_H
 #include "PathEffects/patheffect.h"
 
-class DashPathEffect : public PathEffect {
+class CORE_EXPORT DashPathEffect : public PathEffect {
     e_OBJECT
 protected:
     DashPathEffect();

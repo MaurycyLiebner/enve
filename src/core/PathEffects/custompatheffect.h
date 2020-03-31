@@ -19,7 +19,7 @@
 #include "patheffect.h"
 #include "../customidentifier.h"
 
-class CustomPathEffect : public PathEffect {
+class CORE_EXPORT CustomPathEffect : public PathEffect {
 public:
     CustomPathEffect(const QString& name);
 

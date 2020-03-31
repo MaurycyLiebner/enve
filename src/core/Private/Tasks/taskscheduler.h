@@ -29,7 +29,7 @@ class HddExecController;
 class GpuExecController;
 class ComplexTask;
 
-class TaskScheduler : public QObject {
+class CORE_EXPORT TaskScheduler : public QObject {
     Q_OBJECT
     using Func = std::function<void()>;
 public:

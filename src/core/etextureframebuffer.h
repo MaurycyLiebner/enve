@@ -18,7 +18,7 @@
 #define ETEXTUREFRAMEBUFFER_H
 #include "etexture.h"
 
-struct eTextureFrameBuffer {
+struct CORE_EXPORT eTextureFrameBuffer {
     GrBackendRenderTarget fGrFBO;
     eTexture fTexture;
     GLuint fFBOId = 0;

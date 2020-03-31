@@ -34,7 +34,7 @@ class eBoxOrSound;
 class ContainerBox;
 class ExternalLinkBox;
 
-class Actions : public QObject {
+class CORE_EXPORT Actions : public QObject {
 public:
     Actions(Document& document);
 

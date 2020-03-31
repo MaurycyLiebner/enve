@@ -17,6 +17,8 @@
 #ifndef EOBJECT_H
 #define EOBJECT_H
 
+#include "../core_global.h"
+
 #define e_PROHIBIT_HEAP \
 private: \
     static void *operator new (size_t sz) { \

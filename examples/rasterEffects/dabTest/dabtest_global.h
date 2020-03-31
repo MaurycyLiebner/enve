@@ -20,29 +20,25 @@
 #include <QtCore/qglobal.h>
 
 #if defined(DABTEST_LIBRARY)
-#  define DABTESTSHARED_EXPORT Q_DECL_EXPORT
+#  define DABTEST_EXPORT Q_DECL_EXPORT
 #else
-#  define DABTESTSHARED_EXPORT Q_DECL_IMPORT
+#  define DABTEST_EXPORT Q_DECL_IMPORT
 #endif
 
 #include "enveCore/RasterEffects/customrastereffect.h"
 
 extern "C" {
 
-DABTESTSHARED_EXPORT
-    qsptr<CustomRasterEffect> eCreateNewestVersion();
+DABTEST_EXPORT void eCreateNewestVersion(qsptr<CustomRasterEffect>& result);
 
-DABTESTSHARED_EXPORT
-    qsptr<CustomRasterEffect> eCreate(
-        const CustomIdentifier &identifier);
+DABTEST_EXPORT void eCreate(const CustomIdentifier &identifier,
+                            qsptr<CustomRasterEffect>& result);
 
-DABTESTSHARED_EXPORT
-    QString eName();
+DABTEST_EXPORT void eName(QString& result);
 
-DABTESTSHARED_EXPORT
-    CustomIdentifier eIdentifier();
+DABTEST_EXPORT void eIdentifier(CustomIdentifier& result);
 
-DABTESTSHARED_EXPORT
-    bool eSupports(const CustomIdentifier &identifier);
+DABTEST_EXPORT bool eSupports(const CustomIdentifier &identifier);
+
 }
 #endif // DABTEST_GLOBAL_H

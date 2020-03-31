@@ -20,7 +20,7 @@ class QrealKey;
 #include "../pointhelpers.h"
 #include "../framerange.h"
 
-class QrealSnapshot {
+class CORE_EXPORT QrealSnapshot {
     friend class Iterator;
     struct KeySnaphot {
         qreal fC0Frame;

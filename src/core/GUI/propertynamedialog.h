@@ -1,13 +1,16 @@
 #ifndef PROPERTYNAMEDIALOG_H
 #define PROPERTYNAMEDIALOG_H
+
 #include <QDialog>
 #include <QLabel>
 #include <QLineEdit>
 
+#include "../core_global.h"
+
 class Property;
 class BoundingBox;
 
-class PropertyNameDialog : public QDialog {
+class CORE_EXPORT PropertyNameDialog : public QDialog {
 public:
     PropertyNameDialog(const QString& initialValue,
                        QWidget* const parent = nullptr);

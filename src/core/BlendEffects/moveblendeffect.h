@@ -20,7 +20,7 @@
 #include "blendeffect.h"
 #include "Animators/intanimator.h"
 
-class MoveBlendEffect : public BlendEffect {
+class CORE_EXPORT MoveBlendEffect : public BlendEffect {
 public:
     MoveBlendEffect();
 

@@ -17,8 +17,9 @@
 #ifndef NODEPOINTVALUES_H
 #define NODEPOINTVALUES_H
 #include <QPointF>
+#include "core_global.h"
 
-struct NodePointValues {
+struct CORE_EXPORT NodePointValues {
     QPointF fC0;
     QPointF fP1;
     QPointF fC2;

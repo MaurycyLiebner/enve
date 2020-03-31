@@ -17,7 +17,7 @@
 #ifndef LINKCANVASRENDERDATA_H
 #define LINKCANVASRENDERDATA_H
 #include "canvasrenderdata.h"
-struct LinkCanvasRenderData : public CanvasRenderData {
+struct CORE_EXPORT LinkCanvasRenderData : public CanvasRenderData {
     LinkCanvasRenderData(BoundingBox * const parentBoxT) :
         CanvasRenderData(parentBoxT) {}
 

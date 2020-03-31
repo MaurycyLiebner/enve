@@ -25,7 +25,7 @@
 
 class Canvas;
 
-class SvgExporter : public ComplexTask {
+class CORE_EXPORT SvgExporter : public ComplexTask {
 public:
     SvgExporter(const QString& path, Canvas* const scene,
                 const FrameRange& frameRange,

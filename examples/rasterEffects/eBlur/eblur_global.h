@@ -29,15 +29,16 @@
 
 extern "C" {
 
-EBLUR_EXPORT qsptr<CustomRasterEffect> eCreateNewestVersion();
+EBLUR_EXPORT void eCreateNewestVersion(qsptr<CustomRasterEffect>& result);
 
-EBLUR_EXPORT qsptr<CustomRasterEffect> eCreate(const CustomIdentifier &identifier);
+EBLUR_EXPORT void eCreate(const CustomIdentifier &identifier,
+                          qsptr<CustomRasterEffect>& result);
 
-EBLUR_EXPORT QString eName();
+EBLUR_EXPORT void eName(QString& result);
 
-EBLUR_EXPORT CustomIdentifier eIdentifier();
+EBLUR_EXPORT void eIdentifier(CustomIdentifier& result);
 
-EBLUR_EXPORT  bool eSupports(const CustomIdentifier &identifier);
+EBLUR_EXPORT bool eSupports(const CustomIdentifier &identifier);
 
 }
 #endif // EBLUR_GLOBAL_H

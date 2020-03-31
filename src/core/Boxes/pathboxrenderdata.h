@@ -19,7 +19,7 @@
 #include "boxrenderdata.h"
 #include "Animators/paintsettingsanimator.h"
 
-struct PathBoxRenderData : public BoxRenderData {
+struct CORE_EXPORT PathBoxRenderData : public BoxRenderData {
     PathBoxRenderData(BoundingBox * const parentBox);
 
     SkPath fEditPath;

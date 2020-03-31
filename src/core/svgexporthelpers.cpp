@@ -16,10 +16,6 @@
 
 #include "svgexporthelpers.h"
 
-#include "include/utils/SkBase64.h"
-#include "src/codec/SkJpegCodec.h"
-#include "src/codec/SkPngCodec.h"
-
 #include "simplemath.h"
 
 QString SvgExportHelpers::ptrToStr(const void* const ptr) {
@@ -33,28 +29,28 @@ void SvgExportHelpers::assignLoop(QDomElement& ele, const bool loop) {
 }
 
 sk_sp<SkData> asDataUri(SkImage* image) {
-    sk_sp<SkData> imageData = image->encodeToData();
+    sk_sp<SkData> imageData = image->encodeToData(SkEncodedImageFormat::kPNG, 100);
     if (!imageData) {
         return nullptr;
     }
 
-    const char* src = (char*)imageData->data();
+//    const char* src = (char*)imageData->data();
     const char* selectedPrefix = nullptr;
     size_t selectedPrefixLength = 0;
 
     const static char pngDataPrefix[] = "data:image/png;base64,";
-    const static char jpgDataPrefix[] = "data:image/jpeg;base64,";
+//    const static char jpgDataPrefix[] = "data:image/jpeg;base64,";
 
-    if (SkJpegCodec::IsJpeg(src, imageData->size())) {
-        selectedPrefix = jpgDataPrefix;
-        selectedPrefixLength = sizeof(jpgDataPrefix);
-    } else {
-      if (!SkPngCodec::IsPng(src, imageData->size())) {
-        imageData = image->encodeToData(SkEncodedImageFormat::kPNG, 100);
-      }
+//    if (SkJpegCodec::IsJpeg(src, imageData->size())) {
+//        selectedPrefix = jpgDataPrefix;
+//        selectedPrefixLength = sizeof(jpgDataPrefix);
+//    } else {
+//      if (!SkPngCodec::IsPng(src, imageData->size())) {
+//        imageData = image->encodeToData(SkEncodedImageFormat::kPNG, 100);
+//      }
       selectedPrefix = pngDataPrefix;
       selectedPrefixLength = sizeof(pngDataPrefix);
-    }
+//    }
 
     size_t b64Size = SkBase64::Encode(imageData->data(), imageData->size(), nullptr);
     sk_sp<SkData> dataUri = SkData::MakeUninitialized(selectedPrefixLength + b64Size);

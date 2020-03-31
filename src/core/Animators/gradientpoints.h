@@ -23,7 +23,7 @@ class PathBox;
 class QPointFAnimator;
 #include "skia/skiaincludes.h"
 
-class GradientPoints : public StaticComplexAnimator {
+class CORE_EXPORT GradientPoints : public StaticComplexAnimator {
     e_OBJECT
 protected:
     GradientPoints(BoundingBox * const parent);

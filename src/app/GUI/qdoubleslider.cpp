@@ -44,7 +44,6 @@ void SliderEdit::keyPressEvent(QKeyEvent* e) {
     switch(key) {
     case Qt::Key_Escape:
         mCanceled = true;
-        [[fallthrough]];
     case Qt::Key_Return:
     case Qt::Key_Enter:
         clearFocus();

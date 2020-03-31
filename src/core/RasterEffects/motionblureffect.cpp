@@ -209,18 +209,14 @@ void MotionBlurCaller::sInitialize(QGL33 * const gl) {
     gl->glUseProgram(sProgramId);
 
     const GLint texture1 = gl->glGetUniformLocation(sProgramId, "texture1");
-    CheckInvalidLocation(texture1, "texture1");
     gl->glUniform1i(texture1, 0);
 
     const GLint texture2 = gl->glGetUniformLocation(sProgramId, "texture2");
-    CheckInvalidLocation(texture2, "texture2");
     gl->glUniform1i(texture2, 1);
 
     sOpacity2Loc = gl->glGetUniformLocation(sProgramId, "opacity2");
-    CheckInvalidLocation(sOpacity2Loc, "opacity2");
 
     sRect2Loc = gl->glGetUniformLocation(sProgramId, "rect2");
-    CheckInvalidLocation(sRect2Loc, "rect2");
 }
 
 void MotionBlurCaller::sDrawSample(const stdsptr<BoxRenderData>& sample,

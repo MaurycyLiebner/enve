@@ -20,8 +20,10 @@
 #include "orastructure.h"
 
 namespace CreatorOra {
+    CORE_EXPORT
     void save(const QString& path, const OraImage_Qt& ora,
               const bool mergeImages);
+    CORE_EXPORT
     void save(QIODevice* const dst, const OraImage_Qt& ora,
               const bool mergeImages);
 };

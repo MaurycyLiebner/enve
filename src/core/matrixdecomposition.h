@@ -20,9 +20,12 @@
 #include "transformvalues.h"
 
 namespace MatrixDecomposition {
+    CORE_EXPORT
     TransformValues decompose(const QMatrix& transform);
+    CORE_EXPORT
     TransformValues decomposePivoted(const QMatrix& transform,
                                      const QPointF& pivot);
+    CORE_EXPORT
     TransformValues setPivotKeepTransform(const TransformValues& transform,
                                           const QPointF& newPivot);
 };

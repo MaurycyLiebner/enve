@@ -23,9 +23,6 @@
 template <typename BoxT>
 class InternalLinkBoxBase : public BoxT {
 protected:
-    InternalLinkBoxBase(const eBoxType type,
-                        const bool innerLink) :
-        BoxT(type), mInnerLink(innerLink) {}
     InternalLinkBoxBase(const QString& name,
                         const eBoxType type,
                         const bool innerLink) :

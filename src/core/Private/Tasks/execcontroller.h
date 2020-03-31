@@ -19,7 +19,7 @@
 
 #include "taskexecutor.h"
 
-class ExecController : public QObject {
+class CORE_EXPORT ExecController : public QObject {
     Q_OBJECT
 protected:
     ExecController(TaskExecutor * const executor,
@@ -39,19 +39,19 @@ private:
     void finishedTask(const stdsptr<eTask>& task);
 };
 
-class CpuExecController : public ExecController {
+class CORE_EXPORT CpuExecController : public ExecController {
 public:
     CpuExecController(QObject * const parent = nullptr);
 };
 
-class GpuExecController : public ExecController {
+class CORE_EXPORT GpuExecController : public ExecController {
 public:
     GpuExecController(QObject * const parent = nullptr);
 
     void initialize();
 };
 
-class HddExecController : public ExecController {
+class CORE_EXPORT HddExecController : public ExecController {
 public:
     HddExecController(QObject * const parent = nullptr);
 };

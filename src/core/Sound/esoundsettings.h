@@ -23,7 +23,9 @@ extern "C" {
     #include <libavutil/channel_layout.h>
 }
 
-struct eSoundSettingsData {
+#include "../core_global.h"
+
+struct CORE_EXPORT eSoundSettingsData {
     int fSampleRate = 44100;
     AVSampleFormat fSampleFormat = AV_SAMPLE_FMT_FLT;
     uint64_t fChannelLayout = AV_CH_LAYOUT_STEREO;
@@ -47,7 +49,7 @@ struct eSoundSettingsData {
     }
 };
 
-class eSoundSettings : public QObject, private eSoundSettingsData {
+class CORE_EXPORT eSoundSettings : public QObject, private eSoundSettingsData {
     Q_OBJECT
 public:
     eSoundSettings();

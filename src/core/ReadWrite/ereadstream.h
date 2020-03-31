@@ -1,14 +1,15 @@
 #ifndef EREADSTREAM_H
 #define EREADSTREAM_H
 
-#include <QIODevice>
-
+#include "../core_global.h"
 #include "efuturepos.h"
+
+#include <QIODevice>
 
 class SimpleBrushWrapper;
 struct iValueRange;
 
-class eReadFutureTable {
+class CORE_EXPORT eReadFutureTable {
     friend class eReadStream;
     eReadFutureTable(QIODevice* const main);
 
@@ -28,7 +29,7 @@ private:
     QIODevice* const mMain;
 };
 
-class eReadStream {
+class CORE_EXPORT eReadStream {
 public:
     eReadStream(const int evFileVersion, QIODevice* const src);
     eReadStream(QIODevice* const src);

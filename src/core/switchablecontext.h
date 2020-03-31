@@ -18,7 +18,7 @@
 #define SWITCHABLECONTEXT_H
 #include "glhelpers.h"
 
-class SwitchableContext {
+class CORE_EXPORT SwitchableContext {
     friend class GpuTaskExecutor;
     enum class Mode { OpenGL, Skia };
 public:

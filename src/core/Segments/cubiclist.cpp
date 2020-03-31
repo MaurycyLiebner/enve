@@ -174,7 +174,7 @@ qreal CubicList::minDistanceTo(const QPointF &p,
                                QPointF * const pBestPos) const {
     qreal bestT = 0;
     QPointF bestPos;
-    qreal smallestDist = __DBL_MAX__;
+    qreal smallestDist = DBL_MAX;
     const int iMax = mSegments.count();
     for(int i = 0; i < iMax; i++) {
         auto& seg = mSegments[i];

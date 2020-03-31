@@ -20,7 +20,7 @@
 
 #include "Properties/comboboxproperty.h"
 
-class TargetedBlendEffect : public BlendEffect {
+class CORE_EXPORT TargetedBlendEffect : public BlendEffect {
 public:
     TargetedBlendEffect();
 

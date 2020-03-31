@@ -28,11 +28,10 @@ CONFIG += c++14
 DEFINES += QT_NO_FOREACH
 
 ENVE_FOLDER = $$PWD/../..
-THIRD_PARTY_FOLDER =  $$ENVE_FOLDER/third_party
+THIRD_PARTY_FOLDER = $$ENVE_FOLDER/third_party
 SKIA_FOLDER = $$THIRD_PARTY_FOLDER/skia
 LIBMYPAINT_FOLDER = $$THIRD_PARTY_FOLDER/libmypaint-1.5.1
 QUAZIP_FOLDER = $$THIRD_PARTY_FOLDER/quazip-0.8.1
-GPERFTOOLS_FOLDER = $$THIRD_PARTY_FOLDER/gperftools-2.7-enve-mod
 QSCINTILLA_FOLDER = $$THIRD_PARTY_FOLDER/QScintilla-2.11.4/Qt4Qt5
 
 INCLUDEPATH += ../core
@@ -41,13 +40,10 @@ DEPENDPATH += ../core
 LIBS += -L$$OUT_PWD/../core -lenvecore
 
 INCLUDEPATH += $$LIBMYPAINT_FOLDER/include
-LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint -lgobject-2.0 -lglib-2.0 -ljson-c
+LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
 
 INCLUDEPATH += $$QUAZIP_FOLDER
 LIBS += -L$$QUAZIP_FOLDER/quazip -lquazip
-
-INCLUDEPATH += $$GPERFTOOLS_FOLDER/include
-LIBS += -L$$GPERFTOOLS_FOLDER/.libs -ltcmalloc
 
 INCLUDEPATH += $$QSCINTILLA_FOLDER
 LIBS += -L$$QSCINTILLA_FOLDER -lqscintilla2_qt5
@@ -58,17 +54,42 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$SKIA_FOLDER/out/Debug
 } else {
     LIBS += -L$$SKIA_FOLDER/out/Release
-    QMAKE_CFLAGS -= -O2
-    QMAKE_CFLAGS -= -O1
-    QMAKE_CXXFLAGS -= -O2
-    QMAKE_CXXFLAGS -= -O1
-    QMAKE_CFLAGS = -m64 -O3
-    QMAKE_LFLAGS = -m64 -O3
-    QMAKE_CXXFLAGS = -m64 -O3
 }
 
-QMAKE_CXXFLAGS += -fopenmp
-LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp# -lX11
+win32 { # Windows
+    DEFINES += QSCINTILLA_DLLS
+
+    FFMPEG_FOLDER = $$THIRD_PARTY_FOLDER/ffmpeg-4.2.2-win64-dev
+    LIBS += -L$$FFMPEG_FOLDER/lib
+    INCLUDEPATH += $$FFMPEG_FOLDER/include
+
+    QMAKE_CFLAGS_RELEASE += /O2 -O2
+    QMAKE_CXXFLAGS_RELEASE += /O2 -O2
+
+    QMAKE_CFLAGS += -openmp
+    QMAKE_CXXFLAGS += -openmp
+} unix {
+    macx { # Mac OS X
+    } else { # Linux
+        GPERFTOOLS_FOLDER = $$THIRD_PARTY_FOLDER/gperftools-2.7-enve-mod
+        INCLUDEPATH += $$GPERFTOOLS_FOLDER/include
+        LIBS += -L$$GPERFTOOLS_FOLDER/.libs -ltcmalloc
+
+        LIBS += -lgobject-2.0 -lglib-2.0 -ljson-c
+
+        QMAKE_CFLAGS_RELEASE -= -O2
+        QMAKE_CFLAGS_RELEASE -= -O1
+        QMAKE_CXXFLAGS_RELEASE -= -O2
+        QMAKE_CXXFLAGS_RELEASE -= -O1
+        QMAKE_CFLAGS_RELEASE += -m64 -O3
+        QMAKE_CXXFLAGS_RELEASE += -m64 -O3
+
+        QMAKE_CXXFLAGS += -fopenmp
+        LIBS += -lpthread -lfreetype -lpng -ldl -fopenmp# -lX11
+    }
+}
+
+LIBS += -lskia
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = enve
@@ -362,7 +383,7 @@ DISTFILES += \
     icons/toolbarButtons/checkable/pressure \
     icons/toolbarButtons/checkable/sculpt+ \
     icons/toolbarButtons/checkable/sculpt- \
-    icons/toolbarButtons/checkable/sculpt<- \
+    icons/toolbarButtons/checkable/sculptx- \
     icons/toolbarButtons/checkable/sculpt= \
     icons/toolbarButtons/checkable/sculptUnchecked \
     icons/toolbarButtons/checkable/spacing \

@@ -25,7 +25,7 @@
 template <class T> using qsptr = QSharedPointer<T>;
 template <class T> using qptr = QPointer<T>;
 
-class SelfRef : public QObject {
+class CORE_EXPORT SelfRef : public QObject {
     e_PROHIBIT_HEAP
 public:
     template <class T, typename... Args>

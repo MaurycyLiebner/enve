@@ -21,7 +21,7 @@
 #include "conncontextptr.h"
 #include "Animators/eboxorsound.h"
 
-class FileCacheHandler : public SelfRef {
+class CORE_EXPORT FileCacheHandler : public SelfRef {
     friend class FilesHandler;
     friend class FileHandlerObjRefBase;
     Q_OBJECT

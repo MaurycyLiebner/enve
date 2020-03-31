@@ -25,7 +25,7 @@ template <class T> class StdPointer;
 template <class T> using stdsptr = std::shared_ptr<T>;
 template <class T> using stdptr = StdPointer<T>;
 
-class StdSelfRef {
+class CORE_EXPORT StdSelfRef {
     template <class T> friend class StdPointer;
     e_PROHIBIT_HEAP
 public:

@@ -32,7 +32,7 @@
     #define TILE_SPIXEL_SIZE TILE_SIZE*TILE_SIZE*4
 #endif
 
-struct AutoTilesData {
+struct CORE_EXPORT AutoTilesData {
     using TileCreator = std::function<stdsptr<Tile>(const size_t&)>;
 
     AutoTilesData(const TileCreator& tileCreator);

@@ -19,7 +19,7 @@
 #include "Animators/staticcomplexanimator.h"
 #include "Animators/intanimator.h"
 
-class RandomGrid : public StaticComplexAnimator {
+class CORE_EXPORT RandomGrid : public StaticComplexAnimator {
     e_OBJECT
 protected:
     RandomGrid();

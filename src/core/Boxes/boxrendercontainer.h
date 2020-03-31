@@ -24,7 +24,7 @@
 
 struct BoxRenderData;
 
-class RenderContainer {
+class CORE_EXPORT RenderContainer {
 public:
     RenderContainer() {}
 

@@ -44,7 +44,7 @@ bool GpuTaskExecutor::unhandledException() const {
 
 std::exception_ptr GpuTaskExecutor::handleException() {
     std::exception_ptr exc;
-    mProcessException.swap(exc);
+    std::swap(mProcessException, exc);
     return exc;
 }
 

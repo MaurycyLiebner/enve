@@ -17,6 +17,8 @@
 #ifndef EWIDGETS_H
 #define EWIDGETS_H
 
+#include "../core_global.h"
+
 #include <functional>
 
 class QObject;
@@ -26,7 +28,7 @@ class QColor;
 class ColorSetting;
 class ColorAnimator;
 
-class eWidgets {
+class CORE_EXPORT eWidgets {
     template <typename T> using Func = std::function<T>;
     static eWidgets* sInstance;
 protected:

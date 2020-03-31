@@ -6,13 +6,13 @@
 #include "Properties/boxtargetproperty.h"
 
 class PathBox;
-class ChildRenderData;
+struct ChildRenderData;
 
 enum class BlendEffectType {
     move, targeted
 };
 
-class BlendEffect : public eEffect {
+class CORE_EXPORT BlendEffect : public eEffect {
     Q_OBJECT
     e_OBJECT
 protected:

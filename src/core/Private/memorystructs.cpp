@@ -13,7 +13,7 @@ intKB::intKB(const intMB &mb) :
     fValue(mb.fValue*1024) {}
 
 longB::longB(const intKB &kb) :
-    fValue(static_cast<long>(kb.fValue)*1024) {}
+    fValue(static_cast<qint64>(kb.fValue)*1024) {}
 
 longB::longB(const intMB &mb) :
     longB(intKB(mb)) {}
@@ -83,10 +83,10 @@ longB operator+(const longB& a, const longB& b) {
     return longB(a.fValue + b.fValue);
 }
 
-longB operator*(const longB& a, const long& b) {
+longB operator*(const longB& a, const qint64& b) {
     return longB(a.fValue*b);
 }
 
-longB operator/(const longB& a, const long& b) {
+longB operator/(const longB& a, const qint64& b) {
     return longB(a.fValue/b);
 }

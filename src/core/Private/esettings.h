@@ -39,7 +39,7 @@ enum class AccPreference : int {
     gpuStrongPreference
 };
 
-class eSettings {
+class CORE_EXPORT eSettings {
 public:
     eSettings(const int cpuThreads, const intKB ramKB,
               const GpuVendor gpuVendor);

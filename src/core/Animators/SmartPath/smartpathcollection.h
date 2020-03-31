@@ -25,7 +25,7 @@ class SmartPathAnimator;
 class SmartNodePoint;
 typedef DynamicComplexAnimator<SmartPathAnimator> SmartPathCollectionBase;
 
-class SmartPathCollection : public SmartPathCollectionBase {
+class CORE_EXPORT SmartPathCollection : public SmartPathCollectionBase {
     Q_OBJECT
     e_OBJECT
 protected:

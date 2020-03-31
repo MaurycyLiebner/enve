@@ -19,6 +19,8 @@
 
 #include <QString>
 
+#include "core_global.h"
+
 enum class SWT_BoxRule : short {
     all,
     selected,
@@ -42,7 +44,7 @@ enum class SWT_Type : short {
     sound
 };
 
-struct SWT_RulesCollection {
+struct CORE_EXPORT SWT_RulesCollection {
     SWT_RulesCollection();
     SWT_RulesCollection(const SWT_BoxRule rule,
                         const bool alwaysShowChildren,

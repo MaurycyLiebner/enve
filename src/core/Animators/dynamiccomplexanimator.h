@@ -244,7 +244,7 @@ void TNoWriteType(T* const obj, eWriteStream& dst) {
 template <class T,
           void (&TWriteType)(T* const obj, eWriteStream& dst) = TNoWriteType<T>,
           qsptr<T> (&TReadTypeAndCreate)(eReadStream& src) = TCreateOnly<T>>
-class DynamicComplexAnimator : public DynamicComplexAnimatorBase<T> {
+class CORE_EXPORT DynamicComplexAnimator : public DynamicComplexAnimatorBase<T> {
     e_OBJECT
 protected:
     DynamicComplexAnimator(const QString &name) :

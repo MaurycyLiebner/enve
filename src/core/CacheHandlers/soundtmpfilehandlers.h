@@ -25,7 +25,7 @@
 #include "tmploader.h"
 
 class SoundCacheContainer;
-class SoundContainerTmpFileDataLoader : public TmpLoader {
+class CORE_EXPORT SoundContainerTmpFileDataLoader : public TmpLoader {
     e_OBJECT
 public:
     SoundContainerTmpFileDataLoader(const qsptr<QTemporaryFile> &file,
@@ -37,7 +37,7 @@ protected:
     stdsptr<Samples> mSamples;
 };
 
-class SoundContainerTmpFileDataSaver : public TmpSaver {
+class CORE_EXPORT SoundContainerTmpFileDataSaver : public TmpSaver {
     e_OBJECT
 public:
     SoundContainerTmpFileDataSaver(const stdsptr<Samples> &samples,

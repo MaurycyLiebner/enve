@@ -1,10 +1,13 @@
 #ifndef SCULPTNODEBASE_H
 #define SCULPTNODEBASE_H
+
+#include "../../core_global.h"
+
 #include <QPointF>
 
 class SculptBrush;
 
-class SculptNodeBase {
+class CORE_EXPORT SculptNodeBase {
 public:
     SculptNodeBase() {}
     SculptNodeBase(const qreal t, const QPointF& pos);

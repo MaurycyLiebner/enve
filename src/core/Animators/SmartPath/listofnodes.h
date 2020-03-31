@@ -20,7 +20,7 @@
 #include "smartPointers/stdselfref.h"
 #include "node.h"
 
-class ListOfNodes {
+class CORE_EXPORT ListOfNodes {
 public:
     ListOfNodes() = default;
     ListOfNodes(ListOfNodes&& other);

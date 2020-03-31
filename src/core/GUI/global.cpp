@@ -16,6 +16,14 @@
 
 #include "global.h"
 
+
+int FONT_HEIGHT;
+int MIN_WIDGET_DIM;
+int BUTTON_DIM;
+int KEY_RECT_SIZE;
+
+QPixmap* ALPHA_MESH_PIX;
+
 QString gSingleLineTooltip(const QString &text) {
     return "<p style='white-space:pre'>" + text + "</p>";
 }

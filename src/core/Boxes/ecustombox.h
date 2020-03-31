@@ -19,7 +19,7 @@
 #include "boundingbox.h"
 #include "../customidentifier.h"
 
-class eCustomBox : public BoundingBox {
+class CORE_EXPORT eCustomBox : public BoundingBox {
 public:
     eCustomBox(const QString& name);
 

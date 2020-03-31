@@ -18,7 +18,7 @@
 #define ETEXTURE_H
 #include "glhelpers.h"
 
-struct eTexture {
+struct CORE_EXPORT eTexture {
     GLuint fId = 0;
     int fWidth = 0;
     int fHeight = 0;

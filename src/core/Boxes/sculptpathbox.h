@@ -23,7 +23,7 @@
 #include "Animators/coloranimator.h"
 #include "Animators/paintsettingsanimator.h"
 
-class SculptPathBox : public BoundingBox {
+class CORE_EXPORT SculptPathBox : public BoundingBox {
     e_OBJECT
     e_DECLARE_TYPE(SculptPathBox)
 protected:

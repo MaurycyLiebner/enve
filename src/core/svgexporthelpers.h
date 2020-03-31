@@ -26,11 +26,15 @@
 #include "svgexporter.h"
 
 namespace SvgExportHelpers {
+    CORE_EXPORT
     QString ptrToStr(const void* const ptr);
+    CORE_EXPORT
     void assignLoop(QDomElement& ele, const bool loop);
+    CORE_EXPORT
     void defImage(SvgExporter& exp,
                   const sk_sp<SkImage>& image,
                   const QString id);
+    CORE_EXPORT
     void assignVisibility(SvgExporter& exp,
                           QDomElement& ele,
                           const FrameRange& visRange);

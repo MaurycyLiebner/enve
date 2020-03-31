@@ -18,7 +18,7 @@
 #define SUMPATHEFFECT_H
 #include "PathEffects/patheffect.h"
 
-class SumPathEffect : public PathEffect {
+class CORE_EXPORT SumPathEffect : public PathEffect {
     e_OBJECT
 protected:
     SumPathEffect();

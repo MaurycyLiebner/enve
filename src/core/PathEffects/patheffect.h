@@ -27,7 +27,7 @@ class BoundingBox;
 enum class PathEffectType : short {
     DISPLACE,
     DASH,
-    DUPLICATE,
+    Duplicate,
     SOLIDIFY,
     SUM,
     SUB,
@@ -40,7 +40,7 @@ enum class PathEffectType : short {
 };
 class PathEffect;
 
-class PathEffect : public eEffect {
+class CORE_EXPORT PathEffect : public eEffect {
     Q_OBJECT
 protected:
     PathEffect(const QString& name, const PathEffectType type);

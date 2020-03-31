@@ -16,7 +16,12 @@
 
 #ifndef COLORCONVERSIONS_H
 #define COLORCONVERSIONS_H
-#include <stdint-gcc.h>
+
+#if (defined (_WIN32) || defined (_WIN64))
+    #include <stdint.h>
+#elif (defined (LINUX) || defined (__linux__))
+    #include <stdint-gcc.h>
+#endif
 
 void rgba8_to_rgba16(uint8_t* src,
                      const int srcWidth,
@@ -30,11 +35,11 @@ void rgba16_to_rgba8_unpremultiplied(uint16_t* src,
                     const int dstWidth,
                     const int height);
 
-
 void rgba16_to_rgba8_premultiplied(
         uint16_t* src,
         const int srcWidth,
         uint8_t* dst,
         const int dstWidth,
         const int height);
+
 #endif // COLORCONVERSIONS_H

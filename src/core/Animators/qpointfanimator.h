@@ -19,7 +19,7 @@
 #include "staticcomplexanimator.h"
 #include "../skia/skiaincludes.h"
 
-class QPointFAnimator : public StaticComplexAnimator {
+class CORE_EXPORT QPointFAnimator : public StaticComplexAnimator {
     e_OBJECT
 protected:
     QPointFAnimator(const QString& name);

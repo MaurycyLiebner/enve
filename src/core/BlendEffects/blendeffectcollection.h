@@ -13,7 +13,7 @@ typedef DynamicComplexAnimator<
     writeBlendEffectType,
     readIdCreateBlendEffect> BlendEffectCollectionBase;
 
-class BlendEffectCollection : public BlendEffectCollectionBase {
+class CORE_EXPORT BlendEffectCollection : public BlendEffectCollectionBase {
     Q_OBJECT
     e_OBJECT
 protected:

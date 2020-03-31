@@ -16,17 +16,17 @@
 
 #include "dabtest.h"
 
-qsptr<CustomRasterEffect> eCreateNewestVersion() {
+void eCreateNewestVersion(qsptr<CustomRasterEffect> &result) {
     // Use default, most up to date, version
-    return enve::make_shared<DabTest000>();
+    result = enve::make_shared<DabTest000>();
 }
 
-qsptr<CustomRasterEffect> eCreate(
-        const CustomIdentifier &identifier) {
+void eCreate(const CustomIdentifier &identifier,
+             qsptr<CustomRasterEffect>& result) {
     Q_UNUSED(identifier)
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
-    return enve::make_shared<DabTest000>();
+    result = enve::make_shared<DabTest000>();
 }
 
 // Returned value must be unique, lets enve distinguish effects
@@ -34,9 +34,11 @@ QString effectId() {
     return "3535afs7535gst";
 }
 
+#define eDTName QStringLiteral("Dab Test")
+
 // Name of your effect used in UI
-QString eName() {
-    return "Dab Test";
+void eName(QString& result) {
+    result = eDTName;
 }
 
 // here specify your effect's most up to date version
@@ -44,20 +46,20 @@ CustomIdentifier::Version effectVersion() {
     return { 0, 0, 0 };
 }
 
-CustomIdentifier eIdentifier() {
-    return { effectId(), eName(), effectVersion() };
+void eIdentifier(CustomIdentifier &result) {
+    result = { effectId(), eDTName, effectVersion() };
 }
 
 bool eSupports(const CustomIdentifier &identifier) {
     if(identifier.fEffectId != effectId()) return false;
-    if(identifier.fEffectName != eName()) return false;
+    if(identifier.fEffectName != eDTName) return false;
     return identifier.fVersion == effectVersion();
 }
 
 #include "enveCore/Animators/qrealanimator.h"
 
 DabTest000::DabTest000() :
-    CustomRasterEffect(eName().toLower(), HardwareSupport::gpuOnly, false) {
+    CustomRasterEffect(eDTName.toLower(), HardwareSupport::gpuOnly, false) {
     mRadius = enve::make_shared<QrealAnimator>(0.5, 0, 0.5, 0.1, "radius");
     ca_addChild(mRadius);
 
@@ -82,7 +84,7 @@ stdsptr<RasterEffectCaller> DabTest000::getEffectCaller(
 }
 
 CustomIdentifier DabTest000::getIdentifier() const {
-    return { effectId(), eName(), { 0, 0, 0 } };
+    return { effectId(), eDTName, { 0, 0, 0 } };
 }
 
 bool DabTestCaller000::sInitialized = false;
@@ -108,7 +110,6 @@ void DabTestCaller000::sInitialize(QGL33 * const gl) {
     gl->glUseProgram(sProgramId);
 
     const auto dabDataU = gl->glGetUniformLocation(sProgramId, "dabData");
-    CheckInvalidLocation(dabDataU, "dabData");
 
     gl->glUniform1i(dabDataU, 0);
 }

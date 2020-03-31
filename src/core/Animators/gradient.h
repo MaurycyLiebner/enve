@@ -22,7 +22,7 @@
 
 enum class GradientType : short { LINEAR, RADIAL };
 
-class Gradient : public DynamicComplexAnimator<ColorAnimator> {
+class CORE_EXPORT Gradient : public DynamicComplexAnimator<ColorAnimator> {
     Q_OBJECT
     e_OBJECT
 protected:

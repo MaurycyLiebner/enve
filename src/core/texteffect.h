@@ -31,7 +31,7 @@ class AnimatedPoint;
 
 enum class TextFragmentType : short;
 
-class TextEffect : public eEffect {
+class CORE_EXPORT TextEffect : public eEffect {
     Q_OBJECT
 public:
     TextEffect();

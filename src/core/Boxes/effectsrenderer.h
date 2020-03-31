@@ -23,7 +23,7 @@
 class RasterEffectCaller;
 struct BoxRenderData;
 
-class EffectsRenderer {
+class CORE_EXPORT EffectsRenderer {
 public:
     void add(const stdsptr<RasterEffectCaller>& effect) {
         mEffects.append(effect);

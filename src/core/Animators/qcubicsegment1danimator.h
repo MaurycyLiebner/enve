@@ -21,7 +21,7 @@
 #include "../ReadWrite/basicreadwrite.h"
 class qCubicSegment1DAnimator;
 
-class qCubicSegment1DAnimator : public InterpolationAnimatorT<qCubicSegment1D> {
+class CORE_EXPORT qCubicSegment1DAnimator : public InterpolationAnimatorT<qCubicSegment1D> {
     Q_OBJECT
     e_OBJECT
 protected:

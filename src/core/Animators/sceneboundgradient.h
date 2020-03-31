@@ -18,7 +18,7 @@
 #define SCENEBOUNDGRADIENT_H
 #include "gradient.h"
 
-class SceneBoundGradient : public Gradient {
+class CORE_EXPORT SceneBoundGradient : public Gradient {
 public:
     SceneBoundGradient(Canvas* const scene);
 

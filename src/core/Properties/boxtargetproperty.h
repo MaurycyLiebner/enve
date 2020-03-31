@@ -24,7 +24,7 @@ class QrealAnimator;
 
 class BoxTargetProperty;
 
-class BoxTargetProperty : public Property {
+class CORE_EXPORT BoxTargetProperty : public Property {
     Q_OBJECT
     e_OBJECT
 protected:

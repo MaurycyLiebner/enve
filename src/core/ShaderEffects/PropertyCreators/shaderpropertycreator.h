@@ -20,7 +20,7 @@
 #include "Properties/property.h"
 #include "smartPointers/stdselfref.h"
 
-struct ShaderPropertyCreator : public StdSelfRef {
+struct CORE_EXPORT ShaderPropertyCreator : public StdSelfRef {
     ShaderPropertyCreator(const bool glValue,
                           const QString& name,
                           const QString& nameUI) :

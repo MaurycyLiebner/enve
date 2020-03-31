@@ -18,7 +18,7 @@
 #define FIXEDLENANIMATIONRECT_H
 #include "animationrect.h"
 
-class FixedLenAnimationRect : public AnimationRect {
+class CORE_EXPORT FixedLenAnimationRect : public AnimationRect {
 public:
     FixedLenAnimationRect(Property& parentProp) :
         AnimationRect(parentProp) {}

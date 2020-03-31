@@ -21,7 +21,7 @@
 #include "../Boxes/pathbox.h"
 #include "patheffectcaller.h"
 
-class PathEffectsTask : public eCpuTask {
+class CORE_EXPORT PathEffectsTask : public eCpuTask {
     friend class PathBox;
 
     typedef QList<stdsptr<PathEffectCaller>> EffectsList;

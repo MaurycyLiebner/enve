@@ -18,7 +18,7 @@
 #define CONTAINERBOXRENDERDATA_H
 #include "boxrenderdata.h"
 
-struct PathClipOp {
+struct CORE_EXPORT PathClipOp {
     SkPath fClipPath;
     SkClipOp fClipPathOp;
     bool fClipPathAA;
@@ -28,7 +28,7 @@ struct PathClipOp {
     }
 };
 
-struct PathClip {
+struct CORE_EXPORT PathClip {
     int fTargetIndex;
     bool fAbove;
     BoundingBox* fTargetBox = nullptr;
@@ -39,7 +39,7 @@ struct PathClip {
     }
 };
 
-struct ChildRenderData {
+struct CORE_EXPORT ChildRenderData {
     template <typename T>
     ChildRenderData(const stdsptr<T>& data) :
         fData(data) {}
@@ -52,7 +52,7 @@ struct ChildRenderData {
     PathClip fClip;
 };
 
-struct ContainerBoxRenderData : public BoxRenderData {
+struct CORE_EXPORT ContainerBoxRenderData : public BoxRenderData {
     e_OBJECT
 public:
     ContainerBoxRenderData(BoundingBox * const parentBox);

@@ -19,7 +19,7 @@
 
 #include "esoundobjectbase.h"
 
-class eIndependentSound : public eSoundObjectBase {
+class CORE_EXPORT eIndependentSound : public eSoundObjectBase {
     e_OBJECT
     e_DECLARE_TYPE(eIndependentSound)
 protected:

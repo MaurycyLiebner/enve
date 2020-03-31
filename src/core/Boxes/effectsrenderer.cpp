@@ -28,7 +28,7 @@ void EffectsRenderer::processGpu(QGL33 * const gl,
     const int srcWidth = srcImage->width();
     const int srcHeight = srcImage->height();
 
-    glViewport(0, 0, srcWidth, srcHeight);
+    gl->glViewport(0, 0, srcWidth, srcHeight);
 
     GpuRenderTools renderTools(gl, context, srcImage, boxData->fGlobalRect);
     while(mCurrentId < mEffects.count()) {

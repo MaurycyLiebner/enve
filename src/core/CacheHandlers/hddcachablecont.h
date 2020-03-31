@@ -20,7 +20,7 @@
 #include "tmpdeleter.h"
 class eTask;
 
-class HddCachableCont : public CacheContainer {
+class CORE_EXPORT HddCachableCont : public CacheContainer {
 protected:
     HddCachableCont();
     virtual int clearMemory() = 0;

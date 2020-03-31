@@ -19,7 +19,7 @@
 #include "rastereffect.h"
 #include "../customidentifier.h"
 
-class CustomRasterEffect : public RasterEffect {
+class CORE_EXPORT CustomRasterEffect : public RasterEffect {
 protected:
     CustomRasterEffect(const QString& name,
                        const HardwareSupport hwSupport,

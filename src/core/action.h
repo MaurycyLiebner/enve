@@ -17,11 +17,13 @@
 #ifndef ACTION_H
 #define ACTION_H
 
+#include "core_global.h"
+
 #include <QObject>
 #include <functional>
 #include <QAction>
 
-class Action : public QObject {
+class CORE_EXPORT Action : public QObject {
     Q_OBJECT
 public:
     explicit Action(const std::function<bool()>& canExecuteFunc,
@@ -50,7 +52,7 @@ signals:
     void textChanged(const QString& text);
 };
 
-class UndoableAction : public Action {
+class CORE_EXPORT UndoableAction : public Action {
 public:
     explicit UndoableAction(const std::function<bool()>& canExecuteFunc,
                             const std::function<void()>& executeFunc,

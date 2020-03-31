@@ -22,7 +22,7 @@
 #include "Tasks/updatable.h"
 #include "../qatomiclist.h"
 
-class TaskExecutor : public QObject {
+class CORE_EXPORT TaskExecutor : public QObject {
     Q_OBJECT
 public:
     TaskExecutor(QAtomicInt& count,
@@ -46,7 +46,7 @@ private:
     QAtomicList<stdsptr<eTask>>& mTasks;
 };
 
-class CpuTaskExecutor : public TaskExecutor {
+class CORE_EXPORT CpuTaskExecutor : public TaskExecutor {
 public:
     CpuTaskExecutor() : TaskExecutor(sUseCount, sTasks) {}
 
@@ -59,7 +59,7 @@ private:
     static QAtomicList<stdsptr<eTask>> sTasks;
 };
 
-class HddTaskExecutor : public TaskExecutor {
+class CORE_EXPORT HddTaskExecutor : public TaskExecutor {
 public:
     HddTaskExecutor() : TaskExecutor(sUseCount, sTasks) {}
 

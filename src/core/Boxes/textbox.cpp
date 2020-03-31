@@ -222,7 +222,7 @@ void TextBox::setupCanvasMenu(PropertyMenu * const menu) {
     };
     menu->addPlainAction("Set Text...", setText);
 }
-#include "include/core/SkFontMetrics.h"
+
 SkPath TextBox::getRelativePath(const qreal relFrame) const {
     const SkFont font = mFont;
     const qreal fontSize = static_cast<qreal>(font.getSize());

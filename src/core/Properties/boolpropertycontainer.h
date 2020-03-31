@@ -19,7 +19,7 @@
 
 #include "../Animators/staticcomplexanimator.h"
 
-class BoolPropertyContainer : public StaticComplexAnimator {
+class CORE_EXPORT BoolPropertyContainer : public StaticComplexAnimator {
     Q_OBJECT
     e_OBJECT
 protected:

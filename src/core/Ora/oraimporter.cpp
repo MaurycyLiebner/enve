@@ -23,6 +23,8 @@
 #include "exceptions.h"
 #include "oraparser.h"
 
+#include <QSvgRenderer>
+
 void applyAttributesToBox(OraElement& ele, BoundingBox& box) {
     box.prp_setName(ele.fName);
     box.setRelativePos(QPointF(ele.fX, ele.fY));
@@ -104,7 +106,6 @@ void drawLayerPNG(OraLayerPNG_Sk& layer, SkCanvas& canvas) {
     canvas.drawImage(layer.fImage, layer.fX, layer.fY, &paint);
 }
 
-#include <QtSvg/QSvgRenderer>
 void drawLayerSVG(OraLayerSVG& layer, SkCanvas& canvas) {
     SkPaint paint;
     setupPaint(layer, paint);

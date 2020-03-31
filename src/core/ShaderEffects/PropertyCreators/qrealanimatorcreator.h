@@ -20,7 +20,7 @@
 #include "Animators/qrealanimator.h"
 #include "shaderpropertycreator.h"
 
-struct QrealAnimatorCreator : public ShaderPropertyCreator {
+struct CORE_EXPORT QrealAnimatorCreator : public ShaderPropertyCreator {
     e_OBJECT
     QrealAnimatorCreator(const qreal iniVal,
                          const qreal minVal,

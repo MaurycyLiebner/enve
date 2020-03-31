@@ -21,7 +21,7 @@
 
 class BoundingBox;
 
-class MotionBlurEffect : public RasterEffect {
+class CORE_EXPORT MotionBlurEffect : public RasterEffect {
     friend class SelfRef;
     MotionBlurEffect();
 public:

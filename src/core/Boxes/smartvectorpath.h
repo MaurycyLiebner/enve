@@ -29,7 +29,7 @@ enum class CanvasMode : short;
 
 class SmartVectorPathEdge;
 
-class SmartVectorPath : public PathBox {
+class CORE_EXPORT SmartVectorPath : public PathBox {
     e_OBJECT
     e_DECLARE_TYPE(SmartVectorPath)
 protected:

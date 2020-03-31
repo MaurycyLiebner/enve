@@ -18,7 +18,7 @@
 #define LINESPATHEFFECT_H
 #include "PathEffects/patheffect.h"
 
-class LinesPathEffect : public PathEffect {
+class CORE_EXPORT LinesPathEffect : public PathEffect {
     e_OBJECT
 protected:
     LinesPathEffect();

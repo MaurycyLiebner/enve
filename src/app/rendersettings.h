@@ -25,7 +25,6 @@ extern "C" {
     #include <libavformat/avformat.h>
     #include <libswscale/swscale.h>
     #include <libavutil/imgutils.h>
-    #include <libavresample/avresample.h>
     #include <libavutil/channel_layout.h>
     #include <libavutil/mathematics.h>
     #include <libavutil/opt.h>

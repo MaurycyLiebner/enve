@@ -18,7 +18,7 @@
 #define TILEBITMAPS_H
 #include "skia/skiahelpers.h"
 
-struct TileBitmaps {
+struct CORE_EXPORT TileBitmaps {
     int fRowCount = 0;
     int fColumnCount = 0;
     int fZeroTileRow = 0;

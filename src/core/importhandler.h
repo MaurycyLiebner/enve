@@ -20,7 +20,7 @@
 #include <memory>
 #include "Boxes/boundingbox.h"
 
-class eImporter {
+class CORE_EXPORT eImporter {
 public:
     virtual ~eImporter();
 
@@ -31,7 +31,7 @@ public:
 private:
 };
 
-class ImportHandler {
+class CORE_EXPORT ImportHandler {
 public:
     ImportHandler();
 

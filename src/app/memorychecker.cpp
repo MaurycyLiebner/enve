@@ -16,14 +16,21 @@
 
 #include "memorychecker.h"
 
-#include <sys/sysinfo.h>
-#include <gperftools/tcmalloc.h>
-#include <gperftools/malloc_extension.h>
+
+#if (defined (_WIN32) || defined (_WIN64))
+    #include <windows.h>
+    #include <psapi.h>
+#elif (defined (LINUX) || defined (__linux__))
+    #include <sys/sysinfo.h>
+    #include <unistd.h>
+    #include <gperftools/tcmalloc.h>
+    #include <gperftools/malloc_extension.h>
+#endif
+
 #include <QDebug>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
-#include <unistd.h>
 
 #include "exceptions.h"
 #include "hardwareinfo.h"
@@ -41,30 +48,43 @@ MemoryChecker::MemoryChecker(QObject * const parent) : QObject(parent) {
 char MemoryChecker::sLine[256];
 
 void MemoryChecker::sGetFreeKB(intKB& procFreeKB, intKB& sysFreeKB) {
-//    qDebug() << "";
+    const auto usageCap = eSettings::sInstance->fRamMBCap;
+
+    longB enveUsedB(0);
+    qint64 freeInternal = 0;
+    intKB freeExternal(0);
+#if (defined (_WIN32) || defined (_WIN64))
+    const auto processID = GetCurrentProcessId();
+    const auto hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+                                      FALSE, processID);
+
+    if(hProcess != NULL) {
+        PROCESS_MEMORY_COUNTERS pmc;
+        if(GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc))) {
+            enveUsedB = longB(pmc.WorkingSetSize);
+        }
+    }
+
+    MEMORYSTATUSEX statex;
+    statex.dwLength = sizeof(statex);
+    GlobalMemoryStatusEx(&statex);
+    const longB availPhysB(statex.ullAvailPhys);
+    freeExternal = intKB(availPhysB);
+#elif (defined (LINUX) || defined (__linux__))
+    //    qDebug() << "";
     size_t virtual_memory_used;
     size_t physical_memory_used;
     size_t bytes_in_use_by_app;
     MallocExtension::instance()->eMemoryStats(&virtual_memory_used,
                                               &physical_memory_used,
                                               &bytes_in_use_by_app);
-
 //    qDebug() << "virtual_memory_used" << intMB(longB(virtual_memory_used)).fValue;
 //    qDebug() << "physical_memory_used" << intMB(longB(physical_memory_used)).fValue;
 //    qDebug() << "bytes_in_use_by_app" << intMB(longB(bytes_in_use_by_app)).fValue;
 
-    const auto usageCap = eSettings::sInstance->fRamMBCap;
+    enveUsedB = longB(static_cast<qint64>(bytes_in_use_by_app));
 
-    const longB enveUsedB(static_cast<long>(bytes_in_use_by_app));
-    const intKB enveUsedKB(enveUsedB);
-    if(usageCap.fValue > 0) {
-        procFreeKB = intKB(usageCap) - enveUsedKB;
-    } else {
-        procFreeKB = HardwareInfo::sRamKB() - enveUsedKB;
-    }
-
-    const long freeInternal = physical_memory_used - bytes_in_use_by_app;
-    intKB freeExternal(0);
+    freeInternal = physical_memory_used - bytes_in_use_by_app;
     int found = 0;
     FILE * const meminfo = fopen("/proc/meminfo", "r");
     if(!meminfo) RuntimeThrow("Failed to open /proc/meminfo");
@@ -81,16 +101,28 @@ void MemoryChecker::sGetFreeKB(intKB& procFreeKB, intKB& sysFreeKB) {
         if(++found == 3) break;
     }
     fclose(meminfo);
+    if(found != 3) RuntimeThrow("Entries missing from /proc/meminfo");
+#endif
+
+    const intKB enveUsedKB(enveUsedB);
+    if(usageCap.fValue > 0) {
+        procFreeKB = intKB(usageCap) - enveUsedKB;
+    } else {
+        procFreeKB = HardwareInfo::sRamKB() - enveUsedKB;
+    }
 
     sysFreeKB = intKB(longB(freeInternal)) + freeExternal;
 
 //    qDebug() << "free" << intMB(sysFreeKB).fValue;
 //    qDebug() << "usage" << 100 - 100*sysFreeKB.fValue/HardwareInfo::sRamKB().fValue;
-    if(found != 3) RuntimeThrow("Entries missing from /proc/meminfo");
-    const long releaseBytes = 500L*1024L*1024L;
+    const qint64 releaseBytes = 500L*1024L*1024L;
     if(freeInternal > releaseBytes) {
-        MallocExtension::instance()->ReleaseToSystem(releaseBytes);
+#if (defined (_WIN32) || defined (_WIN64))
+
+#elif (defined (LINUX) || defined (__linux__))
+    MallocExtension::instance()->ReleaseToSystem(releaseBytes);
 //        qDebug() << "released";
+#endif
     }
 }
 

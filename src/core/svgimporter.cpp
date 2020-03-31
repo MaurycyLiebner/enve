@@ -423,8 +423,6 @@ qsptr<ContainerBox> loadBoxesGroup(const QDomElement &groupElement,
     return boxesGroup;
 }
 
-#include "include/utils/SkParsePath.h"
-
 void loadVectorPath(const QDomElement &pathElement,
                     ContainerBox *parentGroup,
                     VectorPathSvgAttributes& attributes) {
@@ -494,7 +492,7 @@ void loadRect(const QDomElement &pathElement,
     const QString rYstr = pathElement.attribute("ry");
     const QString rXstr = pathElement.attribute("rx");
 
-    const auto rect = enve::make_shared<Rectangle>();
+    const auto rect = enve::make_shared<RectangleBox>();
     rect->planCenterPivotPosition();
 
     const auto topLeft = QPointF(xStr.toDouble(), yStr.toDouble());

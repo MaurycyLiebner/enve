@@ -20,7 +20,7 @@
 
 class ShaderEffect;
 
-struct ShaderEffectCreator : public StdSelfRef {
+struct CORE_EXPORT ShaderEffectCreator : public StdSelfRef {
     e_OBJECT
 public:
     ShaderEffectCreator(const QString& grePath, const QString& name,

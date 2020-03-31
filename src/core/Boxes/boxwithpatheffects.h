@@ -22,7 +22,7 @@ class PathEffectCollection;
 class PathEffectsTask;
 class PathEffectCaller;
 
-class BoxWithPathEffects : public BoundingBox {
+class CORE_EXPORT BoxWithPathEffects : public BoundingBox {
 public:
     BoxWithPathEffects(const QString &name, const eBoxType type);
 

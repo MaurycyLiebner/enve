@@ -16,14 +16,18 @@
 
 #ifndef QCUBICSEGMENT1D_H
 #define QCUBICSEGMENT1D_H
+
+#include "../simplemath.h"
+#include "../core_global.h"
+
 #include <QPointF>
 #include <QPainterPath>
-#include "../simplemath.h"
+
 typedef std::pair<qreal, qreal> qrealPair;
 class eWriteStream;
 class eReadStream;
 
-struct qCubicSegment1D {
+struct CORE_EXPORT qCubicSegment1D {
     typedef std::pair<qCubicSegment1D, qCubicSegment1D> Pair;
     qCubicSegment1D() {}
 

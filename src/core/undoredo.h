@@ -24,7 +24,7 @@
 class UndoRedo_priv;
 class UndoRedoSet;
 
-class UndoRedoStack : public SelfRef {
+class CORE_EXPORT UndoRedoStack : public SelfRef {
     Q_OBJECT
 public:
     class StackBlock {

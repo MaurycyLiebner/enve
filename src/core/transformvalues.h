@@ -19,7 +19,9 @@
 
 #include <QMatrix>
 
-struct TransformValues {
+#include "core_global.h"
+
+struct CORE_EXPORT TransformValues {
     qreal fPivotX = 0;
     qreal fPivotY = 0;
     qreal fMoveX = 0;

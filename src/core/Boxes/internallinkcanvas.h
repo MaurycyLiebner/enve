@@ -20,7 +20,7 @@
 #include "Properties/boolproperty.h"
 #include "Boxes/frameremapping.h"
 
-class InternalLinkCanvas : public InternalLinkGroupBox {
+class CORE_EXPORT InternalLinkCanvas : public InternalLinkGroupBox {
     e_OBJECT
 protected:
     InternalLinkCanvas(ContainerBox * const linkTarget,

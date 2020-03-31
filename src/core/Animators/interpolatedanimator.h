@@ -19,7 +19,7 @@
 #include "animatort.h"
 
 template <typename T>
-class InterpolatedAnimator : public AnimatorT<T> {
+class CORE_EXPORT InterpolatedAnimator : public AnimatorT<T> {
 public:
     T getValueAtRelFrame(const int relFrame) const {
         if(!Animator::anim_hasKeys())

@@ -20,7 +20,7 @@
 
 class ComplexAnimator;
 
-class ComplexKey : public Key {
+class CORE_EXPORT ComplexKey : public Key {
     e_OBJECT
 protected:
     ComplexKey(const int absFrame,

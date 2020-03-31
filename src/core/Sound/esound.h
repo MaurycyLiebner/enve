@@ -18,10 +18,10 @@
 #define ESOUND_H
 #include "Animators/eboxorsound.h"
 #include "Animators/qrealanimator.h"
-class Samples;
+struct Samples;
 class SoundReaderForMerger;
 
-class eSound : public eBoxOrSound {
+class CORE_EXPORT eSound : public eBoxOrSound {
     e_OBJECT
     e_DECLARE_TYPE(eSound)
 protected:

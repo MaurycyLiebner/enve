@@ -20,7 +20,7 @@
 #include "Animators/qpointfanimator.h"
 #include "shaderpropertycreator.h"
 
-class QPointFAnimatorCreator : public ShaderPropertyCreator {
+class CORE_EXPORT QPointFAnimatorCreator : public ShaderPropertyCreator {
     e_OBJECT
     QPointFAnimatorCreator(const QPointF iniVal,
                            const QPointF minVal,

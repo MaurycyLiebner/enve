@@ -23,7 +23,7 @@
 #include "../ReadWrite/basicreadwrite.h"
 #include "etaskbase.h"
 
-class eTask : public StdSelfRef, public eTaskBase {
+class CORE_EXPORT eTask : public StdSelfRef, public eTaskBase {
     friend class TaskScheduler;
     friend class Que;
     friend class eTaskBase;

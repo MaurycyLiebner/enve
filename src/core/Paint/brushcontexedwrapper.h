@@ -21,14 +21,14 @@
 
 class BrushesContext;
 
-struct BrushData {
+struct CORE_EXPORT BrushData {
     QString fName;
     stdsptr<SimpleBrushWrapper> fWrapper;
     QImage fIcon;
     QByteArray fWholeFile;
 };
 
-class BrushContexedWrapper : public SelfRef {
+class CORE_EXPORT BrushContexedWrapper : public SelfRef {
     Q_OBJECT
     e_OBJECT
 public:

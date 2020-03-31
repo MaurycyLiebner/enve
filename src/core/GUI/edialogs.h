@@ -16,17 +16,24 @@
 
 #ifndef EDIALOGS_H
 #define EDIALOGS_H
+
 #include <QString>
 
+#include "../core_global.h"
+
 namespace eDialogs {
+    CORE_EXPORT
     QString openFile(const QString& title,
                      const QString& path,
                      const QString& filter);
+    CORE_EXPORT
     QStringList openFiles(const QString& title,
                           const QString& path,
                           const QString& filter);
+    CORE_EXPORT
     QString openDir(const QString& title,
                     const QString& path);
+    CORE_EXPORT
     QString saveFile(const QString& title,
                      const QString& path,
                      const QString& filter);

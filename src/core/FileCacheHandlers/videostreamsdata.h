@@ -18,7 +18,7 @@
 #define VIDEOSTREAMSDATA_H
 #include "audiostreamsdata.h"
 
-struct VideoStreamsData {
+struct CORE_EXPORT VideoStreamsData {
 private:
     explicit VideoStreamsData() {}
 

@@ -7,7 +7,7 @@
 
 class eWriteStream;
 
-class FileFooter {
+class CORE_EXPORT FileFooter {
 public:
     static void sWrite(eWriteStream& dst);
 

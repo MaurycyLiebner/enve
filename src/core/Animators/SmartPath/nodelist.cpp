@@ -458,8 +458,6 @@ SkPath NodeList::toSkPath() const {
     return result;
 }
 
-#include "src/core/SkGeometry.h"
-
 void NodeList::setPath(const SkPath &path) {
     mNodes.clear();
     Node * firstNode = nullptr;

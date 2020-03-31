@@ -18,7 +18,7 @@
 #define TASKQUEHANDLER_H
 #include "taskque.h"
 
-class TaskQueHandler {
+class CORE_EXPORT TaskQueHandler {
 public:
     int countQues() const;
     bool isEmpty() const;

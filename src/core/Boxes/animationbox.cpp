@@ -32,6 +32,16 @@
 #include "GUI/dialogsinterface.h"
 #include "svgexporter.h"
 
+struct AnimationBoxRenderData : public ImageContainerRenderData {
+    AnimationBoxRenderData(AnimationFrameHandler *cacheHandler,
+                           BoundingBox *parentBox);
+
+    void loadImageFromHandler();
+
+    const qptr<AnimationFrameHandler> fSrcCacheHandler;
+    int fAnimFrame;
+};
+
 AnimationBox::AnimationBox(const QString &name, const eBoxType type) :
     BoundingBox(name, type) {
     connect(this, &eBoxOrSound::parentChanged,

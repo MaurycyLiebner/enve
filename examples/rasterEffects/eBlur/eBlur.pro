@@ -29,23 +29,35 @@ ENVE_FOLDER = $$PWD/../../..
 INCLUDEPATH += $$ENVE_FOLDER/include
 DEPENDPATH += $$ENVE_FOLDER/include
 
-INCLUDEPATH += $$ENVE_FOLDER/third_party/skia
-DEPENDPATH += $$ENVE_FOLDER/third_party/skia
+SKIA_FOLDER = $$ENVE_FOLDER/third_party/skia
+INCLUDEPATH += $$SKIA_FOLDER
+DEPENDPATH += $$SKIA_FOLDER
 
 CONFIG(debug, debug|release) {
-    ENVE_CORE_OUT = $$ENVE_FOLDER/build/Debug/src/core
+    win32 { # Windows
+        LIBS += -L$$SKIA_FOLDER/out/Debug -lskia
+    }
 } else {
-    ENVE_CORE_OUT = $$ENVE_FOLDER/build/Release/src/core
-    QMAKE_CFLAGS -= -O2
-    QMAKE_CFLAGS -= -O1
-    QMAKE_CXXFLAGS -= -O2
-    QMAKE_CXXFLAGS -= -O1
-    QMAKE_CFLAGS = -m64 -O3
-    QMAKE_LFLAGS = -m64 -O3
-    QMAKE_CXXFLAGS = -m64 -O3
+    win32 { # Windows
+        LIBS += -L$$SKIA_FOLDER/out/Release -lskia
+        QMAKE_CFLAGS_RELEASE += /O2 -O2
+        QMAKE_CXXFLAGS_RELEASE += /O2 -O2
+    } unix {
+        macx { # Mac OS X
+
+        } else { # Linux
+            QMAKE_CFLAGS -= -O2
+            QMAKE_CFLAGS -= -O1
+            QMAKE_CXXFLAGS -= -O2
+            QMAKE_CXXFLAGS -= -O1
+            QMAKE_CFLAGS = -m64 -O3
+            QMAKE_LFLAGS = -m64 -O3
+            QMAKE_CXXFLAGS = -m64 -O3
+        }
+    }
 }
 
-LIBS += -L$$ENVE_CORE_OUT -lenvecore
+LIBS += -L$$OUT_PWD/../../../src/core -lenvecore
 
 TARGET = eBlur
 TEMPLATE = lib

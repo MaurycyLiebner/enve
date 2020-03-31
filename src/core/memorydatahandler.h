@@ -18,9 +18,11 @@
 #define MEMORYDATAHANDLER_H
 #include <QList>
 
+#include "core_global.h"
+
 class CacheContainer;
 
-class MemoryDataHandler {
+class CORE_EXPORT MemoryDataHandler {
 public:
     MemoryDataHandler();
 

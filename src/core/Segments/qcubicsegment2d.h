@@ -20,20 +20,22 @@
 #include <QPointF>
 #include <QPainterPath>
 #include "../simplemath.h"
+#include "../core_global.h"
+
 typedef std::pair<qreal, qreal> qrealPair;
 struct qCubicSegment1D;
 
-struct PosAndTan {
+struct CORE_EXPORT PosAndTan {
     QPointF fPos;
     QPointF fTan;
 };
 
-struct PosAndT {
+struct CORE_EXPORT PosAndT {
     qreal fT;
     QPointF fPos;
 };
 
-struct qCubicSegment2D {
+struct CORE_EXPORT qCubicSegment2D {
     typedef std::pair<qCubicSegment2D, qCubicSegment2D> Pair;
     qCubicSegment2D(const QPointF& p0, const QPointF& c1,
                     const QPointF& c2, const QPointF& p1) {

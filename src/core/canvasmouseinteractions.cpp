@@ -237,7 +237,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
         mCurrentCircle = newPath.get();
 
     } else if(mCurrentMode == CanvasMode::rectCreate) {
-        const auto newPath = enve::make_shared<Rectangle>();
+        const auto newPath = enve::make_shared<RectangleBox>();
         newPath->planCenterPivotPosition();
         mCurrentContainer->addContained(newPath);
         newPath->setAbsolutePos(e.fPos);

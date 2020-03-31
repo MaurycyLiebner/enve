@@ -23,7 +23,7 @@ class ComplexKey;
 class KeysClipboard;
 class QrealAnimator;
 
-class ComplexAnimator : public Animator {
+class CORE_EXPORT ComplexAnimator : public Animator {
     Q_OBJECT
     e_OBJECT
     e_DECLARE_TYPE(ComplexAnimator)

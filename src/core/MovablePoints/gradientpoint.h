@@ -19,7 +19,7 @@
 #include "MovablePoints/animatedpoint.h"
 class PathBox;
 
-class GradientPoint : public AnimatedPoint {
+class CORE_EXPORT GradientPoint : public AnimatedPoint {
     e_OBJECT
 public:
     GradientPoint(QPointFAnimator* const associatedAnimator,

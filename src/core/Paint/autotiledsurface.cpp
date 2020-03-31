@@ -31,11 +31,11 @@ AutoTiledSurfaceBase::AutoTiledSurfaceBase(const TileCreator tileCreator,
     mRequestEnd(requestEnd) {
     mypaint_tiled_surface_init(&mParent, requestStart, requestEnd);
     mParent.parent.destroy = sFree;
-#ifdef _OPENMP
+//#ifdef _OPENMP
     mParent.threadsafe_tile_requests = true;
-#else
-    fParent.threadsafe_tile_requests = false;
-#endif
+//#else
+//    mParent.threadsafe_tile_requests = false;
+//#endif
 }
 
 AutoTiledSurfaceBase::AutoTiledSurfaceBase(const AutoTiledSurfaceBase &other) :
@@ -113,9 +113,9 @@ void AutoTiledSurfaceBase::free() {
     mypaint_tiled_surface_destroy(&mParent);
 }
 
-#ifdef _OPENMP
+//#ifdef _OPENMP
 #include <omp.h>
-#endif
+//#endif
 
 void AutoTiledSurface::sRequestStart(MyPaintTiledSurface *surface,
                                      MyPaintTileRequest *request) {

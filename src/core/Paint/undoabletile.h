@@ -18,13 +18,13 @@
 #define UNDOABLETILE_H
 #include "tile.h"
 
-struct UndoableTile : public Tile {
+struct CORE_EXPORT UndoableTile : public Tile {
     UndoableTile(const size_t& size) : Tile(size) {}
 
     bool fUndo = false;
 };
 
-class UndoTile {
+class CORE_EXPORT UndoTile {
 public:
     UndoTile(const int tx, const int ty,
              const stdsptr<UndoableTile>& tile);

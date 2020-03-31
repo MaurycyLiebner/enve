@@ -18,7 +18,7 @@
 #define TASKQUE_H
 #include "Tasks/updatable.h"
 
-class TaskQue {
+class CORE_EXPORT TaskQue {
     friend class TaskQueHandler;
 public:
     explicit TaskQue();

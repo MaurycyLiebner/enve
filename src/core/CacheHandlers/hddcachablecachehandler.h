@@ -24,7 +24,7 @@
 
 #include <QPainter>
 
-class HddCachableCacheHandler {
+class CORE_EXPORT HddCachableCacheHandler {
     friend class UsedRange;
 public:
     typedef HddCachableRangeCont Cont;

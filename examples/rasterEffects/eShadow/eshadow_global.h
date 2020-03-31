@@ -29,13 +29,14 @@
 
 extern "C" {
 
-ESHADOW_EXPORT qsptr<CustomRasterEffect> eCreateNewestVersion();
+ESHADOW_EXPORT void eCreateNewestVersion(qsptr<CustomRasterEffect>& result);
 
-ESHADOW_EXPORT qsptr<CustomRasterEffect> eCreate(const CustomIdentifier &identifier);
+ESHADOW_EXPORT void eCreate(const CustomIdentifier &identifier,
+                            qsptr<CustomRasterEffect>& result);
 
-ESHADOW_EXPORT QString eName();
+ESHADOW_EXPORT void eName(QString& result);
 
-ESHADOW_EXPORT CustomIdentifier eIdentifier();
+ESHADOW_EXPORT void eIdentifier(CustomIdentifier& result);
 
 ESHADOW_EXPORT bool eSupports(const CustomIdentifier &identifier);
 

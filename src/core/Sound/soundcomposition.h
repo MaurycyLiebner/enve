@@ -37,7 +37,7 @@
 class Canvas;
 class SoundMerger;
 
-class SoundComposition : public QIODevice {
+class CORE_EXPORT SoundComposition : public QIODevice {
 public:
     SoundComposition(Canvas * const parent);
 

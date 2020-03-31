@@ -16,13 +16,16 @@
 
 #ifndef QUADSEGMENT_H
 #define QUADSEGMENT_H
+
 #include <QPointF>
-class SkPoint;
+#include "../core_global.h"
+
+struct SkPoint;
 template <typename T>
 struct CubicSegment;
 
 template <typename T>
-struct QuadSegment {
+struct CORE_EXPORT QuadSegment {
     T p0;
     T p1;
     T p2;

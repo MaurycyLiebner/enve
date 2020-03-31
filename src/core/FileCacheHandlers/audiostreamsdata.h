@@ -18,7 +18,7 @@
 #define AUDIOSTREAMSDATA_H
 #include "soundreader.h"
 
-struct AudioStreamsData : public QObject {
+struct CORE_EXPORT AudioStreamsData : public QObject {
 private:
     explicit AudioStreamsData();
 

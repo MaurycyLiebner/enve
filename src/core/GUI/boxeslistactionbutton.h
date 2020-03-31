@@ -17,9 +17,11 @@
 #ifndef BOXESLISTACTIONBUTTON_H
 #define BOXESLISTACTIONBUTTON_H
 
+#include "../core_global.h"
+
 #include <QWidget>
 
-class BoxesListActionButton : public QWidget {
+class CORE_EXPORT BoxesListActionButton : public QWidget {
     Q_OBJECT
 public:
     BoxesListActionButton(QWidget * const parent = nullptr);
@@ -33,7 +35,7 @@ signals:
     void pressed();
 };
 #include <functional>
-class PixmapActionButton : public BoxesListActionButton {
+class CORE_EXPORT PixmapActionButton : public BoxesListActionButton {
 public:
     PixmapActionButton(QWidget * const parent = nullptr) :
         BoxesListActionButton(parent) {}

@@ -22,13 +22,14 @@ class PathBox;
 class PathEffectCollection;
 class BlendEffectBoxShadow;
 
-class ContainerBox : public BoxWithPathEffects {
+class CORE_EXPORT ContainerBox : public BoxWithPathEffects {
     Q_OBJECT
     e_OBJECT
     e_DECLARE_TYPE(ContainerBox)
     typedef qCubicSegment1DAnimator::Action SegAction;
 protected:
     ContainerBox(const eBoxType type = eBoxType::group);
+    ContainerBox(const QString& name, const eBoxType type = eBoxType::group);
 public:
     bool isGroup() const final { return !mIsLayer; }
     bool isLayer() const final { return mIsLayer; }

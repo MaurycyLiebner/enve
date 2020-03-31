@@ -23,7 +23,7 @@
 class Canvas;
 class SmartPathCollectionHandler;
 
-class PathPointsHandler : public PointsHandler {
+class CORE_EXPORT PathPointsHandler : public PointsHandler {
     e_OBJECT
 protected:
     PathPointsHandler(SmartPathAnimator * const targetAnimator);

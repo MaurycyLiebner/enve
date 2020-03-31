@@ -19,7 +19,7 @@
 
 #include "brushstroke.h"
 
-struct BrushStrokeSet {
+struct CORE_EXPORT BrushStrokeSet {
     static BrushStrokeSet sFromCubicList(
             const CubicList& segs,
             const qCubicSegment1D& timeCurve,

@@ -20,7 +20,7 @@
 #include "taskexecutor.h"
 #include "offscreenqgl33c.h"
 
-class GpuTaskExecutor : public TaskExecutor,
+class CORE_EXPORT GpuTaskExecutor : public TaskExecutor,
                         private OffscreenQGL33c {
 public:
     GpuTaskExecutor();

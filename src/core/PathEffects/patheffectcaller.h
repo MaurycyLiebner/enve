@@ -4,7 +4,7 @@
 #include "../skia/skiaincludes.h"
 #include "../smartPointers/stdselfref.h"
 
-class PathEffectCaller : public StdSelfRef {
+class CORE_EXPORT PathEffectCaller : public StdSelfRef {
 public:
     PathEffectCaller();
 

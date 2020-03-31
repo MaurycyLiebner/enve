@@ -21,7 +21,7 @@
 class BoxTransformAnimator;
 enum class CanvasMode : short;
 
-class PointsHandler : public StdSelfRef {
+class CORE_EXPORT PointsHandler : public StdSelfRef {
     e_OBJECT
 protected:
     PointsHandler();

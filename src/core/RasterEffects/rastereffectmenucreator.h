@@ -23,7 +23,7 @@
 
 class RasterEffect;
 
-struct RasterEffectMenuCreator {
+struct CORE_EXPORT RasterEffectMenuCreator {
     template <typename T> using Func = std::function<T>;
     template <typename T> using Creator = Func<qsptr<T>()>;
     using EffectCreator = Creator<RasterEffect>;

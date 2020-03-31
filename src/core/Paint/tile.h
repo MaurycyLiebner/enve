@@ -21,7 +21,7 @@
 #include "ReadWrite/ewritestream.h"
 #include "smartPointers/stdselfref.h"
 
-class Tile {
+class CORE_EXPORT Tile {
 public:
     Tile(const size_t& size);
     Tile(const Tile& other);

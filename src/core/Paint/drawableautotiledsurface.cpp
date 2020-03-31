@@ -186,7 +186,11 @@ void DrawableAutoTiledSurface::updateTileRecBitmaps(QRect tileRect) {
     stretchBitmapsToTile(min.x(), min.y());
     stretchBitmapsToTile(max.x(), max.y());
     const int n = tileRect.width()*tileRect.height();
+#if (defined (_WIN32) || defined (_WIN64))
+    #pragma omp parallel for if(n > 4)
+#elif (defined (LINUX) || defined (__linux__))
     #pragma omp parallel for collapse(2) if(n > 4)
+#endif
     for(int tx = tileRect.left(); tx <= tileRect.right(); tx++) {
         for(int ty = tileRect.top(); ty <= tileRect.bottom(); ty++) {
             const auto tileId = QPoint(tx, ty) + zeroTile();

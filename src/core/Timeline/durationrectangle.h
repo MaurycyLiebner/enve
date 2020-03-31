@@ -25,7 +25,7 @@
 class Property;
 class HddCachableCacheHandler;
 
-class TimelineMovable : public SelfRef {
+class CORE_EXPORT TimelineMovable : public SelfRef {
     Q_OBJECT
 public:
     enum Type {
@@ -89,7 +89,7 @@ private:
     int mSavedValue = 0;
 };
 
-class DurationMinMax : public TimelineMovable {
+class CORE_EXPORT DurationMinMax : public TimelineMovable {
 public:
     DurationMinMax(const Type type, Property& parentProp) :
         TimelineMovable(type, parentProp) {}
@@ -120,13 +120,13 @@ private:
     using TimelineMovable::getValue;
 };
 
-struct RangeRectValues {
+struct CORE_EXPORT RangeRectValues {
     int fShift;
     int fMin;
     int fMax;
 };
 
-class DurationRectangle : public TimelineMovable {
+class CORE_EXPORT DurationRectangle : public TimelineMovable {
     Q_OBJECT
 public:
     DurationRectangle(Property &parentProp);

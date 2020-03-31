@@ -30,7 +30,7 @@ typedef DynamicComplexAnimator<
     writePathEffectType,
     readIdCreatePathEffect> PathEffectCollectionBase;
 
-class PathEffectCollection : public PathEffectCollectionBase {
+class CORE_EXPORT PathEffectCollection : public PathEffectCollectionBase {
     e_OBJECT
 protected:
     PathEffectCollection();

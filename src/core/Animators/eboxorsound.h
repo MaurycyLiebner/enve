@@ -23,7 +23,7 @@ class Canvas;
 class DurationRectangle;
 class QMimeData;
 
-class eBoxOrSound : public StaticComplexAnimator {
+class CORE_EXPORT eBoxOrSound : public StaticComplexAnimator {
     Q_OBJECT
     e_OBJECT
     e_DECLARE_TYPE(eBoxOrSound)

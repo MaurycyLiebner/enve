@@ -24,7 +24,7 @@
 
 #include <QJSValue>
 
-class PropertyBindingBase : public QObject {
+class CORE_EXPORT PropertyBindingBase : public QObject {
     Q_OBJECT
 protected:
     PropertyBindingBase(const Property* const context);

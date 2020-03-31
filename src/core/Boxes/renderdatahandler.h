@@ -19,7 +19,7 @@
 #include "boxrenderdata.h"
 #include <map>
 
-class RenderDataHandler {
+class CORE_EXPORT RenderDataHandler {
 public:
     void clear() { mFrameToData.clear(); }
     bool removeItem(const stdsptr<BoxRenderData> &item);

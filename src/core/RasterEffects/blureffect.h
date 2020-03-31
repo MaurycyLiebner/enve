@@ -2,7 +2,7 @@
 #define BLUREFFECT_H
 #include "rastereffect.h"
 
-class BlurEffect : public RasterEffect {
+class CORE_EXPORT BlurEffect : public RasterEffect {
     e_OBJECT
 protected:
     BlurEffect();

@@ -21,7 +21,7 @@
 #include "smartPointers/stdpointer.h"
 #include "../../ReadWrite/basicreadwrite.h"
 class SkPath;
-class NodeList {
+class CORE_EXPORT NodeList {
     friend class SmartPath;
 protected:
     NodeList() = default;

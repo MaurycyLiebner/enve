@@ -29,7 +29,7 @@ extern "C" {
 }
 
 struct VideoStreamsData;
-class VideoFrameLoader : public eHddTask {
+class CORE_EXPORT VideoFrameLoader : public eHddTask {
     e_OBJECT
 protected:
     VideoFrameLoader(VideoFrameHandler * const cacheHandler,

@@ -22,7 +22,7 @@
 
 VERSION = 0.0.0
 
-QT += opengl multimedia qml xml
+QT += opengl multimedia qml xml svg
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample
 CONFIG += c++14
 TARGET = envecore
@@ -42,7 +42,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 ENVE_FOLDER = $$PWD/../..
-THIRD_PARTY_FOLDER =  $$ENVE_FOLDER/third_party
+THIRD_PARTY_FOLDER = $$ENVE_FOLDER/third_party
 SKIA_FOLDER = $$THIRD_PARTY_FOLDER/skia
 LIBMYPAINT_FOLDER = $$THIRD_PARTY_FOLDER/libmypaint-1.5.1
 QUAZIP_FOLDER = $$THIRD_PARTY_FOLDER/quazip-0.8.1
@@ -50,26 +50,47 @@ QUAZIP_FOLDER = $$THIRD_PARTY_FOLDER/quazip-0.8.1
 INCLUDEPATH += $$SKIA_FOLDER
 
 INCLUDEPATH += $$LIBMYPAINT_FOLDER/include
-LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint -lgobject-2.0 -lglib-2.0 -ljson-c
+LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
 
 INCLUDEPATH += $$QUAZIP_FOLDER
 LIBS += -L$$QUAZIP_FOLDER/quazip -lquazip
 
 CONFIG(debug, debug|release) {
-    LIBS += -L$$SKIA_FOLDER/out/Debug -lskia
+    LIBS += -L$$SKIA_FOLDER/out/Debug
 } else {
-    LIBS += -L$$SKIA_FOLDER/out/Release -lskia
-    QMAKE_CFLAGS -= -O2
-    QMAKE_CFLAGS -= -O1
-    QMAKE_CXXFLAGS -= -O2
-    QMAKE_CXXFLAGS -= -O1
-    QMAKE_CFLAGS = -m64 -O3
-    QMAKE_LFLAGS = -m64 -O3
-    QMAKE_CXXFLAGS = -m64 -O3
+    LIBS += -L$$SKIA_FOLDER/out/Release
 }
 
-QMAKE_CXXFLAGS += -fopenmp
-LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
+win32 { # Windows
+    DEFINES += QSCINTILLA_DLLS
+
+    FFMPEG_FOLDER = $$THIRD_PARTY_FOLDER/ffmpeg-4.2.2-win64-dev
+    LIBS += -L$$FFMPEG_FOLDER/lib
+    INCLUDEPATH += $$FFMPEG_FOLDER/include
+
+    QMAKE_CFLAGS_RELEASE += /O2 -O2
+    QMAKE_CXXFLAGS_RELEASE += /O2 -O2
+
+    QMAKE_CFLAGS += -openmp
+    QMAKE_CXXFLAGS += -openmp
+} unix {
+    macx { # Mac OS X
+    } else { # Linux
+        LIBS += -lgobject-2.0 -lglib-2.0 -ljson-c
+
+        QMAKE_CFLAGS_RELEASE -= -O2
+        QMAKE_CFLAGS_RELEASE -= -O1
+        QMAKE_CXXFLAGS_RELEASE -= -O2
+        QMAKE_CXXFLAGS_RELEASE -= -O1
+        QMAKE_CFLAGS_RELEASE += -m64 -O3
+        QMAKE_CXXFLAGS_RELEASE += -m64 -O3
+
+        QMAKE_CXXFLAGS += -fopenmp
+        LIBS += -lpthread -lfreetype -lpng -ldl -fopenmp# -lX11
+    }
+}
+
+LIBS += -lskia
 
 SOURCES += \
     Expressions/expression.cpp \

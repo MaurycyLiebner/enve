@@ -21,7 +21,7 @@
 #include "exceptions.h"
 #include "nodepointvalues.h"
 
-struct NormalNodeData {
+struct CORE_EXPORT NormalNodeData {
     NormalNodeData(const bool c0Enabled,
                    const bool c2Enabled,
                    const CtrlsMode ctrlsMode,
@@ -57,7 +57,7 @@ enum class NodeType : char {
     dissolved, normal, none
 };
 
-struct Node {
+struct CORE_EXPORT Node {
     friend class NodeList;
     friend class ListOfNodes;
 

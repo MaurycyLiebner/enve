@@ -39,7 +39,7 @@ class FillSettingsAnimator;
 class OutlineSettingsAnimator;
 class PaintSettingsApplier;
 class RasterEffectCollection;
-class ShaderEffectProgram;
+struct ShaderEffectProgram;
 class BoxTransformAnimator;
 class BasicTransformAnimator;
 class CustomProperties;
@@ -81,7 +81,7 @@ class BoundingBox;
 template<typename T> class TypeMenu;
 typedef TypeMenu<Property> PropertyMenu;
 
-class BoundingBox : public eBoxOrSound {
+class CORE_EXPORT BoundingBox : public eBoxOrSound {
     Q_OBJECT
     e_OBJECT
     e_DECLARE_TYPE(BoundingBox)

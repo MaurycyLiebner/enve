@@ -21,7 +21,11 @@
 #include "shadereffectjs.h"
 
 typedef QList<stdsptr<UniformSpecifierCreator>> UniformSpecifierCreators;
-struct ShaderEffectProgram {
+struct CORE_EXPORT ShaderEffectProgram {
+    ShaderEffectProgram() {}
+    ShaderEffectProgram(const ShaderEffectProgram& s) = delete;
+    ShaderEffectProgram& operator=(const ShaderEffectProgram& s) = delete;
+
     GLuint fId = 0;
     GLuint fFragShader;
     GLint fTexLocation;

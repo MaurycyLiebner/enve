@@ -16,16 +16,17 @@
 
 #include "eblur.h"
 
-qsptr<CustomRasterEffect> eCreateNewestVersion() {
+void eCreateNewestVersion(qsptr<CustomRasterEffect> &result) {
     // Use default, most up to date, version
-    return enve::make_shared<eBlur>();
+    result = enve::make_shared<eBlur>();
 }
 
-qsptr<CustomRasterEffect> eCreate(const CustomIdentifier &identifier) {
+void eCreate(const CustomIdentifier &identifier,
+             qsptr<CustomRasterEffect>& result) {
     Q_UNUSED(identifier)
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
-    return enve::make_shared<eBlur>();
+    result = enve::make_shared<eBlur>();
 }
 
 // Returned value must be unique, lets enve distinguish effects
@@ -33,9 +34,11 @@ QString effectId() {
     return "iz4784jsvg6fw7bc3clb";
 }
 
+#define eBName QStringLiteral("eBlur")
+
 // Name of your effect used in UI
-QString eName() {
-    return "eBlur";
+void eName(QString& result) {
+    result = eBName;
 }
 
 // here specify your effect's most up to date version
@@ -43,18 +46,18 @@ CustomIdentifier::Version effectVersion() {
     return { 0, 0, 0 };
 }
 
-CustomIdentifier eIdentifier() {
-    return { effectId(), eName(), effectVersion() };
+void eIdentifier(CustomIdentifier &result) {
+    result = { effectId(), eBName, effectVersion() };
 }
 
 bool eSupports(const CustomIdentifier &identifier) {
     if(identifier.fEffectId != effectId()) return false;
-    if(identifier.fEffectName != eName()) return false;
+    if(identifier.fEffectName != eBName) return false;
     return identifier.fVersion == effectVersion();
 }
 
 #include "enveCore/Animators/qrealanimator.h"
-eBlur::eBlur() : CustomRasterEffect(eName().toLower(),
+eBlur::eBlur() : CustomRasterEffect(eBName.toLower(),
                                     HardwareSupport::gpuPreffered, false) {
     mRadius = enve::make_shared<QrealAnimator>(10, 0, 999.999, 1, "radius");
     ca_addChild(mRadius);
@@ -80,7 +83,7 @@ QMargins eBlur::getMargin() const {
 }
 
 CustomIdentifier eBlur::getIdentifier() const {
-    return { effectId(), eName(), { 0, 0, 0 } };
+    return { effectId(), eBName, { 0, 0, 0 } };
 }
 
 eBlurCaller::eBlurCaller(const HardwareSupport hwSupport, const qreal radius) :

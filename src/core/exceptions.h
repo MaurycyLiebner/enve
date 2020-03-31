@@ -16,14 +16,25 @@
 
 #ifndef EXCEPTIONS_H
 #define EXCEPTIONS_H
+
+#include "core_global.h"
+
 #include <exception>
 #include <csignal>
 #include <QDebug>
+
 #define ERROUT(msg) qDebug() << msg << __LINE__
 #define FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #ifdef QT_DEBUG
-    #define BREAKPOINT (std::raise(SIGTRAP) ? "" : "") +
+    #if (defined (_WIN32) || defined (_WIN64))
+        #define NOMINMAX
+        #include <windows.h>
+        #undef NOMINMAX
+        #define BREAKPOINT DebugBreak();
+    #elif (defined (LINUX) || defined (__linux__))
+        #define BREAKPOINT std::raise(SIGTRAP);
+    #endif
 #else
     #define BREAKPOINT
 #endif
@@ -34,12 +45,15 @@
     )
 
 #define RuntimeThrow(msg) \
-    std::throw_with_nested(\
-        std::runtime_error(BREAKPOINT \
+{ \
+    BREAKPOINT \
+    std::throw_with_nested( \
+        std::runtime_error( \
             std::to_string(__LINE__) + "  :  " + \
-            FILENAME + "  :  " + __func__ + "()\n  " + msg\
-        )\
-    )
+            FILENAME + "  :  " + __func__ + "()\n  " + msg \
+        ) \
+    ); \
+}
 
 #define CheckInvalidLocation(vLoc, name) \
     if(vLoc < 0) { \
@@ -47,19 +61,29 @@
         RuntimeThrow("Invalid " name " location."); \
     }
 
+CORE_EXPORT
 std::string operator+(const std::string& c, const QString& k);
+CORE_EXPORT
 std::string operator<<(const std::string& c, const QString& k);
+CORE_EXPORT
 std::string operator>>(const QString& k, const std::string& c);
 
+CORE_EXPORT
 QDebug operator<<(QDebug out, const std::string& str);
 
+CORE_EXPORT
 extern QString gAllTextFromException(const std::exception& e,
                                      QString allText = "",
                                      const uint level = 0);
+CORE_EXPORT
 extern void gPrintExceptionCritical(const std::exception& e);
+CORE_EXPORT
 extern void gPrintExceptionFatal(const std::exception& e);
+CORE_EXPORT
 extern void gPrintException(const bool fatal, const QString& allText);
+CORE_EXPORT
 extern void gPrintExceptionCritical(const std::exception_ptr& eptr);
+CORE_EXPORT
 extern void gPrintExceptionFatal(const std::exception_ptr& eptr);
 
 #endif // EXCEPTIONS_H

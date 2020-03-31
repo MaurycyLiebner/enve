@@ -23,7 +23,7 @@
 #include "CacheHandlers/imagecachecontainer.h"
 class ImageFileDataHandler;
 
-class ImageLoader : public eHddTask {
+class CORE_EXPORT ImageLoader : public eHddTask {
     e_OBJECT
 protected:
     ImageLoader(const QString &filePath,
@@ -38,7 +38,7 @@ protected:
     sk_sp<SkImage> mImage;
 };
 
-class OraLoader : public ImageLoader {
+class CORE_EXPORT OraLoader : public ImageLoader {
     e_OBJECT
 protected:
     using ImageLoader::ImageLoader;
@@ -46,7 +46,7 @@ public:
     void process();
 };
 
-class KraLoader : public ImageLoader {
+class CORE_EXPORT KraLoader : public ImageLoader {
     e_OBJECT
 protected:
     using ImageLoader::ImageLoader;
@@ -54,7 +54,7 @@ public:
     void process();
 };
 
-class ImageFileDataHandler : public FileDataCacheHandler {
+class CORE_EXPORT ImageFileDataHandler : public FileDataCacheHandler {
     e_OBJECT
     friend class ImageLoader;
 
@@ -98,7 +98,7 @@ private:
     stdsptr<ImageLoader> mImageLoader;
 };
 
-class ImageFileHandler : public FileCacheHandler {
+class CORE_EXPORT ImageFileHandler : public FileCacheHandler {
     e_OBJECT
 protected:
     ImageFileHandler() {}

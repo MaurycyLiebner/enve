@@ -18,7 +18,7 @@
 #define SMARTCTRLPOINT_H
 #include "MovablePoints/nonanimatedmovablepoint.h"
 class SmartNodePoint;
-class SmartCtrlPoint : public NonAnimatedMovablePoint {
+class CORE_EXPORT SmartCtrlPoint : public NonAnimatedMovablePoint {
     e_OBJECT
 public:
     enum Type : char { C0, C2 };

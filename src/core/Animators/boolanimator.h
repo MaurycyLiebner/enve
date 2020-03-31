@@ -19,7 +19,7 @@
 
 #include "intanimator.h"
 
-class BoolAnimator : public IntAnimator {
+class CORE_EXPORT BoolAnimator : public IntAnimator {
     e_OBJECT
     BoolAnimator(const QString& name);
 public:

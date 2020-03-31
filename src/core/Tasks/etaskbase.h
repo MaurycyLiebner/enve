@@ -30,7 +30,7 @@ enum class eTaskState {
 
 class eTask;
 
-class eTaskBase {
+class CORE_EXPORT eTaskBase {
 public:
     virtual ~eTaskBase() { cancelDependent(); }
 protected:

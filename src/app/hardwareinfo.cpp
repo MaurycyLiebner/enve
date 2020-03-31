@@ -20,6 +20,10 @@
 
 #include "exceptions.h"
 
+#if (defined (_WIN32) || defined (_WIN64))
+    #include <windows.h>
+#endif
+
 int HardwareInfo::mCpuThreads = -1;
 
 intKB HardwareInfo::mRamKB(0);
@@ -27,6 +31,13 @@ intKB HardwareInfo::mRamKB(0);
 GpuVendor HardwareInfo::mGpuVendor = GpuVendor::unrecognized;
 
 intKB getTotalRamBytes() {
+#if (defined (_WIN32) || defined (_WIN64))
+    MEMORYSTATUSEX statex;
+    statex.dwLength = sizeof (statex);
+    GlobalMemoryStatusEx(&statex);
+    const longB totalBytes(statex.ullTotalPhys);
+    return intKB(totalBytes);
+#elif (defined (LINUX) || defined (__linux__))
     FILE * const meminfo = fopen("/proc/meminfo", "r");
     if(meminfo) {
         char line[256];
@@ -42,6 +53,7 @@ intKB getTotalRamBytes() {
         RuntimeThrow("'MemTotal' missing from /proc/meminfo");
     }
     RuntimeThrow("Failed to open /proc/meminfo");
+#endif
 }
 
 #include "Private/Tasks/offscreenqgl33c.h"

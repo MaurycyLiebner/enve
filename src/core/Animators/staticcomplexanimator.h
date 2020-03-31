@@ -18,7 +18,7 @@
 #define STATICCOMPLEXANIMATOR_H
 #include "complexanimator.h"
 
-class StaticComplexAnimator : public ComplexAnimator {
+class CORE_EXPORT StaticComplexAnimator : public ComplexAnimator {
 public:
     StaticComplexAnimator(const QString &name);
 

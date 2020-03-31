@@ -18,7 +18,7 @@
 #define ESOUNDLINK_H
 #include "esound.h"
 
-class eSoundLink : public eSound {
+class CORE_EXPORT eSoundLink : public eSound {
 public:
     eSoundLink(eSound* const target);
 

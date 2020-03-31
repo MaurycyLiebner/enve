@@ -31,7 +31,7 @@ class PaintSettingsAnimator;
 class FillSettingsAnimator;
 class OutlineSettingsAnimator;
 
-class PaintSetting {
+class CORE_EXPORT PaintSetting {
 public:
     enum Target { FILL, OUTLINE };
     virtual ~PaintSetting() {}
@@ -51,7 +51,7 @@ private:
     const Target mTarget;
 };
 
-class ColorPaintSetting : public PaintSetting {
+class CORE_EXPORT ColorPaintSetting : public PaintSetting {
 public:
     ColorPaintSetting(const Target& target,
                       const ColorSetting& colorSettings) :
@@ -64,7 +64,7 @@ private:
     const ColorSetting mColorSetting;
 };
 
-class GradientPaintSetting : public PaintSetting {
+class CORE_EXPORT GradientPaintSetting : public PaintSetting {
 public:
     GradientPaintSetting(const Target& target,
                          Gradient * const gradient) :
@@ -77,7 +77,7 @@ private:
     Gradient * const mGradient;
 };
 
-class GradientPtsPosSetting : public PaintSetting {
+class CORE_EXPORT GradientPtsPosSetting : public PaintSetting {
 public:
     GradientPtsPosSetting(const Target& target,
                           const QPointF& pt1, const QPointF& pt2) :
@@ -91,7 +91,7 @@ private:
     const QPointF mPt2;
 };
 
-class GradientTransformSetting : public PaintSetting {
+class CORE_EXPORT GradientTransformSetting : public PaintSetting {
 public:
     GradientTransformSetting(const Target& target,
                              const QMatrix& trans) :
@@ -105,7 +105,7 @@ private:
     const QMatrix mTransform;
 };
 
-class GradientTypePaintSetting : public PaintSetting {
+class CORE_EXPORT GradientTypePaintSetting : public PaintSetting {
 public:
     GradientTypePaintSetting(const Target& target,
                              const GradientType type) :
@@ -118,7 +118,7 @@ private:
     const GradientType mGradientType;
 };
 
-class PaintTypePaintSetting : public PaintSetting {
+class CORE_EXPORT PaintTypePaintSetting : public PaintSetting {
 public:
     PaintTypePaintSetting(const Target& target,
                           const PaintType type) :
@@ -131,7 +131,7 @@ private:
     const PaintType mPaintType;
 };
 
-class OutlineWidthPaintSetting : public PaintSetting {
+class CORE_EXPORT OutlineWidthPaintSetting : public PaintSetting {
 public:
     OutlineWidthPaintSetting(const qreal width) :
         PaintSetting(OUTLINE), mWidth(width) {}
@@ -143,7 +143,7 @@ private:
     const qreal mWidth;
 };
 
-class StrokeBrushPaintSetting : public PaintSetting {
+class CORE_EXPORT StrokeBrushPaintSetting : public PaintSetting {
 public:
     StrokeBrushPaintSetting(SimpleBrushWrapper * const brush) :
         PaintSetting(OUTLINE), mBrush(brush) {}
@@ -155,7 +155,7 @@ private:
     SimpleBrushWrapper * const mBrush;
 };
 
-class StrokeWidthCurvePaintSetting : public PaintSetting {
+class CORE_EXPORT StrokeWidthCurvePaintSetting : public PaintSetting {
 public:
     StrokeWidthCurvePaintSetting(const qCubicSegment1D& widthCurve) :
         PaintSetting(OUTLINE), mWidthCurve(widthCurve) {}
@@ -167,7 +167,7 @@ private:
     const qCubicSegment1D mWidthCurve;
 };
 
-class StrokePressureCurvePaintSetting : public PaintSetting {
+class CORE_EXPORT StrokePressureCurvePaintSetting : public PaintSetting {
 public:
     StrokePressureCurvePaintSetting(const qCubicSegment1D& pressureCurve) :
         PaintSetting(OUTLINE), mPressureCurve(pressureCurve) {}
@@ -179,7 +179,7 @@ private:
     const qCubicSegment1D mPressureCurve;
 };
 
-class StrokeTimeCurvePaintSetting : public PaintSetting {
+class CORE_EXPORT StrokeTimeCurvePaintSetting : public PaintSetting {
 public:
     StrokeTimeCurvePaintSetting(const qCubicSegment1D& timeCurve) :
         PaintSetting(OUTLINE), mTimeCurve(timeCurve) {}
@@ -191,7 +191,7 @@ private:
     const qCubicSegment1D mTimeCurve;
 };
 
-class PaintSettingsApplier {
+class CORE_EXPORT PaintSettingsApplier {
 public:
     inline PaintSettingsApplier &operator<< (const stdsptr<PaintSetting> &t)
     { mSettings << t; return *this; }

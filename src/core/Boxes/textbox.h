@@ -25,7 +25,7 @@ enum class TextFragmentType : short {
     letter, word, line, whole
 };
 
-class TextBox : public PathBox {
+class CORE_EXPORT TextBox : public PathBox {
     e_OBJECT
 protected:
     TextBox();

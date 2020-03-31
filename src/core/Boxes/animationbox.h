@@ -25,17 +25,7 @@
 class AnimationFrameHandler;
 class IntFrameRemapping;
 
-struct AnimationBoxRenderData : public ImageContainerRenderData {
-    AnimationBoxRenderData(AnimationFrameHandler *cacheHandler,
-                           BoundingBox *parentBox);
-
-    void loadImageFromHandler();
-
-    const qptr<AnimationFrameHandler> fSrcCacheHandler;
-    int fAnimFrame;
-};
-
-class AnimationBox : public BoundingBox {
+class CORE_EXPORT AnimationBox : public BoundingBox {
     e_OBJECT
 protected:
     AnimationBox(const QString& name, const eBoxType type);

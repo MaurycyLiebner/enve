@@ -21,7 +21,7 @@
 #include "pointhelpers.h"
 #include "smartPointers/ememory.h"
 
-class SimpleBrushWrapper : public StdSelfRef {
+class CORE_EXPORT SimpleBrushWrapper : public StdSelfRef {
     e_OBJECT
 public:
     ~SimpleBrushWrapper();

@@ -17,12 +17,16 @@
 #ifndef NAMEFIXER_H
 #define NAMEFIXER_H
 
+#include "core_global.h"
+
 #include <QRegExp>
 #include <functional>
 
 namespace NameFixer {
+    CORE_EXPORT
     QString stringScrapEndDigits(const QString& string);
     using NamesGetter = std::function<QStringList(const QString&)>;
+    CORE_EXPORT
     QString makeNameUnique(const QString& name,
                            const NamesGetter& namesGetter);
 };

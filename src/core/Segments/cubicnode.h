@@ -18,7 +18,8 @@
 #define CUBICNODE_H
 #include <QPointF>
 
-struct CubicNode {
+#include "../core_global.h"
+struct CORE_EXPORT CubicNode {
 public:
     CubicNode(const QPointF& c1, const QPointF& p, const QPointF& c2) {
         mC1 = c1; mP = p; mC2 = c2;

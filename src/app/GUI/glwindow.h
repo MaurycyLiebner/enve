@@ -26,8 +26,8 @@
 #include <QResizeEvent>
 #include <QOpenGLPaintDevice>
 
-class ShaderEffectCreator;
-class ShaderEffectProgram;
+struct ShaderEffectCreator;
+struct ShaderEffectProgram;
 
 class GLWindow : public QOpenGLWidget, protected QGL33 {
 public:

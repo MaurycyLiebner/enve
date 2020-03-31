@@ -17,18 +17,26 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-extern int FONT_HEIGHT;
-extern int MIN_WIDGET_DIM;
-extern int BUTTON_DIM;
-extern int KEY_RECT_SIZE;
+#include "../core_global.h"
 
 #include <QPixmap>
-
-extern QPixmap* ALPHA_MESH_PIX;
-
 #include <QString>
 
+CORE_EXPORT
+extern int FONT_HEIGHT;
+CORE_EXPORT
+extern int MIN_WIDGET_DIM;
+CORE_EXPORT
+extern int BUTTON_DIM;
+CORE_EXPORT
+extern int KEY_RECT_SIZE;
+
+CORE_EXPORT
+extern QPixmap* ALPHA_MESH_PIX;
+
+CORE_EXPORT
 QString gSingleLineTooltip(const QString& text);
+CORE_EXPORT
 QString gSingleLineTooltip(const QString& text, const QString& shortcut);
 
 #endif // GLOBAL_H

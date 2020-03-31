@@ -28,7 +28,7 @@
 #include "autotilesdata.h"
 #include "brushstrokeset.h"
 
-class AutoTiledSurfaceBase {
+class CORE_EXPORT AutoTiledSurfaceBase {
     friend struct BrushStroke;
     friend struct BrushStrokeSet;
 public:
@@ -155,7 +155,7 @@ private:
     const Request mRequestEnd;
 };
 
-class AutoTiledSurface : public AutoTiledSurfaceBase {
+class CORE_EXPORT AutoTiledSurface : public AutoTiledSurfaceBase {
 public:
     AutoTiledSurface();
 
@@ -165,7 +165,7 @@ public:
                             MyPaintTileRequest *);
 };
 #include "undoabletile.h"
-class UndoableAutoTiledSurface : public AutoTiledSurfaceBase {
+class CORE_EXPORT UndoableAutoTiledSurface : public AutoTiledSurfaceBase {
 public:
     UndoableAutoTiledSurface();
 

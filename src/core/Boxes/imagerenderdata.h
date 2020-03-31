@@ -19,7 +19,7 @@
 #include "Boxes/boxrenderdata.h"
 #include "CacheHandlers/imagecachecontainer.h"
 
-struct ImageRenderData : public BoxRenderData {
+struct CORE_EXPORT ImageRenderData : public BoxRenderData {
     ImageRenderData(BoundingBox * const parentBoxT);
 
     virtual void loadImageFromHandler() = 0;
@@ -34,7 +34,7 @@ private:
     void drawSk(SkCanvas * const canvas);
 };
 
-struct ImageContainerRenderData : public ImageRenderData {
+struct CORE_EXPORT ImageContainerRenderData : public ImageRenderData {
 public:
     using ImageRenderData::ImageRenderData;
 

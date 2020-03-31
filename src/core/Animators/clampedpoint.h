@@ -18,7 +18,7 @@
 #define CLAMPEDPOINT_H
 #include "clampedvalue.h"
 
-class ClampedPoint {
+class CORE_EXPORT ClampedPoint {
     ClampedValue mX;
     ClampedValue mY;
 public:

@@ -18,7 +18,7 @@
 #define SOLIDIFYPATHEFFECT_H
 #include "PathEffects/patheffect.h"
 
-class SolidifyPathEffect : public PathEffect {
+class CORE_EXPORT SolidifyPathEffect : public PathEffect {
     e_OBJECT
 protected:
     SolidifyPathEffect();

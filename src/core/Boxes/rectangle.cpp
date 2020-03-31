@@ -21,7 +21,7 @@
 #include "Animators/transformanimator.h"
 #include "RasterEffects/rastereffectcollection.h"
 
-Rectangle::Rectangle() : PathBox("Rectangle", eBoxType::rectangle) {
+RectangleBox::RectangleBox() : PathBox("RectangleBox", eBoxType::rectangle) {
     setPointsHandler(enve::make_shared<PointsHandler>());
 
     mTopLeftAnimator = enve::make_shared<QPointFAnimator>("top left");
@@ -68,7 +68,7 @@ Rectangle::Rectangle() : PathBox("Rectangle", eBoxType::rectangle) {
             this, pathUpdater);
 }
 
-SkPath Rectangle::getRelativePath(const qreal relFrame) const {
+SkPath RectangleBox::getRelativePath(const qreal relFrame) const {
     SkPath path;
     const QPointF topLeft = mTopLeftAnimator->getEffectiveValue(relFrame);
     const QPointF bottomRight = mBottomRightAnimator->getEffectiveValue(relFrame);
@@ -79,38 +79,38 @@ SkPath Rectangle::getRelativePath(const qreal relFrame) const {
     return path;
 }
 
-void Rectangle::setTopLeftPos(const QPointF &pos) {
+void RectangleBox::setTopLeftPos(const QPointF &pos) {
     mTopLeftPoint->setRelativePos(pos);
 }
 
-void Rectangle::setBottomRightPos(const QPointF &pos) {
+void RectangleBox::setBottomRightPos(const QPointF &pos) {
     mBottomRightPoint->setRelativePos(pos);
 }
 
-void Rectangle::setYRadius(const qreal radiusY) {
+void RectangleBox::setYRadius(const qreal radiusY) {
     mRadiusAnimator->getYAnimator()->setCurrentBaseValue(radiusY);
 }
 
-void Rectangle::setXRadius(const qreal radiusX) {
+void RectangleBox::setXRadius(const qreal radiusX) {
     mRadiusAnimator->getXAnimator()->setCurrentBaseValue(radiusX);
 }
 
-void Rectangle::moveSizePointByAbs(const QPointF &absTrans) {
+void RectangleBox::moveSizePointByAbs(const QPointF &absTrans) {
     mBottomRightPoint->moveByAbs(absTrans);
 }
 
-MovablePoint *Rectangle::getBottomRightPoint() {
+MovablePoint *RectangleBox::getBottomRightPoint() {
     return mBottomRightPoint.get();
 }
 
-void Rectangle::getMotionBlurProperties(QList<Property*> &list) const {
+void RectangleBox::getMotionBlurProperties(QList<Property*> &list) const {
     PathBox::getMotionBlurProperties(list);
     list.append(mTopLeftAnimator.get());
     list.append(mBottomRightAnimator.get());
     list.append(mRadiusAnimator.get());
 }
 
-bool Rectangle::differenceInEditPathBetweenFrames(
+bool RectangleBox::differenceInEditPathBetweenFrames(
         const int frame1, const int frame2) const {
     if(mTopLeftAnimator->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
     if(mBottomRightAnimator->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
@@ -122,8 +122,8 @@ bool Rectangle::differenceInEditPathBetweenFrames(
 #include "Expressions/expression.h"
 #include "svgexporter.h"
 
-void Rectangle::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
-    const auto copy = enve::make_shared<Rectangle>();
+void RectangleBox::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
+    const auto copy = enve::make_shared<RectangleBox>();
     BoxClipboard::sCopyAndPaste(this, copy.get());
     getParentGroup()->addContained(copy);
     SimpleTask::sProcessAll();

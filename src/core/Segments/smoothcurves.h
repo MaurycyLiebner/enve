@@ -17,9 +17,11 @@
 #ifndef SMOOTHCURVES_H
 #define SMOOTHCURVES_H
 
+#include "../core_global.h"
 #include <QtCore>
 
 namespace SmoothCurves {
+    CORE_EXPORT
     extern void movingAverage(const QVector<QPointF>& data,
                               QVector<QPointF>& smooth,
                               const bool fixedStart,

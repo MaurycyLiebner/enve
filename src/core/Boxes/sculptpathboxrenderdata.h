@@ -23,7 +23,7 @@
 
 class SculptPathBox;
 
-class SculptPathBoxRenderData : public BoxRenderData {
+class CORE_EXPORT SculptPathBoxRenderData : public BoxRenderData {
 public:
     SculptPathBoxRenderData(SculptPathBox* const parent);
 

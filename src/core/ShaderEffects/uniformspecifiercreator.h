@@ -36,7 +36,7 @@ enum class ShaderPropertyType {
 
 typedef std::function<void(QGL33 * const)> UniformSpecifier;
 typedef QList<UniformSpecifier> UniformSpecifiers;
-struct UniformSpecifierCreator : public StdSelfRef {
+struct CORE_EXPORT UniformSpecifierCreator : public StdSelfRef {
     UniformSpecifierCreator(const ShaderPropertyType type,
                             const bool glValue,
                             const bool resolutionScaled) :

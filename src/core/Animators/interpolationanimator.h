@@ -18,7 +18,7 @@
 #define INTERPOLATIONANIMATOR_H
 #include "graphanimator.h"
 
-class InterpolationAnimator : public GraphAnimator {
+class CORE_EXPORT InterpolationAnimator : public GraphAnimator {
 public:
     InterpolationAnimator(const QString& name);
 

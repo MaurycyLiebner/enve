@@ -25,7 +25,7 @@
 #include "../../framerange.h"
 #include "../../smartPointers/ememory.h"
 
-class SmartPath {
+class CORE_EXPORT SmartPath {
 public:
     SmartPath() = default;
     SmartPath(const SkPath& path);

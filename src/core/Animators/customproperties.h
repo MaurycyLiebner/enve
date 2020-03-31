@@ -28,7 +28,7 @@ using CustomPropertiesBase =
                            writeCPropertyType,
                            readIdCreateCProperty>;
 
-class CustomProperties : public CustomPropertiesBase {
+class CORE_EXPORT CustomProperties : public CustomPropertiesBase {
     Q_OBJECT
     e_OBJECT
 protected:

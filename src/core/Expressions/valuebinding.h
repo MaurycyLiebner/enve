@@ -19,7 +19,7 @@
 
 #include "propertybindingbase.h"
 
-class ValueBinding : public PropertyBindingBase {
+class CORE_EXPORT ValueBinding : public PropertyBindingBase {
     ValueBinding(const Property* const context);
 public:
     static qsptr<ValueBinding> sCreate(const Property* const context);

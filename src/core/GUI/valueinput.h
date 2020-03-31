@@ -16,11 +16,13 @@
 
 #ifndef VALUEINPUT_H
 #define VALUEINPUT_H
+
+#include "../core_global.h"
+#include "skia/skiaincludes.h"
+
 #include <QString>
 #include <QPointF>
 #include <QLocale>
-
-#include "skia/skiaincludes.h"
 
 class QPainter;
 class SkCanvas;
@@ -29,7 +31,7 @@ class QKeyEvent;
 enum class TransformMode { move, scale, rotate, none };
 enum class DirectionMode { x, y, xy };
 
-class ValueInput {
+class CORE_EXPORT ValueInput {
 public:
     ValueInput();
 

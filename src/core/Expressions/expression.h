@@ -22,7 +22,7 @@
 
 #include "propertybindingparser.h"
 
-class Expression : public QObject {
+class CORE_EXPORT Expression : public QObject {
     Q_OBJECT
     Expression(const QString& definitionsStr,
                const QString& scriptStr,

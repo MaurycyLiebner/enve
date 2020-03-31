@@ -21,7 +21,7 @@
 #include "exceptions.h"
 #include <QOffscreenSurface>
 
-class OffscreenQGL33c : public QGL33 {
+class CORE_EXPORT OffscreenQGL33c : public QGL33 {
 public:
     OffscreenQGL33c();
     ~OffscreenQGL33c();
