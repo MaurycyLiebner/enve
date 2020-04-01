@@ -28,9 +28,10 @@ matrix:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
         - QT_INSTALL_DIR=~/Qt
         - QT_VERSION=5.12.4
-        - QT_BIN=${QT_INSTALL_DIR}/${QT_VERSION}/gcc_64/bin
+        - QT_CONTENT=${QT_INSTALL_DIR}/${QT_VERSION}/gcc_64
+        - QT_BIN=${QT_CONTENT}/bin
         - PATH="${QT_BIN}:${PATH}"
-        - QT_LIB=${QT_INSTALL_DIR}/${QT_VERSION}/gcc_64/lib
+        - QT_LIB=${QT_CONTENT}/lib
         - LD_LIBRARY_PATH="${QT_LIB}:${LD_LIBRARY_PATH}"
         - TRAVIS_CACHE_DIR=$TRAVIS_BUILD_DIR/cache
 cache:
@@ -42,6 +43,12 @@ before_install:
     - chmod +x install-qt.sh
     - ./install-qt.sh -d ${QT_INSTALL_DIR} --version ${QT_VERSION} qtbase qttools qtsvg qtmultimedia qtdeclarative qtwebengine qtwebchannel qtwebview qtlocation qtserialport icu
 install:
+    - # Install qt5ct for a native look
+    - wget -c https://excellmedia.dl.sourceforge.net/project/qt5ct/qt5ct-0.41.tar.bz2
+    - tar xf qt5ct-0.*.tar.bz2
+    - cd qt5ct-0.*/
+    - QT_SELECT=5 qmake
+    - make -j 2 && sudo make install
     - # skia dependencies
     - cd third_party
     - # build skia
@@ -123,7 +130,7 @@ script:
     - cp Release/src/app/enve AppDir/usr/bin/
     - cp -av Release/src/core/*.so* AppDir/usr/lib/
     - cp -av ../third_party/gperftools-2.7-enve-mod/.libs/libtcmalloc.so* AppDir/usr/lib/
-    - ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage
+    - ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage -extra-plugins=platformthemes/libqt5ct.so,styles/libqt5ct-style.so
 after_success:
     - |
       export GREP_PATH=grep;
