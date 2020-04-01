@@ -49,6 +49,7 @@ install:
     - cd qt5ct-0.*/
     - QT_SELECT=5 qmake
     - make -j 2 && sudo make install
+    - cd ..
     - # skia dependencies
     - cd third_party
     - # build skia
