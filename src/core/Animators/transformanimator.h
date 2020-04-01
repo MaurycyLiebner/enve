@@ -191,10 +191,8 @@ class CORE_EXPORT BoxTransformAnimator : public AdvancedTransformAnimator {
 protected:
     BoxTransformAnimator();
 public:
-    void saveSVG(SvgExporter& exp,
-                 QDomElement& parent,
-                 const FrameRange& visRange,
-                 const QDomElement& child) const;
+    QDomElement saveSVG(SvgExporter& exp, const FrameRange& visRange,
+                        const QDomElement& child) const;
 };
 
 #endif // TRANSFORMANIMATOR_H

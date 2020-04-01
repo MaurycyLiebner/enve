@@ -578,10 +578,9 @@ QDomElement saveSVG_Split(QPointFAnimator* const anim,
     }
 }
 
-void BoxTransformAnimator::saveSVG(SvgExporter& exp,
-                                   QDomElement& parent,
-                                   const FrameRange& visRange,
-                                   const QDomElement& child) const {
+QDomElement BoxTransformAnimator::saveSVG(
+        SvgExporter& exp, const FrameRange& visRange,
+        const QDomElement& child) const {
     auto unpivot = saveSVG_Split(getPivotAnimator(), visRange, -1, 0,
                                  "translate", exp, child);
     {
@@ -614,5 +613,5 @@ void BoxTransformAnimator::saveSVG(SvgExporter& exp,
     auto pivot = saveSVG_Split(getPivotAnimator(), visRange, 1, 0,
                                "translate", exp, translate);
 
-    parent.appendChild(pivot);
+    return pivot;
 }

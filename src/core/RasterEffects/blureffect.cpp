@@ -1,5 +1,9 @@
 #include "blureffect.h"
+
 #include "Animators/qrealanimator.h"
+#include "Boxes/containerbox.h"
+#include "svgexporthelpers.h"
+#include "svgexporter.h"
 
 class BlurEffectCaller : public RasterEffectCaller {
 public:
@@ -39,6 +43,35 @@ QMargins radiusToMargin(const qreal radius) {
 
 QMargins BlurEffect::getMargin() const {
     return radiusToMargin(mRadius->getEffectiveValue());
+}
+
+QDomElement BlurEffect::saveBlurSVG(
+        SvgExporter& exp, const FrameRange& visRange,
+        const QDomElement& child) const {
+    auto result = exp.createElement("g");
+
+    const QString filterId = SvgExportHelpers::ptrToStr(this);
+    auto filter = exp.createElement("filter");
+    filter.setAttribute("id", filterId);
+    filter.setAttribute("filterUnits", "userSpaceOnUse");
+
+    qreal scale = 1.;
+    if(const auto parent = getFirstAncestor<BoundingBox>()) {
+        if(const auto grandParent = parent->getParentGroup()) {
+            scale /= grandParent->getTotalTransform().m11();
+        }
+    }
+
+    auto shadow = exp.createElement("feGaussianBlur");
+    mRadius->saveQrealSVG(exp, shadow, visRange, "stdDeviation", scale/3);
+
+    filter.appendChild(shadow);
+
+    exp.addToDefs(filter);
+    result.setAttribute("filter", "url(#" + filterId + ")");
+
+    result.appendChild(child);
+    return result;
 }
 
 BlurEffectCaller::BlurEffectCaller(const HardwareSupport hwSupport,

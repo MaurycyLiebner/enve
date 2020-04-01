@@ -1,5 +1,9 @@
 #include "shadoweffect.h"
 
+#include "Boxes/containerbox.h"
+#include "svgexporter.h"
+#include "svgexporthelpers.h"
+
 class ShadowEffectCaller : public RasterEffectCaller {
 public:
     ShadowEffectCaller(const HardwareSupport hwSupport,
@@ -53,6 +57,39 @@ ShadowEffect::ShadowEffect() :
     ca_setGUIProperty(mColor.data());
 }
 
+QDomElement ShadowEffect::saveShadowSVG(
+        SvgExporter& exp, const FrameRange& visRange,
+        const QDomElement& child) const {
+    auto result = exp.createElement("g");
+
+    const QString filterId = SvgExportHelpers::ptrToStr(this);
+    auto filter = exp.createElement("filter");
+    filter.setAttribute("id", filterId);
+    filter.setAttribute("filterUnits", "userSpaceOnUse");
+
+    qreal scale = 1.;
+    if(const auto parent = getFirstAncestor<BoundingBox>()) {
+        if(const auto grandParent = parent->getParentGroup()) {
+            scale /= grandParent->getTotalTransform().m11();
+        }
+    }
+
+    auto shadow = exp.createElement("feDropShadow");
+    const auto x = mTranslation->getXAnimator();
+    x->saveQrealSVG(exp, shadow, visRange, "dx", scale);
+    const auto y = mTranslation->getYAnimator();
+    y->saveQrealSVG(exp, shadow, visRange, "dy", scale);
+    mColor->saveColorSVG(exp, shadow, visRange, "flood-color");
+    mOpacity->saveQrealSVG(exp, shadow, visRange, "flood-opacity");
+    mBlurRadius->saveQrealSVG(exp, shadow, visRange, "stdDeviation", scale/3);
+    filter.appendChild(shadow);
+
+    exp.addToDefs(filter);
+    result.setAttribute("filter", "url(#" + filterId + ")");
+
+    result.appendChild(child);
+    return result;
+}
 
 stdsptr<RasterEffectCaller>
 ShadowEffect::getEffectCaller(

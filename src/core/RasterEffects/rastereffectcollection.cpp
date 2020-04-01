@@ -95,6 +95,21 @@ void RasterEffectCollection::updateIfUsesProgram(
     }
 }
 
+QDomElement RasterEffectCollection::saveEffectsSVG(
+        SvgExporter& exp, const FrameRange& visRange,
+        const QDomElement& child) const {
+    QDomElement result = child;
+    const auto& children = ca_getChildren();
+    for(const auto& effect : children) {
+        if(const auto blur = enve_cast<BlurEffect*>(effect.get())) {
+            result = blur->saveBlurSVG(exp, visRange, result);
+        } else if(const auto shadow = enve_cast<ShadowEffect*>(effect.get())) {
+            result = shadow->saveShadowSVG(exp, visRange, result);
+        }
+    }
+    return result;
+}
+
 bool RasterEffectCollection::hasEffects() {
     return ca_hasChildren();
 }

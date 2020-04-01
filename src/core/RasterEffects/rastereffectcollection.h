@@ -51,6 +51,10 @@ public:
     const QMargins& getMaxForcedMargin() const {
         return mMaxForcedMargin;
     }
+
+    QDomElement saveEffectsSVG(SvgExporter& exp, const FrameRange& visRange,
+                               const QDomElement& child) const;
+
 signals:
     void forcedMarginChanged();
 private:

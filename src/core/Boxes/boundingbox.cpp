@@ -1263,7 +1263,10 @@ eTask* BoundingBox::saveSVGWithTransform(SvgExporter& exp, QDomElement& parent,
         if(ptr) {
             SvgExportHelpers::assignVisibility(*expPtr, ele, visRange);
             const auto transform = ptr->mTransformAnimator.get();
-            transform->saveSVG(*expPtr, *parentPtr, visRange, ele);
+            const auto transformed = transform->saveSVG(*expPtr, visRange, ele);
+            const auto effects = ptr->mRasterEffectsAnimators.get();
+            const auto withEffects = effects->saveEffectsSVG(*expPtr, visRange, transformed);
+            parentPtr->appendChild(withEffects);
         }
     }, nullptr});
     saveSVG(exp, taskPtr);
