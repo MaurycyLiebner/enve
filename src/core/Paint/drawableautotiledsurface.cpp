@@ -22,14 +22,15 @@ DrawableAutoTiledSurface::DrawableAutoTiledSurface() :
     mColumnCount(mTileBitmaps.fColumnCount),
     mZeroTileRow(mTileBitmaps.fZeroTileRow),
     mZeroTileCol(mTileBitmaps.fZeroTileCol),
-    mBitmaps(mTileBitmaps.fBitmaps) {}
+    mBitmaps(mTileBitmaps.fBitmaps) {
+    afterDataReplaced();
+}
 
 DrawableAutoTiledSurface::DrawableAutoTiledSurface(
         const DrawableAutoTiledSurface &other) :
     DrawableAutoTiledSurface() {
     mSurface = other.mSurface;
     mTileBitmaps = other.mTileBitmaps;
-    afterDataReplaced();
 }
 
 DrawableAutoTiledSurface &DrawableAutoTiledSurface::operator=(
