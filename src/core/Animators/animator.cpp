@@ -672,11 +672,13 @@ void Animator::saveSVG(SvgExporter& exp,
                        const QString& attrName,
                        const ValueGetter& valueGetter,
                        const bool transform,
-                       const QString& type) const {
+                       const QString& type,
+                       const QString& interpolation,
+                       const bool forceDumbIncrement) const {
     Q_ASSERT(!transform || attrName == "transform");
     const auto idRange = prp_getIdenticalRelRange(visRange.fMin);
     const int span = exp.fAbsRange.span();
-    if(idRange.inRange(visRange) || span == 1) {
+    if((idRange.inRange(visRange) && !forceDumbIncrement) || span == 1) {
         auto value = valueGetter(visRange.fMin);
         if(transform) {
             value = parent.attribute(attrName) + " " +
@@ -686,6 +688,7 @@ void Animator::saveSVG(SvgExporter& exp,
     } else {
         const auto tagName = transform ? "animateTransform" : "animate";
         auto anim = exp.createElement(tagName);
+        anim.setAttribute("calcMode", interpolation);
         anim.setAttribute("attributeName", attrName);
         if(!type.isEmpty()) anim.setAttribute("type", type);
         const qreal div = span - 1;
@@ -697,7 +700,9 @@ void Animator::saveSVG(SvgExporter& exp,
         while(true) {
             const auto value = valueGetter(i);
             values << value;
-            const auto iRange = exp.fAbsRange*prp_getIdenticalAbsRange(i);
+            const auto iRange = forceDumbIncrement ?
+                                    FrameRange{i, i} :
+                                    exp.fAbsRange*prp_getIdenticalAbsRange(i);
             const qreal minTime = (iRange.fMin - exp.fAbsRange.fMin)/div;
             keyTimes << QString::number(minTime);
             if(iRange.fMin != iRange.fMax) {
@@ -706,7 +711,7 @@ void Animator::saveSVG(SvgExporter& exp,
                 keyTimes << QString::number(maxTime);
             }
             if(iRange.fMax >= visRange.fMax) break;
-            i = prp_nextDifferentRelFrame(i);
+            i = forceDumbIncrement ? i + 1 : prp_nextDifferentRelFrame(i);
         }
         if(keyTimes.isEmpty()) return;
         if(keyTimes.last() != "1") {
@@ -728,6 +733,9 @@ void Animator::saveSVG(SvgExporter& exp,
                        QDomElement& parent,
                        const FrameRange& visRange,
                        const QString& attrName,
-                       const ValueGetter& valueGetter) const {
-    saveSVG(exp, parent, visRange, attrName, valueGetter, false, "");
+                       const ValueGetter& valueGetter,
+                       const QString& interpolation,
+                       const bool forceDumbIncrement) const {
+    saveSVG(exp, parent, visRange, attrName, valueGetter,
+            false, "", interpolation, forceDumbIncrement);
 }
