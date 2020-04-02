@@ -531,7 +531,7 @@ void Canvas::deselectAllBoxes() {
 MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
                                        const CanvasMode mode,
                                        const qreal invScale) {
-    if(mode == CanvasMode::boxTransform) {
+    if(mode == CanvasMode::boxTransform || mode == CanvasMode::pointTransform) {
         if(mRotPivot->isPointAtAbsPos(absPos, mode, invScale)) {
             return mRotPivot.get();
         }
