@@ -193,8 +193,7 @@ public:
                  const FrameRange& visRange,
                  const QString& attrName,
                  const ValueGetter& valueGetter,
-                 const QString& interpolation = "linear",
-                 const bool forceDumbIncrement = false) const;
+                 const QString& interpolation = "linear") const;
     void saveSVG(SvgExporter& exp,
                  QDomElement& parent,
                  const FrameRange& visRange,
@@ -202,8 +201,7 @@ public:
                  const ValueGetter& valueGetter,
                  const bool transform,
                  const QString& type,
-                 const QString& interpolation = "linear",
-                 const bool forceDumbIncrement = false) const;
+                 const QString& interpolation = "linear") const;
 protected:
     void anim_readKeys(eReadStream &src);
     void anim_writeKeys(eWriteStream& dst) const;

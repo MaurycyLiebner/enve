@@ -79,7 +79,7 @@ void SmartPathCollection::savePathsSVG(SvgExporter& exp,
             SkParsePath::ToSVGString(path, &pathStr);
             if(pathStr.isEmpty()) return QString("M0 0");
             return QString(pathStr.c_str());
-        }, "discrete", forceDumbIncrement);
+        }, "discrete");
     }
 }
 
