@@ -62,6 +62,8 @@ public:
             SkCanvas * const canvas,
             const SkFilterQuality filter, int& drawId,
             QList<BlendEffect::Delayed> &delayed) const override;
+
+    void saveSVG(SvgExporter& exp, DomEleTask* const task) const override;
 protected:
     ConnContext& assignLinkTarget(BoxT * const linkTarget);
     BoxT *getLinkTarget() const
@@ -243,6 +245,12 @@ void ILBB::detachedBlendSetup(
         if(!linkTarget) return;
         linkTarget->detachedBlendSetup(canvas, filter, drawId, delayed);
     } else BoxT::detachedBlendSetup(canvas, filter, drawId, delayed);
+}
+
+template<typename BoxT>
+void ILBB::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
+    const auto linkTarget = getLinkTarget();
+    if(linkTarget) linkTarget->saveSVG(exp, task);
 }
 
 #endif // INTERNALLINKBOXBASE_H
