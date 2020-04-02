@@ -99,9 +99,9 @@ ExportSvgDialog::ExportSvgDialog(QWidget* const parent) :
 
     settingsLayout->addLayout(twoColLayout);
     settingsLayout->addSpacing(MIN_WIDGET_DIM);
-    settingsLayout->addWidget(mBackground, 0, Qt::AlignTop);
-    settingsLayout->addWidget(mFixedSize, 0, Qt::AlignTop);
-    settingsLayout->addWidget(mLoop, 0, Qt::AlignTop);
+    settingsLayout->addWidget(mBackground);
+    settingsLayout->addWidget(mFixedSize);
+    settingsLayout->addWidget(mLoop);
     settingsLayout->addSpacing(MIN_WIDGET_DIM);
 
     connect(mFirstFrame, qOverload<int>(&QSpinBox::valueChanged),
