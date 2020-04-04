@@ -20,10 +20,10 @@
 #
 #-------------------------------------------------
 
-VERSION = 0.0.0
+# VERSION = 0.0.0
 
 QT += opengl multimedia qml xml svg
-LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample
+LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample
 CONFIG += c++14
 TARGET = envecore
 TEMPLATE = lib
@@ -62,17 +62,21 @@ CONFIG(debug, debug|release) {
 }
 
 win32 { # Windows
-    DEFINES += QSCINTILLA_DLLS
-
     FFMPEG_FOLDER = $$THIRD_PARTY_FOLDER/ffmpeg-4.2.2-win64-dev
     LIBS += -L$$FFMPEG_FOLDER/lib
     INCLUDEPATH += $$FFMPEG_FOLDER/include
 
-    QMAKE_CFLAGS_RELEASE += /O2 -O2
-    QMAKE_CXXFLAGS_RELEASE += /O2 -O2
+    INCLUDEPATH += $$THIRD_PARTY_FOLDER/zlib/src
+    LIBS += -L$$THIRD_PARTY_FOLDER/zlib -lzlib
+
+    QMAKE_CFLAGS_RELEASE += /O2 -O2 /GL
+    QMAKE_LFLAGS_RELEASE += /LTCG
+    QMAKE_CXXFLAGS_RELEASE += /O2 -O2 /GL
 
     QMAKE_CFLAGS += -openmp
     QMAKE_CXXFLAGS += -openmp
+
+    CONFIG -= debug_and_release
 } unix {
     macx { # Mac OS X
     } else { # Linux

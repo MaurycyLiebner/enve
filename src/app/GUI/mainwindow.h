@@ -174,6 +174,7 @@ public:
 protected:
     void lockFinished();
     void resizeEvent(QResizeEvent* e);
+    void showEvent(QShowEvent* e);
 private:
     QWidget * mWelcomeDialog = nullptr;
     CentralWidget * mCentralWidget = nullptr;

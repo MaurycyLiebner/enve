@@ -20,10 +20,10 @@
 #
 #-------------------------------------------------
 
-VERSION = 0.0.0
+# VERSION = 0.0.0
 
 QT += multimedia core gui svg opengl sql qml xml concurrent webenginewidgets
-LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample
+LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample
 CONFIG += c++14
 DEFINES += QT_NO_FOREACH
 
@@ -45,6 +45,7 @@ LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
 INCLUDEPATH += $$QUAZIP_FOLDER
 LIBS += -L$$QUAZIP_FOLDER/quazip -lquazip
 
+DEFINES += QSCINTILLA_DLL
 INCLUDEPATH += $$QSCINTILLA_FOLDER
 LIBS += -L$$QSCINTILLA_FOLDER -lqscintilla2_qt5
 
@@ -57,17 +58,20 @@ CONFIG(debug, debug|release) {
 }
 
 win32 { # Windows
-    DEFINES += QSCINTILLA_DLLS
-
     FFMPEG_FOLDER = $$THIRD_PARTY_FOLDER/ffmpeg-4.2.2-win64-dev
     LIBS += -L$$FFMPEG_FOLDER/lib
     INCLUDEPATH += $$FFMPEG_FOLDER/include
 
-    QMAKE_CFLAGS_RELEASE += /O2 -O2
-    QMAKE_CXXFLAGS_RELEASE += /O2 -O2
+    QMAKE_CFLAGS_RELEASE += /O2 -O2 /GL
+    QMAKE_LFLAGS_RELEASE += /LTCG
+    QMAKE_CXXFLAGS_RELEASE += /O2 -O2 /GL
 
     QMAKE_CFLAGS += -openmp
     QMAKE_CXXFLAGS += -openmp
+
+    CONFIG -= debug_and_release
+
+    RC_ICONS = pixmaps\enve.ico
 } unix {
     macx { # Mac OS X
     } else { # Linux

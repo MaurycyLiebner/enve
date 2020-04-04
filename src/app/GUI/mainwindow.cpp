@@ -1436,7 +1436,13 @@ void MainWindow::lockFinished() {
 }
 
 void MainWindow::resizeEvent(QResizeEvent* e) {
-    if(statusBar()) statusBar()->setMaximumWidth(e->size().width());
+    if(statusBar()) statusBar()->setMaximumWidth(width());
+    QMainWindow::resizeEvent(e);
+}
+
+void MainWindow::showEvent(QShowEvent *e) {
+    if(statusBar()) statusBar()->setMaximumWidth(width());
+    QMainWindow::showEvent(e);
 }
 
 void MainWindow::updateRecentMenu() {
