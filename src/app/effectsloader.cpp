@@ -60,23 +60,23 @@ EffectsLoader::~EffectsLoader() {
 }
 
 void EffectsLoader::initializeGpu() {
-    OffscreenQGL33c::initialize();
     try {
-        makeCurrent();
-
+        OffscreenQGL33c::initialize();
         try {
+            makeCurrent();
+
             iniPlainVShaderVBO(this);
             iniPlainVShaderVAO(this, mPlainSquareVAO);
             iniTexturedVShaderVBO(this);
             iniTexturedVShaderVAO(this, mTexturedSquareVAO);
             iniColorPrograms(this);
         } catch(...) {
+            doneCurrent();
             RuntimeThrow("Error initializing basic OpenGL programs.");
         }
 
         doneCurrent();
     } catch(const std::exception& e) {
-        doneCurrent();
         gPrintExceptionCritical(e);
     }
 }

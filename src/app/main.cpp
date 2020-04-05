@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "GUI/mainwindow.h"
+#include <iostream>
 #include <QApplication>
 #include <QSurfaceFormat>
 #include <QProcess>
@@ -39,6 +40,21 @@ extern "C" {
                        const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count(); \
                        qDebug() << name << duration << "us" << endl;
 
+void printHardware() {
+    std::cout << "Hardware:" << std::endl;
+    std::cout << "    CPU Threads: " << HardwareInfo::sCpuThreads() << std::endl;
+    std::cout << "         Memory: " << intMB(HardwareInfo::sRamKB()).fValue << "MB" << std::endl;
+    std::cout << "            GPU: ";
+    switch(HardwareInfo::sGpuVendor()) {
+    case GpuVendor::amd: std::cout << "AMD"; break;
+    case GpuVendor::intel: std::cout << "Intel"; break;
+    case GpuVendor::nvidia: std::cout << "Nvidia"; break;
+    case GpuVendor::unrecognized: std::cout << "Unrecognized"; break;
+    }
+    std::cout << std::endl;
+    std::cout << std::endl;
+}
+
 void setDefaultFormat() {
     QSurfaceFormat format;
     format.setVersion(3, 3);
@@ -49,11 +65,14 @@ void setDefaultFormat() {
     //format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
     //format.setSwapInterval(0); // Disable vertical refresh syncing
     QSurfaceFormat::setDefaultFormat(format);
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
 }
 
 int main(int argc, char *argv[]) {
+    std::cout << "Entered main()" << std::endl;
     setDefaultFormat();
-    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    std::cout << "Setup Default QSurfaceFormat" << std::endl;
     QApplication app(argc, argv);
     setlocale(LC_NUMERIC, "C");
 
@@ -74,6 +93,7 @@ int main(int argc, char *argv[]) {
         p.fillRect(0, dim, dim, dim, dark);
         p.fillRect(dim, dim, dim, dim, light);
         p.end();
+        std::cout << "Generated Alpha Mesh" << std::endl;
     }
 
     //#ifdef QT_DEBUG
@@ -82,7 +102,19 @@ int main(int argc, char *argv[]) {
     //    process->start("prlimit --data=3000000000 --pid " + QString::number(pId));
     //#endif
 
-    HardwareInfo::sUpdateInfo();
+    const bool threadedOpenGL = QOpenGLContext::supportsThreadedOpenGL();
+    if(!threadedOpenGL) {
+        gPrintException(false, "Your GPU drivers do not support OpenGL "
+                               "rendering outside the main thread");
+    }
+    try {
+        HardwareInfo::sUpdateInfo();
+    } catch(const std::exception& e) {
+        gPrintException(false, "Your GPU drivers do not seem to be compatible.");
+        gPrintExceptionCritical(e);
+    }
+    printHardware();
+
     eSettings settings(HardwareInfo::sCpuThreads(),
                        HardwareInfo::sRamKB(),
                        HardwareInfo::sGpuVendor());
@@ -135,6 +167,7 @@ int main(int argc, char *argv[]) {
     try {
         taskScheduler.initializeGpu();
     } catch(const std::exception& e) {
+        gPrintException(false, "Your GPU doesn't seem to be compatible.");
         gPrintExceptionFatal(e);
     }
 
@@ -187,98 +220,6 @@ int main(int argc, char *argv[]) {
     splash->showMessage("Done");
     app.processEvents();
     w.show();
-
-//    QJSEngine e;
-//    e.evaluate("function test() {"
-//               "var z = 1;"
-//               "this.x = 2;"
-//               "var that = this;"
-//               "this.xFunc = function() {"
-//               "return that.x;"
-//               "};"
-//               "this.zFunc = function() {"
-//               "return z;"
-//               "};"
-//               "}"
-//               "var w = 3;"
-//               "function wFunc() { return w; }");
-//    const auto val0 = e.evaluate("var y = new test()");
-//    QJSValue val1;
-//    {TIME_BEGIN
-//        for(int i = 0; i < 10000; i++) {
-//            val1 = e.evaluate("y.x");
-//            val1.toNumber();
-//        }
-//        qDebug() << val1.toNumber();
-//    TIME_END("eval")}
-
-//    auto xFunc = e.evaluate("y.xFunc");
-//    {TIME_BEGIN
-//        for(int i = 0; i < 10000; i++) {
-//            val1 = xFunc.call();
-//            val1.toNumber();
-//        }
-//        qDebug() << val1.toNumber();
-//    TIME_END("xFunc")}
-
-//    auto zFunc = e.evaluate("y.zFunc");
-//    {TIME_BEGIN
-//        for(int i = 0; i < 10000; i++) {
-//            val1 = zFunc.call();
-//            val1.toNumber();
-//        }
-//        qDebug() << val1.toNumber();
-//    TIME_END("zFunc")}
-
-//    auto wFunc = e.evaluate("wFunc");
-//    {TIME_BEGIN
-//        for(int i = 0; i < 10000; i++) {
-//            val1 = wFunc.call();
-//            val1.toNumber();
-//        }
-//        qDebug() << val1.toNumber();
-//    TIME_END("wFunc")}
-
-//    QJSEngine e;
-//    const auto defRet = e.evaluate(
-//               "function _eClass() {"
-//                   // Definitions
-//                   "function examplesDefFunc(x) {"
-//                       "return Math.sin(x) + x*Math.PI;"
-//                   "}"
-//                   "var w;" // because w extern
-//                   "var x;"
-//                   "var y;"
-//                   "var z;"
-//                   "this._eSet = function(_x, _y, _z) {"
-//                       "x = _x;"
-//                       "y = _y;"
-//                       "z = _z;"
-//                   "};"
-//                   "var gl_w;" // glValue name
-//                   "var _eMargin = 0;"
-//                   "this._eEvaluate = function() {"
-//                       "extern w = examplesDefFunc(x*y*z);" // extern w
-//                       "gl_w = w*5;" // glValue script
-//                       "_eMargin = 7*w" // margin script
-//                   "};"
-//                   // Getters for all glValues
-//                   "this._eGet_gl_w() = function() {"
-//                       "return gl_w;"
-//                   "};"
-//                   // Getter for margin
-//                   "this._eGet_eMargin() = function() {"
-//                       "return _eMargin;"
-//                   "};"
-//               "}");
-//    qDebug() << defRet.toString();
-//    const auto obj = e.evaluate("var _eObj; _eObj = new _eClass()");
-//    qDebug() << obj.toString();
-//    auto setter = obj.property("_eSet");
-//    qDebug() << setter.toString();
-//    auto evaluator = obj.property("_eEvaluate");
-//    qDebug() << evaluator.toString();
-
 
     const bool keepSplashVisible = true;
     if(keepSplashVisible) {

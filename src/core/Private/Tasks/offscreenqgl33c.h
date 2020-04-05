@@ -32,16 +32,18 @@ public:
         mContext = new QOpenGLContext();
         mContext->setShareContext(QOpenGLContext::globalShareContext());
         if(!mContext->create())
-            RuntimeThrow("Creating OpenGL context failed.");
+            PrettyRuntimeThrow("Creating OpenGL context failed.\n "
+                               "Make sure your GPU drivers support OpenGL 3.3 core.");
     }
 
     void makeCurrent() {
         if(!mContext->makeCurrent(mOffscreenSurface))
-            RuntimeThrow("Making OpenGL context current failed.");
+            PrettyRuntimeThrow("Making OpenGL context current failed.\n"
+                               "Make sure your GPU drivers support OpenGL 3.3 core.");
         if(!mInitialized) {
             if(!initializeOpenGLFunctions())
-                RuntimeThrow("Initializing OpenGL 3.3 functions failed. "
-                             "Make sure your GPU supports OpenGL 3.3.");
+                PrettyRuntimeThrow("Initializing OpenGL 3.3 core functions failed.\n"
+                                   "Make sure your GPU drivers support OpenGL 3.3 core.");
             mInitialized = true;
         }
     }
