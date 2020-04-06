@@ -60,25 +60,16 @@ EffectsLoader::~EffectsLoader() {
 }
 
 void EffectsLoader::initializeGpu() {
-    try {
-        OffscreenQGL33c::initialize();
-        try {
-            makeCurrent();
+    OffscreenQGL33c::initialize();
+    makeCurrent();
 
-            iniPlainVShaderVBO(this);
-            iniPlainVShaderVAO(this, mPlainSquareVAO);
-            iniTexturedVShaderVBO(this);
-            iniTexturedVShaderVAO(this, mTexturedSquareVAO);
-            iniColorPrograms(this);
-        } catch(...) {
-            doneCurrent();
-            RuntimeThrow("Error initializing basic OpenGL programs.");
-        }
+    iniPlainVShaderVBO(this);
+    iniPlainVShaderVAO(this, mPlainSquareVAO);
+    iniTexturedVShaderVBO(this);
+    iniTexturedVShaderVAO(this, mTexturedSquareVAO);
+    iniColorPrograms(this);
 
-        doneCurrent();
-    } catch(const std::exception& e) {
-        gPrintExceptionCritical(e);
-    }
+    doneCurrent();
 }
 
 #include "Boxes/ecustombox.h"

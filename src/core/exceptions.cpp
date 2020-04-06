@@ -83,7 +83,12 @@ QString gAllTextFromException(const std::exception &e,
 
 void gPrintException(const bool fatal, const QString &allText) {
     const QString txt = fatal ? "Fatal" : "Critical";
-    QMessageBox(QMessageBox::Critical, txt + " Error", allText).exec();
+    const auto icon = fatal ? QMessageBox::Critical : QMessageBox::Warning;
+    QMessageBox(icon, txt + " Error", allText).exec();
+}
+
+void gPrintException(const QString &allText) {
+    gPrintException(false, allText);
 }
 
 void gPrintExceptionCritical(const std::exception_ptr &eptr) {

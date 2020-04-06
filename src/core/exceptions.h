@@ -82,6 +82,8 @@ extern void gPrintExceptionFatal(const std::exception& e);
 CORE_EXPORT
 extern void gPrintException(const bool fatal, const QString& allText);
 CORE_EXPORT
+extern void gPrintException(const QString& allText);
+CORE_EXPORT
 extern void gPrintExceptionCritical(const std::exception_ptr& eptr);
 CORE_EXPORT
 extern void gPrintExceptionFatal(const std::exception_ptr& eptr);

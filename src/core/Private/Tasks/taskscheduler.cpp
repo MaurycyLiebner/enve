@@ -85,7 +85,7 @@ void TaskScheduler::initializeGpu() {
     try {
         mGpuExec->initialize();
     } catch(...) {
-        RuntimeThrow("Failed to initialize gpu for post-processing.");
+        RuntimeThrow("Failed to initialize GPU execution controler.");
     }
 }
 
