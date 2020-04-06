@@ -453,10 +453,7 @@ void VideoEncoder::startEncodingNow() {
     if(!mFormatContext) RuntimeThrow("Error allocating AVFormatContext");
 
     mFormatContext->oformat = const_cast<AVOutputFormat*>(mOutputFormat);
-    const size_t urlSize = static_cast<size_t>(mPathByteArray.size() + 1);
-    char* const url = new char[urlSize];
-    memcpy(url, mPathByteArray.constData(), urlSize);
-    mFormatContext->url = url;
+    mFormatContext->url = av_strdup(mPathByteArray.constData());
 
     _mCurrentContainerFrame = 0;
     // add streams
