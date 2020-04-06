@@ -40,6 +40,8 @@ extern "C" {
                        const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count(); \
                        qDebug() << name << duration << "us" << endl;
 
+#define GPU_NOT_COMPATIBLE gPrintException("Your GPU drivers do not seem to be compatible.")
+
 void printHardware() {
     std::cout << "Hardware:" << std::endl;
     std::cout << "    CPU Threads: " << HardwareInfo::sCpuThreads() << std::endl;
@@ -65,12 +67,25 @@ void setDefaultFormat() {
     //format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
     //format.setSwapInterval(0); // Disable vertical refresh syncing
     QSurfaceFormat::setDefaultFormat(format);
-    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
-    QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+}
+
+void generateAlphaMesh(QPixmap& alphaMesh) {
+    const int dim = MIN_WIDGET_DIM/2;
+    alphaMesh = QPixmap(2*dim, 2*dim);
+    const QColor light = QColor::fromRgbF(0.2, 0.2, 0.2);
+    const QColor dark = QColor::fromRgbF(0.4, 0.4, 0.4);
+    QPainter p(&alphaMesh);
+    p.fillRect(0, 0, dim, dim, light);
+    p.fillRect(dim, 0, dim, dim, dark);
+    p.fillRect(0, dim, dim, dim, dark);
+    p.fillRect(dim, dim, dim, dim, light);
+    p.end();
 }
 
 int main(int argc, char *argv[]) {
     std::cout << "Entered main()" << std::endl;
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
     setDefaultFormat();
     std::cout << "Setup Default QSurfaceFormat" << std::endl;
     QApplication app(argc, argv);
@@ -80,21 +95,11 @@ int main(int argc, char *argv[]) {
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
     BUTTON_DIM = qRound(MIN_WIDGET_DIM*1.1);
     KEY_RECT_SIZE = MIN_WIDGET_DIM*3/5;
-    QPixmap alphaMeshPix;
-    {
-        const int dim = MIN_WIDGET_DIM/2;
-        alphaMeshPix = QPixmap(2*dim, 2*dim);
-        ALPHA_MESH_PIX = &alphaMeshPix;
-        const QColor light = QColor::fromRgbF(0.2, 0.2, 0.2);
-        const QColor dark = QColor::fromRgbF(0.4, 0.4, 0.4);
-        QPainter p(ALPHA_MESH_PIX);
-        p.fillRect(0, 0, dim, dim, light);
-        p.fillRect(dim, 0, dim, dim, dark);
-        p.fillRect(0, dim, dim, dim, dark);
-        p.fillRect(dim, dim, dim, dim, light);
-        p.end();
-        std::cout << "Generated Alpha Mesh" << std::endl;
-    }
+
+    QPixmap alphaMesh;
+    generateAlphaMesh(alphaMesh);
+    ALPHA_MESH_PIX = &alphaMesh;
+    std::cout << "Generated Alpha Mesh" << std::endl;
 
     //#ifdef QT_DEBUG
     //    const qint64 pId = QCoreApplication::applicationPid();
@@ -104,13 +109,13 @@ int main(int argc, char *argv[]) {
 
     const bool threadedOpenGL = QOpenGLContext::supportsThreadedOpenGL();
     if(!threadedOpenGL) {
-        gPrintException(false, "Your GPU drivers do not support OpenGL "
-                               "rendering outside the main thread");
+        gPrintException("Your GPU drivers do not support OpenGL "
+                        "rendering outside the main thread");
     }
     try {
         HardwareInfo::sUpdateInfo();
     } catch(const std::exception& e) {
-        gPrintException(false, "Your GPU drivers do not seem to be compatible.");
+        GPU_NOT_COMPATIBLE;
         gPrintExceptionCritical(e);
     }
     printHardware();
@@ -163,11 +168,11 @@ int main(int argc, char *argv[]) {
     splash->showMessage("Initialize gpu resources...");
     app.processEvents();
     EffectsLoader effectsLoader;
-    effectsLoader.initializeGpu();
     try {
+        effectsLoader.initializeGpu();
         taskScheduler.initializeGpu();
     } catch(const std::exception& e) {
-        gPrintException(false, "Your GPU doesn't seem to be compatible.");
+        GPU_NOT_COMPATIBLE;
         gPrintExceptionFatal(e);
     }
 
@@ -181,7 +186,12 @@ int main(int argc, char *argv[]) {
 
     splash->showMessage("Initialize shader effects...");
     app.processEvents();
-    effectsLoader.iniShaderEffects();
+    try {
+        effectsLoader.iniShaderEffects();
+    } catch(const std::exception& e) {
+        GPU_NOT_COMPATIBLE;
+        gPrintExceptionCritical(e);
+    }
     QObject::connect(&effectsLoader, &EffectsLoader::programChanged,
     [&document](ShaderEffectProgram * program) {
         for(const auto& scene : document.fScenes)
