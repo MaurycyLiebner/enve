@@ -33,7 +33,7 @@ Enve was created with flexibility and expandability in mind.
 <img src="https://user-images.githubusercontent.com/16670651/70745938-36e20900-1d25-11ea-9bdf-78d3fe402291.png"/>
 
 ## Download
-You can download the latest enve AppImage from <a href="https://github.com/MaurycyLiebner/enve/releases/continuous/" target="_blank">here</a>.
+You can download the latest enve release for <a href="https://github.com/MaurycyLiebner/enve/releases/continuous-linux/" target="_blank">Linux</a> and <a href="https://github.com/MaurycyLiebner/enve/releases/continuous-windows/" target="_blank">Windows</a>.
 
 ## How to build
 
