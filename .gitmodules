@@ -1,0 +1,12 @@
+[submodule "third_party/skia"]
+	path = third_party/skia
+	url = https://skia.googlesource.com/skia
+[submodule "third_party/libmypaint"]
+	path = third_party/libmypaint
+	url = https://github.com/mypaint/libmypaint.git
+[submodule "third_party/qscintilla"]
+	path = third_party/qscintilla
+	url = https://github.com/opencor/qscintilla.git
+[submodule "third_party/quazip"]
+	path = third_party/quazip
+	url = https://github.com/stachenov/quazip.git
