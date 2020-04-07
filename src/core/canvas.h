@@ -37,6 +37,8 @@
 #include "CacheHandlers/sceneframecontainer.h"
 #include "undoredo.h"
 #include "drawpath.h"
+#include <QMouseEvent>
+#include <QTabletEvent>
 
 class AnimatedSurface;
 class PaintBox;

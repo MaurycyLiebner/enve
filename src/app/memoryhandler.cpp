@@ -16,10 +16,15 @@
 
 #include "memoryhandler.h"
 #include "Boxes/boxrendercontainer.h"
-#include <malloc.h>
 #include "GUI/mainwindow.h"
 #include <QMetaType>
 #include "GUI/usagewidget.h"
+
+#ifdef Q_OS_MAC
+#include <malloc/malloc.h>
+#else
+#include <malloc.h>
+#endif
 
 MemoryHandler *MemoryHandler::sInstance = nullptr;
 Q_DECLARE_METATYPE(MemoryState)

@@ -27,6 +27,8 @@
     template <bool T> using BoolConstant = std::bool_constant<T>;
 #elif (defined (LINUX) || defined (__linux__))
     template <bool T> using BoolConstant = std::__bool_constant<T>;
+#elif (defined (Q_OS_MAC))
+    template <bool T> using BoolConstant = std::integral_constant<bool, T>;
 #endif
 
 class SingleWidgetTarget;

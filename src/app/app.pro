@@ -30,17 +30,19 @@ DEFINES += QT_NO_FOREACH
 ENVE_FOLDER = $$PWD/../..
 THIRD_PARTY_FOLDER = $$ENVE_FOLDER/third_party
 SKIA_FOLDER = $$THIRD_PARTY_FOLDER/skia
-LIBMYPAINT_FOLDER = $$THIRD_PARTY_FOLDER/libmypaint-1.5.1
-QUAZIP_FOLDER = $$THIRD_PARTY_FOLDER/quazip-0.8.1
-QSCINTILLA_FOLDER = $$THIRD_PARTY_FOLDER/QScintilla-2.11.4/Qt4Qt5
+LIBMYPAINT_FOLDER = $$THIRD_PARTY_FOLDER/libmypaint
+QUAZIP_FOLDER = $$THIRD_PARTY_FOLDER/quazip
+QSCINTILLA_FOLDER = $$THIRD_PARTY_FOLDER/qscintilla/Qt4Qt5
 
 INCLUDEPATH += ../core
 DEPENDPATH += ../core
 
 LIBS += -L$$OUT_PWD/../core -lenvecore
 
-INCLUDEPATH += $$LIBMYPAINT_FOLDER/include
-LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
+!macx {
+    INCLUDEPATH += $$LIBMYPAINT_FOLDER/include
+    LIBS += -L$$LIBMYPAINT_FOLDER/.libs
+}
 
 INCLUDEPATH += $$QUAZIP_FOLDER
 LIBS += -L$$QUAZIP_FOLDER/quazip -lquazip
@@ -74,6 +76,9 @@ win32 { # Windows
     RC_ICONS = pixmaps\enve.ico
 } unix {
     macx { # Mac OS X
+        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
+        INCLUDEPATH += /usr/local/include
+        LIBS += -L/usr/local/lib -ltcmalloc
     } else { # Linux
         GPERFTOOLS_FOLDER = $$THIRD_PARTY_FOLDER/gperftools-2.7-enve-mod
         INCLUDEPATH += $$GPERFTOOLS_FOLDER/include
@@ -93,7 +98,7 @@ win32 { # Windows
     }
 }
 
-LIBS += -lskia
+LIBS += -lskia -lmypaint
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = enve
@@ -393,3 +398,21 @@ DISTFILES += \
     icons/toolbarButtons/checkable/spacing \
     icons/toolbarButtons/checkable/time \
     icons/toolbarButtons/checkable/width
+
+macx {
+    MAC_APP_FOLDER = $$sprintf("%1/%2/%3.app", $$OUT_PWD, $$DESTDIR, $$TARGET)
+    MAC_LIB_FOLDER = $$MAC_APP_FOLDER/Contents/MacOS
+
+    QMAKE_POST_LINK = \
+        cp -fLR $$OUT_PWD/../core/libenvecore.1.dylib $$MAC_LIB_FOLDER/ && \
+        cp -fLR $$QUAZIP_FOLDER/quazip/libquazip.1.dylib $$MAC_LIB_FOLDER/ && \
+        cp -fLR $$QSCINTILLA_FOLDER/libqscintilla2_qt5.15.dylib $$MAC_LIB_FOLDER/ && \
+        install_name_tool -add_rpath @executable_path \
+                          -change libquazip.1.dylib @rpath/libquazip.1.dylib \
+                          $$MAC_LIB_FOLDER/libenvecore.1.dylib && \
+        install_name_tool -add_rpath @executable_path \
+                          -change libenvecore.1.dylib @rpath/libenvecore.1.dylib -change libquazip.1.dylib @rpath/libquazip.1.dylib \
+                          $$MAC_APP_FOLDER/Contents/MacOS/$$TARGET
+
+    #CONFIG(release, debug|release): QMAKE_POST_LINK += && macdeployqt $$MAC_APP_FOLDER
+}

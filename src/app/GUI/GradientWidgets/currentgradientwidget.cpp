@@ -20,6 +20,7 @@
 #include "GUI/ColorWidgets/colorwidgetshaders.h"
 #include "Animators/gradient.h"
 #include "Private/document.h"
+#include <QMouseEvent>
 
 CurrentGradientWidget::CurrentGradientWidget(QWidget *parent) :
     GLWidget(parent) {

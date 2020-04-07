@@ -78,6 +78,7 @@ public:
         value.write(*this);
         return *this;
     }
+
 private:
     QIODevice* const mDst;
     eWriteFutureTable mFutureTable;

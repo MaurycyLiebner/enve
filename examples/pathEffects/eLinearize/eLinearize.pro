@@ -34,7 +34,7 @@ INCLUDEPATH += $$SKIA_FOLDER
 DEPENDPATH += $$SKIA_FOLDER
 
 CONFIG(debug, debug|release) {
-    win32 { # Windows
+    win32|macx { # Windows
         LIBS += -L$$SKIA_FOLDER/out/Debug -lskia
     }
 } else {
@@ -44,7 +44,7 @@ CONFIG(debug, debug|release) {
         QMAKE_CXXFLAGS_RELEASE += /O2 -O2
     } unix {
         macx { # Mac OS X
-
+            LIBS += -L$$SKIA_FOLDER/out/Release -lskia
         } else { # Linux
             QMAKE_CFLAGS -= -O2
             QMAKE_CFLAGS -= -O1

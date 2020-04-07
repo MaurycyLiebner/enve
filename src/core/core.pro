@@ -44,13 +44,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 ENVE_FOLDER = $$PWD/../..
 THIRD_PARTY_FOLDER = $$ENVE_FOLDER/third_party
 SKIA_FOLDER = $$THIRD_PARTY_FOLDER/skia
-LIBMYPAINT_FOLDER = $$THIRD_PARTY_FOLDER/libmypaint-1.5.1
-QUAZIP_FOLDER = $$THIRD_PARTY_FOLDER/quazip-0.8.1
+LIBMYPAINT_FOLDER = $$THIRD_PARTY_FOLDER/libmypaint
+QUAZIP_FOLDER = $$THIRD_PARTY_FOLDER/quazip
 
 INCLUDEPATH += $$SKIA_FOLDER
 
-INCLUDEPATH += $$LIBMYPAINT_FOLDER/include
-LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
+!macx {
+    INCLUDEPATH += $$LIBMYPAINT_FOLDER/include
+    LIBS += -L$$LIBMYPAINT_FOLDER/.libs
+}
 
 INCLUDEPATH += $$QUAZIP_FOLDER
 LIBS += -L$$QUAZIP_FOLDER/quazip -lquazip
@@ -79,6 +81,9 @@ win32 { # Windows
     CONFIG -= debug_and_release
 } unix {
     macx { # Mac OS X
+        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
+        INCLUDEPATH += /usr/local/include
+        LIBS += -L/usr/local/lib
     } else { # Linux
         LIBS += -lgobject-2.0 -lglib-2.0 -ljson-c
 
@@ -94,7 +99,7 @@ win32 { # Windows
     }
 }
 
-LIBS += -lskia
+LIBS += -lskia -lmypaint
 
 SOURCES += \
     Expressions/expression.cpp \

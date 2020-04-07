@@ -17,10 +17,10 @@
 #ifndef AUTOTILEDSURFACE_H
 #define AUTOTILEDSURFACE_H
 
-#include <mypaint-config.h>
-#include <mypaint-glib-compat.h>
-#include <mypaint-tiled-surface.h>
-#include <mypaint-brush.h>
+#include <libmypaint/mypaint-config.h>
+#include <libmypaint/mypaint-glib-compat.h>
+#include <libmypaint/mypaint-tiled-surface.h>
+#include <libmypaint/mypaint-brush.h>
 #include <QPointF>
 #include "smartPointers/stdselfref.h"
 #include "pointhelpers.h"

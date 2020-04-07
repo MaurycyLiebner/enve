@@ -21,7 +21,7 @@
 #include "pointhelpers.h"
 #include "pathoperations.h"
 #include <QRect>
-#include <mypaint-brush.h>
+#include <libmypaint/mypaint-brush.h>
 
 #define DEFAULT_TILT_CURVE qCubicSegment1D{0, 0, 0, 0}
 
