@@ -50,7 +50,7 @@ public:
         mAudioIOOutput->write(request.fData, request.fSize);
     }
 
-    void initializeAudio(const eSoundSettingsData &soundSettings);
+    void initializeAudio(eSoundSettingsData &soundSettings);
     void startAudio();
     void pauseAudio();
     void resumeAudio();

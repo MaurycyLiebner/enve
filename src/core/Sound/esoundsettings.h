@@ -62,7 +62,7 @@ public:
     static bool sPlanarFormat();
     static int sChannelCount();
     static int sBytesPerSample();
-    static const eSoundSettingsData &sData();
+    static eSoundSettingsData &sData();
 
     static void sSetSampleRate(const int sampleRate);
     static void sSetSampleFormat(const AVSampleFormat format);

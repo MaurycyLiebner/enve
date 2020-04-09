@@ -16,6 +16,9 @@
 
 #include "audiohandler.h"
 #include "Sound/soundcomposition.h"
+
+#include <iostream>
+
 AudioHandler* AudioHandler::sInstance = nullptr;
 
 AudioHandler::AudioHandler() {
@@ -34,7 +37,16 @@ QAudioFormat::SampleType toQtAudioFormat(const AVSampleFormat avFormat) {
                         av_get_sample_fmt_name(avFormat));
 }
 
-void AudioHandler::initializeAudio(const eSoundSettingsData& soundSettings) {
+AVSampleFormat toAVAudioFormat(const QAudioFormat::SampleType qFormat) {
+    if(qFormat == QAudioFormat::SignedInt) {
+        return AV_SAMPLE_FMT_S32;
+    } else if(qFormat == QAudioFormat::Float) {
+        return AV_SAMPLE_FMT_FLT;
+    } else RuntimeThrow("Unsupported sample format " +
+                        QString::number(qFormat));
+}
+
+void AudioHandler::initializeAudio(eSoundSettingsData& soundSettings) {
     if(mAudioOutput) delete mAudioOutput;
 
     mAudioBuffer = QByteArray(BufferSize, 0);
@@ -50,8 +62,16 @@ void AudioHandler::initializeAudio(const eSoundSettingsData& soundSettings) {
     QAudioDeviceInfo info(mAudioDevice);
     if(!info.isFormatSupported(mAudioFormat)) {
         const auto oldFormat = mAudioFormat;
-        RuntimeThrow("Default format not supported - trying to use nearest");
         mAudioFormat = info.nearestFormat(mAudioFormat);
+        std::cout << "Using:" << std::endl <<
+                     "    Sample rate: " << mAudioFormat.sampleRate() << std::endl <<
+                     "    Channel count: " << mAudioFormat.channelCount() << std::endl <<
+                     "    Sample size: " << mAudioFormat.sampleSize() << std::endl <<
+                     "    Codec: " << mAudioFormat.codec().toStdString() << std::endl <<
+                     "    Sample Type: " << mAudioFormat.sampleType() << std::endl <<
+                     "    Byte order: " << mAudioFormat.byteOrder() << std::endl;
+        soundSettings.fSampleRate = mAudioFormat.sampleRate();
+        soundSettings.fSampleFormat = toAVAudioFormat(mAudioFormat.sampleType());
     }
 
     mAudioOutput = new QAudioOutput(mAudioDevice, mAudioFormat, this);

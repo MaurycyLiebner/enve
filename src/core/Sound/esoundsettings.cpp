@@ -47,7 +47,7 @@ int eSoundSettings::sBytesPerSample() {
     return sInstance->bytesPerSample();
 }
 
-const eSoundSettingsData& eSoundSettings::sData() {
+eSoundSettingsData& eSoundSettings::sData() {
     return *sInstance;
 }
 
