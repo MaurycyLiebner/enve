@@ -16,6 +16,8 @@
 
 #include "gputaskexecutor.h"
 
+#include <iostream>
+
 QAtomicList<stdsptr<eTask>> GpuTaskExecutor::sTasks;
 QAtomicInt GpuTaskExecutor::sUseCount = 0;
 
@@ -54,20 +56,25 @@ void GpuTaskExecutor::initialize(QThread* const thread) {
 }
 
 void GpuTaskExecutor::initializeContext() {
+    std::cout << "Entered GpuTaskExecutor::initializeContext" << std::endl;
     mInterface = GrGLMakeNativeInterface();
     if(!mInterface) RuntimeThrow("Failed to make native interface.");
+    std::cout << "Created GrGLInterface" << std::endl;
     const auto grContext = GrContext::MakeGL(mInterface);
     if(!grContext) RuntimeThrow("Failed to make GrContext.");
+    std::cout << "Created GrContext" << std::endl;
     GLuint textureSquareVAO;
     iniTexturedVShaderVAO(this, textureSquareVAO);
+    std::cout << "iniTexturedVShaderVAO" << std::endl;
     mContext.setContext(grContext, textureSquareVAO);
+    std::cout << "SwitchableContext set" << std::endl;
     glClearColor(0, 0, 0, 0);
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    const GLenum glError = glGetError();
-    if(glError != GL_NO_ERROR)
-        RuntimeThrow("OpenGL error " + std::to_string(glError));
+    checkGLErrors(this, "Error initializing GPU context.");
+
+    std::cout << "Done GpuTaskExecutor::initializeContext" << std::endl;
 }
 
 void GpuTaskExecutor::processTask(eTask& task) {

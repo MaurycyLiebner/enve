@@ -19,6 +19,7 @@
 #include "RasterEffects/rastereffect.h"
 #include <QFileSystemWatcher>
 #include <QFileSystemModel>
+#include <iostream>
 #include "ShaderEffects/shadereffectcreator.h"
 #include "Private/esettings.h"
 
@@ -60,16 +61,26 @@ EffectsLoader::~EffectsLoader() {
 }
 
 void EffectsLoader::initializeGpu() {
+    std::cout << "Entered initializeGpu" << std::endl;
+
     OffscreenQGL33c::initialize();
+    std::cout << "OffscreenQGL33c initialized" << std::endl;
     makeCurrent();
+    std::cout << "Make OffscreenQGL33c current" << std::endl;
 
     iniPlainVShaderVBO(this);
+    std::cout << "iniPlainVShaderVBO" << std::endl;
     iniPlainVShaderVAO(this, mPlainSquareVAO);
+    std::cout << "iniPlainVShaderVAO" << std::endl;
     iniTexturedVShaderVBO(this);
+    std::cout << "iniTexturedVShaderVBO" << std::endl;
     iniTexturedVShaderVAO(this, mTexturedSquareVAO);
+    std::cout << "iniTexturedVShaderVAO" << std::endl;
     iniColorPrograms(this);
+    std::cout << "iniColorPrograms" << std::endl;
 
     doneCurrent();
+    std::cout << "Done OffscreenQGL33c current" << std::endl;
 }
 
 #include "Boxes/ecustombox.h"

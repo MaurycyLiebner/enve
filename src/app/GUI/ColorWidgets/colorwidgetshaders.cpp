@@ -58,6 +58,8 @@ void iniColorProgram(QGL33 * const gl,
 
         program.fMeshSizeLoc = gl->glGetUniformLocation(
                     program.fID, "meshSize"); // optional
+
+        checkGLErrors(gl);
     } catch(...) {
         RuntimeThrow("Error initializing color program.");
     }

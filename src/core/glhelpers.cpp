@@ -41,6 +41,8 @@ void iniTexturedVShaderVBO(QGL33 * const gl) {
     gl->glBindBuffer(GL_ARRAY_BUFFER, GL_TEXTURED_SQUARE_VBO);
     gl->glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),
                      vertices, GL_STATIC_DRAW);
+
+    checkGLErrors(gl, "Error initializing Textured Vertex Shader VBO.");
 }
 
 void iniTexturedVShaderVAO(QGL33 * const gl, GLuint &VAO) {
@@ -58,6 +60,8 @@ void iniTexturedVShaderVAO(QGL33 * const gl, GLuint &VAO) {
     gl->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
                               5 * sizeof(float), BUFFER_OFFSET(3 * sizeof(float)));
     gl->glEnableVertexAttribArray(1);
+
+    checkGLErrors(gl, "Error initializing Textured Vertex Shader VAO.");
 }
 
 void iniPlainVShaderVBO(QGL33 * const gl) {
@@ -73,6 +77,7 @@ void iniPlainVShaderVBO(QGL33 * const gl) {
     gl->glBindBuffer(GL_ARRAY_BUFFER, GL_PLAIN_SQUARE_VBO);
     gl->glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),
                      vertices, GL_STATIC_DRAW);
+    checkGLErrors(gl, "Error initializing Plain Vertex Shader VBO.");
 }
 
 void iniPlainVShaderVAO(QGL33 * const gl, GLuint &VAO) {
@@ -86,6 +91,7 @@ void iniPlainVShaderVAO(QGL33 * const gl, GLuint &VAO) {
     gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
                               3 * sizeof(float), BUFFER_OFFSET(0));
     gl->glEnableVertexAttribArray(0);
+    checkGLErrors(gl, "Error initializing Plain Vertex Shader VAO.");
 }
 
 //! @brief Checks for errors after program linking and shader compilation.
@@ -110,6 +116,7 @@ void checkCompileErrors(QGL33 * const gl,
         }
     }
 }
+
 #include <QFile>
 void iniProgram(QGL33 * const gl, GLuint& program,
                 const QString& vShaderPath,
@@ -169,4 +176,10 @@ void iniProgram(QGL33 * const gl, GLuint& program,
 
     gl->glDeleteShader(vertexShader);
     gl->glDeleteShader(fragmentShader);
+}
+
+void checkGLErrors(QGL33 * const gl, const QString &msg) {
+    const GLenum glError = gl->glGetError();
+    if(glError == GL_NO_ERROR) return;
+    RuntimeThrow(msg + (msg.isEmpty() ? "" : "\n") + "OpenGL error " + std::to_string(glError));
 }

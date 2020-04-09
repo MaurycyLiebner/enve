@@ -179,10 +179,12 @@ int main(int argc, char *argv[]) {
     splash->showMessage("Initialize custom path effects...");
     app.processEvents();
     effectsLoader.iniCustomPathEffects();
+    std::cout << "Custom path effects initialized" << std::endl;
 
     splash->showMessage("Initialize custom raster effects...");
     app.processEvents();
     effectsLoader.iniCustomRasterEffects();
+    std::cout << "Custom raster effects initialized" << std::endl;
 
     splash->showMessage("Initialize shader effects...");
     app.processEvents();
@@ -198,24 +200,32 @@ int main(int argc, char *argv[]) {
             scene->updateIfUsesProgram(program);
         document.actionFinished();
     });
+    std::cout << "Shader effects initialized" << std::endl;
 
     splash->showMessage("Initialize custom objects...");
     app.processEvents();
     effectsLoader.iniCustomBoxes();
-
+    std::cout << "Custom objects initialized" << std::endl;
 
     splash->showMessage("Initialize audio...");
     app.processEvents();
 
     eSoundSettings soundSettings;
     AudioHandler audioHandler;
-    audioHandler.initializeAudio(soundSettings.sData());
+
+    try {
+        audioHandler.initializeAudio(soundSettings.sData());
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
+    std::cout << "Audio initialized" << std::endl;
 
     splash->showMessage("Initialize render handler...");
     app.processEvents();
     const auto videoEncoder = enve::make_shared<VideoEncoder>();
     RenderHandler renderHandler(document, audioHandler,
                                 *videoEncoder, memoryHandler);
+    std::cout << "Render handler initialized" << std::endl;
 
     MainWindow w(document, actions, audioHandler, renderHandler);
     if(argc > 1) {

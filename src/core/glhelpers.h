@@ -25,12 +25,9 @@
 
 typedef QOpenGLFunctions_3_3_Core QGL33;
 #define BUFFER_OFFSET(i) ((void*)(i))
-#define checkGlErrors \
-    { \
-        const GLenum glError = glGetError(); \
-        if(glError != GL_NO_ERROR) \
-            RuntimeThrow("OpenGL error " + std::to_string(glError)); \
-    }
+
+CORE_EXPORT
+extern void checkGLErrors(QGL33 * const gl, const QString& msg = "");
 
 //! @brief Creates a program, compiles, and attaches associated shaders.
 CORE_EXPORT

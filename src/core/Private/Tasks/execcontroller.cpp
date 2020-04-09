@@ -17,6 +17,7 @@
 #include "execcontroller.h"
 
 #include "gputaskexecutor.h"
+#include <iostream>
 
 ExecController::ExecController(TaskExecutor* const executor, QObject* const parent) :
     QObject(parent),
@@ -64,8 +65,12 @@ GpuExecController::GpuExecController(QObject* const parent) :
 }
 
 void GpuExecController::initialize() {
+    std::cout << "Entered GpuExecController initialize" << std::endl;
+
     const auto gpuExec = static_cast<GpuTaskExecutor*>(mExecutor);
     gpuExec->initialize(mThread);
+
+    std::cout << "GpuTaskExecutor initialized" << std::endl;
     start();
 }
 
