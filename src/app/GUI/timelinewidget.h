@@ -21,10 +21,11 @@
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QPushButton>
-#include <QMenuBar>
+
 #include "smartPointers/stdselfref.h"
 #include "framerange.h"
 #include "ReadWrite/basicreadwrite.h"
+#include "fakemenubar.h"
 
 class SWT_Abstraction;
 class FrameScrollBar;
@@ -48,7 +49,7 @@ class TimelineWidget : public QWidget {
     Q_OBJECT
 public:
     explicit TimelineWidget(Document& document,
-                            QMenuBar * const menu,
+                            QWidget * const menu,
                             QWidget *parent);
 
     Canvas* getCurrrentScene() const {
@@ -93,8 +94,8 @@ private:
     QAction *mGraphAct = nullptr;
     QWidget* mMenuWidget;
     QWidget *mMenuWidgetsCont;
-    QMenuBar *mBoxesListMenuBar;
-    QMenuBar *mCornerMenuBar;
+    FakeMenuBar *mBoxesListMenuBar;
+    FakeMenuBar *mCornerMenuBar;
     QLineEdit *mSearchLine;
     ScrollArea *mBoxesListScrollArea;
     BoxScrollWidget *mBoxesListWidget;

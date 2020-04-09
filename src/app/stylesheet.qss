@@ -151,31 +151,25 @@ QMenuBar {
                                       stop:0 lightgray, stop:1 darkgray);
 }
 
-QMenuBar#cornerMenuBar {
-    background: transparent;
+QMenuBar::item,
+QPushButton#QActionButton {
     border: 0;
-    margin-bottom: -1px;
-    padding: 0 4px;
-}
-
-QMenuBar::item {
     padding: 1px 4px;
     background: transparent;
 }
 
-QMenuBar#cornerMenuBar::item {
-    padding: 1px 0px;
-}
-
-QMenuBar::item:selected { /* when selected using mouse or keyboard */
+QMenuBar::item:selected,
+QPushButton#QActionButton:hover { /* when selected using mouse or keyboard */
     background: #a8a8a8;
 }
 
-QMenuBar::item:disabled {
+QMenuBar::item:disabled,
+QPushButton#QActionButton:disabled {
     color: rgb(60, 60, 60);
 }
 
-QMenuBar::item:pressed {
+QMenuBar::item:pressed,
+QPushButton#QActionButton:pressed {
     background: #888888;
 }
 

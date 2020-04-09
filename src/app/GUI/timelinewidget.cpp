@@ -36,7 +36,7 @@
 #include "timelinehighlightwidget.h"
 
 TimelineWidget::TimelineWidget(Document &document,
-                               QMenuBar * const menu,
+                               QWidget * const menu,
                                QWidget *parent) :
     QWidget(parent), mDocument(document) {
     mMainLayout = new QGridLayout(this);
@@ -46,37 +46,36 @@ TimelineWidget::TimelineWidget(Document &document,
     mMenuLayout = new QHBoxLayout();
     mMenuLayout->setSpacing(0);
     mMenuLayout->setMargin(0);
-    mBoxesListMenuBar = new QMenuBar(this);
+    mBoxesListMenuBar = new FakeMenuBar(this);
     mBoxesListMenuBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-    ((QToolButton*)mBoxesListMenuBar->children()[0])->setStyleSheet(
-                "QToolButton {"
-                    "padding: 0px 0px;"
-                    "background: transparent;"
-                    "border-radius: 4px;"
-                    "margin-top: 0;"
-                    "border-bottom-right-radius: 0px;"
-                    "border-bottom-left-radius: 0px;"
-                    "padding-bottom: 0;"
-                    "margin-bottom: 0;"
-                "}"
-                "QToolButton:hover {"
-                    "background-color: rgba(0, 0, 0, 30);"
-                "}"
+//    ((QToolButton*)mBoxesListMenuBar->children()[0])->setStyleSheet(
+//                "QToolButton {"
+//                    "padding: 0px 0px;"
+//                    "background: transparent;"
+//                    "border-radius: 4px;"
+//                    "margin-top: 0;"
+//                    "border-bottom-right-radius: 0px;"
+//                    "border-bottom-left-radius: 0px;"
+//                    "padding-bottom: 0;"
+//                    "margin-bottom: 0;"
+//                "}"
+//                "QToolButton:hover {"
+//                    "background-color: rgba(0, 0, 0, 30);"
+//                "}"
 
-                "QToolButton:pressed {"
-                    "background-color: rgba(0, 0, 0, 50);"
-                "}"
+//                "QToolButton:pressed {"
+//                    "background-color: rgba(0, 0, 0, 50);"
+//                "}"
 
-                "QToolButton:checked {"
-                    "background-color: rgb(60, 60, 60);"
-                    "color: white;"
-                "}");
-    mBoxesListMenuBar->addSeparator();
+//                "QToolButton:checked {"
+//                    "background-color: rgb(60, 60, 60);"
+//                    "color: white;"
+//                "}");
     mSceneChooser = new SceneChooser(mDocument, true,
                                      mBoxesListMenuBar);
     mBoxesListMenuBar->addMenu(mSceneChooser);
 
-    mCornerMenuBar = new QMenuBar(this);
+    mCornerMenuBar = new FakeMenuBar(this);
     mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     mCornerMenuBar->setStyleSheet("QMenuBar::item { padding: 1px 0px; }");
 
@@ -165,13 +164,16 @@ TimelineWidget::TimelineWidget(Document &document,
     }
 
     //QMenu *viewMenu = mBoxesListMenuBar->addMenu("View");
-    mGraphAct = mCornerMenuBar->addAction("Graph");
-    mGraphAct->setIcon(QIcon(iconsDir + "/graphDisabled.png"));
+    mGraphAct = mCornerMenuBar->addAction(QIcon(iconsDir + "/graphDisabled.png"),
+                                          "Graph");
     mGraphAct->setCheckable(true);
     connect(mGraphAct, &QAction::toggled,
             this, &TimelineWidget::setGraphEnabled);
 
-    mCornerMenuBar->setCornerWidget(menu);
+    mCornerMenuBar->setStyleSheet("QWidget#menuBarWidget {"
+                                      "border-right: 1px solid black;"
+                                  "}");
+    mCornerMenuBar->setContentsMargins(0, 0, 1, 0);
 
     mSearchLine = new QLineEdit("", mBoxesListMenuBar);
     mSearchLine->setMinimumHeight(0);
@@ -192,6 +194,7 @@ TimelineWidget::TimelineWidget(Document &document,
     mMenuLayout->addWidget(mBoxesListMenuBar);
     mMenuLayout->addWidget(mSearchLine);
     mMenuLayout->addWidget(mCornerMenuBar);
+    mMenuLayout->addWidget(menu);
 
     mMenuWidget = new QWidget(this);
     mMenuWidget->setLayout(mMenuLayout);

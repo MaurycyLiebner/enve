@@ -20,8 +20,9 @@
 #include <QMenuBar>
 #include "Private/esettings.h"
 #include "wrappernode.h"
+#include "fakemenubar.h"
 
-class StackWrapperMenu : public QMenuBar {
+class StackWrapperMenu : public FakeMenuBar {
     friend class StackWidgetWrapper;
 protected:
     explicit StackWrapperMenu();
@@ -45,22 +46,23 @@ public:
 
     QWidget* widget() { return this; }
 private:
-    WidgetWrapperCornerMenu* mCornerMenu;
+    WidgetWrapperCornerMenu* mCornerMenu = nullptr;
     StackWrapperMenu* mMenuBar = nullptr;
     QWidget* mCenterWidget = nullptr;
+    QHBoxLayout* mMenuLayout;
     QVBoxLayout* mLayout;
 };
 
-class WidgetWrapperCornerMenu : public QMenuBar {
+class WidgetWrapperCornerMenu : public FakeMenuBar {
 public:
     WidgetWrapperCornerMenu(WidgetWrapperNode* const target) {
         const auto iconsDir = eSettings::sIconsDir();
-        mSplitV = addAction("split v");
-        mSplitV->setIcon(QIcon(iconsDir + "/split_v.png"));
-        mSplitH = addAction("split h");
-        mSplitH->setIcon(QIcon(iconsDir + "/split_h.png"));
-        mClose = addAction("x");
-        mClose->setIcon(QIcon(iconsDir + "/close.png"));
+        mSplitV = addAction(QIcon(iconsDir + "/split_v.png"),
+                            "Split Vertically");
+        mSplitH = addAction(QIcon(iconsDir + "/split_h.png"),
+                            "Split Horizontally");
+        mClose = addAction(QIcon(iconsDir + "/close.png"),
+                           "Close");
 
         connect(mSplitV, &QAction::triggered,
                 target, &WidgetWrapperNode::splitV);
@@ -69,9 +71,7 @@ public:
         connect(mClose, &QAction::triggered,
                 target, &WidgetWrapperNode::close);
 
-        setObjectName("cornerMenuBar");
-
-        setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     }
 
     void disableClose() {

@@ -25,6 +25,9 @@ WidgetWrapperNode::WidgetWrapperNode(const WrapperNode::WrapperNodeCreator &crea
     WrapperNode(WrapperNodeType::widget, creator) {
     mCornerMenu = new WidgetWrapperCornerMenu(this);
     mLayout = new QVBoxLayout(this);
+    mMenuLayout = new QHBoxLayout();
+    mMenuLayout->addWidget(mCornerMenu);
+    mLayout->addLayout(mMenuLayout);
     setLayout(mLayout);
     mLayout->setSpacing(0);
     mLayout->setMargin(0);
@@ -33,14 +36,14 @@ WidgetWrapperNode::WidgetWrapperNode(const WrapperNode::WrapperNodeCreator &crea
 void WidgetWrapperNode::setMenuBar(StackWrapperMenu * const menu) {
     if(mMenuBar) delete mMenuBar;
     mMenuBar = menu;
-    mMenuBar->setCornerWidget(mCornerMenu);
-    mLayout->insertWidget(0, mMenuBar);
+    mMenuLayout->addWidget(mMenuBar);
+    mMenuLayout->addWidget(mCornerMenu);
 }
 
 void WidgetWrapperNode::setCentralWidget(QWidget * const widget) {
     if(mCenterWidget) delete mCenterWidget;
     mCenterWidget = widget;
-    mLayout->insertWidget(-1, mCenterWidget);
+    mLayout->addWidget(mCenterWidget);
     mCenterWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                  QSizePolicy::MinimumExpanding);
 }

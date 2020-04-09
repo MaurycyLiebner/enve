@@ -138,6 +138,7 @@ SOURCES += main.cpp\
     GUI/envelicense.cpp \
     GUI/envesplash.cpp \
     GUI/ewidgetsimpl.cpp \
+    GUI/fakemenubar.cpp \
     GUI/layouthandler.cpp \
     GUI/scenechooser.cpp \
     GUI/switchbutton.cpp \
@@ -259,6 +260,7 @@ HEADERS  += \
     GUI/envelicense.h \
     GUI/envesplash.h \
     GUI/ewidgetsimpl.h \
+    GUI/fakemenubar.h \
     GUI/layouthandler.h \
     GUI/scenechooser.h \
     GUI/switchbutton.h \
