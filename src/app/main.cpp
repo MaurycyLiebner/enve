@@ -89,6 +89,7 @@ int main(int argc, char *argv[]) {
     setDefaultFormat();
     std::cout << "Setup Default QSurfaceFormat" << std::endl;
     QApplication app(argc, argv);
+    app.setStyleSheet("QStatusBar::item { border: 0px solid black };");
     setlocale(LC_NUMERIC, "C");
 
     FONT_HEIGHT = QApplication::fontMetrics().height();
