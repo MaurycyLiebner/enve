@@ -257,7 +257,7 @@ MainWindow::~MainWindow() {
 #include "efiltersettings.h"
 #include "Settings/settingsdialog.h"
 void MainWindow::setupMenuBar() {
-    mMenuBar = new QMenuBar(this);
+    mMenuBar = new QMenuBar(nullptr);
 
     mFileMenu = mMenuBar->addMenu(tr("File", "MenuBar"));
     mFileMenu->addAction(tr("New...", "MenuBar_File"),
