@@ -48,9 +48,8 @@ public:
             const auto it = atFrame(currKeyMin);
             if(it == this->end()) {
                 const auto after = afterFrame(currKeyMin);
-                const int lastEmpty = after == this->end() ?
-                            iValueRange::EMAX :
-                            (it->first.fMin - 1);
+                if(after == this->end()) return {currKeyMin, iValueRange::EMAX};
+                const int lastEmpty = after->first.adjusted(-1, 0).fMin;
                 return {currKeyMin, lastEmpty};
             }
             currKeyMin = it->first.fMax + 1;
