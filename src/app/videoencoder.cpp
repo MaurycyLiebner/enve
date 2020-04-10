@@ -140,35 +140,6 @@ static void addVideoStream(OutputStream * const ost,
     }
 }
 
-/* Prepare a dummy image. */
-static void copyImageToFrame(AVFrame * const pict,
-                             const sk_sp<SkImage> &skiaImg,
-                             const int width, const int height) {
-    /* when we pass a frame to the encoder, it may keep a reference to it
-     * internally;
-     * make sure we do not overwrite it here
-     */
-    const int ret = av_frame_make_writable(pict);
-    if(ret < 0) AV_RuntimeThrow(ret, "Could not make AVFrame writable")
-
-    SkPixmap pixmap;
-    skiaImg->peekPixels(&pixmap);
-
-    const auto srcData = static_cast<uint8_t*>(pixmap.writable_addr());
-    const auto dstData = reinterpret_cast<uint8_t*>(pict->data);
-    int yi = 0;
-    int xi = 0;
-    for(int y = 0; y < height; y++) {
-        for(int x = 0; x < width; x++) {
-            dstData[xi++] = srcData[yi++];
-            dstData[xi++] = srcData[yi++];
-            dstData[xi++] = srcData[yi++];
-            yi++;
-            //pict->data[3][y * pict->linesize[3] + x] = imgData[yi++];
-        }
-    }
-}
-
 static AVFrame *getVideoFrame(OutputStream * const ost,
                               const sk_sp<SkImage> &image) {
     AVCodecContext *c = ost->fCodec;
@@ -178,38 +149,29 @@ static AVFrame *getVideoFrame(OutputStream * const ost,
 //                      STREAM_DURATION, (AVRational) { 1, 1 }) >= 0)
 //        return nullptr;
 
-    if(c->pix_fmt != AV_PIX_FMT_RGBA) {
-        /* as we only generate a rgba picture, we must convert it
-         * to the codec pixel format if needed */
-        if(!ost->fSwsCtx) {
-            ost->fSwsCtx = sws_getContext(c->width, c->height,
-                                          AV_PIX_FMT_RGBA,
-                                          c->width, c->height,
-                                          c->pix_fmt, SWS_BICUBIC,
-                                          nullptr, nullptr, nullptr);
-            if(!ost->fSwsCtx)
-                RuntimeThrow("Cannot initialize the conversion context");
-        }
-        SkPixmap pixmap;
-        image->peekPixels(&pixmap);
-        uint8_t * const dstSk[] = {static_cast<uint8_t*>(pixmap.writable_addr())};
-        int linesizesSk[4];
-
-        av_image_fill_linesizes(linesizesSk, AV_PIX_FMT_RGBA, image->width());
-        const int ret = av_frame_make_writable(ost->fDstFrame) ;
-        if(ret < 0)
-            AV_RuntimeThrow(ret, "Could not make AVFrame writable")
-
-        sws_scale(ost->fSwsCtx, dstSk,
-                  linesizesSk, 0, c->height, ost->fDstFrame->data,
-                  ost->fDstFrame->linesize);
-    } else {
-        try {
-            copyImageToFrame(ost->fDstFrame, image, c->width, c->height);
-        } catch(...) {
-            RuntimeThrow("Failed to copy image to frame");
-        }
+    /* as we only generate a rgba picture, we must convert it
+     * to the codec pixel format if needed */
+    if(!ost->fSwsCtx) {
+        ost->fSwsCtx = sws_getContext(c->width, c->height,
+                                      AV_PIX_FMT_RGBA,
+                                      c->width, c->height,
+                                      c->pix_fmt, SWS_BICUBIC,
+                                      nullptr, nullptr, nullptr);
+        if(!ost->fSwsCtx)
+            RuntimeThrow("Cannot initialize the conversion context");
     }
+    SkPixmap pixmap;
+    image->peekPixels(&pixmap);
+    const uint8_t * const dstSk[] = {static_cast<uint8_t*>(pixmap.writable_addr())};
+    int linesizesSk[4];
+
+    av_image_fill_linesizes(linesizesSk, AV_PIX_FMT_RGBA, image->width());
+    const int ret = av_frame_make_writable(ost->fDstFrame) ;
+    if(ret < 0) AV_RuntimeThrow(ret, "Could not make AVFrame writable")
+
+    sws_scale(ost->fSwsCtx, dstSk,
+              linesizesSk, 0, c->height, ost->fDstFrame->data,
+              ost->fDstFrame->linesize);
 
     ost->fDstFrame->pts = ost->fNextPts++;
 
