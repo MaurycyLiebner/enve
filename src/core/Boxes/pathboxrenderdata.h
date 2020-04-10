@@ -34,7 +34,14 @@ struct CORE_EXPORT PathBoxRenderData : public BoxRenderData {
     void updateRelBoundingRect();
     QPointF getCenterPosition();
 protected:
+    void setupRenderData();
     void drawSk(SkCanvas * const canvas);
+    void drawOnParentLayer(SkCanvas * const canvas, SkPaint &paint);
+    void copyFrom(BoxRenderData *src);
+private:
+    void setupDirectDraw();
+
+    bool mDirectDraw = false;
 };
 
 #endif // PATHBOXRENDERDATA_H

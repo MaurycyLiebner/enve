@@ -38,6 +38,7 @@ void BoxRenderData::copyFrom(BoxRenderData *src) {
     fRelTransform = src->fRelTransform;
     fInheritedTransform = src->fInheritedTransform;
     fTotalTransform = src->fTotalTransform;
+    fScaledTransform = src->fScaledTransform;
     fRelFrame = src->fRelFrame;
     fRelBoundingRect = src->fRelBoundingRect;
     fRenderTransform = src->fRenderTransform;
@@ -66,7 +67,14 @@ sk_sp<SkImage> BoxRenderData::requestImageCopy() {
     else return mImageCopies.takeLast();
 }
 
-void BoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {
+void BoxRenderData::drawOnParentLayer(SkCanvas * const canvas) {
+    SkPaint paint;
+    if(fUseRenderTransform) paint.setFilterQuality(fFilterQuality);
+    drawOnParentLayer(canvas, paint);
+}
+
+void BoxRenderData::drawOnParentLayer(SkCanvas * const canvas,
+                                      SkPaint& paint) {
     if(isZero4Dec(fOpacity)) return;
     if(fUseRenderTransform) canvas->concat(toSkMatrix(fRenderTransform));
     if(fBlendMode == SkBlendMode::kDstIn ||
@@ -83,11 +91,9 @@ void BoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {
         canvas->clear(SK_ColorTRANSPARENT);
         canvas->restore();
     }
-    SkPaint paint;
     paint.setAlpha(static_cast<U8CPU>(qRound(fOpacity*2.55)));
     paint.setBlendMode(fBlendMode);
     paint.setAntiAlias(fAntiAlias);
-    if(fUseRenderTransform) paint.setFilterQuality(fFilterQuality);
     canvas->drawImage(fRenderedImage, fGlobalRect.x(), fGlobalRect.y(), &paint);
 }
 

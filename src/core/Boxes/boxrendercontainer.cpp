@@ -19,35 +19,22 @@
 #include "skia/skiahelpers.h"
 
 void RenderContainer::drawSk(SkCanvas * const canvas,
-                             SkPaint& paint) const {
+                             const SkFilterQuality filter) const {
     if(!mSrcRenderData) return;
     canvas->save();
-    canvas->concat(toSkMatrix(mPaintTransform));
-    const auto blendMode = paint.getBlendMode();
-    if(blendMode == SkBlendMode::kDstIn ||
-       blendMode == SkBlendMode::kSrcIn ||
-       blendMode == SkBlendMode::kDstATop ||
-       blendMode == SkBlendMode::kModulate ||
-       blendMode == SkBlendMode::kSrcOut) {
-        canvas->save();
-        auto rect = SkRect::MakeXYWH(mGlobalRect.x(), mGlobalRect.y(),
-                                     mImageSk->width(), mImageSk->height());
-        rect.inset(1, 1);
-        canvas->clipRect(rect, SkClipOp::kDifference, false);
-        canvas->clear(SK_ColorTRANSPARENT);
-        canvas->restore();
-    }
-    paint.setAntiAlias(mAntiAlias);
-    canvas->drawImage(mImageSk, mGlobalRect.x(), mGlobalRect.y(), &paint);
+    canvas->concat(mPaintTransform);
+    SkPaint paint;
+    paint.setFilterQuality(filter);
+    mSrcRenderData->drawOnParentLayer(canvas, paint);
     canvas->restore();
 }
 
 void RenderContainer::updatePaintTransformGivenNewTotalTransform(
                                     const QMatrix &totalTransform) {
-    mPaintTransform = mTransform.inverted()*totalTransform;
+    QMatrix paintTransform = mTransform.inverted()*totalTransform;
     const qreal invRes = 1/mResolutionFraction;
-    mPaintTransform.scale(invRes, invRes);
-    mPaintTransform = mRenderTransform*mPaintTransform;
+    paintTransform.scale(invRes, invRes);
+    mPaintTransform = toSkMatrix(paintTransform);
 }
 
 void RenderContainer::clear() {
@@ -61,9 +48,8 @@ void RenderContainer::setSrcRenderData(BoxRenderData * const data) {
     mImageSk = data->fRenderedImage;
     mGlobalRect = data->fGlobalRect;
     mAntiAlias = data->fAntiAlias;
-    mPaintTransform.reset();
-    mPaintTransform.scale(1/mResolutionFraction, 1/mResolutionFraction);
-    mRenderTransform = data->fRenderTransform;
-    mPaintTransform = mRenderTransform*mPaintTransform;
+    QMatrix paintTransform;
+    paintTransform.scale(1/mResolutionFraction, 1/mResolutionFraction);
+    mPaintTransform = toSkMatrix(paintTransform);
     mSrcRenderData = data->ref<BoxRenderData>();
 }

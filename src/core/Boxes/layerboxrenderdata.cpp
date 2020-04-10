@@ -72,7 +72,7 @@ void ContainerBoxRenderData::drawSk(SkCanvas * const canvas) {
             child.fClip.clip(canvas);
             canvas->setMatrix(transform);
         }
-        child->drawRenderedImageForParent(canvas);
+        child->drawOnParentLayer(canvas);
         canvas->restore();
     }
 }

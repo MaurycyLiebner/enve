@@ -20,6 +20,54 @@
 PathBoxRenderData::PathBoxRenderData(BoundingBox * const parentBox) :
     BoxRenderData(parentBox) {}
 
+void PathBoxRenderData::setupRenderData() {
+    const bool isBrush = fStrokeSettings.fPaintType == PaintType::BRUSHPAINT;
+    mDirectDraw = !isBrush && !hasEffects() &&
+                  fBlendMode == SkBlendMode::kSrcOver;
+    if(mDirectDraw) setupDirectDraw();
+}
+
+void PathBoxRenderData::setupDirectDraw() {
+    fBaseMargin = QMargins();
+    dataSet();
+    updateGlobalRect();
+    fAntiAlias = true;
+    finishedProcessing();
+}
+
+void PathBoxRenderData::copyFrom(BoxRenderData *src) {
+    BoxRenderData::copyFrom(src);
+    if(const auto pathSrc = enve_cast<PathBoxRenderData*>(src)) {
+        mDirectDraw = pathSrc->mDirectDraw;
+        if(!mDirectDraw) return;
+        fPaintSettings = pathSrc->fPaintSettings;
+        fFillPath = pathSrc->fFillPath;
+        fStrokeSettings = pathSrc->fStrokeSettings;
+        fOutlinePath = pathSrc->fOutlinePath;
+    }
+}
+
+void PathBoxRenderData::drawOnParentLayer(SkCanvas * const canvas,
+                                          SkPaint& paint) {
+    if(!mDirectDraw) return BoxRenderData::drawOnParentLayer(canvas, paint);
+    if(isZero4Dec(fOpacity)) return;
+    canvas->concat(toSkMatrix(fScaledTransform));
+    paint.setAlpha(static_cast<U8CPU>(qRound(fOpacity*2.55)));
+    paint.setBlendMode(fBlendMode);
+    paint.setAntiAlias(true);
+    paint.setStyle(SkPaint::kFill_Style);
+
+    if(!fFillPath.isEmpty()) {
+        fPaintSettings.applyPainterSettingsSk(&paint);
+        canvas->drawPath(fFillPath, paint);
+    }
+    if(!fOutlinePath.isEmpty()) {
+        paint.setShader(nullptr);
+        fStrokeSettings.applyPainterSettingsSk(&paint);
+        canvas->drawPath(fOutlinePath, paint);
+    }
+}
+
 void PathBoxRenderData::updateRelBoundingRect() {
     SkPath totalPath;
     totalPath.addPath(fFillPath);

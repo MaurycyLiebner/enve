@@ -36,10 +36,10 @@ protected:
     BoxRenderData(BoundingBox * const parent);
 
     virtual void drawSk(SkCanvas * const canvas) = 0;
+    virtual void updateRelBoundingRect() = 0;
     virtual void setupRenderData() {}
     virtual void transformRenderCanvas(SkCanvas& canvas) const;
     virtual void copyFrom(BoxRenderData *src);
-    virtual void updateRelBoundingRect() = 0;
     virtual void updateGlobalRect();
 
     HardwareSupport hardwareSupport() const;
@@ -54,6 +54,10 @@ protected:
         return SK_ColorTRANSPARENT;
     }
 public:
+    virtual void drawOnParentLayer(SkCanvas * const canvas,
+                                   SkPaint& paint);
+    void drawOnParentLayer(SkCanvas * const canvas);
+
     virtual QPointF getCenterPosition() {
         return fRelBoundingRect.center();
     }
@@ -104,8 +108,6 @@ public:
     qptr<BoundingBox> fParentBox;
     BoundingBox* fBlendEffectIdentifier;
     sk_sp<SkImage> fRenderedImage;
-
-    void drawRenderedImageForParent(SkCanvas * const canvas);
 
     void dataSet();
 

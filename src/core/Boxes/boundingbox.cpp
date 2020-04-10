@@ -269,12 +269,7 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
                                const SkFilterQuality filter) const {
     const qreal opacity = mTransformAnimator->getOpacity();
     if(isZero4Dec(opacity) || !mVisibleInScene) return;
-    SkPaint paint;
-    const int intAlpha = qRound(opacity*2.55);
-    paint.setAlpha(static_cast<U8CPU>(intAlpha));
-    paint.setBlendMode(mBlendMode);
-    paint.setFilterQuality(filter);
-    mDrawRenderContainer.drawSk(canvas, paint);
+    mDrawRenderContainer.drawSk(canvas, filter);
 }
 
 bool BoundingBox::blendEffectsEnabled() const {

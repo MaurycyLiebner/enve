@@ -28,7 +28,8 @@ class CORE_EXPORT RenderContainer {
 public:
     RenderContainer() {}
 
-    void drawSk(SkCanvas * const canvas, SkPaint &paint) const;
+    void drawSk(SkCanvas * const canvas,
+                const SkFilterQuality filter) const;
 
     void updatePaintTransformGivenNewTotalTransform(
             const QMatrix &totalTransform);
@@ -53,8 +54,7 @@ protected:
     qreal mResolutionFraction;
     QRect mGlobalRect;
     QMatrix mTransform;
-    QMatrix mPaintTransform;
-    QMatrix mRenderTransform;
+    SkMatrix mPaintTransform;
     stdsptr<BoxRenderData> mSrcRenderData;
     sk_sp<SkImage> mImageSk;
 };
