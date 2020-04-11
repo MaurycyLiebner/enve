@@ -63,6 +63,10 @@ Initialize and checkout all submodules:
 ```
 git submodule update --init
 ```
+Apply enve-specific library patches:
+```
+make patch
+```
 #### Skia
 
 Enter the skia directory:
