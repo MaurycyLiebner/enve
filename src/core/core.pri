@@ -20,6 +20,8 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$SKIA_FOLDER/out/Release
 }
 
+LIBS += -lskia -lmypaint
+
 win32 { # Windows
     FFMPEG_FOLDER = $$THIRD_PARTY_FOLDER/ffmpeg-4.2.2-win64-dev
     LIBS += -L$$FFMPEG_FOLDER/lib
@@ -52,8 +54,6 @@ win32 { # Windows
         QMAKE_CXXFLAGS_RELEASE += -m64 -O3
 
         QMAKE_CXXFLAGS += -fopenmp
-        LIBS += -lpthread -lfreetype -lpng -ldl -fopenmp# -lX11
+        LIBS += -lfreetype -lpng -ldl -fopenmp# -lX11
     }
 }
-
-LIBS += -lskia -lmypaint

@@ -47,6 +47,7 @@ win32 { # Windows
     GPERFTOOLS_FOLDER = $$THIRD_PARTY_FOLDER/gperftools
     INCLUDEPATH += $$GPERFTOOLS_FOLDER/include
     LIBS += -L$$GPERFTOOLS_FOLDER/.libs -ltcmalloc
+    !macx: LIBS += -lpthread
 }
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
