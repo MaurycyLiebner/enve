@@ -148,7 +148,7 @@ sudo apt-get install libunwind-dev
 
 Build gperftools:
 ```
-cd gperftools-2.7-enve-mod
+cd gperftools
 ./autogen.sh
 ./configure --prefix /usr
 make
@@ -190,32 +190,39 @@ sudo apt-get install libxkbcommon-x11-dev
 ```
 
 #### Building for macOS
-Most dependencies could be installed directly from Homebrew.
+Some dependencies could be installed directly from Homebrew.
+```sh
+brew install libmypaint ffmpeg
 ```
-brew install libmypaint gperftools ffmpeg
-```
-Skia, quazip, and QScintilla might require additional libraries:
-```
-brew install ninja json-c zlib
+Skia, quazip, gperftools, and QScintilla might require additional libraries:
+```sh
+brew install ninja json-c autoconf automake libtool zlib
 ```
 For Skia:
-```
+```sh
 pyenv shell system  # disable pyenv as build script breaks under Python 3
 tools/git-sync-deps
 bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] skia_use_system_expat=false skia_use_system_icu=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false'
 ninja -C out/Release skia
 ```
 For quazip:
-```
+```sh
 # Explicitly add zlib to path upon build, as Homebrew zlib is keg-only.
 # Do not `brew link zlib` to or you would risk
-LDFLAGS="-L/usr/local/opt/zlib/lib:$LDFLAGS"
-CPPFLAGS="-I/usr/local/opt/zlib/include:$CPPFLAGS"
+LDFLAGS="-L/usr/local/opt/zlib/lib $LDFLAGS"
+CPPFLAGS="-I/usr/local/opt/zlib/include $CPPFLAGS"
 qmake quazip.pro -spec macx-clang CONFIG+=release CONFIG+=x86_64 LIBS+=-lz
 make
 ```
-For QScintilla:
+For gperftools:
+```sh
+CFLAGS="$CFLAGS -Wno-error -D_XOPEN_SOURCE"
+./autogen.sh
+./configure --disable-dependency-tracking --prefix=/usr/local
+make
 ```
+For QScintilla:
+```sh
 cd Qt4Qt5
 qmake -spec macx-clang CONFIG+=release
 ```

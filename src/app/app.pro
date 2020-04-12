@@ -33,7 +33,6 @@ QSCINTILLA_FOLDER = $$THIRD_PARTY_FOLDER/qscintilla/Qt4Qt5
 
 INCLUDEPATH += ../core
 DEPENDPATH += ../core
-
 LIBS += -L$$OUT_PWD/../core -lenvecore
 
 DEFINES += QSCINTILLA_DLL
@@ -44,15 +43,9 @@ win32 { # Windows
     CONFIG -= debug_and_release
     RC_ICONS = pixmaps\enve.ico
 } unix {
-    macx { # Mac OS X
-        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
-        INCLUDEPATH += /usr/local/include
-        LIBS += -L/usr/local/lib -ltcmalloc
-    } else { # Linux
-        GPERFTOOLS_FOLDER = $$THIRD_PARTY_FOLDER/gperftools
-        INCLUDEPATH += $$GPERFTOOLS_FOLDER/include
-        LIBS += -L$$GPERFTOOLS_FOLDER/.libs -ltcmalloc
-    }
+    GPERFTOOLS_FOLDER = $$THIRD_PARTY_FOLDER/gperftools
+    INCLUDEPATH += $$GPERFTOOLS_FOLDER/include
+    LIBS += -L$$GPERFTOOLS_FOLDER/.libs -ltcmalloc
 }
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

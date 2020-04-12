@@ -74,6 +74,7 @@ install:
     - # build libmypaint
     - cd libmypaint
     - export CFLAGS='-fopenmp -Ofast -ftree-vectorize -fopt-info-vec-optimized -funsafe-math-optimizations -funsafe-loop-optimizations -fPIC'
+    - ./autogen.sh
     - ./configure --enable-static --enable-openmp --enable-shared=false
     - sudo make -j 2
     - unset CFLAGS

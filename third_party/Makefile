@@ -6,6 +6,10 @@ all: patch build
 patch:
 	patch -d gperftools -p1 < gperftools-enve-mod.patch
 
+# install_deps:
+# TODO: Integrate third-party build commands to Makefile,
+# making it easier for CI and contributors to start up.
+
 build: skia libmypaint quazip gperftools qscintilla
 
 .ONESHELL:
@@ -18,7 +22,8 @@ skia:
 .ONESHELL:
 libmypaint:
 	cd libmypaint
-	./configure --enable-static --enable-openmp --enable-shared=false
+	./autogen.sh
+	./configure --enable-static --enable-shared=false
 	make
 
 .ONESHELL:
