@@ -7,6 +7,7 @@ LIBMYPAINT_FOLDER = $$THIRD_PARTY_FOLDER/libmypaint
 QUAZIP_FOLDER = $$THIRD_PARTY_FOLDER/quazip
 
 INCLUDEPATH += $$SKIA_FOLDER
+QMAKE_CFLAGS_RELEASE += -isystem$$SKIA_FOLDER
 
 INCLUDEPATH += $$LIBMYPAINT_FOLDER
 LIBS += -L$$LIBMYPAINT_FOLDER/.libs
@@ -54,6 +55,6 @@ win32 { # Windows
         QMAKE_CXXFLAGS_RELEASE += -m64 -O3
 
         QMAKE_CXXFLAGS += -fopenmp
-        LIBS += -lfreetype -lpng -ldl -fopenmp# -lX11
+        LIBS += -lfreetype -lfontconfig -lpng -ldl -fopenmp# -lX11
     }
 }
