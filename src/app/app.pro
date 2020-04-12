@@ -29,10 +29,11 @@ DEFINES += QT_NO_FOREACH
 
 # Include third-party dependencies from core
 include(../core/core.pri)
+ENVE_CORE_FOLDER = ../core
 QSCINTILLA_FOLDER = $$THIRD_PARTY_FOLDER/qscintilla/Qt4Qt5
 
-INCLUDEPATH += ../core
-DEPENDPATH += ../core
+INCLUDEPATH += $$ENVE_CORE_FOLDER
+DEPENDPATH += $$ENVE_CORE_FOLDER
 LIBS += -L$$OUT_PWD/../core -lenvecore
 
 DEFINES += QSCINTILLA_DLL
@@ -354,13 +355,17 @@ macx {
 
     QMAKE_POST_LINK = \
         cp -fLR $$OUT_PWD/../core/libenvecore.1.dylib $$MAC_LIB_FOLDER/ && \
+        cp -fLR $$LIBMYPAINT_FOLDER/.libs/libmypaint-1.5.1.dylib $$MAC_LIB_FOLDER/ && \
         cp -fLR $$QUAZIP_FOLDER/quazip/libquazip.1.dylib $$MAC_LIB_FOLDER/ && \
         cp -fLR $$QSCINTILLA_FOLDER/libqscintilla2_qt5.15.dylib $$MAC_LIB_FOLDER/ && \
         install_name_tool -add_rpath @executable_path \
                           -change libquazip.1.dylib @rpath/libquazip.1.dylib \
+                          -change /usr/local/lib/libmypaint-1.5.1.dylib @rpath/libmypaint-1.5.1.dylib \
                           $$MAC_LIB_FOLDER/libenvecore.1.dylib && \
         install_name_tool -add_rpath @executable_path \
-                          -change libenvecore.1.dylib @rpath/libenvecore.1.dylib -change libquazip.1.dylib @rpath/libquazip.1.dylib \
+                          -change libenvecore.1.dylib @rpath/libenvecore.1.dylib \
+                          -change libquazip.1.dylib @rpath/libquazip.1.dylib \
+                          -change /usr/local/lib/libmypaint-1.5.1.dylib @rpath/libmypaint-1.5.1.dylib \
                           $$MAC_APP_FOLDER/Contents/MacOS/$$TARGET
 
     #CONFIG(release, debug|release): QMAKE_POST_LINK += && macdeployqt $$MAC_APP_FOLDER

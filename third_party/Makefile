@@ -25,6 +25,7 @@ libmypaint:
 	./autogen.sh
 	./configure --enable-static --enable-shared=false
 	make
+	ln -s `pwd` libmypaint
 
 .ONESHELL:
 quazip:

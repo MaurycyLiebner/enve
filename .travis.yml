@@ -77,6 +77,7 @@ install:
     - ./autogen.sh
     - ./configure --enable-static --enable-openmp --enable-shared=false
     - sudo make -j 2
+    - ln -s `pwd` libmypaint
     - unset CFLAGS
     - cd ..
     - # build quazip
@@ -128,7 +129,7 @@ script:
     - cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 AppDir/usr/optional/libstdc++/
     - cp Release/src/app/enve AppDir/usr/bin/
     - cp -av Release/src/core/*.so* AppDir/usr/lib/
-    - cp -av ../third_party/gperftools-2.7-enve-mod/.libs/libtcmalloc.so* AppDir/usr/lib/
+    - cp -av ../third_party/gperftools/.libs/libtcmalloc.so* AppDir/usr/lib/
     - ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage -extra-plugins=platformthemes/libqt5ct.so,styles/libqt5ct-style.so
 after_success:
     - |
