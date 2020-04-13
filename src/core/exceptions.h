@@ -26,6 +26,7 @@
 #define ERROUT(msg) qDebug() << msg << __LINE__
 #define FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
+#define BREAKPOINT
 #ifdef QT_DEBUG
     #if (defined (_WIN32) || defined (_WIN64))
         #define NOMINMAX

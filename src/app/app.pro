@@ -27,73 +27,28 @@ LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample
 CONFIG += c++14
 DEFINES += QT_NO_FOREACH
 
-ENVE_FOLDER = $$PWD/../..
-THIRD_PARTY_FOLDER = $$ENVE_FOLDER/third_party
-SKIA_FOLDER = $$THIRD_PARTY_FOLDER/skia
-LIBMYPAINT_FOLDER = $$THIRD_PARTY_FOLDER/libmypaint-1.5.1
-QUAZIP_FOLDER = $$THIRD_PARTY_FOLDER/quazip-0.8.1
-QSCINTILLA_FOLDER = $$THIRD_PARTY_FOLDER/QScintilla-2.11.4/Qt4Qt5
+# Include third-party dependencies from core
+include(../core/core.pri)
+ENVE_CORE_FOLDER = ../core
+QSCINTILLA_FOLDER = $$THIRD_PARTY_FOLDER/qscintilla/Qt4Qt5
 
-INCLUDEPATH += ../core
-DEPENDPATH += ../core
-
+INCLUDEPATH += $$ENVE_CORE_FOLDER
+DEPENDPATH += $$ENVE_CORE_FOLDER
 LIBS += -L$$OUT_PWD/../core -lenvecore
-
-INCLUDEPATH += $$LIBMYPAINT_FOLDER/include
-LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
-
-INCLUDEPATH += $$QUAZIP_FOLDER
-LIBS += -L$$QUAZIP_FOLDER/quazip -lquazip
 
 DEFINES += QSCINTILLA_DLL
 INCLUDEPATH += $$QSCINTILLA_FOLDER
 LIBS += -L$$QSCINTILLA_FOLDER -lqscintilla2_qt5
 
-INCLUDEPATH += $$SKIA_FOLDER
-
-CONFIG(debug, debug|release) {
-    LIBS += -L$$SKIA_FOLDER/out/Debug
-} else {
-    LIBS += -L$$SKIA_FOLDER/out/Release
-}
-
 win32 { # Windows
-    FFMPEG_FOLDER = $$THIRD_PARTY_FOLDER/ffmpeg-4.2.2-win64-dev
-    LIBS += -L$$FFMPEG_FOLDER/lib
-    INCLUDEPATH += $$FFMPEG_FOLDER/include
-
-    QMAKE_CFLAGS_RELEASE += /O2 -O2 /GL
-    QMAKE_LFLAGS_RELEASE += /LTCG
-    QMAKE_CXXFLAGS_RELEASE += /O2 -O2 /GL
-
-    QMAKE_CFLAGS += -openmp
-    QMAKE_CXXFLAGS += -openmp
-
     CONFIG -= debug_and_release
-
     RC_ICONS = pixmaps\enve.ico
 } unix {
-    macx { # Mac OS X
-    } else { # Linux
-        GPERFTOOLS_FOLDER = $$THIRD_PARTY_FOLDER/gperftools-2.7-enve-mod
-        INCLUDEPATH += $$GPERFTOOLS_FOLDER/include
-        LIBS += -L$$GPERFTOOLS_FOLDER/.libs -ltcmalloc
-
-        LIBS += -lgobject-2.0 -lglib-2.0 -ljson-c
-
-        QMAKE_CFLAGS_RELEASE -= -O2
-        QMAKE_CFLAGS_RELEASE -= -O1
-        QMAKE_CXXFLAGS_RELEASE -= -O2
-        QMAKE_CXXFLAGS_RELEASE -= -O1
-        QMAKE_CFLAGS_RELEASE += -m64 -O3
-        QMAKE_CXXFLAGS_RELEASE += -m64 -O3
-
-        QMAKE_CXXFLAGS += -fopenmp
-        LIBS += -lpthread -lfreetype -lpng -ldl -fopenmp# -lX11
-    }
+    GPERFTOOLS_FOLDER = $$THIRD_PARTY_FOLDER/gperftools
+    INCLUDEPATH += $$GPERFTOOLS_FOLDER/include
+    LIBS += -L$$GPERFTOOLS_FOLDER/.libs -ltcmalloc
 }
 
-LIBS += -lskia
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = enve
@@ -395,3 +350,28 @@ DISTFILES += \
     icons/toolbarButtons/checkable/spacing \
     icons/toolbarButtons/checkable/time \
     icons/toolbarButtons/checkable/width
+
+macx {
+    MAC_APP_FOLDER = $$sprintf("%1/%2/%3.app", $$OUT_PWD, $$DESTDIR, $$TARGET)
+    MAC_LIB_FOLDER = $$MAC_APP_FOLDER/Contents/Frameworks
+
+    QMAKE_CLEAN += -r $$MAC_APP_FOLDER
+
+    QMAKE_POST_LINK = \
+        mkdir -p $$MAC_LIB_FOLDER && \
+        cp -fLR $$OUT_PWD/../core/libenvecore.1.dylib $$MAC_LIB_FOLDER/ && \
+        cp -fLR $$LIBMYPAINT_FOLDER/.libs/libmypaint-1.5.1.dylib $$MAC_LIB_FOLDER/ && \
+        cp -fLR $$QUAZIP_FOLDER/quazip/libquazip.1.dylib $$MAC_LIB_FOLDER/ && \
+        cp -fLR $$QSCINTILLA_FOLDER/libqscintilla2_qt5.15.dylib $$MAC_LIB_FOLDER/ && \
+        install_name_tool -change libquazip.1.dylib @loader_path/libquazip.1.dylib \
+                          -change /usr/local/lib/libmypaint-1.5.1.dylib @loader_path/libmypaint-1.5.1.dylib \
+                          $$MAC_LIB_FOLDER/libenvecore.1.dylib && \
+        install_name_tool -change libenvecore.1.dylib @rpath/libenvecore.1.dylib \
+                          -change libquazip.1.dylib @rpath/libquazip.1.dylib \
+                          -change /usr/local/lib/libmypaint-1.5.1.dylib @rpath/libmypaint-1.5.1.dylib \
+                          $$MAC_APP_FOLDER/Contents/MacOS/$$TARGET
+
+    # Wrap all application depdendencies for deployment. Apply -dmg flag for release DMG image.
+    # Use -appstore-compliant flag to workaround the inclusion of OBDC and PostgreSQL plugins.
+    CONFIG(release, debug|release): QMAKE_POST_LINK += && macdeployqt $$MAC_APP_FOLDER -appstore-compliant
+}

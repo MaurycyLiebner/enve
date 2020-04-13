@@ -16,7 +16,7 @@
 
 #ifndef SIMPLEBRUSHWRAPPER_H
 #define SIMPLEBRUSHWRAPPER_H
-#include <mypaint-brush.h>
+#include <libmypaint/mypaint-brush.h>
 #include <QColor>
 #include "pointhelpers.h"
 #include "smartPointers/ememory.h"

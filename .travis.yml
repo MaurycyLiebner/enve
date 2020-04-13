@@ -50,10 +50,10 @@ install:
     - QT_SELECT=5 qmake
     - make -j 2 && sudo make install
     - cd ..
-    - # skia dependencies
+    - # Travis clones submodules for us, only library patches are needed
     - cd third_party
+    - make patch
     - # build skia
-    - tar xf skia.tar.xz
     - |
       if ! [ -d $TRAVIS_CACHE_DIR/third_party/skia/out/Release ]; then
           cd skia
@@ -72,29 +72,28 @@ install:
           cp -r $TRAVIS_CACHE_DIR/third_party/skia/out/Release/* ./skia/out/Release
       fi
     - # build libmypaint
-    - tar xf libmypaint.tar.xz
-    - cd libmypaint-1.5.1
+    - cd libmypaint
     - export CFLAGS='-fopenmp -Ofast -ftree-vectorize -fopt-info-vec-optimized -funsafe-math-optimizations -funsafe-loop-optimizations -fPIC'
+    - ./autogen.sh
     - ./configure --enable-static --enable-openmp --enable-shared=false
     - sudo make -j 2
+    - ln -s `pwd` libmypaint
     - unset CFLAGS
     - cd ..
     - # build quazip
-    - tar xf quazip-0.8.1.tar.gz
-    - cd quazip-0.8.1/quazip
+    - cd quazip/quazip
     - qmake
     - make -j 2
     - sudo make install
     - cd ../../
     - # build gperftools
-    - cd gperftools-2.7-enve-mod
+    - cd gperftools
     - ./autogen.sh
     - ./configure --prefix /usr LIBS=-lpthread
     - make -j 2
     - cd ..
     - # build QScintilla
-    - tar xf QScintilla-2.11.4.tar.gz
-    - cd QScintilla-2.11.4/Qt4Qt5
+    - cd qscintilla/Qt4Qt5
     - qmake
     - make -j 2
     - sudo make install
@@ -130,7 +129,7 @@ script:
     - cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 AppDir/usr/optional/libstdc++/
     - cp Release/src/app/enve AppDir/usr/bin/
     - cp -av Release/src/core/*.so* AppDir/usr/lib/
-    - cp -av ../third_party/gperftools-2.7-enve-mod/.libs/libtcmalloc.so* AppDir/usr/lib/
+    - cp -av ../third_party/gperftools/.libs/libtcmalloc.so* AppDir/usr/lib/
     - ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage -extra-plugins=platformthemes/libqt5ct.so,styles/libqt5ct-style.so
 after_success:
     - |

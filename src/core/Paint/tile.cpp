@@ -70,13 +70,13 @@ uint16_t *Tile::requestZeroedData() {
 uint16_t *Tile::data() const { return mData; }
 
 void Tile::write(eWriteStream &dst) const {
-    dst << fSize;
+    dst << static_cast<uint64_t>(fSize);
     const bool data = mData; dst << data;
     if(data) dst.writeCompressed(mData, fSize*sizeof(uint16_t));
 }
 
 stdsptr<Tile> Tile::sRead(eReadStream &src, const TileCreator &tileCreator) {
-    size_t size; src >> size;
+    uint64_t size; src >> size;
     bool data; src >> data;
     const auto result = tileCreator(size);
     if(data) {

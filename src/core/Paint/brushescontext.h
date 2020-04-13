@@ -1,6 +1,6 @@
 #ifndef BRUSHESCONTEXT_H
 #define BRUSHESCONTEXT_H
-#include <mypaint-brush.h>
+#include <libmypaint/mypaint-brush.h>
 #include "Paint/brushcontexedwrapper.h"
 
 struct CORE_EXPORT BrushCollectionData {

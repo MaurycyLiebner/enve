@@ -59,12 +59,16 @@ Enter the folder with third party dependencies:
 ```
 cd third_party
 ```
+Initialize and checkout all submodules:
+```
+git submodule update --init
+```
+Apply enve-specific library patches:
+```
+make patch
+```
 #### Skia
 
-Extract skia:
-```
-tar xf skia.tar.xz
-```
 Enter the skia directory:
 ```
 cd skia
@@ -114,13 +118,9 @@ Install libmypaint dependencies:
 ```
 sudo apt-get install libjson-c-dev intltool pkg-config
 ```
-Extract libmypaint:
-```
-tar xf libmypaint.tar.xz
-```
 Enter libmypaint directory:
 ```
-cd libmypaint-1.5.0
+cd libmypaint
 ```
 Set CFLAGS for better optimization:
 ```
@@ -148,7 +148,7 @@ sudo apt-get install libunwind-dev
 
 Build gperftools:
 ```
-cd gperftools-2.7-enve-mod
+cd gperftools
 ./autogen.sh
 ./configure --prefix /usr
 make
@@ -158,13 +158,9 @@ Go back to the third_party folder:
 cd ..
 ```
 #### QScintilla
-Extract QScintilla:
-```
-tar xf QScintilla-2.11.4.tar.gz
-```
 Build QScintilla:
 ```
-cd QScintilla-2.11.4/Qt4Qt5
+cd qscintilla/Qt4Qt5
 qmake
 make -j 2
 ```
@@ -191,6 +187,52 @@ Install libxkbcommon-x11-dev to run QtCreator on Ubuntu 16.04.
 Otherwise it will not execute properly.
 ```
 sudo apt-get install libxkbcommon-x11-dev
+```
+
+#### Building for macOS
+Install build dependencies for third-party libraries from Homebrew.
+```sh
+brew install ninja json-c intltool pkg-config gettext zlib ffmpeg
+```
+For **Skia**:
+```sh
+pyenv shell system  # disable pyenv as build script breaks under Python 3
+tools/git-sync-deps
+bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] skia_use_system_expat=false skia_use_system_icu=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false'
+ninja -C out/Release skia
+```
+For **libmypaint**:
+```sh
+# Manually specify environmental variables for keg-only dependencies.
+ACLOCAL_FLAGS="-I/usr/local/opt/gettext/share/aclocal $ACLOCAL_FLAGS"
+LDFLAGS="-L/usr/local/opt/gettext/lib $LDFLAGS"
+CPPFLAGS="-I/usr/local/opt/gettext/include $CPPFLAGS"
+PATH="/usr/local/opt/gettext/bin:$PATH"
+./autogen.sh
+./configure --enable-openmp --prefix=/usr/local
+make
+ln -s `pwd` libmypaint
+```
+For **quazip**:
+```sh
+# Explicitly add zlib to path upon build, as Homebrew zlib is keg-only.
+# Do not `brew link zlib` as it might conflict with the stock version shipped with macOS.
+LDFLAGS="-L/usr/local/opt/zlib/lib $LDFLAGS"
+CPPFLAGS="-I/usr/local/opt/zlib/include $CPPFLAGS"
+qmake quazip.pro -spec macx-clang CONFIG+=release CONFIG+=x86_64 LIBS+=-lz
+make
+```
+For **gperftools**:
+```sh
+CFLAGS="$CFLAGS -Wno-error -D_XOPEN_SOURCE"
+./autogen.sh
+./configure --disable-dependency-tracking --prefix=/usr/local
+make
+```
+For **QScintilla**:
+```sh
+cd Qt4Qt5
+qmake -spec macx-clang CONFIG+=release
 ```
 
 #### Qt

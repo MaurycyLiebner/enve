@@ -21,6 +21,8 @@
     #include <stdint.h>
 #elif (defined (LINUX) || defined (__linux__))
     #include <stdint-gcc.h>
+#else
+    #include <stdint.h>
 #endif
 
 void rgba8_to_rgba16(uint8_t* src,

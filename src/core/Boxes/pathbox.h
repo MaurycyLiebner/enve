@@ -23,7 +23,7 @@
 #include "Animators/paintsettingsanimator.h"
 #include "Paint/autotiledsurface.h"
 #include "pathboxrenderdata.h"
-#include <mypaint-brush.h>
+#include <libmypaint/mypaint-brush.h>
 #include "Animators/qcubicsegment1danimator.h"
 class SmartVectorPath;
 class GradientPoints;

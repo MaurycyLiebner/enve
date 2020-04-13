@@ -1,6 +1,7 @@
 #include "centralwidget.h"
 #include "bookmarkedwidget.h"
 #include "GUI/global.h"
+#include <QResizeEvent>
 
 CentralWidget::CentralWidget(BookmarkedWidget *left,
                              QWidget *central,
