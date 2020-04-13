@@ -21,8 +21,7 @@
 #include "exceptions.h"
 
 #if (defined (_WIN32) || defined (_WIN64))
-    #pragma comment(lib, "mincore_downlevel.lib")
-    #include <windows.h>
+    #include "windowsincludes.h"
 #endif
 
 int HardwareInfo::mCpuThreads = -1;

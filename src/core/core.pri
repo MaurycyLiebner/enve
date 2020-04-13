@@ -36,7 +36,7 @@ win32 { # Windows
     QMAKE_CXXFLAGS += -openmp
 
     LIBS += -L"C:\Program Files\LLVM\lib" -llibomp
-    LIBS += -L"C:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x64" -luser32 -lopengl32
+    LIBS += -luser32 -lopengl32
 
     CONFIG -= debug_and_release
 } unix {

@@ -299,7 +299,8 @@ HEADERS  += \
     GUI/segment1deditor.h \
     GUI/namedcontainer.h \
     GUI/BrushWidgets/brushwidget.h \
-    boxtypemenu.h
+    boxtypemenu.h \
+    windowsincludes.h
 
 RESOURCES += resources.qrc
 
