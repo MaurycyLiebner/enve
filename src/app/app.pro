@@ -47,7 +47,6 @@ win32 { # Windows
     GPERFTOOLS_FOLDER = $$THIRD_PARTY_FOLDER/gperftools
     INCLUDEPATH += $$GPERFTOOLS_FOLDER/include
     LIBS += -L$$GPERFTOOLS_FOLDER/.libs -ltcmalloc
-    !macx: LIBS += -lpthread
 }
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -352,22 +351,25 @@ DISTFILES += \
 
 macx {
     MAC_APP_FOLDER = $$sprintf("%1/%2/%3.app", $$OUT_PWD, $$DESTDIR, $$TARGET)
-    MAC_LIB_FOLDER = $$MAC_APP_FOLDER/Contents/MacOS
+    MAC_LIB_FOLDER = $$MAC_APP_FOLDER/Contents/Frameworks
+
+    QMAKE_CLEAN += -r $$MAC_APP_FOLDER
 
     QMAKE_POST_LINK = \
+        mkdir -p $$MAC_LIB_FOLDER && \
         cp -fLR $$OUT_PWD/../core/libenvecore.1.dylib $$MAC_LIB_FOLDER/ && \
         cp -fLR $$LIBMYPAINT_FOLDER/.libs/libmypaint-1.5.1.dylib $$MAC_LIB_FOLDER/ && \
         cp -fLR $$QUAZIP_FOLDER/quazip/libquazip.1.dylib $$MAC_LIB_FOLDER/ && \
         cp -fLR $$QSCINTILLA_FOLDER/libqscintilla2_qt5.15.dylib $$MAC_LIB_FOLDER/ && \
-        install_name_tool -add_rpath @executable_path \
-                          -change libquazip.1.dylib @rpath/libquazip.1.dylib \
-                          -change /usr/local/lib/libmypaint-1.5.1.dylib @rpath/libmypaint-1.5.1.dylib \
+        install_name_tool -change libquazip.1.dylib @loader_path/libquazip.1.dylib \
+                          -change /usr/local/lib/libmypaint-1.5.1.dylib @loader_path/libmypaint-1.5.1.dylib \
                           $$MAC_LIB_FOLDER/libenvecore.1.dylib && \
-        install_name_tool -add_rpath @executable_path \
-                          -change libenvecore.1.dylib @rpath/libenvecore.1.dylib \
+        install_name_tool -change libenvecore.1.dylib @rpath/libenvecore.1.dylib \
                           -change libquazip.1.dylib @rpath/libquazip.1.dylib \
                           -change /usr/local/lib/libmypaint-1.5.1.dylib @rpath/libmypaint-1.5.1.dylib \
                           $$MAC_APP_FOLDER/Contents/MacOS/$$TARGET
 
-    #CONFIG(release, debug|release): QMAKE_POST_LINK += && macdeployqt $$MAC_APP_FOLDER
+    # Wrap all application depdendencies for deployment. Apply -dmg flag for release DMG image.
+    # Use -appstore-compliant flag to workaround the inclusion of OBDC and PostgreSQL plugins.
+    CONFIG(release, debug|release): QMAKE_POST_LINK += && macdeployqt $$MAC_APP_FOLDER -appstore-compliant
 }

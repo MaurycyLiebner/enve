@@ -7,10 +7,10 @@ LIBMYPAINT_FOLDER = $$THIRD_PARTY_FOLDER/libmypaint
 QUAZIP_FOLDER = $$THIRD_PARTY_FOLDER/quazip
 
 INCLUDEPATH += $$SKIA_FOLDER
-QMAKE_CFLAGS_RELEASE += -isystem$$SKIA_FOLDER
+QMAKE_CFLAGS += -isystem $$SKIA_FOLDER
 
 INCLUDEPATH += $$LIBMYPAINT_FOLDER
-LIBS += -L$$LIBMYPAINT_FOLDER/.libs
+LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
 
 INCLUDEPATH += $$QUAZIP_FOLDER
 LIBS += -L$$QUAZIP_FOLDER/quazip -lquazip
@@ -20,8 +20,7 @@ CONFIG(debug, debug|release) {
 } else {
     LIBS += -L$$SKIA_FOLDER/out/Release
 }
-
-LIBS += -lskia -lmypaint
+LIBS += -lskia
 
 win32 { # Windows
     FFMPEG_FOLDER = $$THIRD_PARTY_FOLDER/ffmpeg-4.2.2-win64-dev
@@ -55,6 +54,6 @@ win32 { # Windows
         QMAKE_CXXFLAGS_RELEASE += -m64 -O3
 
         QMAKE_CXXFLAGS += -fopenmp
-        LIBS += -lfreetype -lfontconfig -lpng -ldl -fopenmp# -lX11
+        LIBS += -lpthread -lfontconfig -lfreetype -lpng -ldl -fopenmp# -lX11
     }
 }
