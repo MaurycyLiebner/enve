@@ -5,7 +5,9 @@
 
 #include "blendeffect.h"
 
+CORE_EXPORT
 qsptr<BlendEffect> readIdCreateBlendEffect(eReadStream& src);
+CORE_EXPORT
 void writeBlendEffectType(BlendEffect* const obj, eWriteStream& dst);
 
 typedef DynamicComplexAnimator<

@@ -22,7 +22,9 @@
 class PathBox;
 class PathEffectsTask;
 
+CORE_EXPORT
 qsptr<PathEffect> readIdCreatePathEffect(eReadStream& src);
+CORE_EXPORT
 void writePathEffectType(PathEffect* const obj, eWriteStream& dst);
 
 typedef DynamicComplexAnimator<

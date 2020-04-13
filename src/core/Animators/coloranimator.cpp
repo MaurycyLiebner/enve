@@ -254,6 +254,21 @@ void ColorAnimator::setCurrentAlphaValue(const qreal alpha) {
     mAlphaAnimator->setCurrentBaseValue(alpha);
 }
 
+QJsonObject ColorAnimator::saveColorJSON(JsonExporter &exp,
+                                         const FrameRange &visRange) const {
+    QJsonObject result;
+    const auto idRange = prp_getIdenticalRelRange(visRange.fMin);
+    const int span = exp.fAbsRange.span();
+    if(idRange.inRange(visRange) || span == 1) {
+        const QColor col = getColor();
+        result.insert("a", 0);
+        result.insert("k", JsonExportHelpers::qColorToQJson(col));
+    } else {
+
+    }
+    return result;
+}
+
 void ColorAnimator::saveColorSVG(SvgExporter& exp,
                                  QDomElement& parent,
                                  const FrameRange& visRange,

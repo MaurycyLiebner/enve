@@ -1244,6 +1244,32 @@ void BoundingBox::renderDataFinished(BoxRenderData *renderData) {
 //    }
 //}
 
+eTask* BoundingBox::saveJSONWithTransform(JsonExporter& exp, QJsonObject& parent,
+                                          const FrameRange& parentVisRange) const {
+    return nullptr;
+//    const auto visRange = parentVisRange*prp_absInfluenceRange();
+//    const auto task = enve::make_shared<DomEleTask>(exp, visRange);
+//    exp.addNextTask(task);
+//    const auto taskPtr = task.get();
+//    const QPointer<const BoundingBox> ptr = this;
+//    const auto expPtr = &exp;
+//    const auto parentPtr = &parent;
+//    taskPtr->addDependent({[ptr, taskPtr, expPtr, parentPtr, visRange]() {
+//        auto& ele = taskPtr->element();
+//        if(ptr) {
+//            SvgExportHelpers::assignVisibility(*expPtr, ele, visRange);
+//            const auto transform = ptr->mTransformAnimator.get();
+//            const auto transformed = transform->saveJSON(*expPtr, visRange, ele);
+//            const auto effects = ptr->mRasterEffectsAnimators.get();
+//            const auto withEffects = effects->saveEffectsJSON(*expPtr, visRange, transformed);
+//            parentPtr->appendChild(withEffects);
+//        }
+//    }, nullptr});
+//    saveJSON(exp, taskPtr);
+//    taskPtr->queTask();
+//    return task.get();
+}
+
 eTask* BoundingBox::saveSVGWithTransform(SvgExporter& exp, QDomElement& parent,
                                          const FrameRange& parentVisRange) const {
     const auto visRange = parentVisRange*prp_absInfluenceRange();

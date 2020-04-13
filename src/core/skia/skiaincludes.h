@@ -17,6 +17,8 @@
 #ifndef SKIAINCLUDES_H
 #define SKIAINCLUDES_H
 
+#undef foreach
+
 #include "skiadefines.h"
 
 #include "include/gpu/GrBackendSurface.h"
@@ -53,6 +55,8 @@
 #include "include/gpu/gl/GrGLInterface.h"
 
 #include <QtGui/qopengl.h>
+
+#include "modules/skottie/include/Skottie.h"
 
 #include "src/gpu/gl/GrGLDefines.h"
 

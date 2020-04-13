@@ -27,6 +27,7 @@
 #include "Animators/qcubicsegment1danimator.h"
 #include "BlendEffects/blendeffect.h"
 #include "Tasks/domeletask.h"
+#include "Tasks/jsoneletask.h"
 
 class Canvas;
 
@@ -407,6 +408,8 @@ public:
 
     eTask* saveSVGWithTransform(SvgExporter& exp, QDomElement& parent,
                                 const FrameRange& parentVisRange) const;
+    eTask* saveJSONWithTransform(JsonExporter& exp, QJsonObject& parent,
+                                 const FrameRange& parentVisRange) const;
 private:
     void cancelWaitingTasks();
     void afterTotalTransformChanged(const UpdateReason reason);

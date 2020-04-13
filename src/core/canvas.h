@@ -158,6 +158,7 @@ public:
     void prp_afterChangedAbsRange(const FrameRange &range,
                                   const bool clip = true);
 
+    void saveSceneJSON(JsonExporter& exp) const;
     void saveSceneSVG(SvgExporter& exp) const;
 
     void selectOnlyLastPressedBox();

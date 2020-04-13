@@ -20,22 +20,23 @@ CONFIG(debug, debug|release) {
 } else {
     LIBS += -L$$SKIA_FOLDER/out/Release
 }
-LIBS += -lskia
+LIBS += -lskia -lskottie -lsksg -lskshaper
 
 win32 { # Windows
     FFMPEG_FOLDER = $$THIRD_PARTY_FOLDER/ffmpeg-4.2.2-win64-dev
     LIBS += -L$$FFMPEG_FOLDER/lib
     INCLUDEPATH += $$FFMPEG_FOLDER/include
 
-    INCLUDEPATH += $$THIRD_PARTY_FOLDER/zlib/src
-    LIBS += -L$$THIRD_PARTY_FOLDER/zlib -lzlib
+    INCLUDEPATH += $$[QT_INSTALL_HEADERS]/QtZlib
 
     QMAKE_CFLAGS_RELEASE += /O2 -O2 /GL
-    QMAKE_LFLAGS_RELEASE += /LTCG
     QMAKE_CXXFLAGS_RELEASE += /O2 -O2 /GL
 
     QMAKE_CFLAGS += -openmp
     QMAKE_CXXFLAGS += -openmp
+
+    LIBS += -L"C:\Program Files\LLVM\lib" -llibomp
+    LIBS += -L"C:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x64" -luser32 -lopengl32
 
     CONFIG -= debug_and_release
 } unix {

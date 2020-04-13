@@ -169,6 +169,10 @@ void SkiaHelpers::forceLink() {
 
     FORCE_UNDEFINED_SYMBOL(SkTextUtils::GetPath, 0)
     FORCE_UNDEFINED_SYMBOL(SkOpBuilder::add, 1)
+    FORCE_UNDEFINED_SYMBOL(skottie::Logger::log, 2)
+    FORCE_UNDEFINED_SYMBOL(skottie::Animation::seekFrame, 3)
+    FORCE_UNDEFINED_SYMBOL(skottie::Animation::Builder::setLogger, 4)
+
     GrContext::MakeGL();
     GrGLMakeNativeInterface()->validate();
 }

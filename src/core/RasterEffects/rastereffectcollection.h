@@ -24,7 +24,9 @@
 class BoundingBox;
 struct BoxRenderData;
 
+CORE_EXPORT
 qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream& src);
+CORE_EXPORT
 void writeRasterEffectType(RasterEffect* const obj, eWriteStream& dst);
 
 typedef DynamicComplexAnimator<

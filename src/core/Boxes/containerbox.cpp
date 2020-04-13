@@ -127,6 +127,52 @@ OutlineSettingsAnimator *ContainerBox::getStrokeSettings() const {
     return mContainedBoxes.last()->getStrokeSettings();
 }
 
+class GroupSaverJSON : public ComplexTask {
+public:
+    GroupSaverJSON(const ContainerBox* const src, JsonExporter& exp,
+                   QJsonObject& ele, const FrameRange& visRange) :
+        ComplexTask(src->getContainedBoxesCount(),
+                    "SVG " + src->prp_getName()),
+        mSrc(src), mExp(exp), mEle(ele), mVisRange(visRange) {}
+
+    void nextStep() override {
+        if(!mSrc) return cancel();
+        if(setValue(mI)) return;
+        if(done()) return;
+
+        const auto& boxes = mSrc->getContainedBoxes();
+        const int id = boxes.count() - ++mI;
+        if(id >= boxes.count()) return finish();
+        const auto& box = boxes.at(id);
+        if(!box->isVisible()) return nextStep();
+        const auto task = box->saveJSONWithTransform(mExp, mEle, mVisRange);
+        if(task) {
+            addTask(task->ref<eTask>());
+        } else {
+            addEmptyTask();
+        }
+    }
+private:
+    const QPointer<const ContainerBox> mSrc;
+    JsonExporter& mExp;
+    QJsonObject& mEle;
+    const FrameRange mVisRange;
+
+    int mI = 0;
+};
+
+void ContainerBox::saveBoxesJSON(JsonExporter& exp,
+                                 JsonEleTask* const eleTask,
+                                 QJsonObject& ele) const {
+    const auto task = new GroupSaverJSON(this, exp, ele, eleTask->visRange());
+    const auto taskSPtr = qsptr<GroupSaverJSON>(task, &QObject::deleteLater);
+    task->nextStep();
+
+    if(task->done()) return;
+    TaskScheduler::instance()->addComplexTask(taskSPtr);
+    task->addDependent(eleTask);
+}
+
 class GroupSaverSVG : public ComplexTask {
 public:
     GroupSaverSVG(const ContainerBox* const src, SvgExporter& exp,

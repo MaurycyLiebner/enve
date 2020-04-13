@@ -79,6 +79,8 @@ public:
         return mAlphaAnimator.get();
     }
 
+    QJsonObject saveColorJSON(JsonExporter& exp,
+                              const FrameRange& visRange) const;
     void saveColorSVG(SvgExporter& exp,
                       QDomElement& parent,
                       const FrameRange& visRange,
