@@ -215,10 +215,6 @@ signals:
     void anim_removedKey(Key* key, QPrivateSignal);
     void anim_addedKey(Key* key, QPrivateSignal);
 private:
-    void anim_drawKey(QPainter * const p, Key * const key,
-                      const qreal pixelsPerFrame,
-                      const int startFrame,
-                      const int rowHeight);
     void removeKeyWithoutDeselecting(const stdsptr<Key> &keyToRemove);
     void anim_updateKeyOnCurrrentFrame();
     void anim_setKeyOnCurrentFrame(Key * const key);

@@ -528,20 +528,53 @@ void Animator::anim_saveCurrentValueAsKey() {
     anim_addKeyAtRelFrame(anim_getCurrentRelFrame());
 }
 
-void Animator::anim_drawKey(QPainter * const p,
-                            Key * const key,
-                            const qreal pixelsPerFrame,
-                            const int startFrame,
-                            const int rowHeight) {
-    if(key->isSelected()) p->setBrush(Qt::yellow);
-    else p->setBrush(Qt::red);
+enum class KeyFrameType {
+    object, propertyGroup, property
+};
+
+void anim_drawKey(QPainter * const p,
+                  Key * const key,
+                  const qreal pixelsPerFrame,
+                  const int startFrame,
+                  const int rowHeight,
+                  const KeyFrameType type) {
+    QColor color;
+    if(key->isSelected()) color = Qt::yellow;
+    else {
+        switch(type) {
+        case KeyFrameType::object:
+            color = QColor(0, 125, 255);
+            break;
+        case KeyFrameType::propertyGroup:
+            color = QColor(0, 255, 0);
+            break;
+        case KeyFrameType::property:
+            color = QColor(255, 0, 0);
+            break;
+        }
+    }
+    p->setBrush(color);
+
     if(key->isHovered()) p->setPen(QPen(Qt::black, 1.5));
     else p->setPen(QPen(Qt::black, 0.5));
-    const qreal keyRadius = rowHeight * (toComplexAnimator() ? 0.21 : 0.3);
+
+    qreal radMult;
+    if(type == KeyFrameType::object) radMult = 0.3;
+    else radMult = 0.21;
+    const qreal keyRadius = rowHeight * radMult;
+
     const int frameRelToStart = key->getRelFrame() - startFrame;
     const QPointF keyCenter((frameRelToStart + 0.5)*pixelsPerFrame,
                             0.5*rowHeight);
-    p->drawEllipse(keyCenter, keyRadius, keyRadius);
+    switch(type) {
+    case KeyFrameType::property: {
+        const QPointF tl = keyCenter + QPointF(-keyRadius, -keyRadius);
+        p->drawRect(QRectF(tl, QSizeF(2*keyRadius, 2*keyRadius)));
+    } break;
+    default: {
+        p->drawEllipse(keyCenter, keyRadius, keyRadius);
+    }
+    }
 }
 
 void Animator::prp_drawTimelineControls(
@@ -550,11 +583,14 @@ void Animator::prp_drawTimelineControls(
     p->translate(prp_getTotalFrameShift()*pixelsPerFrame, 0);
     const auto relRange = prp_absRangeToRelRange(absFrameRange);
     const auto idRange = anim_frameRangeToKeyIdRange(relRange);
+    KeyFrameType type;
+    if(toBoundingBox()) type = KeyFrameType::object;
+    else if(toComplexAnimator()) type = KeyFrameType::propertyGroup;
+    else type = KeyFrameType::property;
     for(int i = idRange.fMin; i <= idRange.fMax; i++) {
         if(i < 0 || i >= anim_mKeys.count()) continue;
         const auto& key = anim_mKeys.atId(i);
-        anim_drawKey(p, key, pixelsPerFrame,
-                     absFrameRange.fMin, rowHeight);
+        anim_drawKey(p, key, pixelsPerFrame, absFrameRange.fMin, rowHeight, type);
     }
 }
 
