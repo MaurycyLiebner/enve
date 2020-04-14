@@ -44,7 +44,7 @@ protected:
 
     T getValueAtRelFrameK(const qreal frame,
                           const K * const prevKey,
-                          const K * const nextKey) const {
+                          const K * const nextKey) const override {
         T result;
         const qreal prevFrame = prevKey->getRelFrame();
         const qreal nextFrame = nextKey->getRelFrame();
