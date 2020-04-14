@@ -252,12 +252,12 @@ protected:
 public:
     qsptr<T> createDuplicate(T* const src) override {
         Clipboard clipboard(ClipboardType::property);
-        clipboard.write([this, src](eWriteStream& dst) {
+        clipboard.write([src](eWriteStream& dst) {
             TWriteType(src, dst);
             src->prp_writeProperty(dst);
         });
         qsptr<T> duplicate;
-        clipboard.read([this, &duplicate](eReadStream& src) {
+        clipboard.read([&duplicate](eReadStream& src) {
             duplicate = TReadTypeAndCreate(src);
             duplicate->prp_readProperty(src);
         });
