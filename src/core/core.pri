@@ -55,6 +55,6 @@ win32 { # Windows
         QMAKE_CXXFLAGS_RELEASE += -m64 -O3
 
         QMAKE_CXXFLAGS += -fopenmp
-        LIBS += -lpthread -lfontconfig -lfreetype -lpng -ldl -fopenmp# -lX11
+        LIBS += -lpthread -lfontconfig -lfreetype -lpng -ldl -fopenmp -licuuc
     }
 }
