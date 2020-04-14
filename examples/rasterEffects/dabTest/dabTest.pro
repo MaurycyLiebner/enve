@@ -24,6 +24,7 @@ VERSION = 0.0.0
 
 QT += core qml xml
 CONFIG += c++14
+
 ENVE_FOLDER = $$PWD/../../..
 
 INCLUDEPATH += $$ENVE_FOLDER/include
@@ -34,26 +35,27 @@ INCLUDEPATH += $$SKIA_FOLDER
 DEPENDPATH += $$SKIA_FOLDER
 
 CONFIG(debug, debug|release) {
-    win32 { # Windows
-        LIBS += -L$$SKIA_FOLDER/out/Debug -lskia
-    }
+    LIBS += -L$$SKIA_FOLDER/out/Debug
 } else {
-    win32 { # Windows
-        LIBS += -L$$SKIA_FOLDER/out/Release -lskia
-        QMAKE_CFLAGS_RELEASE += /O2 -O2
-        QMAKE_CXXFLAGS_RELEASE += /O2 -O2
-    } unix {
-        macx { # Mac OS X
+    LIBS += -L$$SKIA_FOLDER/out/Release
+}
+LIBS += -lskia
 
-        } else { # Linux
-            QMAKE_CFLAGS -= -O2
-            QMAKE_CFLAGS -= -O1
-            QMAKE_CXXFLAGS -= -O2
-            QMAKE_CXXFLAGS -= -O1
-            QMAKE_CFLAGS = -m64 -O3
-            QMAKE_LFLAGS = -m64 -O3
-            QMAKE_CXXFLAGS = -m64 -O3
-        }
+win32 { # Windows
+    LIBS += -luser32
+
+    QMAKE_CFLAGS_RELEASE += /O2 -O2
+    QMAKE_CXXFLAGS_RELEASE += /O2 -O2
+} unix {
+    macx { # Mac OS X
+    } else { # Linux
+        QMAKE_CFLAGS_RELEASE -= -O2
+        QMAKE_CFLAGS_RELEASE -= -O1
+        QMAKE_CXXFLAGS_RELEASE -= -O2
+        QMAKE_CXXFLAGS_RELEASE -= -O1
+        QMAKE_CFLAGS_RELEASE = -m64 -O3
+        QMAKE_LFLAGS_RELEASE = -m64 -O3
+        QMAKE_CXXFLAGS_RELEASE = -m64 -O3
     }
 }
 
