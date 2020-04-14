@@ -119,7 +119,7 @@ void IconLoader::generateAll(const int minWidgetDim, const int buttonDim) {
         const QImage img(path);
         int targetWidth = qCeil(img.width()*minWidgetDim/22.);
         if(qAbs(targetWidth - img.width()) % 2 == 1) targetWidth--;
-        const auto scaled = img.scaledToWidth(targetWidth);
+        const auto scaled = img.scaledToWidth(targetWidth, Qt::TransformationMode::SmoothTransformation);
         scaled.save(iconsDir.filePath(QString::number(minWidgetDim) + "/" + fileName));
     }
 
