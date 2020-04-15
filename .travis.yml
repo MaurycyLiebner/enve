@@ -9,6 +9,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - 'llvm-toolchain-xenial-7'
             - sourceline: 'ppa:jonathonf/ffmpeg-4'
           packages:
             - clang-7 g++-7
