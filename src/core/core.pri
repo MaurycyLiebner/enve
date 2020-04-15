@@ -20,7 +20,7 @@ CONFIG(debug, debug|release) {
 } else {
     LIBS += -L$$SKIA_FOLDER/out/Release
 }
-LIBS += -lskia -lskottie -lsksg -lskshaper
+LIBS += -lskia
 
 win32 { # Windows
     FFMPEG_FOLDER = $$THIRD_PARTY_FOLDER/ffmpeg-4.2.2-win64-dev

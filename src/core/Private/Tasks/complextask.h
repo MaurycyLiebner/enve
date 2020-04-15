@@ -19,7 +19,7 @@
 
 #include <QObject>
 
-#include "Tasks/updatable.h"
+#include "../../Tasks/updatable.h"
 
 class CORE_EXPORT ComplexTask : public QObject, public eTaskBase {
     Q_OBJECT

@@ -31,13 +31,13 @@
 #include <QMenuBar>
 #include <QLabel>
 
-class SkottieLogger : public skottie::Logger {
-public:
-    void log(skottie::Logger::Level lvl, const char message[], const char json[]) override {
-        Q_UNUSED(lvl);
-        qDebug() << message << json;
-    }
-};
+//class SkottieLogger : public skottie::Logger {
+//public:
+//    void log(skottie::Logger::Level lvl, const char message[], const char json[]) override {
+//        Q_UNUSED(lvl);
+//        qDebug() << message << json;
+//    }
+//};
 
 class JsonPreview : public QLabel {
 public:
@@ -66,13 +66,13 @@ public:
 //            auto rp = skresources::CachingResourceProvider::Make(
 //                        skresources::DataURIResourceProviderProxy::Make(
 //                            skresources::FileResourceProvider::Make(skDirName, true), true));
-            auto logger = sk_make_sp<SkottieLogger>();
+//            auto logger = sk_make_sp<SkottieLogger>();
             QTextStream stream(&file);
             const auto data = stream.readAll();
             const auto stdData = data.toStdString();
             const auto stdFilename = filename.toStdString();
             mAnim = skottie::Animation::Builder()
-                    .setLogger(logger)
+//                    .setLogger(logger)
 //                    .setResourceProvider(rp)
                     .makeFromFile(stdFilename.data());
             if(mAnim) {

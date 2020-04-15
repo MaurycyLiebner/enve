@@ -17,7 +17,7 @@
 #ifndef ETASKBASE_H
 #define ETASKBASE_H
 
-#include "smartPointers/ememory.h"
+#include "../smartPointers/ememory.h"
 
 enum class eTaskState {
     created,

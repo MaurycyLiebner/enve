@@ -27,8 +27,11 @@ LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample
 CONFIG += c++14
 DEFINES += QT_NO_FOREACH
 
+LIBS += -lskottie -lsksg -lskshaper
+
 # Include third-party dependencies from core
 include(../core/core.pri)
+
 ENVE_CORE_FOLDER = ../core
 QSCINTILLA_FOLDER = $$THIRD_PARTY_FOLDER/qscintilla/Qt4Qt5
 

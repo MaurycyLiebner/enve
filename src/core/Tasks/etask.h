@@ -17,9 +17,9 @@
 #ifndef ETASK_H
 #define ETASK_H
 
-#include "glhelpers.h"
-#include "hardwareenums.h"
-#include "switchablecontext.h"
+#include "../glhelpers.h"
+#include "../hardwareenums.h"
+#include "../switchablecontext.h"
 #include "../ReadWrite/basicreadwrite.h"
 #include "etaskbase.h"
 
