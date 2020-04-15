@@ -32,17 +32,17 @@ qreal textLineX(const Qt::Alignment &alignment,
 }
 
 qreal horizontalAdvance(const SkFont& font, const QString& str) {
-    const SkScalar result = font.measureText(str.toUtf8().data(),
-                                             static_cast<size_t>(str.length()),
-                                             SkTextEncoding::kUTF8);
+    const SkScalar result = font.measureText(str.utf16(),
+                                             str.size()*sizeof(short),
+                                             SkTextEncoding::kUTF16);
     return static_cast<qreal>(result);
 }
 
 qreal horizontalAdvance(const SkFont& font, const QString& str,
                         const qreal letterSpacing) {
-    SkScalar result = font.measureText(str.toUtf8().data(),
-                                       static_cast<size_t>(str.length()),
-                                       SkTextEncoding::kUTF8);
+    SkScalar result = font.measureText(str.utf16(),
+                                       str.size()*sizeof(short),
+                                       SkTextEncoding::kUTF16);
     const qreal fontSize = static_cast<qreal>(font.getSize());
     result += static_cast<SkScalar>(fontSize*letterSpacing*str.length());
     return static_cast<qreal>(result);
@@ -50,14 +50,15 @@ qreal horizontalAdvance(const SkFont& font, const QString& str,
 
 qreal horizontalAdvance(const SkFont& font, const QString& str,
                         const qreal letterSpacing, const qreal wordSpacing) {
-    SkScalar result = font.measureText(str.toUtf8().data(),
-                                       static_cast<size_t>(str.length()),
-                                       SkTextEncoding::kUTF8);
+    SkScalar result = font.measureText(str.utf16(),
+                                       str.size()*sizeof(short),
+                                       SkTextEncoding::kUTF16);
     const qreal fontSize = static_cast<qreal>(font.getSize());
     const int nSpaces = str.count(" ");
     if(nSpaces > 0) {
+        const char spaceChar = ' ';
         const SkScalar space = font.measureText(
-                    " ", static_cast<size_t>(1),
+                    &spaceChar, sizeof(char),
                     SkTextEncoding::kUTF8);
         result += nSpaces*space*static_cast<SkScalar>(wordSpacing - 1);
     }
@@ -96,9 +97,9 @@ void LetterRenderData::initialize(const qreal relFrame,
     parent->setupPaintSettings(this, relFrame);
     parent->setupStrokerSettings(this, relFrame);
     SkPath textPath;
-    SkTextUtils::GetPath(letter.toUtf8().data(),
-                         static_cast<size_t>(letter.length()),
-                         SkTextEncoding::kUTF8,
+    SkTextUtils::GetPath(letter.utf16(),
+                         letter.size()*sizeof(short),
+                         SkTextEncoding::kUTF16,
                          toSkScalar(pos.x()),
                          toSkScalar(pos.y()),
                          font, &textPath);

@@ -266,9 +266,9 @@ SkPath TextBox::getRelativePath(const qreal relFrame) const {
         const qreal lineY = i*lineInc + yTranslate;
         if(isZero4Dec(letterSpacing) && isOne4Dec(wordSpacing)) {
             SkPath linePath;
-            SkTextUtils::GetPath(line.toUtf8().data(),
-                                 static_cast<size_t>(line.length()),
-                                 SkTextEncoding::kUTF8,
+            SkTextUtils::GetPath(line.utf16(),
+                                 line.size()*sizeof(short),
+                                 SkTextEncoding::kUTF16,
                                  toSkScalar(lineX), toSkScalar(lineY),
                                  font, &linePath);
             result.addPath(linePath);
@@ -280,9 +280,9 @@ SkPath TextBox::getRelativePath(const qreal relFrame) const {
             [&result, &xPos, lineY, &line, &font](const int i0, const int i) {
                 const QString wordStr = line.mid(i0, i - i0 + 1);
                 SkPath wordPath;
-                SkTextUtils::GetPath(wordStr.toUtf8().data(),
-                                     static_cast<size_t>(wordStr.length()),
-                                     SkTextEncoding::kUTF8,
+                SkTextUtils::GetPath(wordStr.utf16(),
+                                     wordStr.size()*sizeof(short),
+                                     SkTextEncoding::kUTF16,
                                      toSkScalar(xPos), toSkScalar(lineY),
                                      font, &wordPath);
                 result.addPath(wordPath);
@@ -314,9 +314,9 @@ SkPath TextBox::getRelativePath(const qreal relFrame) const {
                 }
                 const QString letter = line.mid(i, 1);
                 SkPath letterPath;
-                SkTextUtils::GetPath(letter.toUtf8().data(),
-                                     static_cast<size_t>(letter.length()),
-                                     SkTextEncoding::kUTF8,
+                SkTextUtils::GetPath(letter.utf16(),
+                                     letter.size()*sizeof(short),
+                                     SkTextEncoding::kUTF16,
                                      toSkScalar(xPos), toSkScalar(lineY),
                                      font, &letterPath);
                 result.addPath(letterPath);
