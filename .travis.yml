@@ -41,7 +41,7 @@ matrix:
       addons:
         homebrew:
           packages:
-            - ninja json-c intltool pkg-config gettext ffmpeg p7zip ccache
+            - ninja json-c intltool pkg-config gettext ffmpeg qt
       env:
         - MATRIX_EVAL="CC=clang && CXX=clang++"
         - QT_INSTALL_DIR=~/Qt
@@ -57,14 +57,6 @@ cache:
         - $TRAVIS_CACHE_DIR
 before_install:
     - eval "${MATRIX_EVAL}"
-    - wget https://raw.githubusercontent.com/qbs/qbs/master/scripts/install-qt.sh
-    - chmod +x install-qt.sh
-    - |
-      if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-          ./install-qt.sh -d ${QT_INSTALL_DIR} --version ${QT_VERSION} qtbase qttools qtsvg qtmultimedia qtdeclarative qtwebengine qtwebchannel qtwebview qtlocation qtserialport icu
-      elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-          ./install-qt.sh -d ${QT_INSTALL_DIR} --version ${QT_VERSION} qtbase qttools qtsvg qtmultimedia qtdeclarative qtwebengine qtwebchannel qtwebview qtlocation qtserialport
-      fi
 install:
     - |
       if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
