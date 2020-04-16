@@ -43,6 +43,8 @@ public:
             const AnimationBox* const src,
             int& firstAbsFrame, int& lastAbsFrame,
             int& increment, QWidget* const parent) const = 0;
+    virtual void showSceneSettingsDialog(
+            Canvas* const scene, QWidget* const parent) const = 0;
 };
 
 #endif // DIALOGSINTERFACE_H

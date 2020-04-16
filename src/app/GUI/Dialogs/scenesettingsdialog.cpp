@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "newcanvasdialog.h"
+#include "scenesettingsdialog.h"
 #include "canvas.h"
 #include "GUI/coloranimatorbutton.h"
 
-CanvasSettingsDialog::CanvasSettingsDialog(Canvas * const canvas,
+SceneSettingsDialog::SceneSettingsDialog(Canvas * const canvas,
                                            QWidget * const parent) :
-    CanvasSettingsDialog(canvas->prp_getName(),
+    SceneSettingsDialog(canvas->prp_getName(),
                          canvas->getCanvasWidth(),
                          canvas->getCanvasHeight(),
                          canvas->getFrameRange(),
@@ -30,11 +30,11 @@ CanvasSettingsDialog::CanvasSettingsDialog(Canvas * const canvas,
     mTargetCanvas = canvas;
 }
 
-CanvasSettingsDialog::CanvasSettingsDialog(const QString &defName,
+SceneSettingsDialog::SceneSettingsDialog(const QString &defName,
                                            QWidget * const parent) :
-    CanvasSettingsDialog(defName, 1920, 1080, {0, 200}, 24., nullptr, parent) {}
+    SceneSettingsDialog(defName, 1920, 1080, {0, 200}, 24., nullptr, parent) {}
 
-CanvasSettingsDialog::CanvasSettingsDialog(const QString &name,
+SceneSettingsDialog::SceneSettingsDialog(const QString &name,
                                            const int width,
                                            const int height,
                                            const FrameRange& range,
@@ -52,7 +52,7 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &name,
     mNameEditLabel = new QLabel("Name: ", this);
     mNameEdit = new QLineEdit(name, this);
     connect(mNameEdit, &QLineEdit::textChanged,
-            this, &CanvasSettingsDialog::validate);
+            this, &SceneSettingsDialog::validate);
     mNameLayout->addWidget(mNameEditLabel);
     mNameLayout->addWidget(mNameEdit);
     mMainLayout->addLayout(mNameLayout);
@@ -121,15 +121,15 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &name,
     mButtonsLayout->addWidget(mCancelButton);
 
     connect(mOkButton, &QPushButton::released,
-            this, &CanvasSettingsDialog::accept);
+            this, &SceneSettingsDialog::accept);
     connect(mCancelButton, &QPushButton::released,
-            this, &CanvasSettingsDialog::reject);
+            this, &SceneSettingsDialog::reject);
     connect(this, &QDialog::rejected, this, &QDialog::close);
 
     validate();
 }
 
-bool CanvasSettingsDialog::validate() {
+bool SceneSettingsDialog::validate() {
     QString nameError;
     const bool validName = Property::prp_sValidateName(
                 mNameEdit->text(), &nameError);
@@ -140,29 +140,29 @@ bool CanvasSettingsDialog::validate() {
     return valid;
 }
 
-int CanvasSettingsDialog::getCanvasWidth() const {
+int SceneSettingsDialog::getCanvasWidth() const {
     return mWidthSpinBox->value();
 }
 
-int CanvasSettingsDialog::getCanvasHeight() const {
+int SceneSettingsDialog::getCanvasHeight() const {
     return mHeightSpinBox->value();
 }
 
-QString CanvasSettingsDialog::getCanvasName() const {
+QString SceneSettingsDialog::getCanvasName() const {
     return mNameEdit->text();
 }
 
-FrameRange CanvasSettingsDialog::getFrameRange() const {
+FrameRange SceneSettingsDialog::getFrameRange() const {
     FrameRange range = {mMinFrameSpin->value(), mMaxFrameSpin->value()};
     range.fixOrder();
     return range;
 }
 
-qreal CanvasSettingsDialog::getFps() const {
+qreal SceneSettingsDialog::getFps() const {
     return mFPSSpinBox->value();
 }
 
-void CanvasSettingsDialog::applySettingsToCanvas(Canvas * const canvas) const {
+void SceneSettingsDialog::applySettingsToCanvas(Canvas * const canvas) const {
     if(!canvas) return;
     canvas->prp_setNameAction(getCanvasName());
     canvas->setCanvasSize(getCanvasWidth(), getCanvasHeight());
@@ -174,12 +174,13 @@ void CanvasSettingsDialog::applySettingsToCanvas(Canvas * const canvas) const {
 }
 
 #include "Private/document.h"
-void CanvasSettingsDialog::sNewCanvasDialog(Document& document,
-                                            QWidget * const parent) {
+void SceneSettingsDialog::sNewSceneDialog(Document& document,
+                                          QWidget * const parent) {
     const QString defName = "Scene " +
             QString::number(document.fScenes.count());
 
-    const auto dialog = new CanvasSettingsDialog(defName, parent);
+    const auto dialog = new SceneSettingsDialog(defName, parent);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
     const auto docPtr = &document;
     connect(dialog, &QDialog::accepted, dialog, [dialog, docPtr]() {
         const auto newCanvas = docPtr->createNewScene();

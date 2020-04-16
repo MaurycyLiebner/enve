@@ -28,8 +28,7 @@
 #include "GUI/Dialogs/durationrectsettingsdialog.h"
 #include "GUI/Dialogs/animationtopaintdialog.h"
 #include "GUI/Dialogs/applyexpressiondialog.h"
-
-DialogsInterfaceImpl DialogsInterfaceImpl::sInstance;
+#include "GUI/Dialogs/scenesettingsdialog.h"
 
 class ShaderChoiceDialog : public QDialog {
 public:
@@ -105,4 +104,15 @@ bool DialogsInterfaceImpl::execAnimationToPaint(
         int& increment, QWidget* const parent) const {
     return AnimationToPaintDialog::sExec(src, firstAbsFrame, lastAbsFrame,
                                          increment, parent);
+}
+
+void DialogsInterfaceImpl::showSceneSettingsDialog(
+        Canvas* const scene, QWidget* const parent) const {
+    const auto dialog = new SceneSettingsDialog(scene, parent);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    QObject::connect(dialog, &QDialog::accepted, scene, [scene, dialog]() {
+        dialog->applySettingsToCanvas(scene);
+        dialog->close();
+    });
+    dialog->show();
 }

@@ -14,8 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef NEWCANVASDIALOG_H
-#define NEWCANVASDIALOG_H
+#ifndef SCENESETTINGSDIALOG_H
+#define SCENESETTINGSDIALOG_H
+
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QPushButton>
@@ -30,13 +31,13 @@ class Canvas;
 class ColorAnimator;
 class ColorAnimatorButton;
 
-class CORE_EXPORT CanvasSettingsDialog : public QDialog {
+class SceneSettingsDialog : public QDialog {
 public:
-    CanvasSettingsDialog(Canvas * const canvas,
+    SceneSettingsDialog(Canvas * const canvas,
                          QWidget * const parent = nullptr);
-    CanvasSettingsDialog(const QString &defName,
+    SceneSettingsDialog(const QString &defName,
                          QWidget * const parent = nullptr);
-    CanvasSettingsDialog(const QString &name,
+    SceneSettingsDialog(const QString &name,
                          const int width,
                          const int height,
                          const FrameRange &range,
@@ -52,7 +53,7 @@ public:
 
     void applySettingsToCanvas(Canvas * const canvas) const;
 
-    static void sNewCanvasDialog(Document &document, QWidget * const parent);
+    static void sNewSceneDialog(Document &document, QWidget * const parent);
 private:
     bool validate();
 
@@ -90,4 +91,4 @@ private:
     QHBoxLayout *mButtonsLayout;
 };
 
-#endif // NEWCANVASDIALOG_H
+#endif // SCENESETTINGSDIALOG_H

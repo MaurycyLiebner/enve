@@ -51,7 +51,7 @@
 #include "GUI/BrushWidgets/brushselectionwidget.h"
 #include "Animators/gradient.h"
 #include "GUI/GradientWidgets/gradientwidget.h"
-#include "GUI/newcanvasdialog.h"
+#include "GUI/Dialogs/scenesettingsdialog.h"
 #include "ShaderEffects/shadereffectprogram.h"
 #include "importhandler.h"
 #include "envesplash.h"
@@ -555,7 +555,7 @@ void MainWindow::setupMenuBar() {
     mSceneMenu = mMenuBar->addMenu(tr("Scene", "MenuBar"));
 
     mSceneMenu->addAction(tr("New Scene...", "MenuBar_Scene"), this, [this]() {
-        CanvasSettingsDialog::sNewCanvasDialog(mDocument, this);
+        SceneSettingsDialog::sNewSceneDialog(mDocument, this);
     });
 
     {
@@ -757,7 +757,7 @@ void MainWindow::setupMenuBar() {
 void MainWindow::openWelcomeDialog() {
     if(mWelcomeDialog) return;
     mWelcomeDialog = new WelcomeDialog(getRecentFiles(),
-       [this]() { CanvasSettingsDialog::sNewCanvasDialog(mDocument, this); },
+       [this]() { SceneSettingsDialog::sNewSceneDialog(mDocument, this); },
        []() { MainWindow::sGetInstance()->openFile(); },
        [](QString path) { MainWindow::sGetInstance()->openFile(path); },
        this);
@@ -1140,7 +1140,7 @@ void MainWindow::enable() {
 void MainWindow::newFile() {
     if(askForSaving()) {
         closeProject();
-        CanvasSettingsDialog::sNewCanvasDialog(mDocument, this);
+        SceneSettingsDialog::sNewSceneDialog(mDocument, this);
     }
 }
 

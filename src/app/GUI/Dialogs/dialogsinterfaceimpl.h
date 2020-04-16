@@ -32,8 +32,8 @@ public:
     bool execAnimationToPaint(const AnimationBox* const src,
                               int& firstAbsFrame, int& lastAbsFrame,
                               int& increment, QWidget* const parent) const;
-private:
-    static DialogsInterfaceImpl sInstance;
+    void showSceneSettingsDialog(
+            Canvas* const scene, QWidget* const parent) const;
 };
 
 #endif // DIALOGSINTERFACEIMPL_H

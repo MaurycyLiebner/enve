@@ -24,7 +24,6 @@
 #include "Sound/soundcomposition.h"
 #include "GUI/global.h"
 #include "renderinstancesettings.h"
-#include "GUI/newcanvasdialog.h"
 #include "svgimporter.h"
 #include "filesourcescache.h"
 #include "videoencoder.h"
@@ -308,16 +307,6 @@ void CanvasWindow::KFT_setFocusToWidget() {
     if(mCurrentCanvas) mDocument.setActiveScene(mCurrentCanvas);
     setFocus();
     update();
-}
-
-void CanvasWindow::openSettingsWindowForCurrentCanvas() {
-    if(!mCurrentCanvas) return;
-    const auto dialog = new CanvasSettingsDialog(mCurrentCanvas, this);
-    connect(dialog, &QDialog::accepted, this, [dialog, this]() {
-        dialog->applySettingsToCanvas(mCurrentCanvas);
-        dialog->close();
-    });
-    dialog->show();
 }
 
 void CanvasWindow::writeState(eWriteStream &dst) const {

@@ -77,8 +77,6 @@ public:
     void releaseMouse();
     bool isMouseGrabber();
 
-    void openSettingsWindowForCurrentCanvas();
-
     void writeState(eWriteStream& dst) const;
     void readState(eReadStream& src);
 protected:

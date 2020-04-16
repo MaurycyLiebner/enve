@@ -70,6 +70,7 @@ SOURCES += main.cpp\
     GUI/Dialogs/durationrectsettingsdialog.cpp \
     GUI/Dialogs/exportjsondialog.cpp \
     GUI/Dialogs/exportsvgdialog.cpp \
+    GUI/Dialogs/scenesettingsdialog.cpp \
     GUI/Expressions/expressiondialog.cpp \
     GUI/Expressions/expressioneditor.cpp \
     GUI/Expressions/expressionhighlighter.cpp \
@@ -194,6 +195,7 @@ HEADERS  += \
     GUI/Dialogs/durationrectsettingsdialog.h \
     GUI/Dialogs/exportjsondialog.h \
     GUI/Dialogs/exportsvgdialog.h \
+    GUI/Dialogs/scenesettingsdialog.h \
     GUI/Expressions/expressiondialog.h \
     GUI/Expressions/expressioneditor.h \
     GUI/Expressions/expressionhighlighter.h \

@@ -17,7 +17,7 @@
 #include "canvas.h"
 
 #include "Private/document.h"
-#include "GUI/newcanvasdialog.h"
+#include "GUI/dialogsinterface.h"
 
 #include "Boxes/circle.h"
 #include "Boxes/rectangle.h"
@@ -90,12 +90,8 @@ void Canvas::addActionsToMenu(QMenu *const menu) {
     });
 
     menu->addAction("Settings...", [this, parentWidget]() {
-        const auto dialog = new CanvasSettingsDialog(this, parentWidget);
-        connect(dialog, &QDialog::accepted, this, [this, dialog]() {
-            dialog->applySettingsToCanvas(this);
-            dialog->close();
-        });
-        dialog->show();
+        const auto& dialogs = DialogsInterface::instance();
+        dialogs.showSceneSettingsDialog(this, parentWidget);
     });
 }
 
