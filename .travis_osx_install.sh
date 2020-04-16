@@ -26,6 +26,10 @@ fi
 # build libmypaint
 cd libmypaint
 brew link gettext --force
+ACLOCAL_FLAGS="-I/usr/local/opt/gettext/share/aclocal $ACLOCAL_FLAGS"
+LDFLAGS="-L/usr/local/opt/gettext/lib $LDFLAGS"
+CPPFLAGS="-I/usr/local/opt/gettext/include $CPPFLAGS"
+PATH="/usr/local/opt/gettext/bin:$PATH"
 ./autogen.sh
 ./configure --enable-openmp --prefix=/usr/local
 make
@@ -34,7 +38,11 @@ cd ..
 
 # build quazip
 cd quazip/quazip
-qmake quazip.pro -spec macx-clang CONFIG+=release CONFIG+=x86_64 INCLUDEPATH+=$$[QT_INSTALL_HEADERS]/QtZlib
+# Explicitly add zlib to path upon build, as Homebrew zlib is keg-only.
+# Do not `brew link zlib` as it might conflict with the stock version shipped with macOS.
+LDFLAGS="-L/usr/local/opt/zlib/lib $LDFLAGS"
+CPPFLAGS="-I/usr/local/opt/zlib/include $CPPFLAGS"
+qmake quazip.pro -spec macx-clang CONFIG+=release CONFIG+=x86_64 LIBS+=-lz
 make -j 2
 sudo make install
 cd ../../

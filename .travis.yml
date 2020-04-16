@@ -41,6 +41,7 @@ matrix:
       addons:
         homebrew:
           packages:
+            - zlib
             - json-c
             - intltool
             - pkg-config
