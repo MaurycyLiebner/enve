@@ -1,6 +1,6 @@
 wget https://raw.githubusercontent.com/qbs/qbs/master/scripts/install-qt.sh
 chmod +x install-qt.sh
-./install-qt.sh -d ${QT_INSTALL_DIR} --version ${QT_VERSION} qtbase qttools qtsvg qtmultimedia qtdeclarative qtwebengine qtwebchannel qtwebview qtlocation qtserialport
+./install-qt.sh -d ${QT_INSTALL_DIR} --version ${QT_VERSION} qtbase qttools qtsvg qtmultimedia qtdeclarative qtwebengine qtwebchannel qtwebview qtlocation qtserialport qtmacextras
 
 # Travis clones submodules for us, only library patches are needed
 cd third_party
@@ -25,10 +25,7 @@ fi
 
 # build libmypaint
 cd libmypaint
-ACLOCAL_FLAGS="-I/usr/local/opt/gettext/share/aclocal $ACLOCAL_FLAGS"
-LDFLAGS="-L/usr/local/opt/gettext/lib $LDFLAGS"
-CPPFLAGS="-I/usr/local/opt/gettext/include $CPPFLAGS"
-PATH="/usr/local/opt/gettext/bin:$PATH"
+brew link gettext --force
 ./autogen.sh
 ./configure --enable-openmp --prefix=/usr/local
 make
