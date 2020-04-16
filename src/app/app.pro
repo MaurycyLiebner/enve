@@ -373,14 +373,16 @@ macx {
         cp -fLR $$QSCINTILLA_FOLDER/libqscintilla2_qt5.15.dylib $$MAC_LIB_FOLDER/ && \
         cp -fLR $$GPERFTOOLS_FOLDER/.libs/libtcmalloc.4.dylib $$MAC_LIB_FOLDER/ && \
         install_name_tool -change libquazip.1.dylib @loader_path/libquazip.1.dylib \
-                          -change /usr/local/lib/libmypaint-1.5.1.dylib @loader_path/libmypaint-1.5.1.dylib \
+                          -change libmypaint-1.5.1.dylib @loader_path/libmypaint-1.5.1.dylib \
+                          -change libtcmalloc.4.dylib @loader_path/libtcmalloc.4.dylib \
                           $$MAC_LIB_FOLDER/libenvecore.1.dylib && \
         install_name_tool -change libenvecore.1.dylib @rpath/libenvecore.1.dylib \
                           -change libquazip.1.dylib @rpath/libquazip.1.dylib \
-                          -change /usr/local/lib/libmypaint-1.5.1.dylib @rpath/libmypaint-1.5.1.dylib \
+                          -change libmypaint-1.5.1.dylib @rpath/libmypaint-1.5.1.dylib \
+                          -change libtcmalloc.4.dylib @rpath/libtcmalloc.4.dylib \
                           $$MAC_APP_FOLDER/Contents/MacOS/$$TARGET
 
     # Wrap all application depdendencies for deployment. Apply -dmg flag for release DMG image.
     # Use -appstore-compliant flag to workaround the inclusion of OBDC and PostgreSQL plugins.
-    CONFIG(release, debug|release): QMAKE_POST_LINK += && macdeployqt $$MAC_APP_FOLDER -appstore-compliant
+    CONFIG(release, debug|release): QMAKE_POST_LINK += && macdeployqt $$MAC_APP_FOLDER -appstore-compliant -dmg
 }
