@@ -48,6 +48,13 @@ win32 { # Windows
     QMAKE_CXXFLAGS_RELEASE += /O2 -O2
 } unix {
     macx { # Mac OS X
+        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.13
+        LIBS += -framework CoreFoundation
+        LIBS += -framework CoreGraphics
+        LIBS += -framework CoreText
+        LIBS += -framework CoreServices
+        INCLUDEPATH += /usr/local/include
+        LIBS += -L/usr/local/lib
     } else { # Linux
         QMAKE_CFLAGS_RELEASE -= -O2
         QMAKE_CFLAGS_RELEASE -= -O1
