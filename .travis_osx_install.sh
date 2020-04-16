@@ -13,7 +13,7 @@ if ! [ -d $TRAVIS_CACHE_DIR/third_party/skia/out/Release ]; then
     wget https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-mac.zip
     unzip ninja-mac.zip
     chmod +x ninja
-    bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] skia_use_system_expat=false skia_use_system_icu=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false skia_use_system_harfbuzz=false'
+    bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] skia_use_system_expat=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false skia_use_icu=false'
     ./ninja -C out/Release -j 2
     mkdir -p $TRAVIS_CACHE_DIR/third_party/skia/out/Release
     cp -r ./out/Release/* $TRAVIS_CACHE_DIR/third_party/skia/out/Release
