@@ -51,6 +51,7 @@ matrix:
             - wget
             - curl
             - libomp
+            - grep
           update: true
       env:
         - MATRIX_EVAL="CC=clang && CXX=clang++"
