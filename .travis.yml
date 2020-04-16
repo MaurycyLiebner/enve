@@ -41,7 +41,7 @@ matrix:
       addons:
         homebrew:
           packages:
-            - ninja json-c intltool pkg-config gettext ffmpeg
+            - ninja json-c intltool pkg-config gettext ffmpeg p7zip
       env:
         - MATRIX_EVAL="CC=clang && CXX=clang++"
         - QT_INSTALL_DIR=~/Qt
