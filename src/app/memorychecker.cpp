@@ -22,8 +22,8 @@
 #elif (defined (LINUX) || defined (__linux__))
     #include <sys/sysinfo.h>
     #include <unistd.h>
-    #include <gperftools/tcmalloc.h>
-    #include <gperftools/malloc_extension.h>
+    #include "gperftools/tcmalloc.h"
+    #include "gperftools/malloc_extension.h"
 #endif
 
 #include <QDebug>
