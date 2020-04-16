@@ -371,6 +371,7 @@ macx {
         cp -fLR $$LIBMYPAINT_FOLDER/.libs/libmypaint-1.5.1.dylib $$MAC_LIB_FOLDER/ && \
         cp -fLR $$QUAZIP_FOLDER/quazip/libquazip.1.dylib $$MAC_LIB_FOLDER/ && \
         cp -fLR $$QSCINTILLA_FOLDER/libqscintilla2_qt5.15.dylib $$MAC_LIB_FOLDER/ && \
+        cp -fLR $$GPERFTOOLS_FOLDER/libtcmalloc.4.dylib $$MAC_LIB_FOLDER/ && \
         install_name_tool -change libquazip.1.dylib @loader_path/libquazip.1.dylib \
                           -change /usr/local/lib/libmypaint-1.5.1.dylib @loader_path/libmypaint-1.5.1.dylib \
                           $$MAC_LIB_FOLDER/libenvecore.1.dylib && \
