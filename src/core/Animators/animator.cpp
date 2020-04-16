@@ -21,6 +21,7 @@
 #include "qrealpoint.h"
 #include "simplemath.h"
 #include "svgexporthelpers.h"
+#include "Private/esettings.h"
 
 #include <QPainter>
 
@@ -537,31 +538,15 @@ void anim_drawKey(QPainter * const p,
                   const qreal pixelsPerFrame,
                   const int startFrame,
                   const int rowHeight,
+                  const QColor& color,
+                  const QColor& selectedColor,
+                  const qreal keyRadius,
                   const KeyFrameType type) {
-    QColor color;
-    if(key->isSelected()) color = Qt::yellow;
-    else {
-        switch(type) {
-        case KeyFrameType::object:
-            color = QColor(0, 125, 255);
-            break;
-        case KeyFrameType::propertyGroup:
-            color = QColor(0, 255, 0);
-            break;
-        case KeyFrameType::property:
-            color = QColor(255, 0, 0);
-            break;
-        }
-    }
-    p->setBrush(color);
+    if(key->isSelected()) p->setBrush(selectedColor);
+    else p->setBrush(color);
 
     if(key->isHovered()) p->setPen(QPen(Qt::black, 1.5));
     else p->setPen(QPen(Qt::black, 0.5));
-
-    qreal radMult;
-    if(type == KeyFrameType::object) radMult = 0.3;
-    else radMult = 0.21;
-    const qreal keyRadius = rowHeight * radMult;
 
     const int frameRelToStart = key->getRelFrame() - startFrame;
     const QPointF keyCenter((frameRelToStart + 0.5)*pixelsPerFrame,
@@ -587,10 +572,28 @@ void Animator::prp_drawTimelineControls(
     if(toBoundingBox()) type = KeyFrameType::object;
     else if(toComplexAnimator()) type = KeyFrameType::propertyGroup;
     else type = KeyFrameType::property;
+    const auto& sett = *eSettings::sInstance;
+    QColor color;
+    switch(type) {
+    case KeyFrameType::object:
+        color = sett.fObjectKeyframeColor;
+        break;
+    case KeyFrameType::propertyGroup:
+        color = sett.fPropertyGroupKeyframeColor;
+        break;
+    case KeyFrameType::property:
+        color = sett.fPropertyKeyframeColor;
+        break;
+    }
+    qreal radMult;
+    if(type == KeyFrameType::object) radMult = 0.3;
+    else radMult = 0.21;
+    const qreal keyRadius = rowHeight * radMult;
     for(int i = idRange.fMin; i <= idRange.fMax; i++) {
         if(i < 0 || i >= anim_mKeys.count()) continue;
         const auto& key = anim_mKeys.atId(i);
-        anim_drawKey(p, key, pixelsPerFrame, absFrameRange.fMin, rowHeight, type);
+        anim_drawKey(p, key, pixelsPerFrame, absFrameRange.fMin, rowHeight,
+                     color, sett.fSelectedKeyframeColor, keyRadius, type);
     }
 }
 

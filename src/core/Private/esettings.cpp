@@ -161,6 +161,19 @@ eSettings::eSettings(const int cpuThreads, const intKB ramKB,
                      fTimelineHighlightRowColor, "timelineHighlightRowColor",
                      QColor(255, 0, 0, 15));
 
+    gSettings << std::make_shared<eColorSetting>(
+                     fObjectKeyframeColor, "objectKeyframeColor",
+                     QColor(0, 125, 255));
+    gSettings << std::make_shared<eColorSetting>(
+                     fPropertyGroupKeyframeColor, "propertyGroupKeyframeColor",
+                     QColor(0, 255, 0));
+    gSettings << std::make_shared<eColorSetting>(
+                     fPropertyKeyframeColor, "propertyKeyframeColor",
+                     QColor(255, 0, 0));
+    gSettings << std::make_shared<eColorSetting>(
+                     fSelectedKeyframeColor, "selectedKeyframeColor",
+                     QColor(255, 255, 0));
+
     gSettings << std::make_shared<eStringSetting>(fGimp, "gimp", "gimp");
     gSettings << std::make_shared<eStringSetting>(fMyPaint, "mypaint", "mypaint");
     gSettings << std::make_shared<eStringSetting>(fKrita, "krita", "krita");

@@ -95,6 +95,11 @@ public:
     bool fTimelineHighlightRow;
     QColor fTimelineHighlightRowColor;
 
+    QColor fObjectKeyframeColor;
+    QColor fPropertyGroupKeyframeColor;
+    QColor fPropertyKeyframeColor;
+    QColor fSelectedKeyframeColor;
+
     // external applications
     QString fGimp = "gimp";
     QString fMyPaint = "mypaint";

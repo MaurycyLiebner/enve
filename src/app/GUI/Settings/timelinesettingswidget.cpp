@@ -19,6 +19,8 @@
 
 #include "GUI/coloranimatorbutton.h"
 
+#include <QLabel>
+
 TimelineSettingsWidget::TimelineSettingsWidget(QWidget *parent) :
     SettingsWidget(parent) {
     mAlternateRowCheck = new QCheckBox("Alternate row color", this);
@@ -30,6 +32,26 @@ TimelineSettingsWidget::TimelineSettingsWidget(QWidget *parent) :
     mHighlightRowColor = new ColorAnimatorButton(
                 mSett.fTimelineHighlightRowColor);
     add2HWidgets(mHighlightRowCheck, mHighlightRowColor);
+
+    addSeparator();
+
+    mObjectKeyframeColor = new ColorAnimatorButton(
+                               mSett.fObjectKeyframeColor);
+    mPropertyGroupKeyframeColor = new ColorAnimatorButton(
+                               mSett.fPropertyGroupKeyframeColor);
+    mPropertyKeyframeColor = new ColorAnimatorButton(
+                               mSett.fPropertyKeyframeColor);
+    mSelectedKeyframeColor = new ColorAnimatorButton(
+                               mSett.fSelectedKeyframeColor);
+
+    add2HWidgets(new QLabel("Object keyframe color"),
+                 mObjectKeyframeColor);
+    add2HWidgets(new QLabel("Property group keyframe color"),
+                 mPropertyGroupKeyframeColor);
+    add2HWidgets(new QLabel("Property keyframe color"),
+                 mPropertyKeyframeColor);
+    add2HWidgets(new QLabel("Selected keyframe color"),
+                 mSelectedKeyframeColor);
 }
 
 void TimelineSettingsWidget::applySettings() {
@@ -38,6 +60,11 @@ void TimelineSettingsWidget::applySettings() {
 
     mSett.fTimelineHighlightRow = mHighlightRowCheck->isChecked();
     mSett.fTimelineHighlightRowColor = mHighlightRowColor->color();
+
+    mSett.fObjectKeyframeColor = mObjectKeyframeColor->color();
+    mSett.fPropertyGroupKeyframeColor = mPropertyGroupKeyframeColor->color();
+    mSett.fPropertyKeyframeColor = mPropertyKeyframeColor->color();
+    mSett.fSelectedKeyframeColor = mSelectedKeyframeColor->color();
 }
 
 void TimelineSettingsWidget::updateSettings() {
@@ -46,4 +73,9 @@ void TimelineSettingsWidget::updateSettings() {
 
     mHighlightRowCheck->setChecked(mSett.fTimelineHighlightRow);
     mHighlightRowColor->setColor(mSett.fTimelineHighlightRowColor);
+
+    mObjectKeyframeColor->setColor(mSett.fObjectKeyframeColor);
+    mPropertyGroupKeyframeColor->setColor(mSett.fPropertyGroupKeyframeColor);
+    mPropertyKeyframeColor->setColor(mSett.fPropertyKeyframeColor);
+    mSelectedKeyframeColor->setColor(mSett.fSelectedKeyframeColor);
 }
