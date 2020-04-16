@@ -1,3 +1,5 @@
+brew link qt5 --force
+
 # Travis clones submodules for us, only library patches are needed
 cd third_party
 make patch
@@ -6,6 +8,9 @@ make patch
 if ! [ -d $TRAVIS_CACHE_DIR/third_party/skia/out/Release ]; then
     cd skia
     python2 tools/git-sync-deps
+    wget https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-mac.zip
+    unzip ninja-mac.zip
+    chmod +x ninja
     bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] skia_use_system_expat=false skia_use_system_icu=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false'
     ninja -C out/Release -j 2
     mkdir -p $TRAVIS_CACHE_DIR/third_party/skia/out/Release
