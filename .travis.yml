@@ -42,6 +42,7 @@ matrix:
         homebrew:
           packages:
             - json-c intltool pkg-config gettext ffmpeg qt5
+          update: true
       env:
         - MATRIX_EVAL="CC=clang && CXX=clang++"
         - QT_INSTALL_DIR=~/Qt
