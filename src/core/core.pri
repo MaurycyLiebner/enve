@@ -43,6 +43,9 @@ win32 { # Windows
     macx { # Mac OS X
         QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.13
         LIBS += -framework CoreFoundation
+        LIBS += -framework CoreGraphics
+        LIBS += -framework CoreText
+        LIBS += -framework CoreServices
         INCLUDEPATH += /usr/local/include
         LIBS += -L/usr/local/lib
     } else { # Linux
