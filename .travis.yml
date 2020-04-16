@@ -48,6 +48,9 @@ matrix:
             - gettext
             - ffmpeg
             - p7zip
+            - wget
+            - curl
+            - libomp
           update: true
       env:
         - MATRIX_EVAL="CC=clang && CXX=clang++"

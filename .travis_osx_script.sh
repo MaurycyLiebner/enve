@@ -12,4 +12,3 @@ echo "#define LATEST_COMMIT_DATE $LATEST_COMMIT_DATE" >> $enveSplash
 echo "#endif" >> $enveSplash
 qmake ../../enve.pro
 make -j 2
-cd ..
