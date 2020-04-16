@@ -41,7 +41,12 @@ matrix:
       addons:
         homebrew:
           packages:
-            - json-c intltool pkg-config gettext ffmpeg qt5
+            - json-c
+            - intltool
+            - pkg-config
+            - gettext
+            - ffmpeg
+            - p7zip
           update: true
       env:
         - MATRIX_EVAL="CC=clang && CXX=clang++"

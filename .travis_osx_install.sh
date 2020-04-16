@@ -1,5 +1,6 @@
-brew link qt5 --force
-brew link intltool --force
+wget https://raw.githubusercontent.com/qbs/qbs/master/scripts/install-qt.sh
+chmod +x install-qt.sh
+./install-qt.sh -d ${QT_INSTALL_DIR} --version ${QT_VERSION} qtbase qttools qtsvg qtmultimedia qtdeclarative qtwebengine qtwebchannel qtwebview qtlocation qtserialport
 
 # Travis clones submodules for us, only library patches are needed
 cd third_party
