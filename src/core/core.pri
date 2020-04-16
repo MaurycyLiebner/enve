@@ -41,7 +41,8 @@ win32 { # Windows
     CONFIG -= debug_and_release
 } unix {
     macx { # Mac OS X
-        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
+        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.13
+        LIBS += -framework CoreFoundation
         INCLUDEPATH += /usr/local/include
         LIBS += -L/usr/local/lib
     } else { # Linux
