@@ -25,11 +25,10 @@ fi
 
 # build libmypaint
 cd libmypaint
-brew link gettext --force
-ACLOCAL_FLAGS="-I/usr/local/opt/gettext/share/aclocal $ACLOCAL_FLAGS"
-LDFLAGS="-L/usr/local/opt/gettext/lib $LDFLAGS"
-CPPFLAGS="-I/usr/local/opt/gettext/include $CPPFLAGS"
-PATH="/usr/local/opt/gettext/bin:$PATH"
+export ACLOCAL_FLAGS="-I/usr/local/opt/gettext/share/aclocal $ACLOCAL_FLAGS"
+export LDFLAGS="-L/usr/local/opt/gettext/lib $LDFLAGS"
+export CPPFLAGS="-I/usr/local/opt/gettext/include $CPPFLAGS"
+export PATH="/usr/local/opt/gettext/bin:$PATH"
 ./autogen.sh
 ./configure --enable-openmp --prefix=/usr/local
 make
