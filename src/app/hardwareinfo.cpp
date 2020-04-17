@@ -20,8 +20,11 @@
 
 #include "exceptions.h"
 
-#if (defined (_WIN32) || defined (_WIN64))
+#if defined(Q_OS_WIN)
     #include "windowsincludes.h"
+#elif defined(Q_OS_MACOS)
+    #include <sys/types.h>
+    #include <sys/sysctl.h>
 #endif
 
 int HardwareInfo::mCpuThreads = -1;
@@ -31,13 +34,13 @@ intKB HardwareInfo::mRamKB(0);
 GpuVendor HardwareInfo::mGpuVendor = GpuVendor::unrecognized;
 
 intKB getTotalRamBytes() {
-#if (defined (_WIN32) || defined (_WIN64))
+#if defined(Q_OS_WIN)
     MEMORYSTATUSEX statex;
     statex.dwLength = sizeof (statex);
     GlobalMemoryStatusEx(&statex);
     const longB totalBytes(statex.ullTotalPhys);
     return intKB(totalBytes);
-#elif (defined (LINUX) || defined (__linux__))
+#elif defined(Q_OS_LINUX)
     FILE * const meminfo = fopen("/proc/meminfo", "r");
     if(meminfo) {
         char line[256];
@@ -53,6 +56,13 @@ intKB getTotalRamBytes() {
         RuntimeThrow("'MemTotal' missing from /proc/meminfo");
     }
     RuntimeThrow("Failed to open /proc/meminfo");
+#elif defined(Q_OS_MACOS)
+    int mib [] = { CTL_HW, HW_MEMSIZE };
+    int64_t bytes = 0;
+    size_t length = sizeof(bytes);
+    const int ret = sysctl(mib, 2, &bytes, &length, NULL, 0);
+    if(ret) RuntimeThrow("Failed to retrieve memory using sysctl");
+    return intKB(longB(bytes));
 #endif
 }
 

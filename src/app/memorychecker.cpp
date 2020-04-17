@@ -17,13 +17,18 @@
 #include "memorychecker.h"
 
 
-#if (defined (_WIN32) || defined (_WIN64))
+#if defined(Q_OS_WIN)
     #include "windowsincludes.h"
-#elif (defined (LINUX) || defined (__linux__))
+#elif defined(Q_OS_LINUX)
     #include <sys/sysinfo.h>
     #include <unistd.h>
     #include "gperftools/tcmalloc.h"
     #include "gperftools/malloc_extension.h"
+#elif defined(Q_OS_MACOS)
+    #include <mach/mach_host.h>
+    #include <mach/mach_init.h>
+    #include <mach/host_info.h>
+    #include <mach/task.h>
 #endif
 
 #include <QDebug>
@@ -52,7 +57,7 @@ void MemoryChecker::sGetFreeKB(intKB& procFreeKB, intKB& sysFreeKB) {
     longB enveUsedB(0);
     qint64 freeInternal = 0;
     intKB freeExternal(0);
-#if (defined (_WIN32) || defined (_WIN64))
+#if defined(Q_OS_WIN)
     const auto processID = GetCurrentProcessId();
     const auto hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
                                       FALSE, processID);
@@ -69,7 +74,7 @@ void MemoryChecker::sGetFreeKB(intKB& procFreeKB, intKB& sysFreeKB) {
     GlobalMemoryStatusEx(&statex);
     const longB availPhysB(statex.ullAvailPhys);
     freeExternal = intKB(availPhysB);
-#elif (defined (LINUX) || defined (__linux__))
+#elif defined(Q_OS_UNIX)
     //    qDebug() << "";
     size_t virtual_memory_used;
     size_t physical_memory_used;
@@ -84,23 +89,35 @@ void MemoryChecker::sGetFreeKB(intKB& procFreeKB, intKB& sysFreeKB) {
     enveUsedB = longB(static_cast<qint64>(bytes_in_use_by_app));
 
     freeInternal = physical_memory_used - bytes_in_use_by_app;
-    int found = 0;
-    FILE * const meminfo = fopen("/proc/meminfo", "r");
-    if(!meminfo) RuntimeThrow("Failed to open /proc/meminfo");
-    while(fgets(sLine, sizeof(sLine), meminfo)) {
-        int ramPartKB;
-        if(sscanf(sLine, "MemFree: %d kB", &ramPartKB) == 1) {
-//            qDebug() << "MemFree" << intMB(intKB(ramPartKB)).fValue;
-        } else if(sscanf(sLine, "Cached: %d kB", &ramPartKB) == 1) {
-//            qDebug() << "Cached" << intMB(intKB(ramPartKB)).fValue;
-        } else if(sscanf(sLine, "Buffers: %d kB", &ramPartKB) == 1) {
-//            qDebug() << "Buffers" << intMB(intKB(ramPartKB)).fValue;
-        } else continue;
-        freeExternal.fValue += ramPartKB;
-        if(++found == 3) break;
-    }
-    fclose(meminfo);
-    if(found != 3) RuntimeThrow("Entries missing from /proc/meminfo");
+    #if defined(Q_OS_LINUX)
+        int found = 0;
+        FILE * const meminfo = fopen("/proc/meminfo", "r");
+        if(!meminfo) RuntimeThrow("Failed to open /proc/meminfo");
+        while(fgets(sLine, sizeof(sLine), meminfo)) {
+            int ramPartKB;
+            if(sscanf(sLine, "MemFree: %d kB", &ramPartKB) == 1) {
+    //            qDebug() << "MemFree" << intMB(intKB(ramPartKB)).fValue;
+            } else if(sscanf(sLine, "Cached: %d kB", &ramPartKB) == 1) {
+    //            qDebug() << "Cached" << intMB(intKB(ramPartKB)).fValue;
+            } else if(sscanf(sLine, "Buffers: %d kB", &ramPartKB) == 1) {
+    //            qDebug() << "Buffers" << intMB(intKB(ramPartKB)).fValue;
+            } else continue;
+            freeExternal.fValue += ramPartKB;
+            if(++found == 3) break;
+        }
+        fclose(meminfo);
+        if(found != 3) RuntimeThrow("Entries missing from /proc/meminfo");
+    #elif defined(Q_OS_MACOS)
+        mach_msg_type_number_t count = HOST_VM_INFO_COUNT;
+        vm_statistics_data_t vmstat;
+        const auto ret = host_statistics(mach_host_self(), HOST_VM_INFO,
+                                         (host_info_t)&vmstat, &count);
+        if(ret != KERN_SUCCESS) RuntimeThrow("Could not retrieve memory usage");
+        // auto total = vmstat.wire_count + vmstat.active_count + vmstat.inactive_count + vmstat.free_count;
+        const int pageSize = 4;
+        freeExternal.fValue += vmstat.inactive_count * 4;
+        freeExternal.fValue += vmstat.free_count * 4;
+    #endif
 #endif
 
     const intKB enveUsedKB(enveUsedB);
@@ -116,9 +133,9 @@ void MemoryChecker::sGetFreeKB(intKB& procFreeKB, intKB& sysFreeKB) {
 //    qDebug() << "usage" << 100 - 100*sysFreeKB.fValue/HardwareInfo::sRamKB().fValue;
     const qint64 releaseBytes = 500L*1024L*1024L;
     if(freeInternal > releaseBytes) {
-#if (defined (_WIN32) || defined (_WIN64))
+#if defined(Q_OS_WIN)
 
-#elif (defined (LINUX) || defined (__linux__))
+#elif defined(Q_OS_UNIX)
     MallocExtension::instance()->ReleaseToSystem(releaseBytes);
 //        qDebug() << "released";
 #endif
