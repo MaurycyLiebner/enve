@@ -20,6 +20,7 @@
 #include "GUI/dialogsinterface.h"
 
 class DialogsInterfaceImpl : public DialogsInterface {
+    static DialogsInterfaceImpl sInstance;
 public:
     stdsptr<ShaderEffectCreator> execShaderChooser(
             const QString& name, const ShaderOptions& options) const;

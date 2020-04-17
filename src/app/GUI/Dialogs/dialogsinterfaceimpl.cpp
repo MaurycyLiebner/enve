@@ -30,6 +30,8 @@
 #include "GUI/Dialogs/applyexpressiondialog.h"
 #include "GUI/Dialogs/scenesettingsdialog.h"
 
+DialogsInterfaceImpl DialogsInterfaceImpl::sInstance;
+
 class ShaderChoiceDialog : public QDialog {
 public:
     ShaderChoiceDialog(const QString& name, const ShaderOptions& options,
