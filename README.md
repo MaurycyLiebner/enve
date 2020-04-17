@@ -137,7 +137,7 @@ Go back to the third_party folder:
 cd ..
 ```
 
-### gperftools
+### Gperftools
 Install packages needed to build gperftools:
 ```
 sudo apt-get install autoconf automake libtool
@@ -357,8 +357,6 @@ msbuild all.sln
 
 ### enve
 
-Build **enve**:
-
 ```
 qmake enve.pro -config release QMAKE_CXX+=clang-cl QMAKE_LINK+=lld-link
 nmake
@@ -370,14 +368,18 @@ Install build dependencies for third-party libraries from Homebrew.
 ```sh
 brew install ninja json-c intltool pkg-config gettext zlib ffmpeg
 ```
-For **Skia**:
+
+### Skia
+
 ```sh
 pyenv shell system  # disable pyenv as build script breaks under Python 3
 tools/git-sync-deps
 bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] skia_use_system_expat=false skia_use_system_icu=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false'
 ninja -C out/Release skia
 ```
-For **libmypaint**:
+
+### Libmypaint
+
 ```sh
 # Manually specify environmental variables for keg-only dependencies.
 ACLOCAL_FLAGS="-I/usr/local/opt/gettext/share/aclocal $ACLOCAL_FLAGS"
@@ -389,7 +391,9 @@ PATH="/usr/local/opt/gettext/bin:$PATH"
 make
 ln -s `pwd` libmypaint
 ```
-For **quazip**:
+
+### Quazip
+
 ```sh
 # Explicitly add zlib to path upon build, as Homebrew zlib is keg-only.
 # Do not `brew link zlib` as it might conflict with the stock version shipped with macOS.
@@ -397,18 +401,30 @@ LDFLAGS="-L/usr/local/opt/zlib/lib $LDFLAGS"
 CPPFLAGS="-I/usr/local/opt/zlib/include $CPPFLAGS"
 qmake quazip.pro -spec macx-clang CONFIG+=release CONFIG+=x86_64 LIBS+=-lz
 make
+
 ```
-For **gperftools**:
+
+### Gperftools
+
 ```sh
 CFLAGS="$CFLAGS -Wno-error -D_XOPEN_SOURCE"
 ./autogen.sh
 ./configure --disable-dependency-tracking --prefix=/usr/local
 make
 ```
-For **QScintilla**:
+
+### QScintilla
+
 ```sh
 cd Qt4Qt5
 qmake -spec macx-clang CONFIG+=release
+```
+
+### enve
+
+```
+qmake enve.pro -spec macx-clang CONFIG+=release
+make
 ```
 
 ## Authors
