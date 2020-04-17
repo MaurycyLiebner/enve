@@ -358,7 +358,7 @@ msbuild all.sln
 ### enve
 
 ```
-qmake enve.pro -config release QMAKE_CXX+=clang-cl QMAKE_LINK+=lld-link
+qmake enve.pro -spec win32-clang-msvc -config release
 nmake
 ```
 
