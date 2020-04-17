@@ -23,8 +23,8 @@ EnveLicense::EnveLicense(QWidget * const parent) : QWidget(parent) {
         licenseFile.close();
     } else licenseText->setPlainText("Could not load license.");
     mainLayout->addWidget(licenseText);
-    licenseText->setMinimumWidth(MIN_WIDGET_DIM*25);
-    licenseText->setMinimumHeight(MIN_WIDGET_DIM*10);
+    licenseText->setMinimumWidth(eSizesUI::widget*25);
+    licenseText->setMinimumHeight(eSizesUI::widget*10);
     licenseText->setReadOnly(true);
 
     const auto closeButton = new QPushButton("Close", this);

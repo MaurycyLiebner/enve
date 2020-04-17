@@ -26,7 +26,9 @@ class QActionButton : public QPushButton {
 public:
     explicit QActionButton(QWidget *parent = nullptr) :
         QPushButton(parent) {
-        setFixedHeight(MIN_WIDGET_DIM - 1);
+        eSizesUI::widget.add(this, [this](const int size) {
+            setFixedHeight(size - 1);
+        });
         setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         setObjectName("QActionButton");
         setStyleSheet("QPushButton::menu-indicator { width:0px; }");
@@ -80,7 +82,9 @@ FakeMenuBar::FakeMenuBar(QWidget* const parent) :
 
     setLayout(mainLayout);
 
-    setFixedHeight(MIN_WIDGET_DIM);
+    eSizesUI::widget.add(this, [this](const int size) {
+        setFixedHeight(size);
+    });
 }
 
 void FakeMenuBar::addSeparator() {

@@ -16,15 +16,20 @@
 
 #include "switchbutton.h"
 
+#include "Private/esettings.h"
+#include "GUI/global.h"
+
 SwitchButton::SwitchButton(const QString &toolTip, QWidget *parent) :
     ButtonBase(toolTip, parent) {
-
+    connect(&eSizesUI::widget, &SizeSetter::sizeChanged,
+            this, [this](int) { mStates.clear(); });
 }
 
-SwitchButton::~SwitchButton() {
-    for(const auto state : mStates) {
-        delete state;
-    }
+void SwitchButton::toggle() {
+    int state = mCurrentState + 1;
+    if(state >= mStates.count()) state = 0;
+    setState(state);
+    emit toggled(mCurrentState);
 }
 
 SwitchButton *SwitchButton::sCreate2Switch(
@@ -38,21 +43,23 @@ SwitchButton *SwitchButton::sCreate2Switch(
 bool SwitchButton::setState(const int state) {
     if(state < 0) return false;
     if(state >= mStates.count()) return false;
-    if(mCurrentState == state) return false;
     mCurrentState = state;
-    setCurrentIcon(*mStates.at(mCurrentState));
+    updateIcon();
     return true;
 }
 
-int SwitchButton::addState(const QString &icon) {
-    mStates << new QImage(icon);
-    if(mStates.count() == 1) toggle();
-    return mStates.count() - 1;
+void SwitchButton::updateIcon() {
+    if(mCurrentState < 0) return;
+    if(mCurrentState >= mStates.count()) return;
+    setCurrentIcon(mStates.at(mCurrentState));
 }
 
-void SwitchButton::toggle() {
-    int state = mCurrentState + 1;
-    if(state >= mStates.count()) state = 0;
-    setState(state);
-    emit toggled(mCurrentState);
+int SwitchButton::addState(const QString &icon) {
+    eSizesUI::widget.add(this, [this, icon](int) {
+        const auto iconPath = eSettings::sIconsDir() + "/" + icon;
+        mStates << QImage(iconPath);
+        if(mCurrentState == mStates.count() - 1) updateIcon();
+    });
+    if(mStates.count() == 1) toggle();
+    return mStates.count() - 1;
 }

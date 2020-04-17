@@ -134,7 +134,7 @@ const char *JSLexer::sKeywordClass1 =
 class JSEditor : public QsciScintilla {
 public:
     JSEditor(const QString& fillerText) : mFillerTextV(fillerText) {
-        setMinimumWidth(20*MIN_WIDGET_DIM);
+        setMinimumWidth(20*eSizesUI::widget);
 
         QFont font(DEFAULT_FONT);
         setFont(font);
@@ -425,7 +425,7 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
     setCurrentTabId(0);
     updateAllScript();
 
-    const int pixSize = MIN_WIDGET_DIM/2;
+    const int pixSize = eSizesUI::widget/2;
     mBindingsButton->setIconSize({pixSize, pixSize});
     mDefinitionsButon->setIconSize({pixSize, pixSize});
 

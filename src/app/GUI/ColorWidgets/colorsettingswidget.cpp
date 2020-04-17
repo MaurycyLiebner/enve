@@ -263,7 +263,6 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     setLayout(mWidgetsLayout);
 
     mColorLabel = new ColorLabel(this);
-    mColorLabel->setFixedHeight(MIN_WIDGET_DIM);
 
 //    mWheelWidget->setLayout(mWheelLayout);
 //    mWheelLayout->setAlignment(Qt::AlignTop);
@@ -271,23 +270,16 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
 //    mWheelLayout->addWidget(wheel_triangle_widget, Qt::AlignHCenter);
 //    mWheelLayout->setAlignment(wheel_triangle_widget, Qt::AlignHCenter);
 
-    const int labelWidth = MIN_WIDGET_DIM;
 
     rRect = new ColorValueRect(RED_PROGRAM, this);
-    rRect->setFixedHeight(MIN_WIDGET_DIM);
-    rLabel->setFixedWidth(labelWidth);
     rLayout->addWidget(rLabel);
     rLayout->addWidget(rRect);
     rLayout->addWidget(rSpin);
     gRect = new ColorValueRect(GREEN_PROGRAM, this);
-    gRect->setFixedHeight(MIN_WIDGET_DIM);
-    gLabel->setFixedWidth(labelWidth);
     gLayout->addWidget(gLabel);
     gLayout->addWidget(gRect);
     gLayout->addWidget(gSpin);
     bRect = new ColorValueRect(BLUE_PROGRAM, this);
-    bRect->setFixedHeight(MIN_WIDGET_DIM);
-    bLabel->setFixedWidth(labelWidth);
     bLayout->addWidget(bLabel);
     bLayout->addWidget(bRect);
     bLayout->addWidget(bSpin);
@@ -298,20 +290,14 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mRGBWidget->setLayout(mRGBLayout);
 
     hRect = new ColorValueRect(HUE_PROGRAM, this);
-    hRect->setFixedHeight(MIN_WIDGET_DIM);
-    hLabel->setFixedWidth(labelWidth);
     hLayout->addWidget(hLabel);
     hLayout->addWidget(hRect);
     hLayout->addWidget(hSpin);
     hsvSatRect = new ColorValueRect(HSV_SATURATION_PROGRAM, this);
-    hsvSatRect->setFixedHeight(MIN_WIDGET_DIM);
-    hsvSLabel->setFixedWidth(labelWidth);
     hsvSLayout->addWidget(hsvSLabel);
     hsvSLayout->addWidget(hsvSatRect);
     hsvSLayout->addWidget(hsvSSpin);
     vRect = new ColorValueRect(VALUE_PROGRAM, this);
-    vRect->setFixedHeight(MIN_WIDGET_DIM);
-    vLabel->setFixedWidth(labelWidth);
     vLayout->addWidget(vLabel);
     vLayout->addWidget(vRect);
     vLayout->addWidget(vSpin);
@@ -322,14 +308,10 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mHSVWidget->setLayout(mHSVLayout);
 
     hslSatRect = new ColorValueRect(HSL_SATURATION_PROGRAM, this);
-    hslSatRect->setFixedHeight(MIN_WIDGET_DIM);
-    hslSLabel->setFixedWidth(labelWidth);
     hslSLayout->addWidget(hslSLabel);
     hslSLayout->addWidget(hslSatRect);
     hslSLayout->addWidget(hslSSpin);
     lRect = new ColorValueRect(LIGHTNESS_PROGRAM, this);
-    lRect->setFixedHeight(MIN_WIDGET_DIM);
-    lLabel->setFixedWidth(labelWidth);
     lLayout->addWidget(lLabel);
     lLayout->addWidget(lRect);
     lLayout->addWidget(lSpin);
@@ -339,14 +321,11 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mHSLWidget->setLayout(mHSLLayout);
 
     aRect = new ColorValueRect(ALPHA_PROGRAM, this);
-    aRect->setFixedHeight(MIN_WIDGET_DIM);
-    aLabel->setFixedWidth(labelWidth);
     aLayout->addWidget(aLabel);
     aLayout->addWidget(aRect);
     aLayout->addWidget(aSpin);
 
-    const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
-    mPickingButton = new ActionButton(iconsDir + "/pickUnchecked.png", "", this);
+    mPickingButton = new ActionButton("toolbarButtons/pickUnchecked.png", "", this);
     connect(mPickingButton, &ActionButton::released,
             this, &ColorSettingsWidget::startColorPicking);
     mColorLabelLayout->addWidget(mColorLabel);
@@ -378,6 +357,28 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
         setDisplayedColor(color);
         emitFinishFullColorChangedSignal();
         Document::sInstance->actionFinished();
+    });
+
+    eSizesUI::widget.add(mColorLabel, [this](const int size) {
+        mColorLabel->setFixedHeight(size);
+        rRect->setFixedHeight(size);
+        rLabel->setFixedWidth(size);
+        gRect->setFixedHeight(size);
+        gLabel->setFixedWidth(size);
+        bRect->setFixedHeight(size);
+        bLabel->setFixedWidth(size);
+        hRect->setFixedHeight(size);
+        hLabel->setFixedWidth(size);
+        hsvSatRect->setFixedHeight(size);
+        hsvSLabel->setFixedWidth(size);
+        vRect->setFixedHeight(size);
+        vLabel->setFixedWidth(size);
+        hslSatRect->setFixedHeight(size);
+        hslSLabel->setFixedWidth(size);
+        lRect->setFixedHeight(size);
+        lLabel->setFixedWidth(size);
+        aRect->setFixedHeight(size);
+        aLabel->setFixedWidth(size);
     });
 
     connect(mTabWidget, &QTabWidget::currentChanged,

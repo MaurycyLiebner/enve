@@ -12,9 +12,9 @@ CentralWidget::CentralWidget(BookmarkedWidget *left,
     setContentsMargins(0, 0, 0, 0);
     central->setParent(this);
     left->setParent(this);
-    left->move(0, MIN_WIDGET_DIM);
+    left->move(0, eSizesUI::widget);
     right->setParent(this);
-    right->move(width() - right->width(), MIN_WIDGET_DIM);
+    right->move(width() - right->width(), eSizesUI::widget);
 }
 
 void CentralWidget::setSidesVisibilitySetting(const bool vis) {
@@ -41,12 +41,12 @@ void CentralWidget::updateSideWidgetsVisibility() {
 
 void CentralWidget::updateSizeWidgetsSize() {
     if(mLeft->isVisible()) {
-        mLeft->setMaximumHeight(height() - MIN_WIDGET_DIM);
+        mLeft->setMaximumHeight(height() - eSizesUI::widget);
         mLeft->updateSize();
     }
     if(mRight->isVisible()) {
-        mRight->move(width() - mRight->width(), MIN_WIDGET_DIM);
-        mRight->setMaximumHeight(height() - MIN_WIDGET_DIM);
+        mRight->move(width() - mRight->width(), eSizesUI::widget);
+        mRight->setMaximumHeight(height() - eSizesUI::widget);
         mRight->updateSize();
     }
 }

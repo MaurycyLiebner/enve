@@ -66,8 +66,8 @@ void CanvasWindow::fitCanvasToSize() {
     const auto canvasSize = mCurrentCanvas->getCanvasSize();
     const qreal widWidth = width();
     const qreal widHeight = height();
-    const qreal widthScale = (widWidth - MIN_WIDGET_DIM)/canvasSize.width();
-    const qreal heightScale = (widHeight - MIN_WIDGET_DIM)/canvasSize.height();
+    const qreal widthScale = (widWidth - eSizesUI::widget)/canvasSize.width();
+    const qreal heightScale = (widHeight - eSizesUI::widget)/canvasSize.height();
     const qreal minScale = qMin(widthScale, heightScale);
     translateView({(widWidth - canvasSize.width()*minScale)*0.5,
                    (widHeight - canvasSize.height()*minScale)*0.5});

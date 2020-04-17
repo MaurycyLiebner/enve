@@ -78,6 +78,21 @@ struct eIntSetting : public eSettingBase<int> {
     }
 };
 
+struct eQrealSetting : public eSettingBase<qreal> {
+    using eSettingBase<qreal>::eSettingBase;
+
+    bool setValueString(const QString& valueStr) {
+        bool ok;
+        const qreal value = valueStr.toDouble(&ok);
+        if(ok) fValue = value;
+        return ok;
+    }
+
+    void writeValue(QTextStream &textStream) const {
+        textStream << fValue;
+    }
+};
+
 struct eStringSetting : public eSettingBase<QString> {
     using eSettingBase<QString>::eSettingBase;
 
@@ -149,6 +164,8 @@ eSettings::eSettings(const int cpuThreads, const intKB ramKB,
                      reinterpret_cast<int&>(fHddCacheMBCap),
                      "hddCacheMBCap", 0);
 
+    gSettings << std::make_shared<eQrealSetting>(
+                     fInterfaceScaling, "interfaceScaling", 1.);
 
     gSettings << std::make_shared<eBoolSetting>(
                      fTimelineAlternateRow, "timelineAlternateRow", true);
@@ -179,6 +196,10 @@ eSettings::eSettings(const int cpuThreads, const intKB ramKB,
     gSettings << std::make_shared<eStringSetting>(fKrita, "krita", "krita");
 
     loadDefaults();
+
+    eSizesUI::widget.add(this, [this](const int size) {
+        mIconsDir = sSettingsDir() + "/icons/" + QString::number(size);
+    });
 }
 
 int eSettings::sCpuThreadsCapped() {
@@ -198,8 +219,8 @@ const QString &eSettings::sSettingsDir() {
     return sInstance->fUserSettingsDir;
 }
 
-QString eSettings::sIconsDir() {
-    return sSettingsDir() + "/icons/" + QString::number(MIN_WIDGET_DIM);
+const QString& eSettings::sIconsDir() {
+    return sInstance->mIconsDir;
 }
 
 void eSettings::loadDefaults() {
@@ -238,6 +259,9 @@ void eSettings::loadFromFile() {
     file.close();
 
     if(fGpuVendor == GpuVendor::nvidia) fPathGpuAcc = false;
+
+    eSizesUI::font.updateSize();
+    eSizesUI::widget.updateSize();
 
     if(!invalidLines.isEmpty()) {
         RuntimeThrow("Invalid setting(s) \n" +

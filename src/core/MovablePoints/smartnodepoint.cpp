@@ -311,7 +311,7 @@ void SmartNodePoint::drawSk(SkCanvas * const canvas,
         paint.setAntiAlias(true);
 
         SkFont font;
-        font.setSize(FONT_HEIGHT*invScale);
+        font.setSize(eSizesUI::font*invScale);
         const auto fontStyle = SkFontStyle(SkFontStyle::kNormal_Weight,
                                            SkFontStyle::kNormal_Width,
                                            SkFontStyle::kUpright_Slant);
@@ -328,7 +328,7 @@ void SmartNodePoint::drawSk(SkCanvas * const canvas,
         paint.setStyle(SkPaint::kFill_Style);
         paint.setColor(SK_ColorWHITE);
         auto drawRect = bounds.makeOffset(x, y);
-        drawRect.outset(FONT_HEIGHT/4, FONT_HEIGHT/4);
+        drawRect.outset(eSizesUI::font/4, eSizesUI::font/4);
         canvas->drawRect(drawRect, paint);
 
         paint.setColor(SK_ColorBLACK);

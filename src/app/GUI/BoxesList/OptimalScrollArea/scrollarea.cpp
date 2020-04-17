@@ -51,9 +51,9 @@ void ScrollArea::resizeEvent(QResizeEvent *e) {
 #include "GUI/global.h"
 void ScrollArea::callWheelEvent(QWheelEvent *event) {
     if(event->delta() > 0) {
-        scrollBy(0, -MIN_WIDGET_DIM);
+        scrollBy(0, -eSizesUI::widget);
     } else {
-        scrollBy(0, MIN_WIDGET_DIM);
+        scrollBy(0, eSizesUI::widget);
     }
 //    verticalScrollBar()->triggerAction(
 //                (event->delta() > 0) ?

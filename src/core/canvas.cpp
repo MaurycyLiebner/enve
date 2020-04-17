@@ -191,7 +191,7 @@ void drawTransparencyMesh(SkCanvas * const canvas,
 
     SkMatrix matr;
     const float scale = canvas->getTotalMatrix().getMinScale();
-    const float dim = MIN_WIDGET_DIM*0.5f / (scale > 1.f ? 1.f : scale);
+    const float dim = eSizesUI::widget*0.5f / (scale > 1.f ? 1.f : scale);
     matr.setScale(dim, dim);
     const auto shader = bitmap.makeShader(SkTileMode::kRepeat,
                                           SkTileMode::kRepeat, &matr);
@@ -215,8 +215,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
     const float invZoom = toSkScalar(qInvZoom);
     const SkMatrix skViewTrans = toSkMatrix(viewTrans);
     const QColor bgColor = mBackgroundColor->getColor();
-    const float intervals[2] = {MIN_WIDGET_DIM*0.25f*invZoom,
-                                MIN_WIDGET_DIM*0.25f*invZoom};
+    const float intervals[2] = {eSizesUI::widget*0.25f*invZoom,
+                                eSizesUI::widget*0.25f*invZoom};
     const auto dashPathEffect = SkDashPathEffect::Make(intervals, 2, 0);
 
     canvas->concat(skViewTrans);
@@ -289,12 +289,12 @@ void Canvas::renderSk(SkCanvas * const canvas,
         if(mTransMode == TransformMode::rotate ||
            mTransMode == TransformMode::scale) {
             mRotPivot->drawTransforming(canvas, mCurrentMode, invZoom,
-                                        MIN_WIDGET_DIM*0.25f*invZoom);
+                                        eSizesUI::widget*0.25f*invZoom);
         } else if(!mouseGrabbing || mRotPivot->isSelected()) {
             mRotPivot->drawSk(canvas, mCurrentMode, invZoom, false, false);
         }
     } else if(mCurrentMode == CanvasMode::drawPath) {
-        const SkScalar nodeSize = 0.15f*MIN_WIDGET_DIM*invZoom;
+        const SkScalar nodeSize = 0.15f*eSizesUI::widget*invZoom;
         SkPaint paint;
         paint.setStyle(SkPaint::kFill_Style);
         paint.setAntiAlias(true);
@@ -386,7 +386,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
     canvas->resetMatrix();
 
     if(mTransMode != TransformMode::none || mValueInput.inputEnabled())
-        mValueInput.draw(canvas, drawRect.height() - MIN_WIDGET_DIM);
+        mValueInput.draw(canvas, drawRect.height() - eSizesUI::widget);
 }
 
 void Canvas::setFrameRange(const FrameRange &range) {

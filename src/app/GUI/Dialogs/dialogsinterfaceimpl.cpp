@@ -41,7 +41,7 @@ public:
 
         layout->addWidget(new QLabel(labelTxt), 0);
 
-        layout->addSpacing(MIN_WIDGET_DIM);
+        eSizesUI::widget.addSpacing(layout);
 
         const auto homePath = QDir::homePath();
 

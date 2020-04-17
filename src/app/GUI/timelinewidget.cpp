@@ -254,11 +254,13 @@ TimelineWidget::TimelineWidget(Document &document,
     connect(mSceneChooser, &SceneChooser::currentChanged,
             this, &TimelineWidget::setCurrentScene);
 
-    mBoxesListScrollArea->setFixedWidth(20*MIN_WIDGET_DIM);
+    eSizesUI::widget.add(mBoxesListScrollArea, [this](const int size) {
+        mBoxesListScrollArea->setFixedWidth(20*size);
+    });
 
     setLayout(mMainLayout);
 
-    mFrameScrollBar = new FrameScrollBar(1, 1, 0, false, false, this);
+    mFrameScrollBar = new FrameScrollBar(1, 1, false, false, this);
     mFrameScrollBar->setSizePolicy(QSizePolicy::Minimum,
                                    QSizePolicy::Preferred);
 //    connect(MemoryHandler::sGetInstance(), &MemoryHandler::memoryFreed,
@@ -272,8 +274,10 @@ TimelineWidget::TimelineWidget(Document &document,
     });
     mMainLayout->addWidget(mFrameScrollBar, 0, 1);
 
-    mFrameRangeScrollBar = new FrameScrollBar(20, 200, MIN_WIDGET_DIM*2/3,
-                                              true, true, this);
+    mFrameRangeScrollBar = new FrameScrollBar(20, 200, true, true, this);
+    eSizesUI::widget.add(mFrameRangeScrollBar, [this](const int size) {
+        mFrameRangeScrollBar->setMinimumHeight(size*2/3);
+    });
 
     connect(mFrameRangeScrollBar, &FrameScrollBar::triggeredFrameRangeChange,
             this, &TimelineWidget::setViewedFrameRange);
@@ -423,7 +427,7 @@ void TimelineWidget::readState(eReadStream &src) {
 }
 
 void TimelineWidget::moveSlider(int val) {
-    int diff = val%MIN_WIDGET_DIM;
+    int diff = val%eSizesUI::widget;
     if(diff != 0) {
         val -= diff;
         mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(val);

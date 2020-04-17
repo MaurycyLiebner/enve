@@ -58,17 +58,17 @@ void ColorPickingWidget::mouseReleaseEvent(QMouseEvent *e) {
 void ColorPickingWidget::paintEvent(QPaintEvent *) {
     QPainter p(this);
     p.drawImage(0, 0, mScreenshot);
-    p.fillRect(mCursorX + 2*MIN_WIDGET_DIM - 4,
-               mCursorY - MIN_WIDGET_DIM - 4,
-               MIN_WIDGET_DIM + 8,
-               MIN_WIDGET_DIM + 8, Qt::black);
-    p.fillRect(mCursorX + 2*MIN_WIDGET_DIM - 2,
-               mCursorY - MIN_WIDGET_DIM - 2,
-               MIN_WIDGET_DIM + 4,
-               MIN_WIDGET_DIM + 4, Qt::white);
-    p.fillRect(mCursorX + 2*MIN_WIDGET_DIM,
-               mCursorY - MIN_WIDGET_DIM,
-               MIN_WIDGET_DIM, MIN_WIDGET_DIM,
+    p.fillRect(mCursorX + 2*eSizesUI::widget - 4,
+               mCursorY - eSizesUI::widget - 4,
+               eSizesUI::widget + 8,
+               eSizesUI::widget + 8, Qt::black);
+    p.fillRect(mCursorX + 2*eSizesUI::widget - 2,
+               mCursorY - eSizesUI::widget - 2,
+               eSizesUI::widget + 4,
+               eSizesUI::widget + 4, Qt::white);
+    p.fillRect(mCursorX + 2*eSizesUI::widget,
+               mCursorY - eSizesUI::widget,
+               eSizesUI::widget, eSizesUI::widget,
                mCurrentColor);
     p.end();
 }

@@ -88,16 +88,16 @@ private:
 private:
     QAction *addSpaceToToolbar();
 
-    void setupDrawPathSpins(const QString& iconsDir);
+    void setupDrawPathSpins();
 
     void setBrushColor(const QColor& color);
     void setBrush(BrushContexedWrapper* const brush);
 
     void setSculptBrushColor(const QColor& color);
-    void setupSculptBrushSizeButtons(const QString &iconsDir);
+    void setupSculptBrushSizeButtons();
     void setupSculptBrushColorLabel();
-    void setupSculptModeButtons(const QString& iconsDir);
-    void setupSculptTargetButtons(const QString& iconsDir);
+    void setupSculptModeButtons();
+    void setupSculptTargetButtons();
     void setupSculptValueSpins();
     void sculptModeChanged();
     void sculptTargetChanged();

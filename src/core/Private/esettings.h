@@ -39,7 +39,7 @@ enum class AccPreference : int {
     gpuStrongPreference
 };
 
-class CORE_EXPORT eSettings {
+class CORE_EXPORT eSettings : public QObject {
 public:
     eSettings(const int cpuThreads, const intKB ramKB,
               const GpuVendor gpuVendor);
@@ -48,7 +48,7 @@ public:
     static intMB sRamMBCap();
     static int sCpuThreadsCapped();
     static const QString& sSettingsDir();
-    static QString sIconsDir();
+    static const QString& sIconsDir();
     static eSettings* sInstance;
 
     void loadDefaults();
@@ -89,6 +89,9 @@ public:
     int fAutoQuickSaveMin = 0; // <= 0 - disabled
     AutosaveTarget fQuickSaveTarget = AutosaveTarget::same_folder;
 
+    // ui settings
+    qreal fInterfaceScaling;
+
     // timeline settings
     bool fTimelineAlternateRow;
     QColor fTimelineAlternateRowColor;
@@ -104,6 +107,8 @@ public:
     QString fGimp = "gimp";
     QString fMyPaint = "mypaint";
     QString fKrita = "krita";
+private:
+    QString mIconsDir;
 };
 
 #endif // SETTINGS_H

@@ -29,7 +29,9 @@
 FileSourceWidget::FileSourceWidget(FileSourceListVisibleWidget *parent) :
     QWidget(parent) {
     mParentVisibleWidget = parent;
-    setFixedHeight(MIN_WIDGET_DIM);
+    eSizesUI::widget.add(this, [this](const int size) {
+        setFixedHeight(size);
+    });
 }
 
 void FileSourceWidget::setTargetCache(FileCacheHandlerAbstraction *target) {
@@ -62,26 +64,26 @@ void FileSourceWidget::mouseMoveEvent(QMouseEvent *event) {
 
 
 void FileSourceWidget::paintEvent(QPaintEvent *) {
-    if(!mTargetCache || width() <= 2*MIN_WIDGET_DIM) return;
+    if(!mTargetCache || width() <= 2*eSizesUI::widget) return;
     QPainter p(this);
 
     QString pathString = mTargetCache->getName();
     if(mFileNameOnly) pathString = pathString.split("/").last();
     const auto fm = p.fontMetrics();
-    const int spaceForPath = int(width() - 1.5*MIN_WIDGET_DIM);
+    const int spaceForPath = int(width() - 1.5*eSizesUI::widget);
     pathString = fm.elidedText(pathString, Qt::ElideLeft, spaceForPath);
     const int pathWidth = fm.width(pathString);
 
     if(mTargetCache->fSelected) {
-        p.fillRect(QRect(0.5*MIN_WIDGET_DIM, 0,
-                         pathWidth + MIN_WIDGET_DIM, MIN_WIDGET_DIM),
+        p.fillRect(QRect(0.5*eSizesUI::widget, 0,
+                         pathWidth + eSizesUI::widget, eSizesUI::widget),
                    QColor(180, 180, 180));
         p.setPen(Qt::black);
     }
     if(mTargetCache->isFileMissing()) p.setPen(Qt::red);
 
-    p.drawText(rect().adjusted(MIN_WIDGET_DIM, 0,
-                               -0.5*MIN_WIDGET_DIM, 0),
+    p.drawText(rect().adjusted(eSizesUI::widget, 0,
+                               -0.5*eSizesUI::widget, 0),
                Qt::AlignVCenter | Qt::AlignLeft,
                pathString);
 
@@ -124,7 +126,7 @@ FileSourceListScrollWidget::FileSourceListScrollWidget(ScrollArea *parent) :
 void FileSourceListScrollWidget::updateHeight() {
     const auto visWid = static_cast<FileSourceListVisibleWidget*>(
                 visiblePartWidget());
-    setFixedHeight((visWid->getCacheListCount() + 0.5) * MIN_WIDGET_DIM);
+    setFixedHeight((visWid->getCacheListCount() + 0.5) * eSizesUI::widget);
 }
 
 FileSourceListVisibleWidget::FileSourceListVisibleWidget(MinimalScrollWidget *parent) :
@@ -138,12 +140,12 @@ FileSourceListVisibleWidget::FileSourceListVisibleWidget(MinimalScrollWidget *pa
 void FileSourceListVisibleWidget::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
-    int currY = MIN_WIDGET_DIM;
+    int currY = eSizesUI::widget;
     p.setPen(QPen(QColor(40, 40, 40), 1.));
     while(currY < height()) {
         p.drawLine(0, currY, width(), currY);
 
-        currY += MIN_WIDGET_DIM;
+        currY += eSizesUI::widget;
     }
 
 //    if(mDragging) {
@@ -156,7 +158,7 @@ void FileSourceListVisibleWidget::paintEvent(QPaintEvent *) {
 }
 
 void FileSourceListVisibleWidget::updateVisibleWidgetsContent() {
-    int firstVisibleId = visibleTop()/MIN_WIDGET_DIM;
+    int firstVisibleId = visibleTop()/eSizesUI::widget;
 
     int iTarget = firstVisibleId;
     const auto& wids = widgets();
@@ -230,7 +232,7 @@ FileSourceList::FileSourceList(QWidget *parent) : ScrollArea(parent) {
     connect(this, &FileSourceList::widthChanged,
             mScrollWidget, &FileSourceListScrollWidget::setWidth);
 
-    verticalScrollBar()->setSingleStep(MIN_WIDGET_DIM);
+    verticalScrollBar()->setSingleStep(eSizesUI::widget);
     setAcceptDrops(true);
 }
 

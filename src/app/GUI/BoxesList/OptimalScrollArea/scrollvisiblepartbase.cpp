@@ -27,6 +27,10 @@ ScrollVisiblePartBase::ScrollVisiblePartBase(
         MinimalScrollWidget * const parent) {
     Q_ASSERT(parent);
     mParentWidget = parent;
+    connect(&eSizesUI::widget, &SizeSetter::sizeChanged, this, [this]() {
+        updateParentHeight();
+        updateVisibleWidgets();
+    });
 }
 
 void ScrollVisiblePartBase::updateParentHeightAndContent() {
@@ -104,7 +108,7 @@ void ScrollVisiblePartBase::updateParentHeightIfNeeded() {
 
 void ScrollVisiblePartBase::updateVisibleWidgets() {
     const int neededWidgets = qCeil(mVisibleHeight/
-                              static_cast<qreal>(MIN_WIDGET_DIM));
+                              static_cast<qreal>(eSizesUI::widget));
     const int currentNWidgets = mSingleWidgets.count();
 
     if(neededWidgets == currentNWidgets) return;
@@ -122,7 +126,7 @@ void ScrollVisiblePartBase::updateVisibleWidgets() {
     for(const auto& widget : mSingleWidgets) {
         widget->move(widget->x(), y);
         widget->setFixedWidth(width() - widget->x());
-        y += MIN_WIDGET_DIM;
+        y += eSizesUI::widget;
     }
 
     updateVisibleWidgetsContent();

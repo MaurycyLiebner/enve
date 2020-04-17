@@ -59,7 +59,7 @@ ApplyExpressionDialog::ApplyExpressionDialog(QrealAnimator* const target,
 
     layout->addPair(new QLabel("First Frame:"), mFirstFrame);
     layout->addPair(new QLabel("Last Frame:"), mLastFrame);
-    layout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(layout);
     layout->addPair(new QLabel("Accuracy:"), mAccuracy);
 
     const auto buttons = new QDialogButtonBox(QDialogButtonBox::Ok |
@@ -77,7 +77,7 @@ ApplyExpressionDialog::ApplyExpressionDialog(QrealAnimator* const target,
     });
 
     mainLayout->addLayout(layout);
-    mainLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(mainLayout);
     mainLayout->addWidget(buttons);
 
     connect(target, &QObject::destroyed, this, &QDialog::reject);

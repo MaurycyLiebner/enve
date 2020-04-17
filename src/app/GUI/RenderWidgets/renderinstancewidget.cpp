@@ -67,7 +67,7 @@ void RenderInstanceWidget::iniGUI() {
     setObjectName("darkWidget");
     mNameLabel = new QLabel(this);
     mNameLabel->setTextFormat(Qt::RichText);
-    mNameLabel->setFixedHeight(MIN_WIDGET_DIM);
+    mNameLabel->setFixedHeight(eSizesUI::widget);
     mNameLabel->setObjectName("darkWidget");
 
     setLabelWidget(mNameLabel);
@@ -90,12 +90,12 @@ void RenderInstanceWidget::iniGUI() {
     renderSettingsLayout->setMargin(0);
     renderSettingsLayout->setAlignment(Qt::AlignLeft);
 
-    renderSettingsLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(renderSettingsLayout);
     QLabel *renderSettingsLabel = new QLabel("Render Settings:", this);
     //renderSettingsLabel->setObjectName("darkWidget");
-    renderSettingsLabel->setFixedHeight(MIN_WIDGET_DIM);
+    renderSettingsLabel->setFixedHeight(eSizesUI::widget);
     renderSettingsLayout->addWidget(renderSettingsLabel);
-    renderSettingsLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(renderSettingsLayout);
 
     mRenderSettingsButton = new QPushButton("Settings");
     mRenderSettingsButton->setObjectName("renderSettings");
@@ -121,20 +121,20 @@ void RenderInstanceWidget::iniGUI() {
     outputSettingsLayout->setMargin(0);
     outputSettingsLayout->setAlignment(Qt::AlignTop);
 
-    outputSettingsLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(outputSettingsLayout);
     QLabel *outputSettingsLabel = new QLabel("Output Settings:", this);
-    outputSettingsLabel->setFixedHeight(MIN_WIDGET_DIM);
+    outputSettingsLabel->setFixedHeight(eSizesUI::widget);
     outputSettingsLabel->setSizePolicy(QSizePolicy::Maximum,
                                        QSizePolicy::Maximum);
     outputSettingsLayout->addWidget(outputSettingsLabel);
-    outputSettingsLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(outputSettingsLayout);
 
     mOutputSettingsProfilesButton = new OutputProfilesListButton(this);
     connect(mOutputSettingsProfilesButton, &OutputProfilesListButton::profileSelected,
             this, &RenderInstanceWidget::outputSettingsProfileSelected);
     mOutputSettingsProfilesButton->setObjectName("renderSettings");
-    mOutputSettingsProfilesButton->setFixedSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM);
-    mOutputSettingsProfilesButton->setIconSize(QSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM));
+    mOutputSettingsProfilesButton->setFixedSize(eSizesUI::widget, eSizesUI::widget);
+    mOutputSettingsProfilesButton->setIconSize(QSize(eSizesUI::widget, eSizesUI::widget));
 
     mOutputSettingsButton = new QPushButton("Settings");
     mOutputSettingsButton->setObjectName("renderSettings");
@@ -145,14 +145,14 @@ void RenderInstanceWidget::iniGUI() {
     outputSettingsLayout->addWidget(mOutputSettingsProfilesButton);
     outputSettingsLayout->addWidget(mOutputSettingsButton);
 
-    outputSettingsLayout->addSpacing(6*MIN_WIDGET_DIM);
+    outputSettingsLayout->addSpacing(6*eSizesUI::widget);
 
     QLabel *outputDestinationLabel = new QLabel("Output Destination:", this);
-    outputDestinationLabel->setFixedHeight(MIN_WIDGET_DIM);
+    outputDestinationLabel->setFixedHeight(eSizesUI::widget);
     outputDestinationLabel->setSizePolicy(QSizePolicy::Maximum,
                                           QSizePolicy::Maximum);
     outputSettingsLayout->addWidget(outputDestinationLabel);
-    outputSettingsLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(outputSettingsLayout);
 
     mOutputDestinationButton = new QPushButton("Destination");
     mOutputDestinationButton->setObjectName("renderSettings");

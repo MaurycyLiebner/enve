@@ -49,7 +49,6 @@ private:
     int mNumberVisibleGradients = 6;
     int mHalfHeight = 64;
     int mQuorterHeight = 32;
-    int mScrollItemHeight;
 
     Gradient *mCurrentGradient = nullptr;
     ColorAnimator *mCurrentColor = nullptr;

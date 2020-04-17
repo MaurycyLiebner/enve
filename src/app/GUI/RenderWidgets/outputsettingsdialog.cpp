@@ -142,14 +142,14 @@ OutputSettingsDialog::OutputSettingsDialog(const OutputSettings &settings,
     mButtonsLayout->addWidget(mOkButton, Qt::AlignRight);
 
     mMainLayout->addLayout(mOutputFormatsLayout);
-    mMainLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(mMainLayout);
     mVideoGroupBox->setLayout(mVideoSettingsLayout);
     mMainLayout->addWidget(mVideoGroupBox);
     mAudioGroupBox->setLayout(mAudioSettingsLayout);
     mMainLayout->addWidget(mAudioGroupBox);
-    mMainLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(mMainLayout);
     mMainLayout->addLayout(mShowLayout);
-    mMainLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(mMainLayout);
     mMainLayout->addLayout(mButtonsLayout);
 
     connect(mVideoCodecsComboBox, &QComboBox::currentTextChanged,

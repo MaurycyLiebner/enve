@@ -25,7 +25,9 @@
 CurrentGradientWidget::CurrentGradientWidget(QWidget *parent) :
     GLWidget(parent) {
     setMouseTracking(true);
-    setFixedHeight(MIN_WIDGET_DIM);
+    eSizesUI::widget.add(this, [this](const int size) {
+        setFixedHeight(size);
+    });
 }
 
 void CurrentGradientWidget::setCurrentGradient(Gradient * const gradient) {

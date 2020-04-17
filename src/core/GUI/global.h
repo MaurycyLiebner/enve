@@ -17,17 +17,27 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include "../core_global.h"
+#include "sizesetter.h"
 
 #include <QPixmap>
 #include <QString>
+#include <QFont>
+
+namespace eSizesUI {
+    //! @brief font height
+    CORE_EXPORT extern SizeSetter font;
+    //! @brief minimum widget dimension
+    CORE_EXPORT extern SizeSetter widget;
+    //! @brief minimum button dimension
+    CORE_EXPORT extern SizeSetter button;
+};
 
 CORE_EXPORT
-extern int FONT_HEIGHT;
+extern void connectAppFont(QWidget* const widget);
+
 CORE_EXPORT
-extern int MIN_WIDGET_DIM;
-CORE_EXPORT
-extern int BUTTON_DIM;
+extern QFont OS_FONT;
+
 CORE_EXPORT
 extern int KEY_RECT_SIZE;
 

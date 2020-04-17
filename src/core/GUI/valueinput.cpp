@@ -35,8 +35,8 @@ void ValueInput::draw(SkCanvas *canvas, const int y) {
     const auto transStr = getText();
     const int textWidth = QApplication::fontMetrics().width(transStr);
     const SkRect inputRect =
-            SkRect::MakeXYWH(2*MIN_WIDGET_DIM, y,
-                             textWidth + MIN_WIDGET_DIM, MIN_WIDGET_DIM);
+            SkRect::MakeXYWH(2*eSizesUI::widget, y,
+                             textWidth + eSizesUI::widget, eSizesUI::widget);
     paint.setStyle(SkPaint::kFill_Style);
     paint.setColor(SkColorSetRGB(225, 225, 225));
     canvas->drawRect(inputRect, paint);
@@ -45,8 +45,8 @@ void ValueInput::draw(SkCanvas *canvas, const int y) {
     paint.setStrokeWidth(.1f);
 
     canvas->drawString(transStr.toStdString().c_str(),
-           inputRect.x() + MIN_WIDGET_DIM*0.5f,
-           inputRect.y() + inputRect.height()*0.5f + FONT_HEIGHT*0.2f,
+           inputRect.x() + eSizesUI::widget*0.5f,
+           inputRect.y() + inputRect.height()*0.5f + eSizesUI::font*0.2f,
            mFont, paint);
 }
 
@@ -54,11 +54,11 @@ void ValueInput::draw(QPainter *p, const int y) {
     p->setFont(QApplication::font());
     const auto transStr = getText();
     const int textWidth = QApplication::fontMetrics().width(transStr);
-    const QRect inputRect(2*MIN_WIDGET_DIM, y,
-                          textWidth + MIN_WIDGET_DIM, MIN_WIDGET_DIM);
+    const QRect inputRect(2*eSizesUI::widget, y,
+                          textWidth + eSizesUI::widget, eSizesUI::widget);
     p->fillRect(inputRect, QColor(255, 255, 255, 55));
-    p->drawText(qRound(inputRect.x() + MIN_WIDGET_DIM*0.5),
-                qRound(inputRect.y() + inputRect.height()*0.5 + FONT_HEIGHT*0.2),
+    p->drawText(qRound(inputRect.x() + eSizesUI::widget*0.5),
+                qRound(inputRect.y() + inputRect.height()*0.5 + eSizesUI::font*0.2),
                 transStr);
 }
 

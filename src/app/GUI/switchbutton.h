@@ -23,7 +23,8 @@ class SwitchButton : public ButtonBase {
     Q_OBJECT
 public:
     SwitchButton(const QString &toolTip, QWidget *parent);
-    ~SwitchButton();
+
+    void toggle();
 
     static SwitchButton* sCreate2Switch(
             const QString &icon0, const QString &icon1,
@@ -32,9 +33,10 @@ public:
     int addState(const QString& icon);
 
     bool setState(const int state);
-    void toggle();
 private:
-    QList<QImage*> mStates;
+    void updateIcon();
+
+    QList<QImage> mStates;
     int mCurrentState = -1;
 signals:
     void toggled(int);

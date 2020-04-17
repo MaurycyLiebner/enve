@@ -12,10 +12,12 @@ RenderSettingsDisplayWidget::RenderSettingsDisplayWidget(QWidget * const parent)
     mResolutionLabel = new QLabel("<b>Resolution:</b>");
     mFpsLabel = new QLabel("<b>Fps:</b>");
 
-    mSceneLabel->setFixedHeight(MIN_WIDGET_DIM);
-    mFrameRangeLabel->setFixedHeight(MIN_WIDGET_DIM);
-    mResolutionLabel->setFixedHeight(MIN_WIDGET_DIM);
-    mFpsLabel->setFixedHeight(MIN_WIDGET_DIM);
+    eSizesUI::widget.add(this, [this](const int size) {
+        mSceneLabel->setFixedHeight(size);
+        mFrameRangeLabel->setFixedHeight(size);
+        mResolutionLabel->setFixedHeight(size);
+        mFpsLabel->setFixedHeight(size);
+    });
 
     mMainLayout->addWidget(mSceneLabel);
     mMainLayout->addWidget(mFrameRangeLabel);

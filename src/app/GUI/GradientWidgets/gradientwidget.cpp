@@ -25,7 +25,10 @@
 
 GradientWidget::GradientWidget(QWidget * const parent) :
     QWidget(parent) {
-    setFixedHeight(qRound((3 + mNumberVisibleGradients + 0.5)*MIN_WIDGET_DIM));
+    eSizesUI::widget.add(this, [this](const int size) {
+        const qreal mult = (3 + mNumberVisibleGradients + 0.5);
+        setFixedHeight(qRound(mult*size));
+    });
     mMainLayout = new QVBoxLayout(this);
     mMainLayout->setMargin(0);
     mMainLayout->setSpacing(0);
@@ -33,11 +36,9 @@ GradientWidget::GradientWidget(QWidget * const parent) :
     mGradientsListWidget = new GradientsListWidget(this);
     mCurrentGradientWidget = new CurrentGradientWidget(this);
     mMainLayout->addWidget(mGradientsListWidget);
-    mMainLayout->addSpacing(MIN_WIDGET_DIM/2);
+    eSizesUI::widget.addHalfSpacing(mMainLayout);
     mMainLayout->addWidget(mCurrentGradientWidget);
     setLayout(mMainLayout);
-
-    mScrollItemHeight = MIN_WIDGET_DIM;
 
     const auto list = mGradientsListWidget->getList();
     connect(list, &DisplayedGradientsWidget::triggered,
@@ -51,7 +52,6 @@ GradientWidget::GradientWidget(QWidget * const parent) :
             mCurrentGradientWidget, &CurrentGradientWidget::setCurrentGradient);
     connect(mCurrentGradientWidget, &CurrentGradientWidget::selectedColorChanged,
             this, &GradientWidget::selectedColorChanged);
-
 }
 
 void GradientWidget::clearAll() {

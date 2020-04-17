@@ -33,15 +33,15 @@ OutputSettingsDisplayWidget::OutputSettingsDisplayWidget(QWidget *parent) :
     mAudioBitrateLabel = new QLabel("<b>Audio bitrate:</b>", this);
     mAudioChannelLayoutLabel = new QLabel("<b>Audio channel layout:</b>", this);
 
-    mOutputFormatLabel->setFixedHeight(MIN_WIDGET_DIM);
-    mVideoCodecLabel->setFixedHeight(MIN_WIDGET_DIM);
-    mVideoPixelFormatLabel->setFixedHeight(MIN_WIDGET_DIM);
-    mVideoBitrateLabel->setFixedHeight(MIN_WIDGET_DIM);
-    mAudioCodecLabel->setFixedHeight(MIN_WIDGET_DIM);
-    mAudioSampleRateLabel->setFixedHeight(MIN_WIDGET_DIM);
-    mAudioSampleFormatLabel->setFixedHeight(MIN_WIDGET_DIM);
-    mAudioBitrateLabel->setFixedHeight(MIN_WIDGET_DIM);
-    mAudioChannelLayoutLabel->setFixedHeight(MIN_WIDGET_DIM);
+    mOutputFormatLabel->setFixedHeight(eSizesUI::widget);
+    mVideoCodecLabel->setFixedHeight(eSizesUI::widget);
+    mVideoPixelFormatLabel->setFixedHeight(eSizesUI::widget);
+    mVideoBitrateLabel->setFixedHeight(eSizesUI::widget);
+    mAudioCodecLabel->setFixedHeight(eSizesUI::widget);
+    mAudioSampleRateLabel->setFixedHeight(eSizesUI::widget);
+    mAudioSampleFormatLabel->setFixedHeight(eSizesUI::widget);
+    mAudioBitrateLabel->setFixedHeight(eSizesUI::widget);
+    mAudioChannelLayoutLabel->setFixedHeight(eSizesUI::widget);
 
     mVideoLayout = new QVBoxLayout();
     mVideoLayout->addWidget(mVideoCodecLabel);
@@ -60,7 +60,7 @@ OutputSettingsDisplayWidget::OutputSettingsDisplayWidget(QWidget *parent) :
     mAudioVideoLayout->setAlignment(mVideoLayout, Qt::AlignLeft);
     mAudioVideoLayout->setAlignment(mAudioLayout, Qt::AlignLeft);
     mAudioVideoLayout->setAlignment(Qt::AlignLeft);
-    mAudioVideoLayout->setSpacing(MIN_WIDGET_DIM);
+    mAudioVideoLayout->setSpacing(eSizesUI::widget);
     mAudioLayout->setSpacing(0);
     mVideoLayout->setSpacing(0);
     mVideoLayout->setAlignment(Qt::AlignTop);

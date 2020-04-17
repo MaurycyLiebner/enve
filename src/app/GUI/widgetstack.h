@@ -60,7 +60,7 @@ protected:
     void setThis(QWidget * const thisP) {
         mThis = thisP;
         DimSetter(mThis, 10);
-        OtherDimSetter(mThis, 2*MIN_WIDGET_DIM*100);
+        OtherDimSetter(mThis, 2*eSizesUI::widget*100);
         mThis->setWindowFlags(Qt::WindowStaysOnTopHint);
         mThis->show();
     }
@@ -69,10 +69,10 @@ protected:
         int dDim = totDDim;
         const int newAboveDim = (mPrevWidget->*DimGetter)() + dDim;
         const int newBelowDim = (mNextWidget->*DimGetter)() - dDim;
-        if(newAboveDim < 2*MIN_WIDGET_DIM) {
-            dDim = 2*MIN_WIDGET_DIM - (mPrevWidget->*DimGetter)();
-        } else if(newBelowDim < 2*MIN_WIDGET_DIM) {
-            dDim = (mNextWidget->*DimGetter)() - 2*MIN_WIDGET_DIM;
+        if(newAboveDim < 2*eSizesUI::widget) {
+            dDim = 2*eSizesUI::widget - (mPrevWidget->*DimGetter)();
+        } else if(newBelowDim < 2*eSizesUI::widget) {
+            dDim = (mNextWidget->*DimGetter)() - 2*eSizesUI::widget;
         }
         if(totDDim != dDim) {
             if(totDDim > 0) {
@@ -317,7 +317,7 @@ protected:
     }
 
     int minDim() const {
-        return mThis->isVisible() ? 2*MIN_WIDGET_DIM : 1;
+        return mThis->isVisible() ? 2*eSizesUI::widget : 1;
     }
 public:
     qreal percentAt(const int id) const {

@@ -43,13 +43,13 @@ QWidget *BoxScroller::createNewSingleWidget() {
 void BoxScroller::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
-    int currY = MIN_WIDGET_DIM;
+    int currY = eSizesUI::widget;
     p.setPen(QPen(QColor(40, 40, 40), 1));
     const auto parent = static_cast<BoxScrollWidget*>(parentWidget());
-    const int parentContHeight = parent->getContentHeight() - MIN_WIDGET_DIM;
+    const int parentContHeight = parent->getContentHeight() - eSizesUI::widget;
     while(currY < parentContHeight) {
         p.drawLine(0, currY, width(), currY);
-        currY += MIN_WIDGET_DIM;
+        currY += eSizesUI::widget;
     }
 
     if(mDropTarget.isValid()) {
@@ -87,7 +87,7 @@ bool BoxScroller::tryDropIntoAbs(SWT_Abstraction* const abs,
 BoxScroller::DropTarget BoxScroller::getClosestDropTarget(const int yPos) {
     const auto mainAbs = getMainAbstration();
     if(!mainAbs) return DropTarget();
-    const int idAtPos = yPos / MIN_WIDGET_DIM;
+    const int idAtPos = yPos / eSizesUI::widget;
     DropTarget target;
     const auto& wids = widgets();
     const int nWidgets = wids.count();
@@ -96,15 +96,15 @@ BoxScroller::DropTarget BoxScroller::getClosestDropTarget(const int yPos) {
         if(bsw->isHidden()) {
             const int nChildren = mainAbs->childrenCount();
             if(tryDropIntoAbs(mainAbs, nChildren, target)) {
-                mCurrentDragRect = QRect(0, visibleCount()*MIN_WIDGET_DIM, width(), 1);
+                mCurrentDragRect = QRect(0, visibleCount()*eSizesUI::widget, width(), 1);
                 return target;
             }
         } else if(bsw->getTargetAbstraction()) {
             const auto abs = bsw->getTargetAbstraction();
-            const bool above = yPos % MIN_WIDGET_DIM < MIN_WIDGET_DIM*0.5;
+            const bool above = yPos % eSizesUI::widget < eSizesUI::widget*0.5;
             bool dropOn = false;
             {
-                const qreal posFrac = qreal(yPos)/MIN_WIDGET_DIM;
+                const qreal posFrac = qreal(yPos)/eSizesUI::widget;
                 if(qAbs(qRound(posFrac) - posFrac) > 0.333) dropOn = true;
                 if(!above && abs->contentVisible() &&
                    abs->childrenCount() > 0) dropOn = true;
@@ -154,8 +154,8 @@ BoxScroller::DropTarget BoxScroller::getClosestDropTarget(const int yPos) {
         if(!bsw->isHidden() && bsw->getTargetAbstraction()) {
             const auto abs = bsw->getTargetAbstraction();
             if(tryDropIntoAbs(abs, 0, target)) {
-                mCurrentDragRect = QRect(bsw->x() + MIN_WIDGET_DIM,
-                                         bsw->y() + MIN_WIDGET_DIM,
+                mCurrentDragRect = QRect(bsw->x() + eSizesUI::widget,
+                                         bsw->y() + eSizesUI::widget,
                                          width(), 1);
                 return target;
             }
@@ -240,13 +240,13 @@ void BoxScroller::updateDropTarget() {
 }
 
 void BoxScroller::scrollUp() {
-    parentWidget()->scrollParentAreaBy(-MIN_WIDGET_DIM);
+    parentWidget()->scrollParentAreaBy(-eSizesUI::widget);
     updateDropTarget();
     update();
 }
 
 void BoxScroller::scrollDown() {
-    parentWidget()->scrollParentAreaBy(MIN_WIDGET_DIM);
+    parentWidget()->scrollParentAreaBy(eSizesUI::widget);
     updateDropTarget();
     update();
 }

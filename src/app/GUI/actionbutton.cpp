@@ -16,12 +16,15 @@
 
 #include "actionbutton.h"
 #include "GUI/global.h"
+#include "Private/esettings.h"
 #include <QPainter>
 
 ActionButton::ActionButton(const QString &icon,
                            const QString &toolTip,
                            QWidget *parent) :
     ButtonBase(toolTip, parent) {
-    mIcon.load(icon);
-    setCurrentIcon(mIcon);
+    eSizesUI::widget.add(this, [this, icon](int) {
+        mIcon.load(eSettings::sIconsDir() + "/" + icon);
+        setCurrentIcon(mIcon);
+    });
 }

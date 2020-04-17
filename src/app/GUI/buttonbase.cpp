@@ -24,7 +24,9 @@ ButtonBase::ButtonBase(const QString &toolTip,
     QWidget(parent) {
     setToolTip(toolTip);
     setFocusPolicy(Qt::NoFocus);
-    setFixedSize(BUTTON_DIM, BUTTON_DIM);
+    eSizesUI::button.add(this, [this](const int size) {
+        setFixedSize(size, size);
+    });
 }
 
 void ButtonBase::setCurrentIcon(const QImage &icon) {

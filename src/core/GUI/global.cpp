@@ -16,10 +16,14 @@
 
 #include "global.h"
 
+#include <QWidget>
+#include <QApplication>
 
-int FONT_HEIGHT;
-int MIN_WIDGET_DIM;
-int BUTTON_DIM;
+SizeSetter eSizesUI::font;
+SizeSetter eSizesUI::widget;
+SizeSetter eSizesUI::button;
+
+QFont OS_FONT;
 int KEY_RECT_SIZE;
 
 QPixmap* ALPHA_MESH_PIX;
@@ -31,4 +35,11 @@ QString gSingleLineTooltip(const QString &text) {
 QString gSingleLineTooltip(const QString &text, const QString &shortcut) {
     return "<p style='white-space:pre'>" + text +
             " <font color='grey'>" + shortcut + "</font></p>";
+}
+
+void connectAppFont(QWidget* const widget) {
+    QObject::connect(&eSizesUI::font, &SizeSetter::sizeChanged,
+                     widget, [widget]() {
+        widget->setFont(QApplication::font());
+    });
 }

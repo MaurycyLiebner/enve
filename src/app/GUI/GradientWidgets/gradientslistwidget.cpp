@@ -21,8 +21,10 @@
 
 GradientsListWidget::GradientsListWidget(QWidget *parent) :
     ScrollArea(parent) {
-    setFixedHeight(6*MIN_WIDGET_DIM);
-    verticalScrollBar()->setSingleStep(MIN_WIDGET_DIM);
+    eSizesUI::widget.add(this, [this](const int size) {
+        setFixedHeight(6*size);
+        verticalScrollBar()->setSingleStep(size);
+    });
     mDisplayedGradients = new DisplayedGradientsWidget(this);
     setWidget(mDisplayedGradients);
 }

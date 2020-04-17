@@ -27,7 +27,6 @@ class FrameScrollBar : public QWidget {
 public:
     explicit FrameScrollBar(const int minSpan,
                             const int maxSpan,
-                            const int height,
                             const bool range,
                             const bool clamp,
                             QWidget *parent = nullptr);

@@ -34,7 +34,7 @@ void TimelineHighlightWidget::setOther(TimelineHighlightWidget * const other)
 { mOther = other; }
 
 void TimelineHighlightWidget::mouseMoveEvent(QMouseEvent *event) {
-    setHoverRow(event->y()/MIN_WIDGET_DIM);
+    setHoverRow(event->y()/eSizesUI::widget);
     event->ignore();
 }
 
@@ -47,13 +47,13 @@ void TimelineHighlightWidget::paintEvent(QPaintEvent *) {
     if(mSettings.fTimelineAlternateRow) {
         const int height = this->height();
         const QColor color = mSettings.fTimelineAlternateRowColor;
-        for(int i = 0; i < height; i += 2*MIN_WIDGET_DIM) {
-            p.fillRect(0, i, width(), MIN_WIDGET_DIM, color);
+        for(int i = 0; i < height; i += 2*eSizesUI::widget) {
+            p.fillRect(0, i, width(), eSizesUI::widget, color);
         }
     }
     if(mSettings.fTimelineHighlightRow && mHoverRow >= 0) {
-        p.fillRect(0, mHoverRow*MIN_WIDGET_DIM,
-                   width(), MIN_WIDGET_DIM,
+        p.fillRect(0, mHoverRow*eSizesUI::widget,
+                   width(), eSizesUI::widget,
                    mSettings.fTimelineHighlightRowColor);
     }
     p.end();

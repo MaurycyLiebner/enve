@@ -42,6 +42,11 @@ KeysView::KeysView(BoxScrollWidget *boxesListVisible,
     setMouseTracking(true);
     setAcceptDrops(true);
     mScrollTimer = new QTimer(this);
+
+    eSizesUI::widget.add(this, [this](int) {
+        updatePixelsPerFrame();
+        update();
+    });
 }
 
 TimelineHighlightWidget *KeysView::requestHighlighter() {
@@ -135,14 +140,14 @@ void KeysView::getKeysInRect(QRectF selectionRect,
 //    selectionRect.adjust(-0.5, -(BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5,
 //                         0.5, (BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5);
     selectionRect.adjust(0.5, 0, 0.5, 0);
-    const int minX = qRound(selectionRect.top() - MIN_WIDGET_DIM*0.5);
-    const int minY = qRound(selectionRect.bottom() - MIN_WIDGET_DIM*0.5);
+    const int minX = qRound(selectionRect.top() - eSizesUI::widget*0.5);
+    const int minY = qRound(selectionRect.bottom() - eSizesUI::widget*0.5);
     int currY = 0;
     const SetAbsFunc setter = [&abstractions](SWT_Abstraction * abs, int) {
         abstractions.append(abs);
     };
     mainAbs->setAbstractions(
-            minX, minY, currY, 0, MIN_WIDGET_DIM,
+            minX, minY, currY, 0, eSizesUI::widget,
             setter, rules, true, false);
 
     for(const auto& abs : abstractions) {
@@ -186,7 +191,7 @@ void KeysView::wheelEvent(QWheelEvent *e) {
         emit wheelEventSignal(e);
         if(mSelecting) {
             const QPointF posU = mapFromGlobal(QCursor::pos()) +
-                           QPointF(-MIN_WIDGET_DIM/2, 0.);
+                           QPointF(-eSizesUI::widget/2, 0.);
             mSelectionRect.setBottom(posU.y() + mViewedTop);
         }
         //mBoxesList->handleWheelEvent(e);
@@ -247,7 +252,7 @@ TimelineMovable *KeysView::getRectangleMovableAtPos(
 
 void KeysView::mousePressEvent(QMouseEvent *e) {
     KFT_setFocus();
-    const QPoint posU = e->pos() + QPoint(-MIN_WIDGET_DIM/2, 0);
+    const QPoint posU = e->pos() + QPoint(-eSizesUI::widget/2, 0);
     if(e->button() == Qt::MiddleButton) {
         if(mGraphViewed) gMiddlePress(posU);
         else middlePress(posU);
@@ -342,7 +347,7 @@ bool KeysView::KFT_keyPressEvent(QKeyEvent *event) {
         }
     }
     const QPoint posU = mapFromGlobal(QCursor::pos()) +
-            QPoint(-MIN_WIDGET_DIM/2, 0);
+            QPoint(-eSizesUI::widget/2, 0);
     if(inputHandled) {
         handleMouseMove(mLastMovePos, QApplication::mouseButtons());
     } else if(event->key() == Qt::Key_Escape) {
@@ -454,20 +459,20 @@ void KeysView::paintEvent(QPaintEvent *) {
 
     if(mPixelsPerFrame < 0.001) return;
     if(!mGraphViewed) {    
-        int currY = MIN_WIDGET_DIM;
+        int currY = eSizesUI::widget;
         p.setPen(QPen(QColor(40, 40, 40), 1));
         while(currY < height()) {
             p.drawLine(0, currY, width(), currY);
-            currY += MIN_WIDGET_DIM;
+            currY += eSizesUI::widget;
         }
     }
-    p.translate(MIN_WIDGET_DIM/2, 0);
+    p.translate(eSizesUI::widget/2, 0);
 
     p.setPen(QPen(QColor(75, 75, 75), 1));
     qreal xT = mPixelsPerFrame*0.5;
     int iInc = 1;
     bool mult5 = true;
-    while(iInc*mPixelsPerFrame < MIN_WIDGET_DIM/2) {
+    while(iInc*mPixelsPerFrame < eSizesUI::widget/2) {
         if(mult5) iInc *= 5;
         else iInc *= 2;
     }
@@ -501,7 +506,7 @@ void KeysView::paintEvent(QPaintEvent *) {
     } else {
         p.save();
         p.setRenderHint(QPainter::Antialiasing);
-        const qreal transDFrame = 0.5*MIN_WIDGET_DIM/mPixelsPerFrame;
+        const qreal transDFrame = 0.5*eSizesUI::widget/mPixelsPerFrame;
         const qreal frameAtZeroX = mMinViewedFrame - transDFrame;
         const int frameAtZeroXi = qFloor(frameAtZeroX);
         p.translate((frameAtZeroXi - mMinViewedFrame)*mPixelsPerFrame, 0);
@@ -521,7 +526,7 @@ void KeysView::paintEvent(QPaintEvent *) {
 
     p.resetTransform();
     if(mMovingKeys && mValueInput.inputEnabled())
-        mValueInput.draw(&p, height() - MIN_WIDGET_DIM);
+        mValueInput.draw(&p, height() - eSizesUI::widget);
     if(hasFocus()) {
         p.setBrush(Qt::NoBrush);
         p.setPen(QPen(Qt::red, 4));
@@ -545,9 +550,9 @@ void KeysView::KFT_clearFocus() {
 Key *KeysView::getKeyAtPos(const int pressX, const int pressY,
                            const qreal pixelsPerFrame,
                            const int minViewedFrame) {
-    const int remaining = pressY % MIN_WIDGET_DIM;
-    if(remaining < (MIN_WIDGET_DIM - KEY_RECT_SIZE)/2 ||
-       remaining > (MIN_WIDGET_DIM + KEY_RECT_SIZE)/2) return nullptr;
+    const int remaining = pressY % eSizesUI::widget;
+    if(remaining < (eSizesUI::widget - KEY_RECT_SIZE)/2 ||
+       remaining > (eSizesUI::widget + KEY_RECT_SIZE)/2) return nullptr;
     const auto& wids = mBoxesListWidget->visibleWidgets();
     for(const auto& container : wids) {
         const int containerTop = container->y();
@@ -614,7 +619,7 @@ void KeysView::clearHoveredMovable() {
 }
 
 void KeysView::scrollRight() {
-    const int pixelInc = 2*MIN_WIDGET_DIM;
+    const int pixelInc = 2*eSizesUI::widget;
     const int inc = qMax(1, qFloor(pixelInc/mPixelsPerFrame));
     mMinViewedFrame += inc;
     mMaxViewedFrame += inc;
@@ -630,7 +635,7 @@ void KeysView::scrollRight() {
 }
 
 void KeysView::scrollLeft() {
-    const int pixelInc = 2*MIN_WIDGET_DIM;
+    const int pixelInc = 2*eSizesUI::widget;
     const int inc = qMax(1, qFloor(pixelInc/mPixelsPerFrame));
     mMinViewedFrame -= inc;
     mMaxViewedFrame -= inc;
@@ -646,13 +651,13 @@ void KeysView::scrollLeft() {
 }
 
 void KeysView::handleMouseMoveScroll(const QPoint &pos) {
-    if(pos.x() < MIN_WIDGET_DIM/2) {
+    if(pos.x() < eSizesUI::widget/2) {
         if(!mScrollTimer->isActive()) {
             connect(mScrollTimer, &QTimer::timeout,
                     this, &KeysView::scrollLeft);
             mScrollTimer->start(300);
         }
-    } else if(pos.x() > width() - MIN_WIDGET_DIM/2) {
+    } else if(pos.x() > width() - eSizesUI::widget/2) {
         if(!mScrollTimer->isActive()) {
             connect(mScrollTimer, &QTimer::timeout,
                     this, &KeysView::scrollRight);
@@ -666,7 +671,7 @@ void KeysView::handleMouseMoveScroll(const QPoint &pos) {
 
 void KeysView::handleMouseMove(const QPoint &pos,
                                const Qt::MouseButtons &buttons) {
-    const QPoint posU = pos + QPoint(-MIN_WIDGET_DIM/2, 0);
+    const QPoint posU = pos + QPoint(-eSizesUI::widget/2, 0);
     if(buttons & Qt::MiddleButton) {
         if(mGraphViewed) graphMiddleMove(posU);
         else middleMove(posU);
@@ -906,7 +911,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
             }
         }
     }
-    updateHovered(e->pos() + QPoint(-MIN_WIDGET_DIM/2, 0));
+    updateHovered(e->pos() + QPoint(-eSizesUI::widget/2, 0));
     releaseMouseAndDontTrack();
 
     mValueInput.clearAndDisableInput();
@@ -934,7 +939,7 @@ qreal KeysView::getPixelsPerFrame() {
 }
 
 void KeysView::updatePixelsPerFrame() {
-    const qreal animWidth = width() - 2*MIN_WIDGET_DIM;
+    const qreal animWidth = width() - 2*eSizesUI::widget;
     const qreal dFrame = mMaxViewedFrame - mMinViewedFrame + 1;
     mPixelsPerFrame = animWidth/dFrame;
 }

@@ -42,12 +42,16 @@ LayoutHandler::LayoutHandler(Document& document,
 
     const auto newLayPush = new QPushButton("+", mComboWidget);
     newLayPush->setObjectName("addCanvasButton");
-    newLayPush->setFixedWidth(MIN_WIDGET_DIM);
+    eSizesUI::widget.add(newLayPush, [newLayPush](const int size) {
+        newLayPush->setFixedWidth(size);
+    });
     newLayPush->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
 
     const auto removeLayPush = new QPushButton("x", mComboWidget);
     removeLayPush->setObjectName("removeCanvasButton");
-    removeLayPush->setFixedWidth(MIN_WIDGET_DIM);
+    eSizesUI::widget.add(removeLayPush, [removeLayPush](const int size) {
+        removeLayPush->setFixedWidth(size);
+    });
     removeLayPush->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
 
     canvasComboLayout->addWidget(mComboBox);

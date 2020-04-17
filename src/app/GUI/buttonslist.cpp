@@ -56,7 +56,9 @@ ButtonsList::ButtonsList(const TextTriggerGetter& getter,
     for(int i = 0; i < count; i++) {
         const auto textTrigger = getter(i);
         const auto pathButton = new ElidedButton(textTrigger.first, this);
-        pathButton->setMinimumHeight(5*MIN_WIDGET_DIM/4);
+        eSizesUI::widget.add(pathButton, [pathButton](const int size) {
+            pathButton->setMinimumHeight(5*size/4);
+        });
         pathButton->setToolTip(gSingleLineTooltip(textTrigger.first));
         connect(pathButton, &QPushButton::released, textTrigger.second);
         recentLay->addWidget(pathButton, 0, Qt::AlignTop);

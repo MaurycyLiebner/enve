@@ -28,52 +28,55 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     QToolBar(parent) {
     setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-    setIconSize(QSize(qRound(1.25*MIN_WIDGET_DIM),
-                      qRound(1.25*MIN_WIDGET_DIM)));
+    eSizesUI::widget.add(this, [this](const int size) {
+        setIconSize(QSize(qRound(1.25*size), qRound(1.25*size)));
+    });
 
     const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
 
-    mLineButton = new ActionButton(iconsDir + "/segmentLine.png",
+    mLineButton = new ActionButton("toolbarButtons/segmentLine.png",
                                    "Make Segment Line", this);
     connect(mLineButton, &ActionButton::pressed,
             keysView, &KeysView::graphMakeSegmentsLinearAction);
 
-    mCurveButton = new ActionButton(iconsDir + "/segmentCurve.png",
+    mCurveButton = new ActionButton("toolbarButtons/segmentCurve.png",
                                     "Make Segment Curve", this);
     connect(mCurveButton, &ActionButton::pressed,
             keysView, qOverload<>(&KeysView::graphMakeSegmentsSmoothAction));
 
-    mSymmetricButton = new ActionButton(iconsDir + "/nodeSymmetric.png",
+    mSymmetricButton = new ActionButton("toolbarButtons/nodeSymmetric.png",
                                         "Symmetric Nodes", this);
     connect(mSymmetricButton, &ActionButton::pressed,
             keysView, &KeysView::graphSetSymmetricCtrlAction);
 
-    mSmoothButton = new ActionButton(iconsDir + "/nodeSmooth.png",
+    mSmoothButton = new ActionButton("toolbarButtons/nodeSmooth.png",
                                      "Smooth Nodes", this);
     connect(mSmoothButton, &ActionButton::pressed,
             keysView, &KeysView::graphSetSmoothCtrlAction);
 
-    mCornerButton = new ActionButton(iconsDir + "/nodeCorner.png",
+    mCornerButton = new ActionButton("toolbarButtons/nodeCorner.png",
                                      "Corner Nodes", this);
     connect(mCornerButton, &ActionButton::pressed,
             keysView, &KeysView::graphSetCornerCtrlAction);
 
-    mFitToHeightButton = new ActionButton(iconsDir + "/zoom.png",
+    mFitToHeightButton = new ActionButton("toolbarButtons/zoom.png",
                                           "Fit Vertical", this);
     connect(mFitToHeightButton, &ActionButton::pressed,
             keysView, &KeysView::graphResetValueScaleAndMinShownAction);
 
-    const auto valueLines = SwitchButton::sCreate2Switch(iconsDir + "/horizontalLinesOn.png",
-                                                         iconsDir + "/horizontalLinesOff.png",
-                                                         gSingleLineTooltip("Disable Value Lines"),
-                                                         this);
+    const auto valueLines = SwitchButton::sCreate2Switch(
+                                "toolbarButtons/horizontalLinesOn.png",
+                                "toolbarButtons/horizontalLinesOff.png",
+                                gSingleLineTooltip("Disable Value Lines"),
+                                this);
     connect(valueLines, &SwitchButton::toggled,
             keysView, &KeysView::graphSetValueLinesDisabled);
 
-    const auto selectedVisible = SwitchButton::sCreate2Switch(iconsDir + "/notOnlySelectedVisible.png",
-                                                         iconsDir + "/onlySelectedVisible.png",
-                                                         gSingleLineTooltip("View Only Selected Objects' Properties"),
-                                                         this);
+    const auto selectedVisible = SwitchButton::sCreate2Switch(
+                                     "toolbarButtons/notOnlySelectedVisible.png",
+                                     "toolbarButtons/onlySelectedVisible.png",
+                                     gSingleLineTooltip("View Only Selected Objects' Properties"),
+                                     this);
     connect(selectedVisible, &SwitchButton::toggled,
             keysView, &KeysView::graphSetOnlySelectedVisible);
 

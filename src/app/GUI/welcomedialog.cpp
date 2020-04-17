@@ -34,8 +34,9 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
     const auto thisLay = new QVBoxLayout;
 
     const auto mainWid = new QWidget(this);
-    const int size = MIN_WIDGET_DIM*12;
-    mainWid->setMinimumWidth(size);
+    eSizesUI::widget.add(mainWid, [mainWid](const int size) {
+        mainWid->setMinimumWidth(12*size);
+    });
     setLayout(thisLay);
     thisLay->addWidget(mainWid, 0, Qt::AlignHCenter | Qt::AlignVCenter);
 
@@ -71,7 +72,7 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
     const int count = qMin(recentPaths.count(), 8);
     const auto recentWidget = new ButtonsList(textTriggerGetter, count, this);
 
-    mainLay->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(mainLay);
 //    const auto recentScroll = new ScrollArea(this);
 //    recentScroll->setWidget(recentWidget);
 //    mainLay->addWidget(recentScroll);

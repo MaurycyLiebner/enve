@@ -69,8 +69,7 @@ void setDefaultFormat() {
     QSurfaceFormat::setDefaultFormat(format);
 }
 
-void generateAlphaMesh(QPixmap& alphaMesh) {
-    const int dim = MIN_WIDGET_DIM/2;
+void generateAlphaMesh(QPixmap& alphaMesh, const int dim) {
     alphaMesh = QPixmap(2*dim, 2*dim);
     const QColor light = QColor::fromRgbF(0.2, 0.2, 0.2);
     const QColor dark = QColor::fromRgbF(0.4, 0.4, 0.4);
@@ -92,22 +91,6 @@ int main(int argc, char *argv[]) {
     app.setStyleSheet("QStatusBar::item { border: 0; }");
     setlocale(LC_NUMERIC, "C");
 
-    FONT_HEIGHT = QApplication::fontMetrics().height();
-    MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
-    BUTTON_DIM = qRound(MIN_WIDGET_DIM*1.1);
-    KEY_RECT_SIZE = MIN_WIDGET_DIM*3/5;
-
-    QPixmap alphaMesh;
-    generateAlphaMesh(alphaMesh);
-    ALPHA_MESH_PIX = &alphaMesh;
-    std::cout << "Generated Alpha Mesh" << std::endl;
-
-    //#ifdef QT_DEBUG
-    //    const qint64 pId = QCoreApplication::applicationPid();
-    //    QProcess * const process = new QProcess(&w);
-    //    process->start("prlimit --data=3000000000 --pid " + QString::number(pId));
-    //#endif
-
     const bool threadedOpenGL = QOpenGLContext::supportsThreadedOpenGL();
     if(!threadedOpenGL) {
         gPrintException("Your GPU drivers do not support OpenGL "
@@ -124,6 +107,58 @@ int main(int argc, char *argv[]) {
     eSettings settings(HardwareInfo::sCpuThreads(),
                        HardwareInfo::sRamKB(),
                        HardwareInfo::sGpuVendor());
+
+    OS_FONT = QApplication::font();
+    eSizesUI::font.setEvaluator([&settings]() {
+        const auto fm = QFontMetrics(OS_FONT);
+        const qreal scaling = qBound(0.5, settings.fInterfaceScaling, 1.5);
+        return qRound(fm.height()*scaling);
+    });
+    eSizesUI::widget.setEvaluator([]() {
+        return eSizesUI::font.size()*4/3;
+    });
+    QObject::connect(&eSizesUI::font, &SizeSetter::sizeChanged,
+                     &eSizesUI::widget, &SizeSetter::updateSize);
+    eSizesUI::font.add(&app, [&app](const int size) {
+        const auto fm = QFontMetrics(OS_FONT);
+        const qreal mult = size/qreal(fm.height());
+        QFont font = OS_FONT;
+        if(OS_FONT.pixelSize() == -1) {
+            font.setPointSizeF(mult*OS_FONT.pointSizeF());
+        } else {
+            font.setPixelSize(qRound(mult*OS_FONT.pixelSize()));
+        }
+        app.setFont(font);
+    });
+
+    eSizesUI::widget.add(&eSizesUI::button, [](const int size) {
+        eSizesUI::button.set(qRound(size*1.1));
+    });
+
+    eSizesUI::widget.add([](const int size) {
+        KEY_RECT_SIZE = size*3/5;
+    });
+
+    QPixmap alphaMesh;
+    eSizesUI::widget.add([&alphaMesh](const int size) {
+        generateAlphaMesh(alphaMesh, size/2);
+    });
+    ALPHA_MESH_PIX = &alphaMesh;
+    std::cout << "Generated Alpha Mesh" << std::endl;
+
+    //#ifdef QT_DEBUG
+    //    const qint64 pId = QCoreApplication::applicationPid();
+    //    QProcess * const process = new QProcess(&w);
+    //    process->start("prlimit --data=3000000000 --pid " + QString::number(pId));
+    //#endif
+
+    try {
+        settings.loadFromFile();
+        std::cout << "Loaded settings" << std::endl;
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
+
     eFilterSettings filterSettings;
     QDir(eSettings::sSettingsDir()).mkpath(eSettings::sIconsDir());
     try {
@@ -131,7 +166,7 @@ int main(int argc, char *argv[]) {
 #ifdef QT_DEBUG
         QFile(pngPath).remove();
 #endif
-        IconLoader::generate(":/pixmaps/splash.svg", MIN_WIDGET_DIM/22., pngPath);
+        IconLoader::generate(":/pixmaps/splash.svg", eSizesUI::widget/22., pngPath);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
     }
@@ -139,17 +174,11 @@ int main(int argc, char *argv[]) {
     splash->show();
     app.processEvents();
 
-    splash->showMessage("Load settings...");
-    app.processEvents();
-    try {
-        settings.loadFromFile();
-    } catch(const std::exception& e) {
-        gPrintExceptionCritical(e);
-    }
-
     splash->showMessage("Generate icons...");
     app.processEvents();
-    IconLoader::generateAll(MIN_WIDGET_DIM, BUTTON_DIM);
+    eSizesUI::button.add([](const int size) {
+        IconLoader::generateAll(eSizesUI::widget, size);
+    });
 
     eWidgetsImpl widImpl;
     ImportHandler importHandler;

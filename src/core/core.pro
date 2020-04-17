@@ -152,6 +152,7 @@ SOURCES += \
     GUI/ewidgets.cpp \
     GUI/global.cpp \
     GUI/propertynamedialog.cpp \
+    GUI/sizesetter.cpp \
     GUI/valueinput.cpp \
     MovablePoints/gradientpoint.cpp \
     MovablePoints/pathpivot.cpp \
@@ -462,6 +463,7 @@ HEADERS += \
     GUI/ewidgets.h \
     GUI/global.h \
     GUI/propertynamedialog.h \
+    GUI/sizesetter.h \
     GUI/valueinput.h \
     MovablePoints/gradientpoint.h \
     MovablePoints/pathpivot.h \

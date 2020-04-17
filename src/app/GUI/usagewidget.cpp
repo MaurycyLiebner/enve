@@ -43,15 +43,19 @@ public:
         const auto layout = new QHBoxLayout(this);
         layout->setSpacing(0);
         layout->setContentsMargins(0, 0, 0, 0);
-        mLabel->setFixedHeight(MIN_WIDGET_DIM/2);
-        mLabel->setContentsMargins(0, 0, MIN_WIDGET_DIM/2, 0);
-        mCancel->setFixedHeight(MIN_WIDGET_DIM/2);
-        mProgress->setFixedHeight(MIN_WIDGET_DIM/2);
         layout->addWidget(mLabel);
         layout->addWidget(mCancel);
         layout->addWidget(mProgress);
         setLayout(layout);
-        setContentsMargins(0, 0, MIN_WIDGET_DIM/2, 0);
+
+        eSizesUI::widget.add(this, [this](const int size) {
+            const int halfSize = size/2;
+            mLabel->setFixedHeight(halfSize);
+            mLabel->setContentsMargins(0, 0, halfSize, 0);
+            mCancel->setFixedHeight(halfSize);
+            mProgress->setFixedHeight(halfSize);
+            setContentsMargins(0, 0, halfSize, 0);
+        });
     }
 
     void setComplexTask(ComplexTask* const task) {
@@ -84,7 +88,9 @@ class HardwareUsageWidget : public QProgressBar {
 public:
     HardwareUsageWidget(QWidget* const parent = nullptr) :
         QProgressBar(parent) {
-        setFixedHeight(MIN_WIDGET_DIM/2);
+        eSizesUI::widget.add(this, [this](const int size) {
+            setFixedHeight(size/2);
+        });
         setObjectName("hardwareUsage");
         setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     }

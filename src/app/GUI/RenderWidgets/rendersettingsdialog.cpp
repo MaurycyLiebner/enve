@@ -57,7 +57,7 @@ RenderSettingsDialog::RenderSettingsDialog(
     dimLay->addWidget(mWidthLabel);
     dimLay->addWidget(mWidthSpin);
 
-    dimLay->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(dimLay);
 
     mHeightLabel = new QLabel("Height: ");
     mHeightSpin = new QSpinBox(this);
@@ -104,7 +104,7 @@ RenderSettingsDialog::RenderSettingsDialog(
 
 //    mainLayout->addLayout(fpsLay);
 
-    mainLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(mainLayout);
     mainLayout->addStretch();
 
     mButtonsLayout = new QHBoxLayout();

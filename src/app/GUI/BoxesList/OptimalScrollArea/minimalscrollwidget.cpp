@@ -44,13 +44,13 @@ int MinimalScrollWidget::minHeight() const
 { return mParentScrollArea->height(); }
 
 void MinimalScrollWidget::changeVisibleTop(const int top) {
-    int newTop = top - top % MIN_WIDGET_DIM;
+    int newTop = top - top % eSizesUI::widget;
     mVisiblePartWidget->move(0, newTop);
     mVisiblePartWidget->setVisibleTop(newTop);
 }
 
 void MinimalScrollWidget::changeVisibleHeight(const int height) {
-    int newHeight = qCeil(height/(qreal)MIN_WIDGET_DIM)*
-                    MIN_WIDGET_DIM;
+    int newHeight = qCeil(height/(qreal)eSizesUI::widget)*
+                    eSizesUI::widget;
     mVisiblePartWidget->setVisibleHeight(newHeight);
 }

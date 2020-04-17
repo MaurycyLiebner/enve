@@ -31,8 +31,8 @@ ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
     setStyleSheet("QWidget { background: #2E2F30; }");
     setCursorWidth(2);
     setFont(QFont("monospace"));
-    setMinimumWidth(20*MIN_WIDGET_DIM);
-    setMaximumHeight(5*MIN_WIDGET_DIM);
+    setMinimumWidth(20*eSizesUI::widget);
+    setMaximumHeight(5*eSizesUI::widget);
     const auto doc = document();
     setAcceptRichText(false);
     mHighlighter = new ExpressionHighlighter(target, this, doc);

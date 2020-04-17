@@ -48,7 +48,7 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
             this, &FontsWidget::emitSizeChanged);
 
     mMainLayout = new QHBoxLayout(this);
-    mMainLayout->setSpacing(MIN_WIDGET_DIM);
+    mMainLayout->setSpacing(eSizesUI::widget);
     mMainLayout->setContentsMargins(0, 0, 0, 0);
     setContentsMargins(0, 0, 0, 0);
     setLayout(mMainLayout);
@@ -56,47 +56,45 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
     mMainLayout->addWidget(mFontStyleCombo);
     mMainLayout->addWidget(mFontSizeCombo);
 
-    const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
-
-    mAlignLeft = new ActionButton(iconsDir + "/alignLeft.png",
+    mAlignLeft = new ActionButton("toolbarButtons/alignLeft.png",
                                   "Align Text Left", this);
     connect(mAlignLeft, &ActionButton::pressed,
             this, [this]() { emit textAlignmentChanged(Qt::AlignLeft); });
 
-    mAlignCenter = new ActionButton(iconsDir + "/alignCenter.png",
+    mAlignCenter = new ActionButton("toolbarButtons/alignCenter.png",
                                     "Align Text Center", this);
     connect(mAlignCenter, &ActionButton::pressed,
             this, [this]() { emit textAlignmentChanged(Qt::AlignCenter); });
 
-    mAlignRight = new ActionButton(iconsDir + "/alignRight.png",
+    mAlignRight = new ActionButton("toolbarButtons/alignRight.png",
                                   "Align Text Right", this);
     connect(mAlignRight, &ActionButton::pressed,
             this, [this]() { emit textAlignmentChanged(Qt::AlignRight); });
 
 
-    mAlignTop = new ActionButton(iconsDir + "/alignTop.png",
+    mAlignTop = new ActionButton("toolbarButtons/alignTop.png",
                                  "Align Text Top", this);
     connect(mAlignTop, &ActionButton::pressed,
             this, [this]() { emit textVAlignmentChanged(Qt::AlignTop); });
 
-    mAlignVCenter = new ActionButton(iconsDir + "/alignVCenter.png",
+    mAlignVCenter = new ActionButton("toolbarButtons/alignVCenter.png",
                                      "Align Text Center", this);
     connect(mAlignVCenter, &ActionButton::pressed,
             this, [this]() { emit textVAlignmentChanged(Qt::AlignCenter); });
 
-    mAlignBottom = new ActionButton(iconsDir + "/alignBottom.png",
+    mAlignBottom = new ActionButton("toolbarButtons/alignBottom.png",
                                     "Align Text Bottom", this);
     connect(mAlignBottom, &ActionButton::pressed,
             this, [this]() { emit textVAlignmentChanged(Qt::AlignBottom); });
 
     const auto buttonsLayout = new QHBoxLayout;
-    buttonsLayout->setSpacing(MIN_WIDGET_DIM/5);
+    buttonsLayout->setSpacing(eSizesUI::widget/5);
     buttonsLayout->setContentsMargins(0, 0, 0, 0);
 
     buttonsLayout->addWidget(mAlignLeft);
     buttonsLayout->addWidget(mAlignCenter);
     buttonsLayout->addWidget(mAlignRight);
-    buttonsLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(buttonsLayout);
     buttonsLayout->addWidget(mAlignTop);
     buttonsLayout->addWidget(mAlignVCenter);
     buttonsLayout->addWidget(mAlignBottom);

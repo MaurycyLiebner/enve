@@ -26,6 +26,11 @@ DisplayedGradientsWidget::DisplayedGradientsWidget(QWidget *parent) :
     setMouseTracking(true);
     connect(Document::sInstance, &Document::activeSceneSet,
             this, &DisplayedGradientsWidget::setScene);
+
+    eSizesUI::widget.add(this, [this](int) {
+        updateHeight();
+        updateTopGradientId();
+    });
 }
 
 void DisplayedGradientsWidget::setScene(Canvas * const scene) {
@@ -60,14 +65,14 @@ void DisplayedGradientsWidget::setTop(const int top) {
 }
 
 void DisplayedGradientsWidget::updateTopGradientId() {
-    const int newGradientId = mDisplayedTop/MIN_WIDGET_DIM;
+    const int newGradientId = mDisplayedTop/eSizesUI::widget;
     mHoveredGradientId += newGradientId - mTopGradientId;
     mTopGradientId = newGradientId;
     update();
 }
 
 void DisplayedGradientsWidget::updateHeight() {
-    setFixedHeight(qMax(minimumHeight(), (mGradients.count() + 1)*MIN_WIDGET_DIM));
+    setFixedHeight(qMax(minimumHeight(), (mGradients.count() + 1)*eSizesUI::widget));
 }
 
 #include "GUI/ColorWidgets/colorwidgetshaders.h"
@@ -80,17 +85,17 @@ void DisplayedGradientsWidget::paintGL() {
     glUseProgram(GRADIENT_PROGRAM.fID);
     glBindVertexArray(mPlainSquareVAO);
     for(int i = mTopGradientId; i < mTopGradientId + nVisible; i++) {
-        const int yInverted = height() - gradY - MIN_WIDGET_DIM;
+        const int yInverted = height() - gradY - eSizesUI::widget;
         const auto gradient = mGradients.at(i);
         const int nColors = gradient->ca_getNumberOfChildren();
         QColor lastColor = gradient->getColorAt(0);
         int xT = 0;
         const float xInc = static_cast<float>(width())/qMax(1, nColors - 1);
         glUniform2f(GRADIENT_PROGRAM.fMeshSizeLoc,
-                    MIN_WIDGET_DIM/(3.f*xInc), 1.f/3);
+                    eSizesUI::widget/(3.f*xInc), 1.f/3);
         for(int j = (nColors == 1 ? 0 : 1); j < nColors; j++) {
             const QColor color = gradient->getColorAt(j);
-            glViewport(xT, yInverted, qRound(xInc), MIN_WIDGET_DIM);
+            glViewport(xT, yInverted, qRound(xInc), eSizesUI::widget);
 
             glUniform4f(GRADIENT_PROGRAM.fRGBAColor1Loc,
                         lastColor.redF(), lastColor.greenF(),
@@ -103,15 +108,15 @@ void DisplayedGradientsWidget::paintGL() {
             xT += qRound(xInc);
             lastColor = color;
         }
-        glViewport(0, yInverted, width(), MIN_WIDGET_DIM);
+        glViewport(0, yInverted, width(), eSizesUI::widget);
         if(gradient == mSelectedGradient) {
             glUseProgram(DOUBLE_BORDER_PROGRAM.fID);
             glUniform2f(DOUBLE_BORDER_PROGRAM.fInnerBorderSizeLoc,
-                        1.f/width(), 1.f/MIN_WIDGET_DIM);
+                        1.f/width(), 1.f/eSizesUI::widget);
             glUniform4f(DOUBLE_BORDER_PROGRAM.fInnerBorderColorLoc,
                         1.f, 1.f, 1.f, 1.f);
             glUniform2f(DOUBLE_BORDER_PROGRAM.fOuterBorderSizeLoc,
-                        1.f/width(), 1.f/MIN_WIDGET_DIM);
+                        1.f/width(), 1.f/eSizesUI::widget);
             glUniform4f(DOUBLE_BORDER_PROGRAM.fOuterBorderColorLoc,
                         0.f, 0.f, 0.f, 1.f);
 
@@ -121,13 +126,13 @@ void DisplayedGradientsWidget::paintGL() {
         if(i == mHoveredGradientId || i == mContextMenuGradientId) {
             glUseProgram(BORDER_PROGRAM.fID);
             glUniform2f(BORDER_PROGRAM.fBorderSizeLoc,
-                        1.f/width(), 1.f/MIN_WIDGET_DIM);
+                        1.f/width(), 1.f/eSizesUI::widget);
             glUniform4f(BORDER_PROGRAM.fBorderColorLoc,
                         1.f, 1.f, 1.f, 1.f);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             glUseProgram(GRADIENT_PROGRAM.fID);
         }
-        gradY += MIN_WIDGET_DIM;
+        gradY += eSizesUI::widget;
     }
 }
 
@@ -226,7 +231,7 @@ void DisplayedGradientsWidget::gradientContextMenuReq(
 }
 
 void DisplayedGradientsWidget::mousePressEvent(QMouseEvent *event) {
-    const int gradientId = event->y()/MIN_WIDGET_DIM;
+    const int gradientId = event->y()/eSizesUI::widget;
     if(event->button() == Qt::LeftButton) {
         gradientLeftPressed(gradientId);
     } else if(event->button() == Qt::RightButton) {
@@ -236,14 +241,14 @@ void DisplayedGradientsWidget::mousePressEvent(QMouseEvent *event) {
            relCursorPos.x() > width() || relCursorPos.y() > height()) {
             mHoveredGradientId = -1;
         } else {
-            mHoveredGradientId = relCursorPos.y()/MIN_WIDGET_DIM;
+            mHoveredGradientId = relCursorPos.y()/eSizesUI::widget;
         }
     }
     update();
 }
 
 void DisplayedGradientsWidget::mouseMoveEvent(QMouseEvent *event) {
-    mHoveredGradientId = event->y()/MIN_WIDGET_DIM;
+    mHoveredGradientId = event->y()/eSizesUI::widget;
     update();
 }
 

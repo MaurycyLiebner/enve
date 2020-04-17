@@ -20,7 +20,9 @@
 
 BoxesListActionButton::BoxesListActionButton(QWidget * const parent) :
     QWidget(parent) {
-    setFixedSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM);
+    eSizesUI::widget.add(this, [this](const int size) {
+        setFixedSize(size, size);
+    });
 }
 
 void BoxesListActionButton::mousePressEvent(QMouseEvent *) {

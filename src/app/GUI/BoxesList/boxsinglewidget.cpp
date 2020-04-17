@@ -290,9 +290,10 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mCheckBox = new BoolPropertyWidget(this);
     mMainLayout->addWidget(mCheckBox);
 
-    mMainLayout->addSpacing(MIN_WIDGET_DIM/2);
+    eSizesUI::widget.addHalfSpacing(mMainLayout);
 
     hide();
+    connectAppFont(this);
 }
 
 ContainerBox* BoxSingleWidget::getPromoteTargetGroup() {
@@ -644,7 +645,7 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
         const auto prop = static_cast<Property*>(mTarget->getTarget());
         const QString name = prop->prp_getName();
         const int nameWidth = QApplication::fontMetrics().width(name);
-        QPixmap pixmap(mFillWidget->x() + nameWidth + MIN_WIDGET_DIM, height());
+        QPixmap pixmap(mFillWidget->x() + nameWidth + eSizesUI::widget, height());
         render(&pixmap);
         drag->setPixmap(pixmap);
     }
@@ -664,7 +665,7 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
     if(event->x() < mFillWidget->x() ||
        event->x() > mFillWidget->x() + mFillWidget->width()) return;
     setSelected(false);
-    if(pointToLen(event->pos() - mDragStartPos) > MIN_WIDGET_DIM/2) return;
+    if(pointToLen(event->pos() - mDragStartPos) > eSizesUI::widget/2) return;
     const bool shiftPressed = event->modifiers() & Qt::ShiftModifier;
     const auto target = mTarget->getTarget();
     if(enve_cast<BoundingBox*>(target) || enve_cast<eIndependentSound*>(target)) {
@@ -690,7 +691,7 @@ void BoxSingleWidget::prp_drawTimelineControls(QPainter * const p,
     const auto target = mTarget->getTarget();
     if(const auto asAnim = enve_cast<Animator*>(target)) {
         asAnim->prp_drawTimelineControls(
-                    p, pixelsPerFrame, viewedFrames, MIN_WIDGET_DIM);
+                    p, pixelsPerFrame, viewedFrames, eSizesUI::widget);
     }
 }
 
@@ -747,7 +748,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         }
     }
     if(bsTarget) {
-        nameX += MIN_WIDGET_DIM/4;
+        nameX += eSizesUI::widget/4;
         const bool ss = enve_cast<eSoundObjectBase*>(prop);
         if(ss || enve_cast<BoundingBox*>(prop)) {
             if(ss) p.fillRect(rect(), QColor(0, 125, 255, 50));
@@ -762,7 +763,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             }
         } else if(enve_cast<BlendEffectBoxShadow*>(prop)) {
             p.fillRect(rect(), QColor(0, 255, 125, 50));
-            nameX += MIN_WIDGET_DIM;
+            nameX += eSizesUI::widget;
         }
     } else if(!enve_cast<ComplexAnimator*>(prop)) {
         if(const auto graphAnim = enve_cast<GraphAnimator*>(prop)) {
@@ -783,25 +784,25 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             }
             if(const auto path = enve_cast<SmartPathAnimator*>(prop)) {
                 const QRect colRect(QPoint{nameX, 0},
-                                    QSize{MIN_WIDGET_DIM, MIN_WIDGET_DIM});
+                                    QSize{eSizesUI::widget, eSizesUI::widget});
                 p.setPen(Qt::NoPen);
                 p.setRenderHint(QPainter::Antialiasing, true);
                 p.setBrush(path->getPathColor());
-                const int radius = qRound(MIN_WIDGET_DIM*0.2);
+                const int radius = qRound(eSizesUI::widget*0.2);
                 p.drawEllipse(colRect.center() + QPoint(0, 2),
                               radius, radius);
                 p.setRenderHint(QPainter::Antialiasing, false);
-                nameX += MIN_WIDGET_DIM;
+                nameX += eSizesUI::widget;
             }
-        } else nameX += MIN_WIDGET_DIM;
+        } else nameX += eSizesUI::widget;
 
-        if(!enve_cast<Animator*>(prop)) nameX += MIN_WIDGET_DIM;
+        if(!enve_cast<Animator*>(prop)) nameX += eSizesUI::widget;
         p.setPen(Qt::white);
     } else { //if(enve_cast<ComplexAnimator*>(target)) {
         p.setPen(Qt::white);
     }
 
-    const QRect textRect(nameX, 0, width() - nameX - MIN_WIDGET_DIM, MIN_WIDGET_DIM);
+    const QRect textRect(nameX, 0, width() - nameX - eSizesUI::widget, eSizesUI::widget);
     const QString& name = prop->prp_getName();
     p.drawText(textRect, name, QTextOption(Qt::AlignVCenter));
     if(mSelected) {
@@ -866,7 +867,7 @@ void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
     const auto target = mTarget->getTarget();
     const auto asQPointFAnim = enve_cast<QPointFAnimator*>(target);
     if(!asQPointFAnim || mTarget->contentVisible()) return;
-    if(width() - mFillWidget->x() > 10*MIN_WIDGET_DIM) {
+    if(width() - mFillWidget->x() > 10*eSizesUI::widget) {
         mValueSlider->setTarget(asQPointFAnim->getXAnimator());
         mValueSlider->show();
         mValueSlider->setIsLeftSlider(true);
@@ -880,21 +881,21 @@ void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
 
 void BoxSingleWidget::updatePathCompositionBoxVisible() {
     if(!mTarget) return;
-    if(mPathBlendModeVisible && width() - mFillWidget->x() > 8*MIN_WIDGET_DIM) {
+    if(mPathBlendModeVisible && width() - mFillWidget->x() > 8*eSizesUI::widget) {
         mPathBlendModeCombo->show();
     } else mPathBlendModeCombo->hide();
 }
 
 void BoxSingleWidget::updateCompositionBoxVisible() {
     if(!mTarget) return;
-    if(mBlendModeVisible && width() - mFillWidget->x() > 10*MIN_WIDGET_DIM) {
+    if(mBlendModeVisible && width() - mFillWidget->x() > 10*eSizesUI::widget) {
         mBlendModeCombo->show();
     } else mBlendModeCombo->hide();
 }
 
 void BoxSingleWidget::updateFillTypeBoxVisible() {
     if(!mTarget) return;
-    if(mFillTypeVisible && width() - mFillWidget->x() > 8*MIN_WIDGET_DIM) {
+    if(mFillTypeVisible && width() - mFillWidget->x() > 8*eSizesUI::widget) {
         mFillTypeCombo->show();
     } else mFillTypeCombo->hide();
 }

@@ -5,6 +5,7 @@
 #include "GUI/global.h"
 
 #include "performancesettingswidget.h"
+#include "interfacesettingswidget.h"
 #include "timelinesettingswidget.h"
 #include "externalappssettingswidget.h"
 
@@ -13,18 +14,24 @@
 
 SettingsDialog::SettingsDialog(QWidget * const parent) :
     QDialog(parent) {
-    setMinimumWidth(20*MIN_WIDGET_DIM);
+    eSizesUI::widget.add(this, [this](const int size) {
+        setMinimumWidth(20*size);
+    });
     setWindowTitle("Settings");
 
     const auto mainLauout = new QVBoxLayout;
     setLayout(mainLauout);
 
     mTabWidget = new QTabWidget(this);
-    mTabWidget->setContentsMargins(MIN_WIDGET_DIM, MIN_WIDGET_DIM,
-                                   MIN_WIDGET_DIM, MIN_WIDGET_DIM);
+    eSizesUI::widget.add(this, [this](const int size) {
+        mTabWidget->setContentsMargins(size, size, size, size);
+    });
 
     const auto performance = new PerformanceSettingsWidget(this);
     addSettingsWidget(performance, "Performance");
+
+    const auto interface = new InterfaceSettingsWidget(this);
+    addSettingsWidget(interface, "Interface");
 
     const auto timeline = new TimelineSettingsWidget(this);
     addSettingsWidget(timeline, "Timeline");
@@ -40,18 +47,20 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
     const auto cancelButton = new QPushButton("Cancel", this);
     const auto applyButton = new QPushButton("Apply", this);
     buttonsLayout->addWidget(restoreButton);
-    buttonsLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(buttonsLayout);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(cancelButton);
     buttonsLayout->addWidget(applyButton);
 
-    mainLauout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(mainLauout);
     mainLauout->addStretch();
     mainLauout->addLayout(buttonsLayout);
 
     connect(restoreButton, &QPushButton::released, this, [this]() {
         eSettings::sInstance->loadDefaults();
         updateSettings();
+        eSizesUI::font.updateSize();
+        eSizesUI::widget.updateSize();
     });
 
     connect(cancelButton, &QPushButton::released, this, &QDialog::close);

@@ -25,7 +25,7 @@ SavedColorButton::SavedColorButton(const QColor &colorT,
                                    QWidget *parent) :
     QWidget(parent) {
     mColor = colorT;
-    setFixedSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM);
+    setFixedSize(eSizesUI::widget, eSizesUI::widget);
 }
 
 void SavedColorButton::setSelected(const bool selected) {

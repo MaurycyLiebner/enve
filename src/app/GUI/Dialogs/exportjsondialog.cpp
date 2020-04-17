@@ -44,7 +44,7 @@ public:
     JsonPreview(QWidget* const parent = nullptr) : QLabel(parent) {
         setSizePolicy(QSizePolicy::MinimumExpanding,
                       QSizePolicy::MinimumExpanding);
-        setMinimumSize(10*MIN_WIDGET_DIM, 10*MIN_WIDGET_DIM);
+        setMinimumSize(10*eSizesUI::widget, 10*eSizesUI::widget);
         connect(&mTimer, &QTimer::timeout, this, &JsonPreview::incFrame);
         setStyleSheet("QLabel { background: white; }");
     }
@@ -172,14 +172,14 @@ ExportJsonDialog::ExportJsonDialog(QWidget* const parent) :
     mBackground->setChecked(true);
 
     twoColLayout->addPair(new QLabel("Scene:"), sceneButton);
-    twoColLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(twoColLayout);
     twoColLayout->addPair(new QLabel("First Frame:"), mFirstFrame);
     twoColLayout->addPair(new QLabel("Last Frame:"), mLastFrame);
 
     settingsLayout->addLayout(twoColLayout);
-    settingsLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(settingsLayout);
     settingsLayout->addWidget(mBackground);
-    settingsLayout->addSpacing(MIN_WIDGET_DIM);
+    eSizesUI::widget.addSpacing(settingsLayout);
 
     connect(mFirstFrame, qOverload<int>(&QSpinBox::valueChanged),
             mLastFrame, &QSpinBox::setMinimum);
@@ -238,7 +238,7 @@ ExportJsonDialog::ExportJsonDialog(QWidget* const parent) :
 
     const auto mainLayout = new QHBoxLayout(this);
     mainLayout->addWidget(mPreview);
-    mainLayout->addSpacing(MIN_WIDGET_DIM/2);
+    eSizesUI::widget.addHalfSpacing(mainLayout);
     mainLayout->addWidget(settingsWidget);
     setLayout(mainLayout);
 }

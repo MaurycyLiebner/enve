@@ -28,6 +28,8 @@ ScrollWidget::ScrollWidget(ScrollWidgetVisiblePart * const visiblePart,
     mVisiblePartWidget(visiblePart) {
     connect(parent, &ScrollArea::heightChanged,
             this, &ScrollWidget::updateHeightAfterScrollAreaResize);
+    connect(&eSizesUI::widget, &SizeSetter::sizeChanged,
+            this, &ScrollWidget::updateHeight);
 }
 
 void ScrollWidget::updateAbstraction() {
@@ -100,7 +102,7 @@ void ScrollWidget::updateHeight() {
     if(!mMainAbstraction) return hide();
     mContentHeight = mMainAbstraction->updateHeight(
                 mVisiblePartWidget->getRulesCollection(),
-                false, false, MIN_WIDGET_DIM) + 3*MIN_WIDGET_DIM/2;
+                false, false, eSizesUI::widget) + 3*eSizesUI::widget/2;
     setFixedHeight(qMax(mContentHeight, minHeight()));
     if(isHidden()) show();
 }

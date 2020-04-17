@@ -28,7 +28,9 @@ SliderEdit::SliderEdit(QWidget* const parent) :
     setAttribute(Qt::WA_TranslucentBackground);
     setStyleSheet("background-color: rgba(0, 0, 0, 0);"
                   "color: black;");
-    setFixedHeight(MIN_WIDGET_DIM);
+    eSizesUI::widget.add(this, [this](const int size) {
+        setFixedHeight(size);
+    });
 
     connect(this, &QLineEdit::editingFinished,
             this, &SliderEdit::lineEditingFinished);
@@ -88,7 +90,6 @@ QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
     setDisplayedValue(minVal);
     updateValueString();
 
-    setFixedHeight(MIN_WIDGET_DIM);
     mLineEdit = new SliderEdit(this);
     mLineEdit->hide();
 
@@ -101,8 +102,11 @@ QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
         Document::sInstance->actionFinished();
     });
 
-    fitWidthToContent();
     setContentsMargins(0, 0, 0, 0);
+    eSizesUI::widget.add(this, [this](const int size) {
+        setFixedHeight(size);
+        fitWidthToContent();
+    });
 }
 
 QDoubleSlider::QDoubleSlider(const QString &name,
@@ -217,7 +221,7 @@ void QDoubleSlider::paint(QPainter *p,
             const qreal valFrac = (mValue - mMinValue)/(mMaxValue - mMinValue);
             const qreal valWidth = clamp(valFrac*width(), 0, width() - 3);
             p->setBrush(sliderFill);
-            const qreal heightRemoval = qMax(0., MIN_WIDGET_DIM/2 - valWidth)*0.5;
+            const qreal heightRemoval = qMax(0., eSizesUI::widget/2 - valWidth)*0.5;
             p->drawRoundedRect(QRectF(1, 1, valWidth, height() - 2).
                                adjusted(0, heightRemoval,
                                         0, -heightRemoval), 5, 5.);
@@ -307,8 +311,8 @@ void QDoubleSlider::fitWidthToContent() {
         textMin = valueToText(mMinValue);
     }
     const int textWidth = qMax(fm.width(textMax), fm.width(textMin));
-    const int maxWidth = (mShowName ? 6 : 3)*MIN_WIDGET_DIM;
-    const int padding = MIN_WIDGET_DIM/2;
+    const int maxWidth = (mShowName ? 6 : 3)*eSizesUI::widget;
+    const int padding = eSizesUI::widget/2;
     const int newWidth = qMin(maxWidth, textWidth + padding);
     setFixedWidth(newWidth);
     mLineEdit->setFixedWidth(newWidth);

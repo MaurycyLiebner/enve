@@ -145,8 +145,10 @@ MainWindow::MainWindow(Document& document,
     //fillStrokeSettingsScroll->setWidget(mFillStrokeSettings);
     mFillStrokeSettingsDock->setWidget(mFillStrokeSettings);
     addDockWidget(Qt::RightDockWidgetArea, mFillStrokeSettingsDock);
-    mFillStrokeSettingsDock->setMinimumWidth(MIN_WIDGET_DIM*12);
-    mFillStrokeSettingsDock->setMaximumWidth(MIN_WIDGET_DIM*20);
+    eSizesUI::widget.add(mFillStrokeSettingsDock, [this](const int size) {
+        mFillStrokeSettingsDock->setMinimumWidth(size*12);
+        mFillStrokeSettingsDock->setMaximumWidth(size*20);
+    });
 
     mPaintColorWidget = new PaintColorWidget(this);
     mPaintColorWidget->hide();
@@ -165,8 +167,10 @@ MainWindow::MainWindow(Document& document,
 
     mBrushSettingsDock = new CloseSignalingDockWidget(
                 tr("Brush Settings", "Dock"), this);
-    mBrushSettingsDock->setMinimumWidth(MIN_WIDGET_DIM*10);
-    mBrushSettingsDock->setMaximumWidth(MIN_WIDGET_DIM*20);
+    eSizesUI::widget.add(mBrushSettingsDock, [this](const int size) {
+        mBrushSettingsDock->setMinimumWidth(size*10);
+        mBrushSettingsDock->setMaximumWidth(size*20);
+    });
 
     const auto pCtxt = BrushSelectionWidget::sPaintContext;
     mBrushSelectionWidget = new BrushSelectionWidget(*pCtxt.get(), this);
@@ -184,8 +188,10 @@ MainWindow::MainWindow(Document& document,
 
     mSelectedObjectDock = new CloseSignalingDockWidget(
                 tr("Selected Objects", "Dock"), this);
-    mSelectedObjectDock->setMinimumWidth(MIN_WIDGET_DIM*10);
-    mSelectedObjectDock->setMaximumWidth(MIN_WIDGET_DIM*20);
+    eSizesUI::widget.add(mSelectedObjectDock, [this](const int size) {
+        mSelectedObjectDock->setMinimumWidth(size*10);
+        mSelectedObjectDock->setMaximumWidth(size*20);
+    });
 
     mObjectSettingsScrollArea = new ScrollArea(this);
     mObjectSettingsWidget = new BoxScrollWidget(
@@ -202,15 +208,19 @@ MainWindow::MainWindow(Document& document,
     connect(mObjectSettingsScrollArea, &ScrollArea::widthChanged,
             mObjectSettingsWidget, &BoxScrollWidget::setWidth);
 
-    mObjectSettingsScrollArea->verticalScrollBar()->setSingleStep(
-                MIN_WIDGET_DIM);
+    const auto vBar = mObjectSettingsScrollArea->verticalScrollBar();
+    eSizesUI::widget.add(vBar, [vBar](const int size) {
+        vBar->setSingleStep(size);
+    });
 
     mSelectedObjectDock->setWidget(mObjectSettingsScrollArea);
     addDockWidget(Qt::LeftDockWidgetArea, mSelectedObjectDock);
 
     mFilesDock = new CloseSignalingDockWidget(tr("Files", "Dock"), this);
-    mFilesDock->setMinimumWidth(MIN_WIDGET_DIM*10);
-    mFilesDock->setMaximumWidth(MIN_WIDGET_DIM*20);
+    eSizesUI::widget.add(mFilesDock, [this](const int size) {
+        mFilesDock->setMinimumWidth(size*10);
+        mFilesDock->setMaximumWidth(size*20);
+    });
 
     mFilesDock->setWidget(new FileSourceList(this));
     addDockWidget(Qt::LeftDockWidgetArea, mFilesDock);
@@ -259,6 +269,7 @@ MainWindow::~MainWindow() {
 #include "Settings/settingsdialog.h"
 void MainWindow::setupMenuBar() {
     mMenuBar = new QMenuBar(nullptr);
+    connectAppFont(mMenuBar);
 
     mFileMenu = mMenuBar->addMenu(tr("File", "MenuBar"));
     mFileMenu->addAction(tr("New...", "MenuBar_File"),
@@ -804,75 +815,75 @@ void MainWindow::setupToolBar() {
     mToolBar = new QToolBar(tr("Toolbar"), this);
     mToolBar->setMovable(false);
 
-    mToolBar->setIconSize(QSize(24, 24));
+    eSizesUI::button.add(mToolBar, [this](const int size) {
+        mToolBar->setIconSize(QSize(size, size));
+    });
 
     mToolBar->addSeparator();
 
-    const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
-
     mBoxTransformMode = SwitchButton::sCreate2Switch(
-                iconsDir + "/boxTransformUnchecked.png",
-                iconsDir + "/boxTransformChecked.png",
+                "toolbarButtons/boxTransformUnchecked.png",
+                "toolbarButtons/boxTransformChecked.png",
                 gSingleLineTooltip(tr("Object Mode", "ToolBar"), "F1"), this);
     mBoxTransformMode->toggle();
     mToolBar->addWidget(mBoxTransformMode);
 
     mPointTransformMode = SwitchButton::sCreate2Switch(
-                iconsDir + "/pointTransformUnchecked.png",
-                iconsDir + "/pointTransformChecked.png",
+                "toolbarButtons/pointTransformUnchecked.png",
+                "toolbarButtons/pointTransformChecked.png",
                 gSingleLineTooltip(tr("Point Mode", "ToolBar"), "F2"), this);
     mToolBar->addWidget(mPointTransformMode);
 
     mAddPointMode = SwitchButton::sCreate2Switch(
-                iconsDir + "/pathCreateUnchecked.png",
-                iconsDir +  "/pathCreateChecked.png",
+                "toolbarButtons/pathCreateUnchecked.png",
+                "toolbarButtons/pathCreateChecked.png",
                 gSingleLineTooltip(tr("Add Path Mode", "ToolBar"), "F3"), this);
     mToolBar->addWidget(mAddPointMode);
 
 
     mDrawPathMode = SwitchButton::sCreate2Switch(
-                iconsDir + "/drawPathUnchecked.png",
-                iconsDir + "/drawPathChecked.png",
+                "toolbarButtons/drawPathUnchecked.png",
+                "toolbarButtons/drawPathChecked.png",
                 gSingleLineTooltip(tr("Draw Path Mode", "ToolBar"), "F4"), this);
     mToolBar->addWidget(mDrawPathMode);
 
     mToolBar->addSeparator();
 
     mPaintMode = SwitchButton::sCreate2Switch(
-                iconsDir + "/paintUnchecked.png",
-                iconsDir + "/paintChecked.png",
+                "toolbarButtons/paintUnchecked.png",
+                "toolbarButtons/paintChecked.png",
                 gSingleLineTooltip(tr("Paint Mode", "ToolBar"), "F5"), this);
     mToolBar->addWidget(mPaintMode);
 
     mCircleMode = SwitchButton::sCreate2Switch(
-                iconsDir + "/circleCreateUnchecked.png",
-                iconsDir + "/circleCreateChecked.png",
+                "toolbarButtons/circleCreateUnchecked.png",
+                "toolbarButtons/circleCreateChecked.png",
                 gSingleLineTooltip(tr("Add Circle Mode", "ToolBar"), "F6"), this);
     mToolBar->addWidget(mCircleMode);
 
     mRectangleMode = SwitchButton::sCreate2Switch(
-                iconsDir + "/rectCreateUnchecked.png",
-                iconsDir + "/rectCreateChecked.png",
+                "toolbarButtons/rectCreateUnchecked.png",
+                "toolbarButtons/rectCreateChecked.png",
                 gSingleLineTooltip(tr("Add Rectange Mode", "ToolBar"), "F7"), this);
     mToolBar->addWidget(mRectangleMode);
 
     mTextMode = SwitchButton::sCreate2Switch(
-                iconsDir + "/textCreateUnchecked.png",
-                iconsDir + "/textCreateChecked.png",
+                "toolbarButtons/textCreateUnchecked.png",
+                "toolbarButtons/textCreateChecked.png",
                 gSingleLineTooltip(tr("Add Text Mode", "ToolBar"), "F8"), this);
     mToolBar->addWidget(mTextMode);
 
     mToolBar->addSeparator();
 
     mSculptMode = SwitchButton::sCreate2Switch(
-                iconsDir + "/sculptUnchecked.png",
-                iconsDir + "/sculptChecked.png",
+                "toolbarButtons/sculptUnchecked.png",
+                "toolbarButtons/sculptChecked.png",
                 gSingleLineTooltip(tr("Sculpt Path Mode", "ToolBar"), "F9"), this);
     mToolBar->addWidget(mSculptMode);
 
     mPickPaintSettingsMode = SwitchButton::sCreate2Switch(
-                iconsDir + "/pickUnchecked.png",
-                iconsDir + "/pickChecked.png",
+                "toolbarButtons/pickUnchecked.png",
+                "toolbarButtons/pickChecked.png",
                 gSingleLineTooltip(tr("Pick Mode", "ToolBar"), "F10"), this);
     mToolBar->addWidget(mPickPaintSettingsMode);
 
@@ -882,44 +893,44 @@ void MainWindow::setupToolBar() {
     mToolBar->widgetForAction(mToolBar->addAction("     "))->
             setObjectName("emptyToolButton");
 
-    mActionConnectPoints = new ActionButton(iconsDir + "/nodeConnect.png",
+    mActionConnectPoints = new ActionButton("toolbarButtons/nodeConnect.png",
                                             tr("Connect Nodes", "ToolBar"), this);
     mActionConnectPointsAct = mToolBar->addWidget(mActionConnectPoints);
 
-    mActionDisconnectPoints = new ActionButton(iconsDir + "/nodeDisconnect.png",
+    mActionDisconnectPoints = new ActionButton("toolbarButtons/nodeDisconnect.png",
                                                tr("Disconnect Nodes", "ToolBar"), this);
     mActionDisconnectPointsAct = mToolBar->addWidget(mActionDisconnectPoints);
 
-    mActionMergePoints = new ActionButton(iconsDir + "/nodeMerge.png",
+    mActionMergePoints = new ActionButton("toolbarButtons/nodeMerge.png",
                                           tr("Merge Nodes", "ToolBar"), this);
     mActionMergePointsAct = mToolBar->addWidget(mActionMergePoints);
 
-    mActionNewNode = new ActionButton(iconsDir + "/nodeNew.png",
+    mActionNewNode = new ActionButton("toolbarButtons/nodeNew.png",
                                       tr("New Node", "ToolBar"), this);
     mActionNewNodeAct = mToolBar->addWidget(mActionNewNode);
 //
     mSeparator1 = mToolBar->addSeparator();
 
-    mActionSymmetricPointCtrls = new ActionButton(iconsDir + "/nodeSymmetric.png",
+    mActionSymmetricPointCtrls = new ActionButton("toolbarButtons/nodeSymmetric.png",
                                                   tr("Symmetric Nodes", "ToolBar"), this);
     mActionSymmetricPointCtrlsAct = mToolBar->addWidget(mActionSymmetricPointCtrls);
 
-    mActionSmoothPointCtrls = new ActionButton(iconsDir + "/nodeSmooth.png",
+    mActionSmoothPointCtrls = new ActionButton("toolbarButtons/nodeSmooth.png",
                                                tr("Smooth Nodes", "ToolBar"), this);
     mActionSmoothPointCtrlsAct = mToolBar->addWidget(mActionSmoothPointCtrls);
 
-    mActionCornerPointCtrls = new ActionButton(iconsDir + "/nodeCorner.png",
+    mActionCornerPointCtrls = new ActionButton("toolbarButtons/nodeCorner.png",
                                                tr("Corner Nodes", "ToolBar"), this);
     mActionCornerPointCtrlsAct = mToolBar->addWidget(mActionCornerPointCtrls);
 
 //
     mSeparator2 = mToolBar->addSeparator();
 
-    mActionLine = new ActionButton(iconsDir + "/segmentLine.png",
+    mActionLine = new ActionButton("toolbarButtons/segmentLine.png",
                                    gSingleLineTooltip(tr("Make Segment Line", "ToolBar")), this);
     mActionLineAct = mToolBar->addWidget(mActionLine);
 
-    mActionCurve = new ActionButton(iconsDir + "/segmentCurve.png",
+    mActionCurve = new ActionButton("toolbarButtons/segmentCurve.png",
                                     gSingleLineTooltip(tr("Make Segment Curve", "ToolBar")), this);
     mActionCurveAct = mToolBar->addWidget(mActionCurve);
 
@@ -927,11 +938,13 @@ void MainWindow::setupToolBar() {
     mFontWidgetAct = mToolBar->addWidget(mFontWidget);
 
     mActionNewEmptyPaintFrame = new ActionButton(
-                iconsDir + "/newEmpty.png",
+                "toolbarButtons/newEmpty.png",
                 gSingleLineTooltip(tr("New Empty Frame", "ToolBar"), "N"), this);
     mActionNewEmptyPaintFrameAct = mToolBar->addWidget(mActionNewEmptyPaintFrame);
 
-    mToolBar->setFixedHeight(2*MIN_WIDGET_DIM);
+    eSizesUI::widget.add(mToolBar, [this](const int size) {
+        mToolBar->setFixedHeight(2*size);
+    });
 
     addToolBar(mToolBar);
 

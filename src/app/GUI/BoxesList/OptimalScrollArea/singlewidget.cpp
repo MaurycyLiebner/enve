@@ -22,7 +22,9 @@
 SingleWidget::SingleWidget(ScrollWidgetVisiblePart *parent) :
     QWidget(parent) {
     mParent = parent;
-    setFixedHeight(MIN_WIDGET_DIM);
+    eSizesUI::widget.add(this, [this](const int size) {
+        setFixedHeight(size);
+    });
 }
 
 void SingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {

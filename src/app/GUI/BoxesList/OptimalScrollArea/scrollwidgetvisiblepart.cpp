@@ -136,12 +136,12 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
             currWidget->setVisible(newAbs);
         }
     };
-    int currY = MIN_WIDGET_DIM/2;
+    int currY = eSizesUI::widget/2;
     const int top = visibleTop();
-    const int bottom = top + visibleHeight() + MIN_WIDGET_DIM/2;
+    const int bottom = top + visibleHeight() + eSizesUI::widget/2;
     mMainAbstraction->setAbstractions(
                 top, bottom,
-                currY, 0, MIN_WIDGET_DIM,
+                currY, 0, eSizesUI::widget,
                 setAbsFunc, mRulesCollection,
                 true, false);
 

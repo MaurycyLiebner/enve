@@ -38,6 +38,10 @@ BookmarkedWidget::BookmarkedWidget(const bool vertical,
     });
 
     setStyleSheet("QPushButton { border-radius: 0; };");
+
+    eSizesUI::widget.add(this, [this](int) {
+        updateLayout();
+    });
 }
 
 void BookmarkedWidget::addWidget(QWidget * const wid) {
@@ -81,7 +85,7 @@ void BookmarkedWidget::updateLayout() {
         setPos = [](QWidget* wid, const int x) { wid->move(x, 0); };
     }
     const int dim = mVertical ? height() : width();
-    const int minArrowDim = MIN_WIDGET_DIM;
+    const int minArrowDim = eSizesUI::widget;
     const bool arrowsVisible = dim - mWidgets.count()*mDimension < 0;
     const int maxVisible = arrowsVisible ?
                 (dim - 2*minArrowDim)/mDimension :
