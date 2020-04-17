@@ -13,4 +13,3 @@ echo "#endif" >> $enveSplash
 qmake ../../enve.pro
 make -j 2
 cd src/app
-ls

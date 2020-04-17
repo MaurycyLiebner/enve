@@ -5,4 +5,4 @@ export LOCAL=$(git rev-parse HEAD);
 if [[ "$REMOTE" != "$LOCAL" ]]; then echo "Build no longer current. $REMOTE vs $LOCAL - aborting upload."; exit 0; fi;
 wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh;
 export UPLOADTOOL_SUFFIX="osx";
-bash upload.sh enve*.dmg*;
+bash upload.sh enve.dmg;
