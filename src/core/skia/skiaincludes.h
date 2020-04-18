@@ -17,7 +17,7 @@
 #ifndef SKIAINCLUDES_H
 #define SKIAINCLUDES_H
 
-#include "qglobal.h"
+#include <qglobal.h>
 
 #undef foreach
 

@@ -23,9 +23,9 @@
 
 #define enve_cast enve::cast
 
-#if (defined (_WIN32) || defined (_WIN64))
+#if defined (Q_OS_WIN)
     template <bool T> using BoolConstant = std::bool_constant<T>;
-#elif (defined (LINUX) || defined (__linux__))
+#elif defined(Q_OS_LINUX)
     template <bool T> using BoolConstant = std::__bool_constant<T>;
 #elif (defined (Q_OS_MAC))
     template <bool T> using BoolConstant = std::integral_constant<bool, T>;

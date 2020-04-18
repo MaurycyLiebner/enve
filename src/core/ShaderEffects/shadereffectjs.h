@@ -19,9 +19,10 @@
 
 #include "../core_global.h"
 
+#include "skia/skiaincludes.h"
+
 #include <memory>
 #include <QJSEngine>
-#include <include/core/SkRect.h>
 
 class CORE_EXPORT ShaderEffectJS {
 public:

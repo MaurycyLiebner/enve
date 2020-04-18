@@ -27,12 +27,12 @@
 #define FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #ifdef QT_DEBUG
-    #if (defined (_WIN32) || defined (_WIN64))
+    #if defined (Q_OS_WIN)
         #define NOMINMAX
         #include <windows.h>
         #undef NOMINMAX
         #define BREAKPOINT DebugBreak();
-    #elif (defined (LINUX) || defined (__linux__))
+    #elif defined(Q_OS_LINUX)
         #define BREAKPOINT std::raise(SIGTRAP);
     #else
         #define BREAKPOINT

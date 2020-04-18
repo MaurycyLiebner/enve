@@ -17,9 +17,9 @@
 #ifndef COLORCONVERSIONS_H
 #define COLORCONVERSIONS_H
 
-#if (defined (_WIN32) || defined (_WIN64))
-    #include <stdint.h>
-#elif (defined (LINUX) || defined (__linux__))
+#include <qglobal.h>
+
+#if defined(Q_OS_LINUX)
     #include <stdint-gcc.h>
 #else
     #include <stdint.h>

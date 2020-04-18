@@ -16,10 +16,11 @@
 
 #ifndef SIMPLEBRUSHWRAPPER_H
 #define SIMPLEBRUSHWRAPPER_H
-#include <libmypaint/mypaint-brush.h>
+
 #include <QColor>
 #include "pointhelpers.h"
 #include "smartPointers/ememory.h"
+#include "libmypaintincludes.h"
 
 class CORE_EXPORT SimpleBrushWrapper : public StdSelfRef {
     e_OBJECT

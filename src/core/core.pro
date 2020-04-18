@@ -590,6 +590,7 @@ HEADERS += \
     jsonexporter.h \
     jsonexporthelpers.h \
     kraimporter.h \
+    libmypaintincludes.h \
     matrixdecomposition.h \
     memorydatahandler.h \
     namefixer.h \

@@ -16,12 +16,14 @@
 
 #ifndef BRUSHSTROKE_H
 #define BRUSHSTROKE_H
+
+#include <QRect>
+
 #include "Segments/qcubicsegment1d.h"
 #include "Segments/qcubicsegment2d.h"
+#include "libmypaintincludes.h"
 #include "pointhelpers.h"
 #include "pathoperations.h"
-#include <QRect>
-#include <libmypaint/mypaint-brush.h>
 
 #define DEFAULT_TILT_CURVE qCubicSegment1D{0, 0, 0, 0}
 
