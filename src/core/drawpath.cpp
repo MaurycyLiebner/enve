@@ -24,10 +24,11 @@ DrawPath::DrawPath() {}
 
 void DrawPath::lineTo(const QPointF& pos) {
     if(!mPts.isEmpty()) {
-        const QPointF& lastPos = mPts.last();
+        const QPointF lastPos = mPts.last();
         const QPointF dPos = pos - lastPos;
         const qreal dist = pointToLen(dPos);
         const int n = qFloor(dist/3);
+        mPts.reserve(mPts.size() + n);
         const qreal div = 1./(1 + n);
         for(int i = 1; i <= n; i++) {
             mPts.append(lastPos + i*dPos*div);
