@@ -36,7 +36,11 @@ extern inline float toSkScalar(const qreal qr) {
 CORE_EXPORT
 extern SkFontStyle::Slant toSkSlant(const QFont::Style& style);
 CORE_EXPORT
-extern int QFontWeightToSkFontWeght(const int qWeight);
+extern int QFontWeightToSkFontWeight(const int qWeight);
+CORE_EXPORT
+extern QFont toQFont(const SkFont& skfont, const int skPPI, const int qPPI);
+CORE_EXPORT
+extern QFont toQFont(const SkFont& skfont);
 CORE_EXPORT
 extern SkFont toSkFont(const QFont& qfont, const int qPPI, const int skPPI);
 CORE_EXPORT

@@ -28,6 +28,7 @@
 #include "pathboxrenderdata.h"
 #include "ReadWrite/evformat.h"
 #include "svgexporter.h"
+#include "Private/esettings.h"
 
 TextBox::TextBox() : PathBox("Text", eBoxType::text) {
     mFillSettings->setPaintType(PaintType::FLATPAINT);
@@ -132,6 +133,8 @@ void TextBox::setFont(const SkFont &font) {
         prp_addUndoRedo(ur);
     }
     mFont = font;
+    mQFont = toQFont(font);
+
     prp_afterWholeInfluenceRangeChanged();
     setPathsOutdated(UpdateReason::userChange);
 }
@@ -223,23 +226,37 @@ void TextBox::setupCanvasMenu(PropertyMenu * const menu) {
     menu->addPlainAction("Set Text...", setText);
 }
 
+void TextBox::textToPath(const qreal x, const qreal y,
+                         const QString& text, SkPath& path) const {
+    if(eSettings::instance().fCanvasRtlSupport) {
+        QPainterPath qpath;
+        qpath.addText(x, y, mQFont, text);
+        path = toSkPath(qpath);
+    } else {
+        SkTextUtils::GetPath(text.utf16(),
+                             text.size()*sizeof(short),
+                             SkTextEncoding::kUTF16,
+                             toSkScalar(x), toSkScalar(y),
+                             mFont, &path);
+    }
+}
+
 SkPath TextBox::getRelativePath(const qreal relFrame) const {
-    const SkFont font = mFont;
-    const qreal fontSize = static_cast<qreal>(font.getSize());
+    const qreal fontSize = static_cast<qreal>(mFont.getSize());
     const QString textAtFrame = mText->getValueAtRelFrame(relFrame);
 
     const qreal letterSpacing = mLetterSpacing->getEffectiveValue(relFrame);
     const qreal wordSpacing = mWordSpacing->getEffectiveValue(relFrame);
     const qreal lineSpacing = mLineSpacing->getEffectiveValue(relFrame);
 
-    const qreal lineInc = static_cast<qreal>(font.getSpacing())*lineSpacing;
+    const qreal lineInc = static_cast<qreal>(mFont.getSpacing())*lineSpacing;
 
     const QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
     qreal maxWidth = 0;
     QList<qreal> lineWidths;
     for(const auto& line : lines) {
         const qreal lineWidth = horizontalAdvance(
-                    font, line, letterSpacing, wordSpacing);
+                    mFont, line, letterSpacing, wordSpacing);
         if(lineWidth > maxWidth) maxWidth = lineWidth;
         lineWidths << lineWidth;
     }
@@ -249,7 +266,7 @@ SkPath TextBox::getRelativePath(const qreal relFrame) const {
     else /*if(mHAlignment == Qt::AlignCenter)*/ xTranslate = -0.5*maxWidth;
 
     SkFontMetrics metrics;
-    font.getMetrics(&metrics);
+    mFont.getMetrics(&metrics);
     const qreal height = (lines.count() - 1)*lineInc +
             static_cast<qreal>(metrics.fAscent + metrics.fDescent);
     qreal yTranslate;
@@ -266,28 +283,20 @@ SkPath TextBox::getRelativePath(const qreal relFrame) const {
         const qreal lineY = i*lineInc + yTranslate;
         if(isZero4Dec(letterSpacing) && isOne4Dec(wordSpacing)) {
             SkPath linePath;
-            SkTextUtils::GetPath(line.utf16(),
-                                 line.size()*sizeof(short),
-                                 SkTextEncoding::kUTF16,
-                                 toSkScalar(lineX), toSkScalar(lineY),
-                                 font, &linePath);
+            textToPath(lineX, lineY, line, linePath);
             result.addPath(linePath);
         } else if(isZero4Dec(letterSpacing)) {
             qreal xPos = lineX;
-            const qreal spaceX = horizontalAdvance(font, " ")*wordSpacing;
+            const qreal spaceX = horizontalAdvance(mFont, " ")*wordSpacing;
 
             const auto wordFinished =
-            [&result, &xPos, lineY, &line, &font](const int i0, const int i) {
+            [this, &result, &xPos, lineY, &line](const int i0, const int i) {
                 const QString wordStr = line.mid(i0, i - i0 + 1);
                 SkPath wordPath;
-                SkTextUtils::GetPath(wordStr.utf16(),
-                                     wordStr.size()*sizeof(short),
-                                     SkTextEncoding::kUTF16,
-                                     toSkScalar(xPos), toSkScalar(lineY),
-                                     font, &wordPath);
+                textToPath(xPos, lineY, wordStr, wordPath);
                 result.addPath(wordPath);
 
-                xPos += horizontalAdvance(font, wordStr);
+                xPos += horizontalAdvance(mFont, wordStr);
             };
 
             int i0 = 0;
@@ -305,7 +314,7 @@ SkPath TextBox::getRelativePath(const qreal relFrame) const {
             if(i0 < line.length()) wordFinished(i0, line.length() - 1);
         } else {
             qreal xPos = lineX;
-            const qreal spaceX = horizontalAdvance(font, " ")*wordSpacing;
+            const qreal spaceX = horizontalAdvance(mFont, " ")*wordSpacing;
 
             for(int i = 0; i < line.length(); i++) {
                 if(line.at(i) == ' ') {
@@ -314,14 +323,10 @@ SkPath TextBox::getRelativePath(const qreal relFrame) const {
                 }
                 const QString letter = line.mid(i, 1);
                 SkPath letterPath;
-                SkTextUtils::GetPath(letter.utf16(),
-                                     letter.size()*sizeof(short),
-                                     SkTextEncoding::kUTF16,
-                                     toSkScalar(xPos), toSkScalar(lineY),
-                                     font, &letterPath);
+                textToPath(xPos, lineY, letter, letterPath);
                 result.addPath(letterPath);
 
-                xPos += horizontalAdvance(font, letter) + letterSpacing*fontSize;
+                xPos += horizontalAdvance(mFont, letter) + letterSpacing*fontSize;
             }
         }
     }

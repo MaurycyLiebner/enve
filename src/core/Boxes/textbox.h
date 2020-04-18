@@ -63,9 +63,13 @@ public:
 
     void saveSVG(SvgExporter& doc, DomEleTask* const task) const;
 private:
+    void textToPath(const qreal x, const qreal y,
+                    const QString& text, SkPath& path) const;
+
     Qt::Alignment mHAlignment = Qt::AlignLeft;
     Qt::Alignment mVAlignment = Qt::AlignTop;
 
+    QFont mQFont;
     SkFont mFont;
     QString mFamily;
     SkFontStyle mStyle;

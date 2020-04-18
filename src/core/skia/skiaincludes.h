@@ -17,7 +17,12 @@
 #ifndef SKIAINCLUDES_H
 #define SKIAINCLUDES_H
 
+#include "qglobal.h"
+
 #undef foreach
+
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_GCC("-Wattributes")
 
 #include "skiadefines.h"
 
@@ -62,5 +67,7 @@
 
 #include "src/core/SkStroke.h"
 #include "src/core/SkGeometry.h" // for SkAutoConicToQuads
+
+QT_WARNING_POP
 
 #endif // SKIAINCLUDES_H

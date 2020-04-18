@@ -199,6 +199,89 @@ void switchSkQ(const float sk, qreal &q) {
     q = toQreal(sk);
 }
 
+QFont::Style toQStyle(const SkFontStyle::Slant& style) {
+    switch(style) {
+    case SkFontStyle::kOblique_Slant:
+        return QFont::StyleOblique;
+    case SkFontStyle::kItalic_Slant:
+        return QFont::StyleItalic;
+    case SkFontStyle::kUpright_Slant:
+        return QFont::StyleNormal;
+    }
+    return QFont::StyleNormal;
+}
+
+int SkFontWeightToQFontWeight(int skWeight) {
+    int qWeight;
+    switch(skWeight) {
+    case SkFontStyle::kThin_Weight: qWeight = QFont::Thin; break;
+    case SkFontStyle::kExtraLight_Weight: qWeight = QFont::ExtraLight; break;
+    case SkFontStyle::kLight_Weight: qWeight = QFont::Light; break;
+    case SkFontStyle::kNormal_Weight: qWeight = QFont::Normal; break;
+    case SkFontStyle::kMedium_Weight: qWeight = QFont::Medium; break;
+    case SkFontStyle::kSemiBold_Weight: qWeight = QFont::DemiBold; break;
+    case SkFontStyle::kBold_Weight: qWeight = QFont::Bold; break;
+    case SkFontStyle::kExtraBold_Weight: qWeight = QFont::ExtraBold; break;
+    case SkFontStyle::kBlack_Weight: qWeight = QFont::Black; break;
+    default: {
+        qWeight = qRound(skWeight/10.0);
+        if(qWeight >= 0 && qWeight < 30) {
+            qWeight -= 10;
+        } else if(qWeight >= 45 && qWeight < 50) {
+            qWeight += 10;
+        }
+    }
+    }
+
+    if(qWeight < 0) qWeight = 0;
+
+    return qWeight;
+}
+
+QFont toQFont(const SkFont &skfont, const int qPPI, const int skPPI) {
+    const auto typeface = skfont.getTypefaceOrDefault();
+    const auto skStyle = typeface->fontStyle();
+    const QFont::Style style = toQStyle(skStyle.slant());
+
+    int stretch;
+    switch(skStyle.width()) {
+    case SkFontStyle::kUltraCondensed_Width:
+        stretch = 56; break;
+    case SkFontStyle::kExtraCondensed_Width:
+        stretch = 68; break;
+    case SkFontStyle::kCondensed_Width:
+        stretch = 81; break;
+    case SkFontStyle::kSemiCondensed_Width:
+        stretch = 94; break;
+    case SkFontStyle::kNormal_Width:
+        stretch = 106; break;
+    case SkFontStyle::kSemiExpanded_Width:
+        stretch = 118; break;
+    case SkFontStyle::kExpanded_Width:
+        stretch = 137; break;
+    case SkFontStyle::kExtraExpanded_Width:
+        stretch = 175; break;
+    default:
+        stretch = 200;
+    }
+
+    const int weight = SkFontWeightToQFontWeight(skStyle.weight());
+
+    QFont qFont;
+    SkString family;
+    typeface->getFamilyName(&family);
+    qFont.setFamily(family.c_str());
+    qFont.setStretch(stretch);
+    qFont.setWeight(weight);
+    qFont.setStyle(style);
+    qFont.setPointSizeF(skfont.getSize()*skPPI/qPPI);
+    return qFont;
+}
+
+QFont toQFont(const SkFont& skfont) {
+    return toQFont(skfont, 72, 72);
+}
+
 SkFontStyle::Slant toSkSlant(const QFont::Style& style) {
     switch(style) {
     case QFont::StyleOblique:
@@ -211,7 +294,7 @@ SkFontStyle::Slant toSkSlant(const QFont::Style& style) {
     return SkFontStyle::kUpright_Slant;
 }
 
-int QFontWeightToSkFontWeght(const int qWeight) {
+int QFontWeightToSkFontWeight(const int qWeight) {
     int skWeight = qWeight;
     switch(qWeight) {
     case QFont::Thin: skWeight = 100; break;
@@ -262,7 +345,7 @@ SkFont toSkFont(const QFont &qfont, const int qPPI, const int skPPI) {
         width = SkFontStyle::kUltraExpanded_Width;
     }
 
-    const int weight = QFontWeightToSkFontWeght(qfont.weight());
+    const int weight = QFontWeightToSkFontWeight(qfont.weight());
     const SkFontStyle style(weight, width, slant);
 
     SkFont skFont;

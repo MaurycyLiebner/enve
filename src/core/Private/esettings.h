@@ -49,6 +49,8 @@ public:
     static int sCpuThreadsCapped();
     static const QString& sSettingsDir();
     static const QString& sIconsDir();
+
+    static const eSettings& instance();
     static eSettings* sInstance;
 
     void loadDefaults();
@@ -91,6 +93,9 @@ public:
 
     // ui settings
     qreal fInterfaceScaling;
+
+    // canvas settings
+    bool fCanvasRtlSupport;
 
     // timeline settings
     bool fTimelineAlternateRow;

@@ -168,6 +168,9 @@ eSettings::eSettings(const int cpuThreads, const intKB ramKB,
                      fInterfaceScaling, "interfaceScaling", 1.);
 
     gSettings << std::make_shared<eBoolSetting>(
+                     fCanvasRtlSupport, "rtlTextSupport", false);
+
+    gSettings << std::make_shared<eBoolSetting>(
                      fTimelineAlternateRow, "timelineAlternateRow", true);
     gSettings << std::make_shared<eColorSetting>(
                      fTimelineAlternateRowColor, "timelineAlternateRowColor",
@@ -221,6 +224,10 @@ const QString &eSettings::sSettingsDir() {
 
 const QString& eSettings::sIconsDir() {
     return sInstance->mIconsDir;
+}
+
+const eSettings& eSettings::instance() {
+    return *sInstance;
 }
 
 void eSettings::loadDefaults() {

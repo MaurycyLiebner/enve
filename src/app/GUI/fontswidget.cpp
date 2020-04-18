@@ -216,7 +216,7 @@ void FontsWidget::emitFamilyAndStyleChanged() {
     const auto family = fontFamily();
     const auto style = fontStyle();
     const int qWeight = mFontDatabase.weight(family, style);
-    const int weight = QFontWeightToSkFontWeght(qWeight);
+    const int weight = QFontWeightToSkFontWeight(qWeight);
     const int width = SkFontStyle::kNormal_Width;
 //    const bool italic = mFontDatabase.italic(family, style);
 //    const auto slant = italic ? SkFontStyle::kItalic_Slant :

@@ -6,6 +6,7 @@
 
 #include "performancesettingswidget.h"
 #include "interfacesettingswidget.h"
+#include "canvassettingswidget.h"
 #include "timelinesettingswidget.h"
 #include "externalappssettingswidget.h"
 
@@ -32,6 +33,9 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
 
     const auto interface = new InterfaceSettingsWidget(this);
     addSettingsWidget(interface, "Interface");
+
+    const auto canvas = new CanvasSettingsWidget(this);
+    addSettingsWidget(canvas, "Canvas");
 
     const auto timeline = new TimelineSettingsWidget(this);
     addSettingsWidget(timeline, "Timeline");
