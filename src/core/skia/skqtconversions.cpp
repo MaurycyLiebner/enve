@@ -238,7 +238,7 @@ int SkFontWeightToQFontWeight(int skWeight) {
     return qWeight;
 }
 
-QFont toQFont(const SkFont &skfont, const int qPPI, const int skPPI) {
+QFont toQFont(const SkFont &skfont, const int skPPI, const int qPPI) {
     const auto typeface = skfont.getTypefaceOrDefault();
     const auto skStyle = typeface->fontStyle();
     const QFont::Style style = toQStyle(skStyle.slant());

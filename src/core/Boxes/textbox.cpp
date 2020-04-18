@@ -133,7 +133,7 @@ void TextBox::setFont(const SkFont &font) {
         prp_addUndoRedo(ur);
     }
     mFont = font;
-    mQFont = toQFont(font);
+    mQFont = toQFont(font, 72, 96);
 
     prp_afterWholeInfluenceRangeChanged();
     setPathsOutdated(UpdateReason::userChange);
