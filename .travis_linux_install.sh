@@ -15,7 +15,7 @@ if ! [ -d $TRAVIS_CACHE_DIR/third_party/skia/out/Release ]; then
     unzip ninja-linux.zip
     chmod +x ninja
     bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] target_os="linux" target_cpu="x64" skia_use_system_expat=false skia_use_system_freetype2=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false skia_use_system_icu=false skia_use_system_harfbuzz=false cc="clang-7" cxx="clang++-7"'
-    ./ninja -C out/Release -j 2
+    ./ninja -C out/Release -j 2 skia
     mkdir -p $TRAVIS_CACHE_DIR/third_party/skia/out/Release
     cp -r ./out/Release/* $TRAVIS_CACHE_DIR/third_party/skia/out/Release
     cd ..

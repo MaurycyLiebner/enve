@@ -98,12 +98,12 @@ bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflag
 ```
 Build a release version of skia (you can use more than 2 threads):
 ```
-./ninja -C out/Release -j 2
+./ninja -C out/Release -j 2 skia
 ```
 If you want, you can also build a debug version:
 ```
 bin/gn gen out/Debug --args='extra_cflags=["-Wno-error"] cc="gcc-7" cxx="g++-7"'
-./ninja -C out/Debug -j 2
+./ninja -C out/Debug -j 2 skia
 ```
 
 Go back to the third_party folder:
