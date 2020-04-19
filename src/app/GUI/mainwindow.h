@@ -165,7 +165,6 @@ public:
     void saveFile();
     void saveFileAs();
     void saveBackup();
-    void exportJSON();
     void exportSVG();
     bool closeProject();
     void linkFile();

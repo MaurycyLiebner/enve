@@ -24,8 +24,6 @@ class QIODevice;
 #include "overlappingkeylist.h"
 
 #include <QDomElement>
-#include "../jsonexporter.h"
-#include "../jsonexporthelpers.h"
 
 class QPainter;
 class TimelineMovable;

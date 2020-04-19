@@ -218,9 +218,6 @@ public:
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
 protected:
-    void saveBoxesJSON(JsonExporter& exp,
-                       JsonEleTask* const eleTask,
-                       QJsonObject& ele) const;
     void saveBoxesSVG(SvgExporter& exp,
                       DomEleTask* const eleTask,
                       QDomElement& ele) const;

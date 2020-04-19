@@ -64,7 +64,6 @@
 #include "eimporters.h"
 #include "ColorWidgets/paintcolorwidget.h"
 #include "Dialogs/exportsvgdialog.h"
-#include "Dialogs/exportjsondialog.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 
@@ -302,10 +301,6 @@ void MainWindow::setupMenuBar() {
                          this, &MainWindow::saveBackup);
 
     const auto exportMenu = mFileMenu->addMenu(tr("Export", "MenuBar_File"));
-#ifdef QT_DEBUG
-    exportMenu->addAction(tr("Export JSON...", "MenuBar_File"),
-                          this, &MainWindow::exportJSON);
-#endif
     exportMenu->addAction(tr("Export SVG...", "MenuBar_File"),
                           this, &MainWindow::exportSVG);
     mFileMenu->addSeparator();
@@ -1348,12 +1343,6 @@ void MainWindow::saveBackup() {
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
     }
-}
-
-void MainWindow::exportJSON() {
-    const auto dialog = new ExportJsonDialog(this);
-    dialog->show();
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
 }
 
 void MainWindow::exportSVG() {

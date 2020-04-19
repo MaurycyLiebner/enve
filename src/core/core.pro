@@ -236,7 +236,6 @@ SOURCES += \
     Tasks/domeletask.cpp \
     Tasks/etask.cpp \
     Tasks/etaskbase.cpp \
-    Tasks/jsoneletask.cpp \
     Tasks/updatable.cpp \
     Timeline/animationrect.cpp \
     Timeline/durationrectangle.cpp \
@@ -262,8 +261,6 @@ SOURCES += \
     filesourcescache.cpp \
     gpurendertools.cpp \
     importhandler.cpp \
-    jsonexporter.cpp \
-    jsonexporthelpers.cpp \
     kraimporter.cpp \
     matrixdecomposition.cpp \
     memorydatahandler.cpp \
@@ -560,7 +557,6 @@ HEADERS += \
     Tasks/domeletask.h \
     Tasks/etask.h \
     Tasks/etaskbase.h \
-    Tasks/jsoneletask.h \
     Tasks/updatable.h \
     Timeline/animationrect.h \
     Timeline/durationrectangle.h \
@@ -587,8 +583,6 @@ HEADERS += \
     gpurendertools.h \
     hardwareenums.h \
     importhandler.h \
-    jsonexporter.h \
-    jsonexporthelpers.h \
     kraimporter.h \
     libmypaintincludes.h \
     matrixdecomposition.h \

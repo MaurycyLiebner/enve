@@ -27,8 +27,6 @@ LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample
 CONFIG += c++14
 DEFINES += QT_NO_FOREACH
 
-LIBS += -lskottie -lsksg -lskshaper
-
 # Include third-party dependencies from core
 include(../core/core.pri)
 
@@ -68,7 +66,6 @@ SOURCES += main.cpp\
     GUI/Dialogs/applyexpressiondialog.cpp \
     GUI/Dialogs/dialogsinterfaceimpl.cpp \
     GUI/Dialogs/durationrectsettingsdialog.cpp \
-    GUI/Dialogs/exportjsondialog.cpp \
     GUI/Dialogs/exportsvgdialog.cpp \
     GUI/Dialogs/scenesettingsdialog.cpp \
     GUI/Expressions/expressiondialog.cpp \
@@ -195,7 +192,6 @@ HEADERS  += \
     GUI/Dialogs/applyexpressiondialog.h \
     GUI/Dialogs/dialogsinterfaceimpl.h \
     GUI/Dialogs/durationrectsettingsdialog.h \
-    GUI/Dialogs/exportjsondialog.h \
     GUI/Dialogs/exportsvgdialog.h \
     GUI/Dialogs/scenesettingsdialog.h \
     GUI/Expressions/expressiondialog.h \

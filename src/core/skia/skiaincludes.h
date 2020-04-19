@@ -61,8 +61,6 @@ QT_WARNING_DISABLE_GCC("-Wattributes")
 
 #include <QtGui/qopengl.h>
 
-#include "modules/skottie/include/Skottie.h"
-
 #include "src/gpu/gl/GrGLDefines.h"
 
 #include "src/core/SkStroke.h"
