@@ -85,6 +85,11 @@ namespace SkiaHelpers {
 
     CORE_EXPORT
     void forceLink();
+
+    CORE_EXPORT
+    void textToPath(const SkFont& font,
+                    const SkScalar x, const SkScalar y,
+                    const QString& text, SkPath& path);
 }
 
 #endif // SKIAHELPERS_H

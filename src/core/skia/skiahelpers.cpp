@@ -167,9 +167,17 @@ void SkiaHelpers::forceLink() {
 #define FORCE_UNDEFINED_SYMBOL(x, nid) \
     auto __fus_fp_ ## nid = &x; Q_UNUSED(__fus_fp_ ## nid)
 
-    FORCE_UNDEFINED_SYMBOL(SkTextUtils::GetPath, 0)
-    FORCE_UNDEFINED_SYMBOL(SkOpBuilder::add, 1)
+    FORCE_UNDEFINED_SYMBOL(SkOpBuilder::add, 0)
 
     GrContext::MakeGL();
     GrGLMakeNativeInterface()->validate();
+}
+
+void SkiaHelpers::textToPath(const SkFont& font,
+                             const SkScalar x, const SkScalar y,
+                             const QString& text, SkPath& path) {
+    SkTextUtils::GetPath(text.utf16(),
+                         text.size()*sizeof(short),
+                         SkTextEncoding::kUTF16,
+                         x, y, font, &path);
 }

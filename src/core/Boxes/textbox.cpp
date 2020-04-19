@@ -233,11 +233,7 @@ void TextBox::textToPath(const qreal x, const qreal y,
         qpath.addText(x, y, mQFont, text);
         path = toSkPath(qpath);
     } else {
-        SkTextUtils::GetPath(text.utf16(),
-                             text.size()*sizeof(short),
-                             SkTextEncoding::kUTF16,
-                             toSkScalar(x), toSkScalar(y),
-                             mFont, &path);
+        SkiaHelpers::textToPath(mFont, x, y, text, path);
     }
 }
 
@@ -323,7 +319,7 @@ SkPath TextBox::getRelativePath(const qreal relFrame) const {
                 }
                 const QString letter = line.mid(i, 1);
                 SkPath letterPath;
-                textToPath(xPos, lineY, letter, letterPath);
+                SkiaHelpers::textToPath(mFont, xPos, lineY, letter, letterPath);
                 result.addPath(letterPath);
 
                 xPos += horizontalAdvance(mFont, letter) + letterSpacing*fontSize;

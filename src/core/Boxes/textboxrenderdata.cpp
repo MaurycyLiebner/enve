@@ -97,12 +97,8 @@ void LetterRenderData::initialize(const qreal relFrame,
     parent->setupPaintSettings(this, relFrame);
     parent->setupStrokerSettings(this, relFrame);
     SkPath textPath;
-    SkTextUtils::GetPath(letter.utf16(),
-                         letter.size()*sizeof(short),
-                         SkTextEncoding::kUTF16,
-                         toSkScalar(pos.x()),
-                         toSkScalar(pos.y()),
-                         font, &textPath);
+    SkiaHelpers::textToPath(font, pos.x(), pos.y(), letter, textPath);
+
     fPath = textPath;
     fEditPath = textPath;
     fFillPath = textPath;
