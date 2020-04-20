@@ -24,6 +24,7 @@ public:
     void addWidgetToFirstColumn(QWidget *wid);
     void addWidgetToSecondColumn(QWidget *wid);
     void addPair(QWidget *column1, QWidget *column2);
+    void addPair(QWidget *column1, QLayout *column2);
 
     void addSpacing(const int size);
 protected:

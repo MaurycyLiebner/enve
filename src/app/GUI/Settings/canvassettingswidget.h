@@ -19,7 +19,11 @@
 
 #include "settingswidget.h"
 
+#include <QDoubleSpinBox>
 #include <QCheckBox>
+
+class ColorAnimatorButton;
+class QSlider;
 
 class CanvasSettingsWidget : public SettingsWidget {
 public:
@@ -29,6 +33,16 @@ public:
     void updateSettings();
 private:
     QCheckBox* mRtlSupport = nullptr;
+
+    QSlider* mPathNodeSize;
+    ColorAnimatorButton* mPathNodeColor = nullptr;
+    ColorAnimatorButton* mPathNodeSelectedColor = nullptr;
+    QSlider* mPathDissolvedNodeSize;
+    ColorAnimatorButton* mPathDissolvedNodeColor = nullptr;
+    ColorAnimatorButton* mPathDissolvedNodeSelectedColor = nullptr;
+    QSlider* mPathControlSize;
+    ColorAnimatorButton* mPathControlColor = nullptr;
+    ColorAnimatorButton* mPathControlSelectedColor = nullptr;
 };
 
 #endif // CANVASSETTINGSWIDGET_H

@@ -78,6 +78,14 @@ void PathPointsHandler::updateAllPoints() {
     for(int i = 0; i < count(); i++) updatePoint(i);
 }
 
+void PathPointsHandler::updateAllPointsRadius() {
+    for(int i = 0; i < count(); i++) {
+        const auto node = getPointWithId<SmartNodePoint>(i);
+        node->updateRadius();
+        node->updateCtrlsRadius();
+    }
+}
+
 void PathPointsHandler::flushNodesRemoval() {
     auto nodes = mRemoveNodes;
     mRemoveNodes.clear();

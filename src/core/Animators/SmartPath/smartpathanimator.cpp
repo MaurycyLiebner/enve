@@ -17,15 +17,21 @@
 #include "smartpathanimator.h"
 #include "Animators/qrealpoint.h"
 #include "smartpathcollection.h"
+#include "Private/esettings.h"
 #include "MovablePoints/pathpointshandler.h"
 
 SmartPathAnimator::SmartPathAnimator() :
     InterOptimalAnimatorT<SmartPath>("path") {
     const auto ptsHandler = enve::make_shared<PathPointsHandler>(this);
-    QObject::connect(this, &Property::prp_currentFrameChanged,
-                     this, [ptsHandler] {
+    connect(this, &Property::prp_currentFrameChanged,
+            this, [ptsHandler] {
         ptsHandler->updateAllPoints();
     });
+    connect(eSettings::sInstance, &eSettings::settingsChanged,
+            this, [ptsHandler] {
+        ptsHandler->updateAllPointsRadius();
+    });
+
     setPointsHandler(ptsHandler);
 }
 

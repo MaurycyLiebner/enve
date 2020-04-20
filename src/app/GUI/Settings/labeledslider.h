@@ -14,32 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SETTINGSWIDGET_H
-#define SETTINGSWIDGET_H
+#ifndef LABELEDSLIDER_H
+#define LABELEDSLIDER_H
 
-#include <QWidget>
-#include <QVBoxLayout>
+#include <QSlider>
+#include <QHBoxLayout>
 
-class eSettings;
-
-class SettingsWidget : public QWidget {
-    Q_OBJECT
+class LabeledSlider : public QHBoxLayout {
 public:
-    explicit SettingsWidget(QWidget *parent = nullptr);
+    explicit LabeledSlider(const QString& suffix,
+                           QWidget *parent = nullptr);
 
-    void add2HWidgets(QWidget* const widget1,
-                      QWidget* const widget2);
-    void addWidget(QWidget* const widget);
-    void addLayout(QLayout* const layout);
-    void addSeparator();
-
-    virtual void applySettings() = 0;
-    virtual void updateSettings() = 0;
-protected:
-    eSettings& mSett;
+    QSlider* slider() const { return mSlider; }
 private:
-    using QWidget::layout;
-    QVBoxLayout* mMainLauout = nullptr;
+    QSlider* mSlider;
 };
 
-#endif // SETTINGSWIDGET_H
+#endif // LABELEDSLIDER_H

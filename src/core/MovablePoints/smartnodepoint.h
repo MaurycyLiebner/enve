@@ -61,6 +61,9 @@ public:
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode mode,
                                    const qreal invScale);
+    void updateRadius();
+
+    void updateCtrlsRadius();
 
     int moveToClosestSegment(const QPointF &absPos);
     SmartNodePoint *actionAddPointRelPos(const QPointF &relPos);

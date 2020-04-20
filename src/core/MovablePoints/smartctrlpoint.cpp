@@ -19,6 +19,7 @@
 #include "pointhelpers.h"
 #include "Animators/SmartPath/smartpathanimator.h"
 #include "Animators/transformanimator.h"
+#include "Private/esettings.h"
 
 SmartCtrlPoint::SmartCtrlPoint(SmartNodePoint * const parentPoint,
                                const Type& type) :
@@ -26,6 +27,21 @@ SmartCtrlPoint::SmartCtrlPoint(SmartNodePoint * const parentPoint,
                             MovablePointType::TYPE_CTRL_POINT),
     mCtrlType(type), mParentPoint_k(parentPoint) {
     disableSelection();
+    updateRadius();
+}
+
+void SmartCtrlPoint::drawSk(SkCanvas * const canvas, const CanvasMode mode,
+                            const float invScale, const bool keyOnCurrent,
+                            const bool ctrlPressed) {
+    Q_UNUSED(mode)
+    Q_UNUSED(keyOnCurrent)
+    Q_UNUSED(ctrlPressed)
+    const auto& sett = eSettings::instance();
+    const QColor settColor = isSelected() ? sett.fPathControlSelectedColor :
+                                            sett.fPathControlColor;
+    const SkColor fillCol = toSkColor(settColor);
+    const SkPoint absPos = toSkPoint(getAbsolutePos());
+    drawOnAbsPosSk(canvas, absPos, invScale, fillCol);
 }
 
 void SmartCtrlPoint::setRelativePos(const QPointF &relPos) {
@@ -46,6 +62,10 @@ void SmartCtrlPoint::scale(const qreal sx, const qreal sy) {
     QMatrix mat;
     mat.scale(sx, sy);
     setRelativePos(mat.map(savedValue) + mParentPoint_k->getRelativePos());
+}
+
+void SmartCtrlPoint::updateRadius() {
+    setRadius(5.*eSettings::instance().fPathControlScaling);
 }
 
 bool SmartCtrlPoint::enabled() const {

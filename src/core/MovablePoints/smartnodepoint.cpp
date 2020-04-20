@@ -24,18 +24,28 @@
 #include "Animators/complexanimator.h"
 #include "smartctrlpoint.h"
 #include "pointtypemenu.h"
+#include "Private/esettings.h"
 
 SmartNodePoint::SmartNodePoint(PathPointsHandler * const handler,
                                SmartPathAnimator * const parentAnimator) :
     NonAnimatedMovablePoint(TYPE_SMART_PATH_POINT),
     mHandler_k(handler), mParentAnimator(parentAnimator) {
-    setRadius(6.5);
 
     mC0Pt = enve::make_shared<SmartCtrlPoint>(this, SmartCtrlPoint::C0);
     mC2Pt = enve::make_shared<SmartCtrlPoint>(this, SmartCtrlPoint::C2);
 
     mC0Pt->setOtherCtrlPt(mC2Pt.get());
     mC2Pt->setOtherCtrlPt(mC0Pt.get());
+}
+
+void SmartNodePoint::updateRadius() {
+    if(isNormal()) setRadius(6.5*eSettings::instance().fPathNodeScaling);
+    else setRadius(5.5*eSettings::instance().fPathDissolvedNodeScaling);
+}
+
+void SmartNodePoint::updateCtrlsRadius() {
+    mC0Pt->updateRadius();
+    mC2Pt->updateRadius();
 }
 
 void SmartNodePoint::startTransform() {
@@ -267,10 +277,12 @@ void SmartNodePoint::drawSk(SkCanvas * const canvas,
     const QPointF qAbsPos = getAbsolutePos();
     const SkPoint skAbsPos = toSkPoint(qAbsPos);
 
+    const auto& sett = eSettings::instance();
+
     if(getType() == NodeType::normal) {
-        const SkColor fillCol = isSelected() ?
-                    SkColorSetRGB(0, 200, 255) :
-                    SkColorSetRGB(170, 240, 255);
+        const QColor settColor = isSelected() ? sett.fPathNodeSelectedColor :
+                                                sett.fPathNodeColor;
+        const SkColor fillCol = toSkColor(settColor);
         drawOnAbsPosSk(canvas, skAbsPos, invScale, fillCol, keyOnCurrent);
 
         if((mode == CanvasMode::pointTransform && isNextNormalSelected()) ||
@@ -300,9 +312,9 @@ void SmartNodePoint::drawSk(SkCanvas * const canvas,
             }
         }
     } else if(getType() == NodeType::dissolved) {
-        const SkColor fillCol = isSelected() ?
-                    SkColorSetRGB(255, 0, 0) :
-                    SkColorSetRGB(255, 120, 120);
+        const QColor settColor = isSelected() ? sett.fPathDissolvedNodeSelectedColor :
+                                                sett.fPathDissolvedNodeColor;
+        const SkColor fillCol = toSkColor(settColor);
         drawOnAbsPosSk(canvas, skAbsPos, invScale, fillCol, keyOnCurrent);
     }
 
@@ -605,8 +617,7 @@ void SmartNodePoint::updateFromNodeData() {
     setNextNormalPoint(nextNormalNode);
 
     const auto type = getType();
-    if(type == NodeType::normal) setRadius(6.5);
-    else setRadius(type == NodeType::dissolved ? 5.5 : 4);
+    updateRadius();
     setSelectionEnabled(type == NodeType::normal);
 }
 

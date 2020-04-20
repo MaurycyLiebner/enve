@@ -12,6 +12,7 @@
 
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QStatusBar>
 
 SettingsDialog::SettingsDialog(QWidget * const parent) :
     QDialog(parent) {
@@ -59,6 +60,8 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
     eSizesUI::widget.addSpacing(mainLauout);
     mainLauout->addStretch();
     mainLauout->addLayout(buttonsLayout);
+    const auto statusBar = new QStatusBar(this);
+    mainLauout->addWidget(statusBar);
 
     connect(restoreButton, &QPushButton::released, this, [this]() {
         eSettings::sInstance->loadDefaults();
@@ -69,17 +72,19 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
 
     connect(cancelButton, &QPushButton::released, this, &QDialog::close);
 
-    connect(applyButton, &QPushButton::released, this, [this]() {
+    connect(applyButton, &QPushButton::released,
+            this, [this, statusBar]() {
         for(const auto widget : mSettingWidgets) {
             widget->applySettings();
         }
+        emit eSettings::sInstance->settingsChanged();
         try {
             eSettings& sett = *eSettings::sInstance;
             sett.saveToFile();
         } catch(const std::exception& e) {
             gPrintExceptionCritical(e);
         }
-        close();
+        statusBar->showMessage("Settings Applied", 1500);
     });
 
     updateSettings();

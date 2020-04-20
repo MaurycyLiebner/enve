@@ -63,6 +63,7 @@ public:
     SmartNodePoint* getClosestNode(const QPointF& absPos, const qreal& maxDist) const;
 
     void updateAllPoints();
+    void updateAllPointsRadius();
 
     const SmartPathAnimator * getAnimator() {
         return mTargetAnimator;

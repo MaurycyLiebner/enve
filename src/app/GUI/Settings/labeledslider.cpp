@@ -14,32 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SETTINGSWIDGET_H
-#define SETTINGSWIDGET_H
+#include "labeledslider.h"
 
-#include <QWidget>
-#include <QVBoxLayout>
+#include <QLabel>
 
-class eSettings;
-
-class SettingsWidget : public QWidget {
-    Q_OBJECT
-public:
-    explicit SettingsWidget(QWidget *parent = nullptr);
-
-    void add2HWidgets(QWidget* const widget1,
-                      QWidget* const widget2);
-    void addWidget(QWidget* const widget);
-    void addLayout(QLayout* const layout);
-    void addSeparator();
-
-    virtual void applySettings() = 0;
-    virtual void updateSettings() = 0;
-protected:
-    eSettings& mSett;
-private:
-    using QWidget::layout;
-    QVBoxLayout* mMainLauout = nullptr;
-};
-
-#endif // SETTINGSWIDGET_H
+LabeledSlider::LabeledSlider(const QString& suffix, QWidget *parent) :
+    QHBoxLayout(parent) {
+    mSlider = new QSlider(Qt::Horizontal, parent);
+    const auto label = new QLabel;
+    addWidget(mSlider);
+    addWidget(label);
+    connect(mSlider, &QSlider::valueChanged,
+            label, [label, suffix](const int value) {
+        label->setText(QString::number(value) + " " + suffix);
+    });
+}

@@ -40,6 +40,7 @@ enum class AccPreference : int {
 };
 
 class CORE_EXPORT eSettings : public QObject {
+    Q_OBJECT
 public:
     eSettings(const int cpuThreads, const intKB ramKB,
               const GpuVendor gpuVendor);
@@ -97,6 +98,18 @@ public:
     // canvas settings
     bool fCanvasRtlSupport;
 
+    qreal fPathNodeScaling;
+    QColor fPathNodeColor;
+    QColor fPathNodeSelectedColor;
+
+    qreal fPathDissolvedNodeScaling;
+    QColor fPathDissolvedNodeColor;
+    QColor fPathDissolvedNodeSelectedColor;
+
+    qreal fPathControlScaling;
+    QColor fPathControlColor;
+    QColor fPathControlSelectedColor;
+
     // timeline settings
     bool fTimelineAlternateRow;
     QColor fTimelineAlternateRowColor;
@@ -112,6 +125,8 @@ public:
     QString fGimp = "gimp";
     QString fMyPaint = "mypaint";
     QString fKrita = "krita";
+signals:
+    void settingsChanged();
 private:
     QString mIconsDir;
 };

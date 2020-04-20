@@ -88,6 +88,7 @@ public:
                                      const PtOp &adder);
 
     virtual void setTransform(BasicTransformAnimator * const trans);
+    virtual void updateRadius() { setRadius(5); }
 
     void moveToAbs(const QPointF& absPos);
     void moveByAbs(const QPointF &absTrans);

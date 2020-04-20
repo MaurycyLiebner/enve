@@ -151,47 +151,100 @@ eSettings::eSettings(const int cpuThreads, const intKB ramKB,
     sInstance = this;
 
     gSettings << std::make_shared<eIntSetting>(
-                     fCpuThreadsCap, "cpuThreadsCap", 0);
+                     fCpuThreadsCap,
+                     "cpuThreadsCap", 0);
     gSettings << std::make_shared<eIntSetting>(
-                     reinterpret_cast<int&>(fRamMBCap), "ramMBCap", 0);
+                     reinterpret_cast<int&>(fRamMBCap),
+                     "ramMBCap", 0);
     gSettings << std::make_shared<eIntSetting>(
-                     reinterpret_cast<int&>(fAccPreference), "accPreference",
+                     reinterpret_cast<int&>(fAccPreference),
+                     "accPreference",
                      static_cast<int>(AccPreference::defaultPreference));
-    gSettings << std::make_shared<eBoolSetting>(fPathGpuAcc, "pathGpuAcc",
-                                                fGpuVendor != GpuVendor::nvidia);
-    gSettings << std::make_shared<eBoolSetting>(fHddCache, "hddCache", true);
+    gSettings << std::make_shared<eBoolSetting>(
+                     fPathGpuAcc,
+                     "pathGpuAcc",
+                     fGpuVendor != GpuVendor::nvidia);
+    gSettings << std::make_shared<eBoolSetting>(
+                     fHddCache,
+                     "hddCache", true);
     gSettings << std::make_shared<eIntSetting>(
                      reinterpret_cast<int&>(fHddCacheMBCap),
                      "hddCacheMBCap", 0);
 
     gSettings << std::make_shared<eQrealSetting>(
-                     fInterfaceScaling, "interfaceScaling", 1.);
+                     fInterfaceScaling,
+                     "interfaceScaling", 1.);
 
     gSettings << std::make_shared<eBoolSetting>(
-                     fCanvasRtlSupport, "rtlTextSupport", false);
+                     fCanvasRtlSupport,
+                     "rtlTextSupport", false);
 
-    gSettings << std::make_shared<eBoolSetting>(
-                     fTimelineAlternateRow, "timelineAlternateRow", true);
     gSettings << std::make_shared<eColorSetting>(
-                     fTimelineAlternateRowColor, "timelineAlternateRowColor",
+                     fPathNodeColor,
+                     "pathNodeColor",
+                     QColor(170, 240, 255));
+    gSettings << std::make_shared<eColorSetting>(
+                     fPathNodeSelectedColor,
+                     "pathNodeSelectedColor",
+                     QColor(0, 200, 255));
+    gSettings << std::make_shared<eQrealSetting>(
+                     fPathNodeScaling,
+                     "pathNodeScaling", 1.);
+
+    gSettings << std::make_shared<eColorSetting>(
+                     fPathDissolvedNodeColor,
+                     "pathDissolvedNodeColor",
+                     QColor(255, 120, 120));
+    gSettings << std::make_shared<eColorSetting>(
+                     fPathDissolvedNodeSelectedColor,
+                     "pathDissolvedNodeSelectedColor",
+                     QColor(255, 0, 0));
+    gSettings << std::make_shared<eQrealSetting>(
+                     fPathDissolvedNodeScaling,
+                     "pathDissolvedNodeScaling", 1.);
+
+    gSettings << std::make_shared<eColorSetting>(
+                     fPathControlColor,
+                     "pathControlColor",
+                     QColor(255, 175, 175));
+    gSettings << std::make_shared<eColorSetting>(
+                     fPathControlSelectedColor,
+                     "pathControlSelectedColor",
+                     QColor(255, 0, 0));
+    gSettings << std::make_shared<eQrealSetting>(
+                     fPathControlScaling,
+                     "pathControlScaling", 1.);
+
+    gSettings << std::make_shared<eBoolSetting>(
+                     fTimelineAlternateRow,
+                     "timelineAlternateRow", true);
+    gSettings << std::make_shared<eColorSetting>(
+                     fTimelineAlternateRowColor,
+                     "timelineAlternateRowColor",
                      QColor(0, 0, 0, 25));
     gSettings << std::make_shared<eBoolSetting>(
-                     fTimelineHighlightRow, "timelineHighlightRow", false);
+                     fTimelineHighlightRow,
+                     "timelineHighlightRow", false);
     gSettings << std::make_shared<eColorSetting>(
-                     fTimelineHighlightRowColor, "timelineHighlightRowColor",
+                     fTimelineHighlightRowColor,
+                     "timelineHighlightRowColor",
                      QColor(255, 0, 0, 15));
 
     gSettings << std::make_shared<eColorSetting>(
-                     fObjectKeyframeColor, "objectKeyframeColor",
+                     fObjectKeyframeColor,
+                     "objectKeyframeColor",
                      QColor(0, 125, 255));
     gSettings << std::make_shared<eColorSetting>(
-                     fPropertyGroupKeyframeColor, "propertyGroupKeyframeColor",
+                     fPropertyGroupKeyframeColor,
+                     "propertyGroupKeyframeColor",
                      QColor(0, 255, 0));
     gSettings << std::make_shared<eColorSetting>(
-                     fPropertyKeyframeColor, "propertyKeyframeColor",
+                     fPropertyKeyframeColor,
+                     "propertyKeyframeColor",
                      QColor(255, 0, 0));
     gSettings << std::make_shared<eColorSetting>(
-                     fSelectedKeyframeColor, "selectedKeyframeColor",
+                     fSelectedKeyframeColor,
+                     "selectedKeyframeColor",
                      QColor(255, 255, 0));
 
     gSettings << std::make_shared<eStringSetting>(fGimp, "gimp", "gimp");

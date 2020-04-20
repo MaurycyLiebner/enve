@@ -26,6 +26,11 @@ protected:
     SmartCtrlPoint(SmartNodePoint * const parentPoint,
                    const Type &type);
 public:
+    void drawSk(SkCanvas* const canvas,
+                const CanvasMode mode,
+                const float invScale,
+                const bool keyOnCurrent,
+                const bool ctrlPressed);
     void setRelativePos(const QPointF &relPos);
     void rotateRelativeToSavedPivot(const qreal rotate);
 
@@ -37,6 +42,8 @@ public:
 
     bool isVisible(const CanvasMode mode) const;
     void scale(const qreal sx, const qreal sy);
+
+    void updateRadius();
 
     bool enabled() const;
 
