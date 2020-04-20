@@ -32,11 +32,8 @@ void ZipFileSaver::setIoDevice(QIODevice * const src) {
     mFile.setZip(&mZip);
 }
 
-void ZipFileSaver::process(const QString &file, const bool text,
-                           const Processor &func) {
-    QIODevice::OpenMode openMode = QIODevice::WriteOnly;
-    if(text) openMode |= QIODevice::Text;
-    if(!mFile.open(openMode, QuaZipNewInfo(file)))
+void ZipFileSaver::process(const QString &file, const Processor &func) {
+    if(!mFile.open(QIODevice::WriteOnly, QuaZipNewInfo(file)))
         RuntimeThrow("Could not open " + file + " in " + mZip.getZipName());
     try {
         func(&mFile);
@@ -45,4 +42,11 @@ void ZipFileSaver::process(const QString &file, const bool text,
         RuntimeThrow("Could not write " + file + " to " + mZip.getZipName());
     }
     mFile.close();
+}
+
+void ZipFileSaver::processText(const QString& file, const TextProcessor& func) {
+    process(file, [&func](QIODevice* const dst) {
+        QTextStream stream(dst);
+        func(stream);
+    });
 }

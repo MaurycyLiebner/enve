@@ -22,8 +22,8 @@
 #include <QPainter>
 
 void writeMimeType(ZipFileSaver& fileSaver) {
-    fileSaver.process("mimetype", true, [](QIODevice* const dst) {
-        dst->write("image/openraster");
+    fileSaver.processText("mimetype", [](QTextStream& stream) {
+        stream << "image/openraster";
     });
 }
 
@@ -113,13 +113,13 @@ void addStack(const OraStack_Qt& stack, QDomElement& dst,
 }
 
 void saveLayerFilePNG(const OraLayerPNG_Qt &layer, ZipFileSaver& fileSaver) {
-    fileSaver.process(layer.fSource, false, [&layer](QIODevice* const dst) {
+    fileSaver.process(layer.fSource, [&layer](QIODevice* const dst) {
         layer.fImage.save(dst, "PNG");
     });
 }
 
 void saveLayerFileSVG(const OraLayerSVG &layer, ZipFileSaver& fileSaver) {
-    fileSaver.process(layer.fSource, false, [&layer](QIODevice* const dst) {
+    fileSaver.process(layer.fSource, [&layer](QIODevice* const dst) {
         dst->write(layer.fDocument);
     });
 }
@@ -187,18 +187,17 @@ void save(ZipFileSaver &fileSaver, const OraImage_Qt &ora,
 
     doc.appendChild(imageEle);
 
-    fileSaver.process("stack.xml", true, [&doc](QIODevice* const dst) {
-        QTextStream stream(dst);
+    fileSaver.processText("stack.xml", [&doc](QTextStream& stream) {
         stream << doc.toString();
     });
     saveStackSourceFiles(ora, fileSaver);
 
     if(mergeImages) {
         const QImage img = mergedImage(ora);
-        fileSaver.process("mergedimage.png", true, [&img](QIODevice* const dst) {
+        fileSaver.process("mergedimage.png", [&img](QIODevice* const dst) {
             img.save(dst, "PNG");
         });
-        fileSaver.process("Thumbnails/thumbnail.png", true, [&img](QIODevice* const dst) {
+        fileSaver.process("Thumbnails/thumbnail.png", [&img](QIODevice* const dst) {
             img.scaled(256, 256, Qt::KeepAspectRatio).save(dst, "PNG");
         });
     }
