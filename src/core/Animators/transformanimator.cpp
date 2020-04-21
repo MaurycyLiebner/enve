@@ -528,13 +528,37 @@ QMatrix AdvancedTransformAnimator::getRelativeTransformAtFrame(const qreal relFr
     return matrix;
 }
 
+
+QDomElement AdvancedTransformAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
+    auto result = doc.createElement("Transform");
+
+    auto translation = mPosAnimator->prp_writeNamedPropertyXEV("Translation", doc);
+    result.appendChild(translation);
+
+    auto scale = mScaleAnimator->prp_writeNamedPropertyXEV("Scale", doc);
+    result.appendChild(scale);
+
+    auto rotation = mRotAnimator->prp_writeNamedPropertyXEV("Rotation", doc);
+    result.appendChild(rotation);
+
+    auto pivot = mPivotAnimator->prp_writeNamedPropertyXEV("Pivot", doc);
+    result.appendChild(pivot);
+
+    auto shear = mShearAnimator->prp_writeNamedPropertyXEV("Shear", doc);
+    result.appendChild(shear);
+
+    auto opacity = mOpacityAnimator->prp_writeNamedPropertyXEV("Opacity", doc);
+    result.appendChild(opacity);
+
+    return result;
+}
+
 BoxTransformAnimator::BoxTransformAnimator() {
     setPointsHandler(enve::make_shared<PointsHandler>());
     const auto pivotPt = enve::make_shared<BoxPathPoint>(
                 getPivotAnimator(), this);
     getPointsHandler()->appendPt(pivotPt);
 }
-
 
 QDomElement saveSVG_Split(QPointFAnimator* const anim,
                           const FrameRange& visRange,

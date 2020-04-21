@@ -48,5 +48,6 @@ void ZipFileSaver::processText(const QString& file, const TextProcessor& func) {
     process(file, [&func](QIODevice* const dst) {
         QTextStream stream(dst);
         func(stream);
+        stream.flush();
     });
 }

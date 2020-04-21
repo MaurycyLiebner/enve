@@ -36,6 +36,8 @@ public:
     void prp_readProperty(eReadStream& src);
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
+    QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
+
     QColor getBaseColor() const;
     QColor getBaseColor(const qreal relFrame) const;
     QColor getColor() const;

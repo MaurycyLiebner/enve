@@ -788,3 +788,55 @@ void QrealAnimator::saveQrealSVG(SvgExporter& exp,
         }, transform, type);
     }
 }
+
+QDomElement QrealAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
+    auto result = doc.createElement("Float");
+
+    if(anim_hasKeys()) {
+        QString values;
+        QString frames;
+        const QString blueprint = QStringLiteral("%1 %2 %3");
+        const auto& keys = anim_getKeys();
+        for(const auto &key : keys) {
+            const auto qaKey = static_cast<QrealKey*>(key);
+            const qreal vc0 = qaKey->getC0Value();
+            const qreal v = qaKey->getValue();
+            const qreal vc2 = qaKey->getC1Value();
+
+            const qreal fc0 = qaKey->getC0Frame();
+            const int f = qaKey->getRelFrame();
+            const qreal fc2 = qaKey->getC1Frame();
+
+            if(!values.isEmpty()) values += ';';
+            values += blueprint.arg(vc0).arg(v).arg(vc2);
+            if(!frames.isEmpty()) frames += ';';
+            frames += blueprint.arg(fc0).arg(f).arg(fc2);
+        }
+    } else result.setAttribute("value", mCurrentBaseValue);
+
+    if(hasExpression()) {
+        auto expression = doc.createElement("Expression");
+
+        const auto definitions = mExpression->definitionsString();
+        const auto defsNode = doc.createTextNode(definitions);
+        auto defsEle = doc.createElement("Definitions");
+        defsEle.appendChild(defsNode);
+        expression.appendChild(defsEle);
+
+        const auto bindings = mExpression->bindingsString();
+        const auto bindNode = doc.createTextNode(bindings);
+        auto bindEle = doc.createElement("Bindings");
+        bindEle.appendChild(bindNode);
+        expression.appendChild(bindEle);
+
+        const auto script = mExpression->scriptString();
+        const auto scriptNode = doc.createTextNode(script);
+        auto scriptEle = doc.createElement("Script");
+        scriptEle.appendChild(scriptNode);
+        expression.appendChild(scriptEle);
+
+        result.appendChild(expression);
+    }
+
+    return result;
+}

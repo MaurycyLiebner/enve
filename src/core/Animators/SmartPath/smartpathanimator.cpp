@@ -109,6 +109,32 @@ void SmartPathAnimator::prp_writeProperty(eWriteStream &dst) const {
     dst << prp_getName();
 }
 
+QDomElement SmartPathAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
+    auto result = doc.createElement("Path");
+    result.setAttribute("closed", isClosed());
+    result.setAttribute("count", baseValue().getNodeCount());
+    if(anim_hasKeys()) {
+        QString values;
+        QString frames;
+        const QString blueprint = QStringLiteral("%1 %2 %3");
+        const auto& keys = anim_getKeys();
+        for(const auto &key : keys) {
+            const auto smKey = static_cast<SmartPathKey*>(key);
+            const QString v = smKey->getValue().toXEV();
+
+            const qreal fc0 = smKey->getC0Frame();
+            const int f = smKey->getRelFrame();
+            const qreal fc2 = smKey->getC1Frame();
+
+            if(!values.isEmpty()) values += ';';
+            values += v;
+            if(!frames.isEmpty()) frames += ';';
+            frames += blueprint.arg(fc0).arg(f).arg(fc2);
+        }
+    } else result.setAttribute("value", baseValue().toXEV());
+    return result;
+}
+
 SkPath SmartPathAnimator::getPathAtRelFrame(const qreal frame) {
     const auto diff = prp_differencesBetweenRelFrames(
                 qRound(frame), anim_getCurrentRelFrame());

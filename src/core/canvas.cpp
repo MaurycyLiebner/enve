@@ -984,6 +984,25 @@ void Canvas::readBoundingBox(eReadStream& src) {
     clearGradientRWIds();
 }
 
+void Canvas::writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
+                                 const QString& path) const {
+    ContainerBox::writeBoxOrSoundXEV(fileSaver, path);
+    fileSaver.processText(path + "gradients.xml",
+                          [this](QTextStream& stream) {
+        QDomDocument doc;
+        auto gradients = doc.createElement("Gradients");
+        int id = 0;
+        for(const auto &grad : mGradients) {
+            auto gradient = grad->prp_writeNamedPropertyXEV("Gradient", doc);
+            gradient.setAttribute("id", id++);
+            gradients.appendChild(gradient);
+        }
+        doc.appendChild(gradients);
+
+        stream << doc.toString();
+    });
+}
+
 void Canvas::readGradients(eReadStream& src) {
     int nGrads; src >> nGrads;
     for(int i = 0; i < nGrads; i++) {

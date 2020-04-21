@@ -93,7 +93,9 @@ public:
 
     FillStrokeSettingsWidget *getFillStrokeSettings();
     void saveToFile(const QString &path);
+    void saveToFileXEV(const QString& path);
     void loadEVFile(const QString &path);
+    void loadXEVFile(const QString &path);
     void clearAll();
     void updateTitle();
     void setFileChangedSinceSaving(const bool changed);
@@ -163,7 +165,9 @@ public:
     void openFile();
     void openFile(const QString& openPath);
     void saveFile();
+    void saveFileXEV();
     void saveFileAs();
+    void saveFileAsXEV();
     void saveBackup();
     void exportSVG();
     bool closeProject();

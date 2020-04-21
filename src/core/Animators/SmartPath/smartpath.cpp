@@ -343,6 +343,36 @@ NodeList SmartPath::getAndClearLastDetached() {
     return detached;
 }
 
+QString SmartPath::toXEV() const {
+    QString result;
+    const QString blueprint = QStringLiteral("%1 %2 %3 %4 %5 %6");
+    for(const auto& node : mNodesList) {
+        if(!result.isEmpty()) result += ',';
+        if(node->isDissolved()) {
+            result += QString::number(node->t());
+        } else {
+            const auto c0 = node->c0();
+            const auto p1 = node->p1();
+            const auto c2 = node->c2();
+
+            const QString c0x = node->getC0Enabled() ?
+                                QString::number(c0.x()) : "*";
+            const QString c0y = node->getC0Enabled() ?
+                                QString::number(c0.y()) : "*";
+
+            const QString c2x = node->getC0Enabled() ?
+                                QString::number(c2.x()) : "*";
+            const QString c2y = node->getC0Enabled() ?
+                                QString::number(c2.y()) : "*";
+
+            result += blueprint.arg(c0x).arg(c0y).
+                                arg(p1.x()).arg(p1.y()).
+                                arg(c2x, c2y);
+        }
+    }
+    return result;
+}
+
 bool SmartPath::isClockwise() const {
     if(mNodesList.isEmpty()) return false;
     QPointF prevPos = mNodesList.at(0)->p1();

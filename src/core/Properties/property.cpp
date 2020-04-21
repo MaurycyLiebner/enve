@@ -68,6 +68,13 @@ void Property::prp_afterChangedAbsRange(const FrameRange &range,
     emit prp_absFrameRangeChanged(range, clip);
 }
 
+QDomElement Property::prp_writeNamedPropertyXEV(
+        const QString& name, QDomDocument& doc) const {
+    auto prop = prp_writePropertyXEV(doc);
+    prop.setTagName(name);
+    return prop;
+}
+
 void Property::prp_afterWholeInfluenceRangeChanged() {
     prp_afterChangedAbsRange(prp_absInfluenceRange());
 }

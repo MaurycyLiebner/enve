@@ -26,6 +26,7 @@
 #include "../conncontextptr.h"
 
 #include <QJSEngine>
+#include <QDomElement>
 
 class Canvas;
 class ComplexAnimator;
@@ -134,6 +135,9 @@ public:
     virtual void prp_readProperty(eReadStream& src) { Q_UNUSED(src) }
     virtual void prp_writeProperty(eWriteStream& dst) const { Q_UNUSED(dst) }
 
+    virtual QDomElement prp_writePropertyXEV(QDomDocument& doc) const
+    { Q_UNUSED(doc) return QDomElement(); }
+
     virtual int prp_getTotalFrameShift() const;
     virtual int prp_getInheritedFrameShift() const;
 
@@ -151,6 +155,9 @@ public:
     virtual bool prp_dependsOn(const Property* const prop) const
     { return prop == this; }
 public:
+    QDomElement prp_writeNamedPropertyXEV(
+            const QString& name, QDomDocument& doc) const;
+
     QMatrix getTransform() const;
 
     void prp_setSelected(const bool selected);

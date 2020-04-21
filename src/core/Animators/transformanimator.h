@@ -180,6 +180,8 @@ public:
     QrealAnimator *getOpacityAnimator() const {
         return mOpacityAnimator.get();
     }
+
+    QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
 private:
     qsptr<QPointFAnimator> mPivotAnimator;
     qsptr<QPointFAnimator> mShearAnimator;

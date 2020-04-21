@@ -17,6 +17,7 @@
 #include "oracreator.h"
 
 #include "../zipfilesaver.h"
+#include "XML/xmlexporthelpers.h"
 
 #include <QtXml/QDomDocument>
 #include <QPainter>
@@ -27,32 +28,6 @@ void writeMimeType(ZipFileSaver& fileSaver) {
     });
 }
 
-QString blendModeToCompositeOp(const SkBlendMode blendMode) {
-    switch(blendMode) {
-    case SkBlendMode::kSrcOver: return "svg:src-over";
-    case SkBlendMode::kMultiply: return "svg:multiply";
-    case SkBlendMode::kScreen: return "svg:screen";
-    case SkBlendMode::kOverlay: return "svg:overlay";
-    case SkBlendMode::kDarken: return "svg:darken";
-    case SkBlendMode::kLighten: return "svg:lighten";
-    case SkBlendMode::kColorDodge: return "svg:color-dodge";
-    case SkBlendMode::kColorBurn: return "svg:color-burn";
-    case SkBlendMode::kHardLight: return "svg:hard-light";
-    case SkBlendMode::kSoftLight: return "svg:soft-light";
-    case SkBlendMode::kDifference: return "svg:difference";
-    case SkBlendMode::kColor: return "svg:color";
-    case SkBlendMode::kLuminosity: return "svg:luminosity";
-    case SkBlendMode::kHue: return "svg:hue";
-    case SkBlendMode::kSaturation: return "svg:saturation";
-    case SkBlendMode::kPlus: return "svg:plus";
-    case SkBlendMode::kDstIn: return "svg:dst-in";
-    case SkBlendMode::kDstOut: return "svg:dst-out";
-    case SkBlendMode::kSrcATop: return "svg:src-atop";
-    case SkBlendMode::kDstATop: return "svg:dst-atop";
-    default: return "svg:src-over";
-    }
-}
-
 void saveOraElementAttributes(const OraElement& ele,
                               QDomElement& xmlEle) {
     xmlEle.setAttribute("name", ele.fName);
@@ -61,7 +36,8 @@ void saveOraElementAttributes(const OraElement& ele,
     xmlEle.setAttribute("opacity", ele.fOpacity);
     xmlEle.setAttribute("visibility", ele.fVisible ? "visible" : "hidden");
     xmlEle.setAttribute("edit-locked", ele.fLocked ? "true" : "false");
-    xmlEle.setAttribute("composite-op", blendModeToCompositeOp(ele.fBlend));
+    const QString compositeOp = XmlExportHelpers::blendModeToString(ele.fBlend);
+    xmlEle.setAttribute("composite-op", compositeOp);
     xmlEle.setAttribute("selected", ele.fSelected ? "true" : "false");
 }
 

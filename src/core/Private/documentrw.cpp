@@ -98,3 +98,53 @@ void Document::read(eReadStream& src) {
     readScenes(src);
     SimpleTask::sProcessAll();
 }
+
+void Document::writeDoxumentXEV(QDomDocument& doc) const {
+    auto document = doc.createElement("Document");
+    auto bColors = doc.createElement("ColorBookmarks");
+    for(const auto &col : fColors) {
+        auto color = doc.createElement("Color");
+        color.setAttribute("name", col.name());
+        bColors.appendChild(color);
+    }
+    document.appendChild(bColors);
+
+    auto bBrushes = doc.createElement("BrushBookmarks");
+    for(const auto &b : fBrushes) {
+        auto brush = doc.createElement("Brush");
+        brush.setAttribute("collection", b->getCollectionName());
+        brush.setAttribute("name", b->getBrushName());
+        bBrushes.appendChild(brush);
+    }
+    document.appendChild(bBrushes);
+
+    auto scenes = doc.createElement("Scenes");
+    int id = 0;
+    for(const auto &s : fScenes) {
+        auto scene = doc.createElement("Scene");
+        scene.setAttribute("frame", s->getCurrentFrame());
+        scene.setAttribute("name", s->prp_getName());
+        scene.setAttribute("id", id++);
+        scenes.appendChild(scene);
+    }
+    document.appendChild(scenes);
+
+    doc.appendChild(document);
+}
+
+void Document::writeScenesXEV(ZipFileSaver& fileSaver) const {
+    int id = 0;
+    for(const auto &s : fScenes) {
+        const QString path = "scenes/" + QString::number(id++) + "/";
+        s->writeBoxOrSoundXEV(fileSaver, path);
+    }
+}
+
+void Document::writeXEV(ZipFileSaver& fileSaver) const {
+    fileSaver.processText("document.xml", [this](QTextStream& stream) {
+        QDomDocument document;
+        writeDoxumentXEV(document);
+        stream << document.toString();
+    });
+    writeScenesXEV(fileSaver);
+}

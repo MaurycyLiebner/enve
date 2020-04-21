@@ -267,3 +267,15 @@ void QPointFAnimator::saveQPointFSVGY(SvgExporter& exp,
     mYAnimator->saveQrealSVG(exp, parent, visRange, name, multiplier,
                              transform, type, templ);
 }
+
+QDomElement QPointFAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
+    auto result = doc.createElement("Vec2");
+
+    auto x = mXAnimator->prp_writeNamedPropertyXEV("X", doc);
+    result.appendChild(x);
+
+    auto y = mYAnimator->prp_writeNamedPropertyXEV("Y", doc);
+    result.appendChild(y);
+
+    return result;
+}

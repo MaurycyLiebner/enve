@@ -52,6 +52,8 @@ public:
     void prp_readProperty(eReadStream& src);
     void prp_writeProperty(eWriteStream& dst) const;
 
+    QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
+
     SkPath getPathAtAbsFrame(const qreal frame)
     { return getPathAtRelFrame(prp_absFrameToRelFrameF(frame)); }
     SkPath getPathAtRelFrame(const qreal frame);

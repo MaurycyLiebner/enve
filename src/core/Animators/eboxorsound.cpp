@@ -139,6 +139,18 @@ void eBoxOrSound::prp_readProperty(eReadStream& src) {
     }
 }
 
+void eBoxOrSound::writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
+                                     const QString& path) const {
+    fileSaver.processText(path + "properties.xml",
+                          [this](QTextStream& stream) {
+        QDomDocument doc;
+        auto props = doc.createElement("Object");
+        ca_writeChildPropertiesXEV(props, doc);
+        doc.appendChild(props);
+        stream << doc.toString();
+    });
+}
+
 TimelineMovable *eBoxOrSound::anim_getTimelineMovable(
         const int relX, const int minViewedFrame,
         const qreal pixelsPerFrame) {

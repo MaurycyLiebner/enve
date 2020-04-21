@@ -292,10 +292,10 @@ void MainWindow::setupMenuBar() {
                          this, &MainWindow::revert);
     mFileMenu->addSeparator();
     mFileMenu->addAction(tr("Save", "MenuBar_File"),
-                         this, &MainWindow::saveFile,
+                         this, &MainWindow::saveFileXEV,
                          Qt::CTRL + Qt::Key_S);
     mFileMenu->addAction(tr("Save As...", "MenuBar_File"),
-                         this, &MainWindow::saveFileAs,
+                         this, &MainWindow::saveFileAsXEV,
                          Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     mFileMenu->addAction(tr("Save Backup", "MenuBar_File"),
                          this, &MainWindow::saveBackup);
@@ -377,7 +377,8 @@ void MainWindow::setupMenuBar() {
     mEditMenu->addSeparator();
     mEditMenu->addAction(tr("Settings...", "MenuBar_Edit"), [this]() {
         const auto settDial = new SettingsDialog(this);
-        settDial->exec();
+        settDial->setAttribute(Qt::WA_DeleteOnClose);
+        settDial->show();
     });
 
 
@@ -1306,6 +1307,37 @@ void MainWindow::saveFile() {
         setFileChangedSinceSaving(false);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
+    }
+}
+
+void MainWindow::saveFileXEV() {
+    if(mDocument.fEvFile.isEmpty()) return saveFileAsXEV();
+    try {
+        saveToFileXEV(mDocument.fEvFile);
+        setFileChangedSinceSaving(false);
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
+}
+
+void MainWindow::saveFileAsXEV() {
+    disableEventFilter();
+    const QString defPath = mDocument.fEvFile.isEmpty() ?
+                QDir::homePath() : mDocument.fEvFile;
+
+    const QString title = tr("Save File", "SaveDialog_Title");
+    const QString fileType = tr("xenve Files %1", "SaveDialog_FileType");
+    QString saveAs = eDialogs::saveFile(title, defPath, fileType.arg("(*.xev)"));
+    enableEventFilter();
+    if(!saveAs.isEmpty()) {
+        if(saveAs.right(4) != ".xev") saveAs += ".xev";
+        try {
+            saveToFileXEV(saveAs);
+            mDocument.setPath(saveAs);
+            setFileChangedSinceSaving(false);
+        } catch(const std::exception& e) {
+            gPrintExceptionCritical(e);
+        }
     }
 }
 

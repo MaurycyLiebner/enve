@@ -18,6 +18,7 @@
 #define DOCUMENT_H
 
 #include <set>
+#include <QDomDocument>
 
 #include "smartPointers/ememory.h"
 #include "singlewidgettarget.h"
@@ -28,6 +29,7 @@
 #include "clipboardcontainer.h"
 #include "Animators/SculptPath/sculptpath.h"
 #include "conncontextptr.h"
+#include "zipfilesaver.h"
 
 class SceneBoundGradient;
 class FileDataCacheHandler;
@@ -159,6 +161,10 @@ public:
 //
     void write(eWriteStream &dst) const;
     void read(eReadStream &src);
+
+    void writeXEV(ZipFileSaver& fileSaver) const;
+    void writeDoxumentXEV(QDomDocument& doc) const;
+    void writeScenesXEV(ZipFileSaver& fileSaver) const;
 
     void SWT_setupAbstraction(SWT_Abstraction * const abstraction,
                               const UpdateFuncs &updateFuncs,

@@ -140,6 +140,8 @@ public:
     bool write(eWriteStream& dst) const
     { return mNodesList.write(dst); }
 
+    QString toXEV() const;
+
     const NodeList& getNodesRef() const
     { return mNodesList; }
 

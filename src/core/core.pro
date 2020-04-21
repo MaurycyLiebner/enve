@@ -240,6 +240,7 @@ SOURCES += \
     Timeline/animationrect.cpp \
     Timeline/durationrectangle.cpp \
     Timeline/fixedlenanimationrect.cpp \
+    XML/xmlexporthelpers.cpp \
     action.cpp \
     actions.cpp \
     canvas.cpp \
@@ -561,6 +562,7 @@ HEADERS += \
     Timeline/animationrect.h \
     Timeline/durationrectangle.h \
     Timeline/fixedlenanimationrect.h \
+    XML/xmlexporthelpers.h \
     action.h \
     actions.h \
     canvas.h \

@@ -69,6 +69,8 @@ public:
     void prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
                                     const FrameRange &newAbsRange);
 
+    QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
+
     void anim_setAbsFrame(const int frame);
     void anim_removeAllKeys();
     void anim_addKeyAtRelFrame(const int relFrame);

@@ -31,6 +31,7 @@
 #include "BlendEffects/blendeffectboxshadow.h"
 #include "svgexporter.h"
 #include "Private/Tasks/taskscheduler.h"
+#include "XML/xmlexporthelpers.h"
 
 ContainerBox::ContainerBox(const eBoxType type) :
     BoxWithPathEffects(type == eBoxType::group ? "Group" : "Layer",
@@ -1314,6 +1315,49 @@ void ContainerBox::writeAllContained(eWriteStream& dst) const {
         dst.assignFuturePos(futureId);
         dst.writeCheckpoint();
     }
+}
+
+void ContainerBox::writeAllContainedXEV(
+        ZipFileSaver& fileSaved, const QString& path) const {
+    const QString childPath = path + "objects/%1/";
+    int id = 0;
+    for(const auto& cont : mContained) {
+        cont->writeBoxOrSoundXEV(fileSaved, childPath.arg(id++));
+    }
+}
+
+void ContainerBox::writeBoxOrSoundXEV(
+        ZipFileSaver& fileSaver, const QString& path) const {
+    BoundingBox::writeBoxOrSoundXEV(fileSaver, path);
+    fileSaver.processText(path + "stack.xml", [this](QTextStream& stream) {
+        QDomDocument doc;
+        auto stack = doc.createElement("Stack");
+        int id = 0;
+        for(const auto& cont : mContained) {
+            QDomElement ele;
+            if(const auto box = enve_cast<BoundingBox*>(cont)) {
+                ele = doc.createElement("Object");
+                const auto blendMode = box->getBlendMode();
+                if(blendMode != SkBlendMode::kSrcOver) {
+                    const QString compositeOp =
+                            XmlExportHelpers::blendModeToString(blendMode);
+                    ele.setAttribute("composite-op", compositeOp);
+                }
+            } else {
+                ele = doc.createElement("Sound");
+            }
+            if(cont->isLocked()) ele.setAttribute("edit-locked", true);
+            if(cont->isSelected()) ele.setAttribute("selected", true);
+            if(!cont->isVisible()) ele.setAttribute("visibility", "hidden");
+
+            ele.setAttribute("name", cont->prp_getName());
+            ele.setAttribute("id", id++);
+            stack.appendChild(ele);
+        }
+        doc.appendChild(stack);
+        stream << doc.toString();
+    });
+    writeAllContainedXEV(fileSaver, path);
 }
 
 void ContainerBox::writeBoundingBox(eWriteStream& dst) const {

@@ -16,7 +16,10 @@
 
 #ifndef EBOXORSOUND_H
 #define EBOXORSOUND_H
+
 #include "staticcomplexanimator.h"
+
+#include "../zipfilesaver.h"
 
 class ContainerBox;
 class Canvas;
@@ -46,6 +49,9 @@ public:
 
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
+
+    virtual void writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
+                                    const QString& path) const;
 
     TimelineMovable *anim_getTimelineMovable(
             const int relX, const int minViewedFrame,

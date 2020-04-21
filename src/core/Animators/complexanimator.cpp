@@ -67,6 +67,24 @@ int ComplexAnimator::ca_getNumberOfChildren() const {
     return ca_mChildren.count();
 }
 
+void ComplexAnimator::ca_writeChildPropertiesXEV(
+        QDomElement& prop, QDomDocument& doc) const {
+    const auto& children = ca_getChildren();
+    int id = 0;
+    for(const auto& c : children) {
+        auto child = c->prp_writePropertyXEV(doc);
+        child.setAttribute("name", c->prp_getName());
+        child.setAttribute("id", id++);
+        prop.appendChild(child);
+    }
+}
+
+QDomElement ComplexAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
+    auto result = doc.createElement("Properties");
+    ca_writeChildPropertiesXEV(result, doc);
+    return result;
+}
+
 #include <QDebug>
 #include "swt_abstraction.h"
 void ComplexAnimator::SWT_setupAbstraction(
@@ -107,13 +125,12 @@ FrameRange ComplexAnimator::prp_nextNonUnaryIdenticalRelRange(const int relFrame
     return FrameRange::EMINMAX;
 }
 
-
 bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                           const bool parentSatisfies,
                                           const bool parentMainTarget) const {
     //if(hasChildAnimators()) {
-        return Animator::SWT_shouldBeVisible(rules, parentSatisfies,
-                                             parentMainTarget);
+    return Animator::SWT_shouldBeVisible(rules, parentSatisfies,
+                                         parentMainTarget);
     //}
     //return false;
 }

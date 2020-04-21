@@ -14,28 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ZIPFILESAVER_H
-#define ZIPFILESAVER_H
+#ifndef XMLEXPORTHELPERS_H
+#define XMLEXPORTHELPERS_H
 
-#include <quazip/quazipfile.h>
+#include "skia/skiaincludes.h"
 
-#include "exceptions.h"
+#include <QString>
 
-class CORE_EXPORT ZipFileSaver {
-public:
-    ZipFileSaver();
-    ~ZipFileSaver() { mZip.close(); }
-
-    void setZipPath(const QString& path);
-    void setIoDevice(QIODevice * const src);
-
-    using Processor = std::function<void(QIODevice* const dst)>;
-    void process(const QString& file, const Processor& func);
-    using TextProcessor = std::function<void(QTextStream& stream)>;
-    void processText(const QString& file, const TextProcessor& func);
-private:
-    QuaZip mZip;
-    QuaZipFile mFile;
+namespace XmlExportHelpers {
+    QString blendModeToString(const SkBlendMode blendMode);
 };
 
-#endif // ZIPFILESAVER_H
+#endif // XMLEXPORTHELPERS_H

@@ -287,3 +287,22 @@ void ColorAnimator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     };
     colorModeMenu->addCheckableAction("HSL", mColorMode == ColorMode::hsl, hslOp);
 }
+
+QDomElement ColorAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
+    auto result = doc.createElement("Color");
+    result.setAttribute("mode", static_cast<int>(mColorMode));
+
+    auto v1 = mVal1Animator->prp_writeNamedPropertyXEV("V1", doc);
+    result.appendChild(v1);
+
+    auto v2 = mVal2Animator->prp_writeNamedPropertyXEV("V2", doc);
+    result.appendChild(v2);
+
+    auto v3 = mVal3Animator->prp_writeNamedPropertyXEV("V3", doc);
+    result.appendChild(v3);
+
+    auto a = mAlphaAnimator->prp_writeNamedPropertyXEV("A", doc);
+    result.appendChild(a);
+
+    return result;
+}

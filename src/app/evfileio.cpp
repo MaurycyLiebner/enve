@@ -123,3 +123,40 @@ void MainWindow::saveToFile(const QString &path) {
     BoundingBox::sClearWriteBoxes();
     addRecentFile(path);
 }
+
+#include "zipfilesaver.h"
+
+void MainWindow::saveToFileXEV(const QString &path) {
+    QFile file(path);
+    if(file.exists()) file.remove();
+
+    if(!file.open(QIODevice::WriteOnly))
+        RuntimeThrow("Could not open file for writing " + path + ".");
+    ZipFileSaver fileSaver;
+    fileSaver.setIoDevice(&file);
+    try {
+        fileSaver.processText("mimetype", [](QTextStream& stream) {
+            stream << "application/enve";
+        });
+
+        fileSaver.process("Thumbnails/thumbnail.png", [this](QIODevice* const dst) {
+            const qreal scale = 256./width();
+            QImage img(qRound(width()*scale),
+                       qRound(height()*scale),
+                       QImage::Format_RGB888);
+            QPainter p(&img);
+            p.scale(scale, scale);
+            render(&p);
+            img.save(dst, "PNG");
+        });
+
+        mDocument.writeXEV(fileSaver);
+    } catch(...) {
+        file.close();
+        RuntimeThrow("Error while writing to file " + path);
+    }
+    file.close();
+
+    BoundingBox::sClearWriteBoxes();
+    addRecentFile(path);
+}
