@@ -24,7 +24,6 @@
 class CORE_EXPORT ZipFileSaver {
 public:
     ZipFileSaver();
-    ~ZipFileSaver() { mZip.close(); }
 
     void setZipPath(const QString& path);
     void setIoDevice(QIODevice * const src);
