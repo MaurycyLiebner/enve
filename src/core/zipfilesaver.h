@@ -29,9 +29,11 @@ public:
     void setIoDevice(QIODevice * const src);
 
     using Processor = std::function<void(QIODevice* const dst)>;
-    void process(const QString& file, const Processor& func);
+    void process(const QString& file, const Processor& func,
+                 const bool compress = true);
     using TextProcessor = std::function<void(QTextStream& stream)>;
-    void processText(const QString& file, const TextProcessor& func);
+    void processText(const QString& file, const TextProcessor& func,
+                     const bool compress = true);
 private:
     QuaZip mZip;
     QuaZipFile mFile;

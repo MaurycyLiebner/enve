@@ -1332,7 +1332,6 @@ void ContainerBox::writeBoxOrSoundXEV(
     fileSaver.processText(path + "stack.xml", [this](QTextStream& stream) {
         QDomDocument doc;
         auto stack = doc.createElement("Stack");
-        int id = 0;
         for(const auto& cont : mContained) {
             QDomElement ele;
             if(const auto box = enve_cast<BoundingBox*>(cont)) {
@@ -1343,6 +1342,8 @@ void ContainerBox::writeBoxOrSoundXEV(
                             XmlExportHelpers::blendModeToString(blendMode);
                     ele.setAttribute("composite-op", compositeOp);
                 }
+                const int type = static_cast<int>(box->getBoxType());
+                ele.setAttribute("type", type);
             } else {
                 ele = doc.createElement("Sound");
             }
@@ -1351,19 +1352,12 @@ void ContainerBox::writeBoxOrSoundXEV(
             if(!cont->isVisible()) ele.setAttribute("visibility", "hidden");
 
             ele.setAttribute("name", cont->prp_getName());
-            ele.setAttribute("id", id++);
             stack.appendChild(ele);
         }
         doc.appendChild(stack);
         stream << doc.toString();
     });
     writeAllContainedXEV(fileSaver, path);
-}
-
-void ContainerBox::writeBoundingBox(eWriteStream& dst) const {
-    BoundingBox::writeBoundingBox(dst);
-    dst.writeCheckpoint();
-    writeAllContained(dst);
 }
 
 #include "smartvectorpath.h"
@@ -1380,9 +1374,7 @@ void ContainerBox::writeBoundingBox(eWriteStream& dst) const {
 #include "sculptpathbox.h"
 #include "svglinkbox.h"
 
-qsptr<BoundingBox> readIdCreateBox(eReadStream& src) {
-    eBoxType type;
-    src.read(&type, sizeof(eBoxType));
+qsptr<BoundingBox> createBoxOfNonCustomType(const eBoxType type) {
     switch(type) {
         case(eBoxType::vectorPath):
             return enve::make_shared<SmartVectorPath>();
@@ -1412,15 +1404,101 @@ qsptr<BoundingBox> readIdCreateBox(eReadStream& src) {
             return enve::make_shared<SvgLinkBox>();
         case(eBoxType::internalLinkCanvas):
             return enve::make_shared<InternalLinkCanvas>(nullptr, false);
-        case(eBoxType::custom): {
-            const auto id = CustomIdentifier::sRead(src);
-            return CustomBoxCreator::sCreateForIdentifier(id);
-        } case(eBoxType::sculptPath):
+        case(eBoxType::sculptPath):
             return enve::make_shared<SculptPathBox>();
         case(eBoxType::canvas) : break;
+        case(eBoxType::count) : break;
+        case(eBoxType::custom): break;
     }
-    const int typeId = static_cast<int>(type);
-    RuntimeThrow("Invalid box type '" + std::to_string(typeId) + "'");
+    return nullptr;
+}
+
+void ContainerBox::readAllContainedXEV(
+        ZipFileLoader& fileLoader, const QString& path) {
+    fileLoader.process(path + "stack.xml", [&](QIODevice* const src) {
+        QDomDocument doc;
+        doc.setContent(src);
+        const auto stack = XmlExportHelpers::getOnlyElement(doc, "Stack");
+        const auto childNodes = stack.childNodes();
+        const int count = childNodes.count();
+        for(int i = 0; i < count; i++) {
+            const auto node = childNodes.at(i);
+            if(!node.isElement()) continue;
+            const auto ele = node.toElement();
+            const auto tag = ele.tagName();
+
+            qsptr<eBoxOrSound> ebs;
+            if(tag == "Object") {
+                const QString comOpStr = ele.attribute("composite-op");
+                const SkBlendMode comOp = XmlExportHelpers::stringToBlendMode(comOpStr);
+
+                const QString typeStr = ele.attribute("type", "-1");
+                const int typeInt = XmlExportHelpers::stringToInt(typeStr);
+                if(qBound(0, typeInt, int(eBoxType::count) - 1) != typeInt)
+                    RuntimeThrow("Invalid object type " + typeStr);
+                const eBoxType type = static_cast<eBoxType>(typeInt);
+
+                auto obj = createBoxOfNonCustomType(type);
+
+                if(type == eBoxType::custom) {
+                    const auto id = CustomIdentifier::sReadXEV(ele);
+                    obj = CustomBoxCreator::sCreateForIdentifier(id);
+                } else if(!obj) RuntimeThrow("Invalid box type '" +
+                                             std::to_string(int(type)) + "'");
+
+                obj->setBlendModeSk(comOp);
+                ebs = obj;
+            } else if(tag == "Sound") {
+
+            } else RuntimeThrow("Invalid tag " + tag);
+
+            const QString name = ele.attribute("name");
+
+            const QString editLockedStr = ele.attribute("edit-locked", "false");
+            const QString selectedStr = ele.attribute("selected", "false");
+            const QString visibilityStr = ele.attribute("visibility", "visible");
+
+            const bool locked = editLockedStr == "true";
+            const bool selected = selectedStr == "true";
+            const bool visible = visibilityStr == "visible";
+
+            ebs->prp_setName(name);
+            ebs->setLocked(locked);
+            ebs->setVisible(visible);
+            ebs->setSelected(selected);
+
+            insertContained(mContained.count(), ebs);
+        }
+    });
+    const QString childPath = path + "objects/%1/";
+    int id = 0;
+    for(const auto& cont : mContained) {
+        cont->readBoxOrSoundXEV(fileLoader, childPath.arg(id++));
+    }
+}
+
+void ContainerBox::readBoxOrSoundXEV(
+        ZipFileLoader& fileLoader, const QString& path) {
+    BoundingBox::readBoxOrSoundXEV(fileLoader, path);
+    readAllContainedXEV(fileLoader, path);
+}
+
+void ContainerBox::writeBoundingBox(eWriteStream& dst) const {
+    BoundingBox::writeBoundingBox(dst);
+    dst.writeCheckpoint();
+    writeAllContained(dst);
+}
+
+qsptr<BoundingBox> readIdCreateBox(eReadStream& src) {
+    eBoxType type;
+    src.read(&type, sizeof(eBoxType));
+
+    const auto result = createBoxOfNonCustomType(type);
+    if(result) return result;
+    if(type == eBoxType::custom) {
+        const auto id = CustomIdentifier::sRead(src);
+        return CustomBoxCreator::sCreateForIdentifier(id);
+    } else RuntimeThrow("Invalid box type '" + std::to_string(int(type)) + "'");
 }
 
 void ContainerBox::readContained(eReadStream& src) {

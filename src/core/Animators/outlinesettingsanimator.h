@@ -30,6 +30,9 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
+    QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
+    void prp_readPropertyXEV(const QDomElement& ele);
+
     void setPaintType(const PaintType paintType);
 
     void strokeWidthAction(const QrealAction& action);
@@ -101,6 +104,11 @@ public:
                  QDomElement& parent,
                  const FrameRange& visRange,
                  const bool asFill = false) const;
+protected:
+    QDomElement writeBrushPaint(QDomDocument& doc) const;
+    void readBrushPaint(const QDomElement& ele);
+
+    QString prp_tagNameXEV() const { return "Outline"; }
 private:
     SkPaint::Cap mCapStyle = SkPaint::kRound_Cap;
     SkPaint::Join mJoinStyle = SkPaint::kRound_Join;

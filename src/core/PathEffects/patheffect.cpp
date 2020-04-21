@@ -25,10 +25,14 @@
 
 PathEffect::PathEffect(const QString &name,
                        const PathEffectType type) :
-    eEffect(name), mPathEffectType(type) {}
+    eEffect(name), mType(type) {}
 
 void PathEffect::writeIdentifier(eWriteStream& dst) const {
-    dst.write(&mPathEffectType, sizeof(PathEffectType));
+    dst.write(&mType, sizeof(PathEffectType));
+}
+
+void PathEffect::writeIdentifierXEV(QDomElement& ele) const {
+    ele.setAttribute("type", static_cast<int>(mType));
 }
 
 void PathEffect::prp_setupTreeViewMenu(PropertyMenu * const menu) {
@@ -48,7 +52,7 @@ void PathEffect::apply(const qreal relFrame,
 }
 
 PathEffectType PathEffect::getEffectType() {
-    return mPathEffectType;
+    return mType;
 }
 
 QMimeData *PathEffect::SWT_createMimeData() {

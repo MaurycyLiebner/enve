@@ -29,7 +29,7 @@ class CORE_EXPORT ComplexAnimator : public Animator {
     e_DECLARE_TYPE(ComplexAnimator)
 protected:
     ComplexAnimator(const QString& name);
-public:
+public:    
     virtual void ca_childIsRecordingChanged();
     virtual void ca_removeAllChildren();
 
@@ -57,8 +57,6 @@ public:
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
     FrameRange prp_nextNonUnaryIdenticalRelRange(const int relFrame) const;
-
-    QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
 
     stdsptr<Key> anim_createKey() final
     { return nullptr; }
@@ -139,9 +137,6 @@ public:
 
     void ca_setHiddenWhenEmpty(const bool hidden);
     void ca_setDisabledWhenEmpty(const bool disabled);
-
-    void ca_writeChildPropertiesXEV(
-            QDomElement& prop, QDomDocument& doc) const;
 signals:
     void ca_childAdded(Property*);
     void ca_childRemoved(Property*);

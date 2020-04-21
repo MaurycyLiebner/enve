@@ -28,6 +28,10 @@ void BlendEffect::writeIdentifier(eWriteStream& dst) const {
     dst.write(&mType, sizeof(BlendEffectType));
 }
 
+void BlendEffect::writeIdentifierXEV(QDomElement& ele) const {
+    ele.setAttribute("type", static_cast<int>(mType));
+}
+
 void BlendEffect::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<BlendEffect>()) return;
     menu->addedActionsForType<BlendEffect>();

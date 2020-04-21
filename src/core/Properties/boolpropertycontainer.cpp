@@ -59,3 +59,14 @@ void BoolPropertyContainer::prp_readProperty(eReadStream& src) {
     setValue(value);
     StaticComplexAnimator::prp_readProperty(src);
 }
+
+QDomElement BoolPropertyContainer::prp_writePropertyXEV(QDomDocument& doc) const {
+    auto result = StaticComplexAnimator::prp_writePropertyXEV(doc);
+    result.setAttribute("checked", mValue ? "true" : "false");
+    return result;
+}
+
+void BoolPropertyContainer::prp_readPropertyXEV(const QDomElement& ele) {
+    StaticComplexAnimator::prp_readPropertyXEV(ele);
+    setValue(ele.attribute("checked") == "true");
+}

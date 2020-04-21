@@ -67,24 +67,6 @@ int ComplexAnimator::ca_getNumberOfChildren() const {
     return ca_mChildren.count();
 }
 
-void ComplexAnimator::ca_writeChildPropertiesXEV(
-        QDomElement& prop, QDomDocument& doc) const {
-    const auto& children = ca_getChildren();
-    int id = 0;
-    for(const auto& c : children) {
-        auto child = c->prp_writePropertyXEV(doc);
-        child.setAttribute("name", c->prp_getName());
-        child.setAttribute("id", id++);
-        prop.appendChild(child);
-    }
-}
-
-QDomElement ComplexAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
-    auto result = doc.createElement("Properties");
-    ca_writeChildPropertiesXEV(result, doc);
-    return result;
-}
-
 #include <QDebug>
 #include "swt_abstraction.h"
 void ComplexAnimator::SWT_setupAbstraction(

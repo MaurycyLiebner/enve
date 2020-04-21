@@ -25,7 +25,7 @@ sk_sp<SkImage> ImportKRA::loadMergedKRAFile(
     fileProcessor.setZipPath(filename);
 
     sk_sp<SkImage> result;
-    fileProcessor.process("mergedimage.png", false, [&](QIODevice* const src) {
+    fileProcessor.process("mergedimage.png", [&](QIODevice* const src) {
         const QByteArray qData = src->readAll();
         const auto data = SkData::MakeWithoutCopy(qData.data(), qData.size());
         result = SkImage::DecodeToRaster(data);

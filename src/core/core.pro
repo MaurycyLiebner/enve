@@ -254,6 +254,7 @@ SOURCES += \
     colorsetting.cpp \
     conncontext.cpp \
     cpurendertools.cpp \
+    customidentifier.cpp \
     drawpath.cpp \
     efiltersettings.cpp \
     etexture.cpp \
@@ -533,6 +534,7 @@ HEADERS += \
     ReadWrite/evformat.h \
     ReadWrite/ewritestream.h \
     ReadWrite/filefooter.h \
+    ReadWrite/xevformat.h \
     Segments/fitcurves.h \
     Segments/smoothcurves.h \
     ShaderEffects/PropertyCreators/coloranimatorcreator.h \

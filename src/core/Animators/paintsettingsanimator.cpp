@@ -27,6 +27,7 @@
 #include "transformanimator.h"
 #include "simpletask.h"
 #include "qpointfanimator.h"
+#include "XML/xmlexporthelpers.h"
 
 PaintSettingsAnimator::PaintSettingsAnimator(const QString &name,
                                              BoundingBox * const parent) :
@@ -71,6 +72,82 @@ void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
         mGradientTransform->prp_readProperty(src);
     }
     setPaintType(paintType);
+}
+
+QDomElement PaintSettingsAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
+    auto result = doc.createElement(prp_tagNameXEV());
+
+    result.setAttribute("type", static_cast<int>(mPaintType));
+
+    switch(mPaintType) {
+    case PaintType::FLATPAINT: {
+        const auto color = mColor->prp_writePropertyXEV(doc);
+        result.appendChild(color);
+    } break;
+    case PaintType::BRUSHPAINT: {
+        const auto brushSettings = writeBrushPaint(doc);
+        result.appendChild(brushSettings);
+    } break;
+    case PaintType::GRADIENTPAINT: {
+        auto gradient = doc.createElement("Gradient");
+        gradient.setAttribute("type", static_cast<int>(mGradientType));
+        const int gradRWId = mGradient ? mGradient->getReadWriteId() : -1;
+        gradient.setAttribute("id", gradRWId);
+        result.appendChild(gradient);
+
+        const auto transform = mGradientTransform->prp_writePropertyXEV(doc);
+        result.appendChild(transform);
+
+        const auto gradPoints = mGradientPoints->prp_writeNamedPropertyXEV(
+                                    "GradientPoints", doc);
+        result.appendChild(gradPoints);
+    } break;
+    default: break;
+    }
+
+    return result;
+}
+
+
+void PaintSettingsAnimator::prp_readPropertyXEV(const QDomElement& ele) {
+    const auto typeStr = ele.attribute("type");
+    const int typeInt = XmlExportHelpers::stringToInt(typeStr);
+    const auto type = static_cast<PaintType>(typeInt);
+    switch(type) {
+    case PaintType::FLATPAINT: {
+        const auto color = ele.firstChildElement("Color");
+        mColor->prp_readPropertyXEV(color);
+    } break;
+    case PaintType::BRUSHPAINT: {
+        readBrushPaint(ele);
+    } break;
+    case PaintType::GRADIENTPAINT: {
+        const auto gradient = ele.firstChildElement("Gradient");
+
+        const auto typeStr = gradient.attribute("type");
+        const int typeInt = XmlExportHelpers::stringToInt(typeStr);
+        const auto type = static_cast<GradientType>(typeInt);
+        mGradientType = type;
+
+        const auto gradIdStr = gradient.attribute("id");
+        const int gradId = XmlExportHelpers::stringToInt(gradIdStr);
+
+        SimpleTask::sScheduleContexted(this, [this, gradId]() {
+            const auto parentScene = getParentScene();
+            if(!parentScene) return;
+            const auto gradient = parentScene->getGradientWithRWId(gradId);
+            setGradientVar(gradient);
+        });
+
+        const auto transform = ele.firstChildElement("Transform");
+        mGradientTransform->prp_readPropertyXEV(transform);
+
+        const auto gradPoints = ele.firstChildElement("GradientPoints");
+        mGradientPoints->prp_readPropertyXEV(gradPoints);
+    } break;
+    default: break;
+    }
+    setPaintType(type);
 }
 
 void PaintSettingsAnimator::updateGradientPoint() {

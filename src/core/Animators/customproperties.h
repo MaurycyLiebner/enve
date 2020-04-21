@@ -20,13 +20,22 @@
 
 #include "Properties/namedproperty.h"
 
+CORE_EXPORT
 qsptr<Animator> readIdCreateCProperty(eReadStream& src);
+CORE_EXPORT
 void writeCPropertyType(Animator* const obj, eWriteStream& dst);
+
+CORE_EXPORT
+qsptr<Animator> readIdCreateCPropertyXEV(const QDomElement& ele);
+CORE_EXPORT
+void writeCPropertyTypeXEV(Animator* const obj, QDomElement& ele);
 
 using CustomPropertiesBase =
     DynamicComplexAnimator<Animator,
                            writeCPropertyType,
-                           readIdCreateCProperty>;
+                           readIdCreateCProperty,
+                           writeCPropertyTypeXEV,
+                           readIdCreateCPropertyXEV>;
 
 class CORE_EXPORT CustomProperties : public CustomPropertiesBase {
     Q_OBJECT

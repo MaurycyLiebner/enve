@@ -1,0 +1,52 @@
+// enve - 2D animations software
+// Copyright (C) 2016-2020 Maurycy Liebner
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#include "customidentifier.h"
+
+#include "XML/xmlexporthelpers.h"
+
+QString CustomIdentifier::toString() const {
+    return fEffectId + " " + fEffectName + " " + fVersion.toString();
+}
+
+void CustomIdentifier::write(eWriteStream& dst) const {
+    dst << fEffectId;
+    dst << fEffectName;
+    dst.write(&fVersion, sizeof(Version));
+}
+
+void CustomIdentifier::writeXEV(QDomElement& ele) const {
+    ele.setAttribute("id", fEffectId);
+    ele.setAttribute("name", fEffectName);
+    ele.setAttribute("version", fVersion.toString());
+}
+
+CustomIdentifier CustomIdentifier::sRead(eReadStream& src) {
+    CustomIdentifier id;
+    src >> id.fEffectId;
+    src >> id.fEffectName;
+    src.read(&id.fVersion, sizeof(Version));
+    return id;
+}
+
+CustomIdentifier CustomIdentifier::sReadXEV(const QDomElement& ele) {
+    CustomIdentifier id;
+    id.fEffectId = XmlExportHelpers::stringToInt(ele.attribute("id"));
+    id.fEffectName = XmlExportHelpers::stringToInt(ele.attribute("name"));
+    const QString versionStr = ele.attribute("version");
+    id.fVersion = Version::sFromString(versionStr);
+    return id;
+}

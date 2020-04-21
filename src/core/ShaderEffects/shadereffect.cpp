@@ -34,6 +34,11 @@ void ShaderEffect::writeIdentifier(eWriteStream& dst) const {
     mCreator->writeIdentifier(dst);
 }
 
+void ShaderEffect::writeIdentifierXEV(QDomElement& ele) const {
+    RasterEffect::writeIdentifierXEV(ele);
+    mCreator->writeIdentifierXEV(ele);
+}
+
 stdsptr<RasterEffectCaller> ShaderEffect::getEffectCaller(
         const qreal relFrame, const qreal resolution,
         const qreal influence, BoxRenderData * const data) const {

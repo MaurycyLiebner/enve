@@ -95,7 +95,7 @@ public:
     void saveToFile(const QString &path);
     void saveToFileXEV(const QString& path);
     void loadEVFile(const QString &path);
-    void loadXEVFile(const QString &path);
+    void loadXevFile(const QString &path);
     void clearAll();
     void updateTitle();
     void setFileChangedSinceSaving(const bool changed);

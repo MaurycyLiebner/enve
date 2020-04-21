@@ -19,6 +19,7 @@
 #include "qrealanimator.h"
 #include "qpointfanimator.h"
 
+#include "XML/xmlexporthelpers.h"
 #include "typemenu.h"
 
 enum class PropertyType {
@@ -76,9 +77,7 @@ void CustomProperties::addProperty(const qsptr<Animator> &prop) {
     addChild(prop);
 }
 
-qsptr<Animator> readIdCreateCProperty(eReadStream &src) {
-    PropertyType type;
-    src.read(&type, sizeof(PropertyType));
+qsptr<Animator> createCProperty(const PropertyType type) {
     switch(type) {
     case PropertyType::QrealAnimator:
         return enve::make_shared<NamedProperty<QrealAnimator>>("");
@@ -90,12 +89,34 @@ qsptr<Animator> readIdCreateCProperty(eReadStream &src) {
     RuntimeThrow("Read invalid property type.");
 }
 
-void writeCPropertyType(Animator * const obj, eWriteStream &dst) {
+qsptr<Animator> readIdCreateCProperty(eReadStream &src) {
+    PropertyType type;
+    src.read(&type, sizeof(PropertyType));
+    return createCProperty(type);
+}
+
+qsptr<Animator> readIdCreateCPropertyXEV(const QDomElement& ele) {
+    const int typeInt = XmlExportHelpers::stringToInt(ele.attribute("type"));
+    const PropertyType type = static_cast<PropertyType>(typeInt);
+    return createCProperty(type);
+}
+
+PropertyType cPropertyType(Animator * const obj) {
     PropertyType type;
     if(enve_cast<QrealAnimator*>(obj)) {
         type = PropertyType::QrealAnimator;
     } else if(enve_cast<QPointFAnimator*>(obj)) {
         type = PropertyType::QPointFAnimator;
     } else RuntimeThrow("Unsupported Type");
+    return type;
+}
+
+void writeCPropertyType(Animator * const obj, eWriteStream &dst) {
+    const auto type = cPropertyType(obj);
     dst.write(&type, sizeof(PropertyType));
+}
+
+void writeCPropertyTypeXEV(Animator * const obj, QDomElement& ele) {
+    const auto type = cPropertyType(obj);
+    ele.setAttribute("type", static_cast<int>(type));
 }

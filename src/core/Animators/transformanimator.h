@@ -182,6 +182,7 @@ public:
     }
 
     QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
+    void prp_readPropertyXEV(const QDomElement& ele);
 private:
     qsptr<QPointFAnimator> mPivotAnimator;
     qsptr<QPointFAnimator> mShearAnimator;

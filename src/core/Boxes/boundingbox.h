@@ -74,7 +74,9 @@ enum class eBoxType {
     paint,
     group,
     custom,
-    sculptPath
+    sculptPath,
+
+    count
 };
 
 class BoundingBox;

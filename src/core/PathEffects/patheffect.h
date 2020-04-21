@@ -52,15 +52,17 @@ public:
     QMimeData *SWT_createMimeData() final;
 
     void writeIdentifier(eWriteStream &dst) const;
+    void writeIdentifierXEV(QDomElement& ele) const;
 
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
+    QString prp_tagNameXEV() const { return "PathEffect"; }
 
     void apply(const qreal relFrame,
                const qreal influence,
                SkPath& path) const;
     PathEffectType getEffectType();
 protected:
-    const PathEffectType mPathEffectType;
+    const PathEffectType mType;
 };
 
 #endif // PATHEFFECT_H

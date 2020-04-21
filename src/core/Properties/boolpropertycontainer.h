@@ -28,6 +28,9 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
+    QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
+    void prp_readPropertyXEV(const QDomElement& ele);
+
     void setValue(const bool value);
     bool getValue();
 

@@ -114,6 +114,9 @@ public:
     bool isClosed() const
     { return mNodesList.isClosed(); }
 
+    void setClosed(const bool closed)
+    { mNodesList.setClosed(closed); }
+
     int getNodeCount() const
     { return mNodesList.count(); }
 
@@ -141,6 +144,7 @@ public:
     { return mNodesList.write(dst); }
 
     QString toXEV() const;
+    void loadXEV(const QStringRef& xev);
 
     const NodeList& getNodesRef() const
     { return mNodesList; }

@@ -48,6 +48,9 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
+    QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
+    void prp_readPropertyXEV(const QDomElement& ele);
+
     virtual void setPaintType(const PaintType paintType);
 
     QColor getColor() const;
@@ -78,6 +81,10 @@ protected:
                  QDomElement& parent,
                  const FrameRange& visRange,
                  const QString& name) const;
+    virtual QDomElement writeBrushPaint(QDomDocument& doc) const
+    { Q_UNUSED(doc) return QDomElement(); }
+    virtual void readBrushPaint(const QDomElement& ele)
+    { Q_UNUSED(ele) }
 private:
     void setGradientVar(Gradient * const grad);
     void resetGradientPoints();
@@ -98,6 +105,8 @@ class CORE_EXPORT FillSettingsAnimator : public PaintSettingsAnimator {
 protected:
     FillSettingsAnimator(BoundingBox * const parent) :
         PaintSettingsAnimator("fill", parent) {}
+
+    QString prp_tagNameXEV() const override { return "Fill"; }
 public:
     void saveSVG(SvgExporter& exp, QDomElement& parent,
                  const FrameRange& visRange) const {

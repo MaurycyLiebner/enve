@@ -24,13 +24,13 @@
 class CORE_EXPORT ZipFileLoader {
 public:
     ZipFileLoader();
-    ~ZipFileLoader() { mZip.close(); }
 
     void setZipPath(const QString& path);
 
     using Processor = std::function<void(QIODevice* const src)>;
-    void process(const QString& file, const bool text,
-                 const Processor& func);
+    void process(const QString& file, const Processor& func);
+    using TextProcessor = std::function<void(QTextStream& stream)>;
+    void processText(const QString& file, const TextProcessor& func);
 private:
     QuaZip mZip;
     QuaZipFile mFile;

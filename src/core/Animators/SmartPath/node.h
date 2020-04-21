@@ -102,6 +102,15 @@ struct CORE_EXPORT Node {
     void disableUnnecessaryCtrls();
 
     void guessCtrlsMode();
+
+    void setC0Enabled(const bool enabled)
+    { mC0Enabled = enabled; }
+
+    void setC2Enabled(const bool enabled)
+    { mC2Enabled = enabled; }
+
+    void assignCtrlsMode(const CtrlsMode ctrlsMode)
+    { mCtrlsMode = ctrlsMode; }
 protected:
     void setNodeId(const int nodeId)
     { mId = nodeId; }
@@ -111,12 +120,6 @@ protected:
 
     void setCtrlsMode(const CtrlsMode ctrlsMode);
 
-    void setC0Enabled(const bool enabled)
-    { mC0Enabled = enabled; }
-
-    void setC2Enabled(const bool enabled)
-    { mC2Enabled = enabled; }
-private:
     bool mC0Enabled = true;
     bool mC2Enabled = true;
     NodeType mType;

@@ -42,6 +42,50 @@ void OutlineSettingsAnimator::prp_readProperty(eReadStream& src) {
     src.read(&mOutlineCompositionMode, sizeof(QPainter::CompositionMode));
 }
 
+QDomElement OutlineSettingsAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
+    auto props = PaintSettingsAnimator::prp_writePropertyXEV(doc);
+
+    const auto lineWidth = mLineWidth->prp_writeNamedPropertyXEV("Width", doc);
+    props.appendChild(lineWidth);
+
+    switch(mCapStyle) {
+    case SkPaint::kButt_Cap:
+        props.setAttribute("stroke-linecap", "butt"); break;
+    case SkPaint::kRound_Cap:
+        props.setAttribute("stroke-linecap", "round"); break;
+    default: // SkPaint::kSquare_Cap
+        props.setAttribute("stroke-linecap", "square"); break;
+    }
+
+    switch(mJoinStyle) {
+    case SkPaint::kMiter_Join:
+        props.setAttribute("stroke-linejoin", "miter"); break;
+    case SkPaint::kRound_Join:
+        props.setAttribute("stroke-linejoin", "round"); break;
+    default: // SkPaint::kBevel_Join
+        props.setAttribute("stroke-linejoin", "bevel"); break;
+    }
+
+    return props;
+}
+
+void OutlineSettingsAnimator::prp_readPropertyXEV(const QDomElement& ele) {
+    PaintSettingsAnimator::prp_readPropertyXEV(ele);
+
+    const auto lineWidth = ele.firstChildElement("Width");
+    mLineWidth->prp_readPropertyXEV(lineWidth);
+
+    const auto capStyle = ele.attribute("stroke-linecap");
+    if(capStyle == "butt") mCapStyle = SkPaint::kButt_Cap;
+    else if(capStyle == "round") mCapStyle = SkPaint::kRound_Cap;
+    else /*if(capStyle == "square")*/ mCapStyle = SkPaint::kSquare_Cap;
+
+    const auto joinStyle = ele.attribute("stroke-linejoin");
+    if(capStyle == "miter") mJoinStyle = SkPaint::kMiter_Join;
+    else if(capStyle == "round") mJoinStyle = SkPaint::kRound_Join;
+    else /*if(capStyle == "bevel")*/ mJoinStyle = SkPaint::kBevel_Join;
+}
+
 void OutlineSettingsAnimator::setPaintType(const PaintType paintType) {
     PaintSettingsAnimator::setPaintType(paintType);
     const auto defaultBrush = Document::sInstance->fOutlineBrush;
@@ -132,6 +176,15 @@ void OutlineSettingsAnimator::saveSVG(SvgExporter& exp,
                                    asFill ? "fill" : "stroke");
     if(asFill) return;
     mLineWidth->saveQrealSVG(exp, parent, visRange, "stroke-width");
+}
+
+QDomElement OutlineSettingsAnimator::writeBrushPaint(QDomDocument& doc) const {
+    return mBrushSettings->prp_writePropertyXEV(doc);
+}
+
+void OutlineSettingsAnimator::readBrushPaint(const QDomElement& ele) {
+    const auto brushSettings = ele.firstChildElement("BrushSettings");
+    mBrushSettings->prp_readPropertyXEV(brushSettings);
 }
 
 void OutlineSettingsAnimator::setupStrokeSettings(const qreal relFrame,

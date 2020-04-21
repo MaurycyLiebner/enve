@@ -135,6 +135,11 @@ public:
     virtual void prp_readProperty(eReadStream& src) { Q_UNUSED(src) }
     virtual void prp_writeProperty(eWriteStream& dst) const { Q_UNUSED(dst) }
 
+    virtual QString prp_tagNameXEV() const { return "Property"; }
+
+    virtual void prp_readPropertyXEV(const QDomElement& ele)
+    { Q_UNUSED(ele) }
+
     virtual QDomElement prp_writePropertyXEV(QDomDocument& doc) const
     { Q_UNUSED(doc) return QDomElement(); }
 

@@ -16,7 +16,13 @@
 
 #ifndef CUSTOMIDENTIFIER_H
 #define CUSTOMIDENTIFIER_H
+
 #include "ReadWrite/basicreadwrite.h"
+
+#include "exceptions.h"
+
+#include <QDomElement>
+#include <QVector>
 
 struct CORE_EXPORT CustomIdentifier {
     struct Version {
@@ -28,6 +34,12 @@ struct CORE_EXPORT CustomIdentifier {
             return QString::number(fMajor) + "." +
                    QString::number(fMinor) + "." +
                    QString::number(fPatch);
+        }
+
+        static Version sFromString(const QString& str) {
+            const auto sep = str.splitRef('.');
+            if(sep.count() != 3) RuntimeThrow("Invalid Version format " + str);
+            return {sep[0].toUInt(), sep[1].toUInt(), sep[2].toUInt()};
         }
 
         bool operator==(const Version& other) const {
@@ -53,23 +65,13 @@ struct CORE_EXPORT CustomIdentifier {
     QString fEffectName;
     Version fVersion;
 
-    QString toString() const {
-        return fEffectId + " " + fEffectName + " " + fVersion.toString();
-    }
+    QString toString() const;
 
-    void write(eWriteStream& dst) const {
-        dst << fEffectId;
-        dst << fEffectName;
-        dst.write(&fVersion, sizeof(Version));
-    }
+    void write(eWriteStream& dst) const;
+    void writeXEV(QDomElement& ele) const;
 
-    static CustomIdentifier sRead(eReadStream& src) {
-        CustomIdentifier id;
-        src >> id.fEffectId;
-        src >> id.fEffectName;
-        src.read(&id.fVersion, sizeof(Version));
-        return id;
-    }
+    static CustomIdentifier sRead(eReadStream& src);
+    static CustomIdentifier sReadXEV(const QDomElement& ele);
 };
 
 #endif // CUSTOMIDENTIFIER_H

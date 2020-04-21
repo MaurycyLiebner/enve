@@ -70,6 +70,7 @@ public:
                                     const FrameRange &newAbsRange);
 
     QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
+    void prp_readPropertyXEV(const QDomElement& ele);
 
     void anim_setAbsFrame(const int frame);
     void anim_removeAllKeys();

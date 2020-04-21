@@ -51,8 +51,10 @@ public:
     qsptr<ShaderEffect> create() const;
 
     void writeIdentifier(eWriteStream& dst) const;
+    void writeIdentifierXEV(QDomElement& ele) const;
 
     static Identifier sReadIdentifier(eReadStream& src);
+    static Identifier sReadIdentifierXEV(const QDomElement& ele);
 
     static stdsptr<ShaderEffectCreator> sLoadFromFile(
             QGL33 * const gl, const QString& grePath);

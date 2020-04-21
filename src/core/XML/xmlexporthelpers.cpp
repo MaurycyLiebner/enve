@@ -16,6 +16,53 @@
 
 #include "xmlexporthelpers.h"
 
+#include "exceptions.h"
+
+SkBlendMode XmlExportHelpers::stringToBlendMode(const QString& compOpStr) {
+    if(compOpStr.isEmpty()) return SkBlendMode::kSrcOver;
+    if(compOpStr == "svg:src-over") {
+        return SkBlendMode::kSrcOver;
+    } else if(compOpStr == "svg:multiply") {
+        return SkBlendMode::kMultiply;
+    } else if(compOpStr == "svg:screen") {
+        return SkBlendMode::kScreen;
+    } else if(compOpStr == "svg:overlay") {
+        return SkBlendMode::kOverlay;
+    } else if(compOpStr == "svg:darken") {
+        return SkBlendMode::kDarken;
+    } else if(compOpStr == "svg:lighten") {
+        return SkBlendMode::kLighten;
+    } else if(compOpStr == "svg:color-dodge") {
+        return SkBlendMode::kColorDodge;
+    } else if(compOpStr == "svg:color-burn") {
+        return SkBlendMode::kColorBurn;
+    } else if(compOpStr == "svg:hard-light") {
+        return SkBlendMode::kHardLight;
+    } else if(compOpStr == "svg:soft-light") {
+        return SkBlendMode::kSoftLight;
+    } else if(compOpStr == "svg:difference") {
+        return SkBlendMode::kDifference;
+    } else if(compOpStr == "svg:color") {
+        return SkBlendMode::kColor;
+    } else if(compOpStr == "svg:luminosity") {
+        return SkBlendMode::kLuminosity;
+    } else if(compOpStr == "svg:hue") {
+        return SkBlendMode::kHue;
+    } else if(compOpStr == "svg:saturation") {
+        return SkBlendMode::kSaturation;
+    } else if(compOpStr == "svg:plus") {
+        return SkBlendMode::kPlus;
+    } else if(compOpStr == "svg:dst-in") {
+        return SkBlendMode::kDstIn;
+    } else if(compOpStr == "svg:dst-out") {
+        return SkBlendMode::kDstOut;
+    } else if(compOpStr == "svg:src-atop") {
+        return SkBlendMode::kSrcATop;
+    } else if(compOpStr == "svg:dst-atop") {
+        return SkBlendMode::kDstATop;
+    } else return SkBlendMode::kSrcOver;
+}
+
 QString XmlExportHelpers::blendModeToString(const SkBlendMode blendMode) {
     switch(blendMode) {
     case SkBlendMode::kSrcOver: return "svg:src-over";
@@ -40,4 +87,39 @@ QString XmlExportHelpers::blendModeToString(const SkBlendMode blendMode) {
     case SkBlendMode::kDstATop: return "svg:dst-atop";
     default: return "svg:src-over";
     }
+}
+
+qreal XmlExportHelpers::stringToDouble(const QStringRef& string) {
+    bool ok;
+    const qreal value = string.toDouble(&ok);
+    if(!ok) RuntimeThrow("Invalid value " + string.toString());
+    return value;
+}
+
+qreal XmlExportHelpers::stringToDouble(const QString& string) {
+    return stringToDouble(&string);
+}
+
+int XmlExportHelpers::stringToInt(const QStringRef& string) {
+    bool ok;
+    const int value = string.toInt(&ok);
+    if(!ok) RuntimeThrow("Invalid value " + string.toString());
+    return value;
+}
+
+int XmlExportHelpers::stringToInt(const QString& string) {
+    return stringToInt(&string);
+}
+
+QDomElement XmlExportHelpers::getOnlyElement(
+        const QDomNode& from, const QString& tagName) {
+    const auto eles = from.childNodes();
+    const int count = eles.count();
+    for(int i = 0; i < count; i++) {
+        const auto node = eles.at(i);
+        if(!node.isElement()) continue;
+        const auto ele = node.toElement();
+        if(ele.tagName() == tagName) return ele;
+    }
+    return QDomElement();
 }

@@ -19,6 +19,7 @@
 #include "Boxes/pathbox.h"
 #include "Boxes/containerbox.h"
 #include "custompatheffectcreator.h"
+#include "XML/xmlexporthelpers.h"
 #include <QDebug>
 
 PathEffectCollection::PathEffectCollection() :
@@ -59,10 +60,7 @@ void PathEffectCollection::addEffects(const qreal relFrame,
     }
 }
 
-#include "patheffectsinclude.h"
-qsptr<PathEffect> readIdCreatePathEffect(eReadStream &src) {
-    PathEffectType type;
-    src.read(&type, sizeof(PathEffectType));
+qsptr<PathEffect> createNonCustomPathEffect(const PathEffectType type) {
     switch(type) {
         case(PathEffectType::DISPLACE):
             return enve::make_shared<DisplacePathEffect>();
@@ -84,16 +82,44 @@ qsptr<PathEffect> readIdCreatePathEffect(eReadStream &src) {
             return enve::make_shared<SpatialDisplacePathEffect>();
         case(PathEffectType::SUBDIVIDE):
             return enve::make_shared<SubdividePathEffect>();
-        case(PathEffectType::CUSTOM): {
-            const auto id = CustomIdentifier::sRead(src);
-            const auto eff = CustomPathEffectCreator::sCreateForIdentifier(id);
-            if(eff) return eff;
-            RuntimeThrow("Unrecogized CustomPathEffect identifier " + id.toString());
-        } default: RuntimeThrow("Invalid path effect type '" +
-                                QString::number(int(type)) + "'");
+        default: return nullptr;
     }
+}
+
+#include "patheffectsinclude.h"
+qsptr<PathEffect> readIdCreatePathEffect(eReadStream &src) {
+    PathEffectType type;
+    src.read(&type, sizeof(PathEffectType));
+    const auto eff = createNonCustomPathEffect(type);
+    if(eff) return eff;
+    if(type == PathEffectType::CUSTOM) {
+        const auto id = CustomIdentifier::sRead(src);
+        const auto eff = CustomPathEffectCreator::sCreateForIdentifier(id);
+        if(eff) return eff;
+        RuntimeThrow("Unrecogized CustomPathEffect identifier " + id.toString());
+    } else RuntimeThrow("Invalid path effect type '" +
+                        QString::number(int(type)) + "'");
 }
 
 void writePathEffectType(PathEffect * const obj, eWriteStream &dst) {
     obj->writeIdentifier(dst);
+}
+
+qsptr<PathEffect> readIdCreatePathEffectXEV(const QDomElement& ele) {
+    const auto typeStr = ele.attribute("type");
+    const int typeInt = XmlExportHelpers::stringToInt(typeStr);
+    const auto type = static_cast<PathEffectType>(typeInt);
+    const auto eff = createNonCustomPathEffect(type);
+    if(eff) return eff;
+    if(type == PathEffectType::CUSTOM) {
+        const auto id = CustomIdentifier::sReadXEV(ele);
+        const auto eff = CustomPathEffectCreator::sCreateForIdentifier(id);
+        if(eff) return eff;
+        RuntimeThrow("Unrecogized CustomPathEffect identifier " + id.toString());
+    } else RuntimeThrow("Invalid path effect type '" +
+                        QString::number(int(type)) + "'");
+}
+
+void writePathEffectTypeXEV(PathEffect* const obj, QDomElement& ele) {
+    obj->writeIdentifierXEV(ele);
 }

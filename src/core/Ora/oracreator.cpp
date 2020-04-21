@@ -25,7 +25,7 @@
 void writeMimeType(ZipFileSaver& fileSaver) {
     fileSaver.processText("mimetype", [](QTextStream& stream) {
         stream << "image/openraster";
-    });
+    }, false);
 }
 
 void saveOraElementAttributes(const OraElement& ele,

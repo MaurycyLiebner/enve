@@ -27,10 +27,17 @@ qsptr<PathEffect> readIdCreatePathEffect(eReadStream& src);
 CORE_EXPORT
 void writePathEffectType(PathEffect* const obj, eWriteStream& dst);
 
+CORE_EXPORT
+qsptr<PathEffect> readIdCreatePathEffectXEV(const QDomElement& ele);
+CORE_EXPORT
+void writePathEffectTypeXEV(PathEffect* const obj, QDomElement& ele);
+
 typedef DynamicComplexAnimator<
     PathEffect,
     writePathEffectType,
-    readIdCreatePathEffect> PathEffectCollectionBase;
+    readIdCreatePathEffect,
+    writePathEffectTypeXEV,
+    readIdCreatePathEffectXEV> PathEffectCollectionBase;
 
 class CORE_EXPORT PathEffectCollection : public PathEffectCollectionBase {
     e_OBJECT
@@ -38,6 +45,7 @@ protected:
     PathEffectCollection();
 public:
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
+    QString prp_tagNameXEV() const { return "PathEffects"; }
 
     bool hasEffects();
     void readPathEffect(eReadStream &target);

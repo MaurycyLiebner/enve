@@ -19,51 +19,7 @@
 #include <QtXml/QDomDocument>
 
 #include "zipfileloader.h"
-
-SkBlendMode compositeOpToBlendMode(const QString& compOpStr) {
-    if(compOpStr.isEmpty()) return SkBlendMode::kSrcOver;
-    if(compOpStr == "svg:src-over") {
-        return SkBlendMode::kSrcOver;
-    } else if(compOpStr == "svg:multiply") {
-        return SkBlendMode::kMultiply;
-    } else if(compOpStr == "svg:screen") {
-        return SkBlendMode::kScreen;
-    } else if(compOpStr == "svg:overlay") {
-        return SkBlendMode::kOverlay;
-    } else if(compOpStr == "svg:darken") {
-        return SkBlendMode::kDarken;
-    } else if(compOpStr == "svg:lighten") {
-        return SkBlendMode::kLighten;
-    } else if(compOpStr == "svg:color-dodge") {
-        return SkBlendMode::kColorDodge;
-    } else if(compOpStr == "svg:color-burn") {
-        return SkBlendMode::kColorBurn;
-    } else if(compOpStr == "svg:hard-light") {
-        return SkBlendMode::kHardLight;
-    } else if(compOpStr == "svg:soft-light") {
-        return SkBlendMode::kSoftLight;
-    } else if(compOpStr == "svg:difference") {
-        return SkBlendMode::kDifference;
-    } else if(compOpStr == "svg:color") {
-        return SkBlendMode::kColor;
-    } else if(compOpStr == "svg:luminosity") {
-        return SkBlendMode::kLuminosity;
-    } else if(compOpStr == "svg:hue") {
-        return SkBlendMode::kHue;
-    } else if(compOpStr == "svg:saturation") {
-        return SkBlendMode::kSaturation;
-    } else if(compOpStr == "svg:plus") {
-        return SkBlendMode::kPlus;
-    } else if(compOpStr == "svg:dst-in") {
-        return SkBlendMode::kDstIn;
-    } else if(compOpStr == "svg:dst-out") {
-        return SkBlendMode::kDstOut;
-    } else if(compOpStr == "svg:src-atop") {
-        return SkBlendMode::kSrcATop;
-    } else if(compOpStr == "svg:dst-atop") {
-        return SkBlendMode::kDstATop;
-    } else return SkBlendMode::kSrcOver;
-}
+#include "XML/xmlexporthelpers.h"
 
 void parseOraElementAttributes(OraElement& oraEle,
                                const QDomElement &domEle) {
@@ -97,7 +53,7 @@ void parseOraElementAttributes(OraElement& oraEle,
     oraEle.fLocked = lockedStr == "true";
 
     const QString compOpStr = domEle.attribute("composite-op");
-    oraEle.fBlend = compositeOpToBlendMode(compOpStr);
+    oraEle.fBlend = XmlExportHelpers::stringToBlendMode(compOpStr);
 
     const QString selectedStr = domEle.attribute("selected");
     oraEle.fSelected = selectedStr == "true";
@@ -215,7 +171,7 @@ template <typename OraLayerPNG_XX,
           typename OraImage_XX = OraImage<OraLayerPNG_XX>>
 std::shared_ptr<OraImage_XX> readStackXml(ZipFileLoader& fileProcessor) {
     std::shared_ptr<OraImage_XX> result;
-    fileProcessor.process("stack.xml", true, [&result](QIODevice* const src) {
+    fileProcessor.process("stack.xml", [&result](QIODevice* const src) {
         result = parseStackXml<OraLayerPNG_XX>(src);
     });
     return result;
@@ -223,7 +179,7 @@ std::shared_ptr<OraImage_XX> readStackXml(ZipFileLoader& fileProcessor) {
 
 
 void loadLayerSourcePNG(OraLayerPNG_Sk& layer, ZipFileLoader& fileProcessor) {
-    fileProcessor.process(layer.fSource, false, [&](QIODevice* const src) {
+    fileProcessor.process(layer.fSource, [&](QIODevice* const src) {
         const QByteArray qData = src->readAll();
         const auto data = SkData::MakeWithoutCopy(qData.data(), qData.size());
         layer.fImage = SkImage::DecodeToRaster(data);
@@ -231,14 +187,14 @@ void loadLayerSourcePNG(OraLayerPNG_Sk& layer, ZipFileLoader& fileProcessor) {
 }
 
 void loadLayerSourcePNG(OraLayerPNG_Qt& layer, ZipFileLoader& fileProcessor) {
-    fileProcessor.process(layer.fSource, false, [&](QIODevice* const src) {
+    fileProcessor.process(layer.fSource, [&](QIODevice* const src) {
         const QByteArray qData = src->readAll();
         layer.fImage.loadFromData(qData);
     });
 }
 
 void loadLayerSourceSVG(OraLayerSVG& layer, ZipFileLoader& fileProcessor) {
-    fileProcessor.process(layer.fSource, true, [&](QIODevice* const src) {
+    fileProcessor.process(layer.fSource, [&](QIODevice* const src) {
         layer.fDocument = src->readAll();
     });
 }
@@ -286,7 +242,7 @@ sk_sp<SkImage> ImportORA::loadContainedMerged(const QString &filename) {
     fileProcessor.setZipPath(filename);
 
     sk_sp<SkImage> result;
-    fileProcessor.process("mergedimage.png", false, [&](QIODevice* const src) {
+    fileProcessor.process("mergedimage.png", [&](QIODevice* const src) {
         const QByteArray qData = src->readAll();
         const auto data = SkData::MakeWithoutCopy(qData.data(), qData.size());
         result = SkImage::DecodeToRaster(data);

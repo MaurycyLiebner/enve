@@ -241,9 +241,23 @@ void TNoWriteType(T* const obj, eWriteStream& dst) {
     Q_UNUSED(dst)
 }
 
+template <class T>
+qsptr<T> TCreateOnlyXEV(const QDomElement& ele) {
+    Q_UNUSED(ele)
+    return enve::make_shared<T>();
+}
+
+template <class T>
+void TNoWriteTypeXEV(T* const obj, QDomElement& ele) {
+    Q_UNUSED(obj)
+    Q_UNUSED(ele)
+}
+
 template <class T,
           void (&TWriteType)(T* const obj, eWriteStream& dst) = TNoWriteType<T>,
-          qsptr<T> (&TReadTypeAndCreate)(eReadStream& src) = TCreateOnly<T>>
+          qsptr<T> (&TReadTypeAndCreate)(eReadStream& src) = TCreateOnly<T>,
+          void (&TWriteTypeXEV)(T* const obj, QDomElement& ele) = TNoWriteTypeXEV<T>,
+          qsptr<T> (&TReadTypeAndCreateXEV)(const QDomElement& ele) = TCreateOnlyXEV<T>>
 class CORE_EXPORT DynamicComplexAnimator : public DynamicComplexAnimatorBase<T> {
     e_OBJECT
 protected:
@@ -293,8 +307,34 @@ public:
         }
     }
 
-private:
+    QDomElement prp_writePropertyXEV(QDomDocument& doc) const override {
+        auto result = doc.createElement(this->prp_tagNameXEV());
+        const auto& children = this->ca_getChildren();
+        for(const auto& c : children) {
+            const auto TProp = static_cast<T*>(c.get());
+            auto child = c->prp_writePropertyXEV(doc);
+            TWriteTypeXEV(TProp, child);
+            result.appendChild(child);
+        }
+        return result;
+    }
 
+    void prp_readPropertyXEV(const QDomElement& ele) override {
+        const auto childNodes = ele.childNodes();
+        const int count = childNodes.count();
+        for(int i = 0; i < count; i++) {
+            const auto node = childNodes.at(i);
+            if(!node.isElement()) continue;
+            const auto element = node.toElement();
+            try {
+                const auto prop = TReadTypeAndCreateXEV(element);
+                prop->prp_readPropertyXEV(element);
+                this->addChild(prop);
+            } catch(const std::exception& e) {
+                gPrintExceptionCritical(e);
+            }
+        }
+    }
 };
 
 #endif // DYNAMICCOMPLEXANIMATOR_H

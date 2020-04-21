@@ -34,6 +34,8 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
+    QString prp_tagNameXEV() const { return "Paths"; }
+
     using EffectApplier = std::function<void(const int relFrame,
                                              SkPath& path)>;
     void savePathsSVG(SvgExporter& exp,

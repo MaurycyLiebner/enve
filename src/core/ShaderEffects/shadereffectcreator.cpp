@@ -19,6 +19,7 @@
 #include "shadereffect.h"
 #include "shadervaluehandler.h"
 #include "regexhelpers.h"
+#include "XML/xmlexporthelpers.h"
 
 #include <QDomDocument>
 
@@ -70,22 +71,37 @@ qsptr<ShaderEffect> ShaderEffectCreator::create() const {
     return shaderEffect;
 }
 
+ShaderPropertyType creatorPropertyType(ShaderPropertyCreator* const prop) {
+    if(enve_cast<QrealAnimatorCreator*>(prop)) {
+        return ShaderPropertyType::floatProperty;
+    } else if(enve_cast<IntAnimatorCreator*>(prop)) {
+        return ShaderPropertyType::intProperty;
+    } else if(enve_cast<QPointFAnimatorCreator*>(prop)) {
+        return ShaderPropertyType::vec2Property;
+    } else RuntimeThrow("Unsupported type");
+}
+
 void ShaderEffectCreator::writeIdentifier(eWriteStream &dst) const {
     dst << fName;
     dst << fGrePath;
     const int nChildren = fProperties.count();
     dst << nChildren;
     for(const auto& anim : fProperties) {
-        ShaderPropertyType type;
-        if(enve_cast<QrealAnimatorCreator*>(anim.get())) {
-            type = ShaderPropertyType::floatProperty;
-        } else if(enve_cast<IntAnimatorCreator*>(anim.get())) {
-            type = ShaderPropertyType::intProperty;
-        } else if(enve_cast<QPointFAnimatorCreator*>(anim.get())) {
-            type = ShaderPropertyType::vec2Property;
-        } else RuntimeThrow("Unsupported type");
+        const ShaderPropertyType type = creatorPropertyType(anim.get());
         dst.write(&type, sizeof(ShaderPropertyType));
     }
+}
+
+void ShaderEffectCreator::writeIdentifierXEV(QDomElement& ele) const {
+    ele.setAttribute("name", fName);
+    ele.setAttribute("grePath", fGrePath);
+    QString props;
+    for(const auto& anim : fProperties) {
+        const ShaderPropertyType type = creatorPropertyType(anim.get());
+        if(!props.isEmpty()) props += ',';
+        props += QString::number(int(type));
+    }
+    ele.setAttribute("properties", props);
 }
 
 ShaderEffectCreator::Identifier ShaderEffectCreator::sReadIdentifier(eReadStream &src) {
@@ -98,6 +114,22 @@ ShaderEffectCreator::Identifier ShaderEffectCreator::sReadIdentifier(eReadStream
         src.read(&type, sizeof(ShaderPropertyType));
         props << type;
     }
+    return Identifier(grePath, name, props);
+}
+
+ShaderEffectCreator::Identifier ShaderEffectCreator::sReadIdentifierXEV(
+        const QDomElement& ele) {
+    const QString name = ele.attribute("name");
+    const QString grePath = ele.attribute("grePath");
+    const QString propsStr = ele.attribute("properties");
+    const auto propsStrList = propsStr.splitRef(',');
+    QList<ShaderPropertyType> props;
+    for(const auto propStr : propsStrList) {
+        const int propInt = XmlExportHelpers::stringToInt(propStr);
+        const ShaderPropertyType prop = static_cast<ShaderPropertyType>(propInt);
+        props << prop;
+    }
+
     return Identifier(grePath, name, props);
 }
 

@@ -30,6 +30,7 @@
 #include "Animators/SculptPath/sculptpath.h"
 #include "conncontextptr.h"
 #include "zipfilesaver.h"
+#include "zipfileloader.h"
 
 class SceneBoundGradient;
 class FileDataCacheHandler;
@@ -165,6 +166,20 @@ public:
     void writeXEV(ZipFileSaver& fileSaver) const;
     void writeDoxumentXEV(QDomDocument& doc) const;
     void writeScenesXEV(ZipFileSaver& fileSaver) const;
+
+    struct SceneSettingsXEV {
+        QString fName;
+        int fFrame;
+        int fWidth;
+        int fHeight;
+        qreal fFps;
+    };
+
+    void readDoxumentXEV(const QDomDocument& doc,
+                         QList<SceneSettingsXEV>& sceneSetts);
+    void readScenesXEV(ZipFileLoader& fileLoader,
+                       const QList<SceneSettingsXEV>& nameList);
+    void readXEV(ZipFileLoader& fileLoader);
 
     void SWT_setupAbstraction(SWT_Abstraction * const abstraction,
                               const UpdateFuncs &updateFuncs,

@@ -45,9 +45,13 @@ public:
                                 const CanvasMode mode,
                                 const float invScale,
                                 const bool ctrlPressed);
+    QString prp_tagNameXEV() const { return "TextEffect"; }
 
     void writeIdentifier(eWriteStream& dst) const
     { Q_UNUSED(dst) }
+
+    void writeIdentifierXEV(QDomElement& ele) const
+    { Q_UNUSED(ele) }
 
     void apply(TextBoxRenderData * const textData) const;
     TextFragmentType target() const;

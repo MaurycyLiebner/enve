@@ -1279,7 +1279,8 @@ void MainWindow::openFile() {
 
         const QString title = tr("Open File", "OpenDialog_Title");
         const QString files = tr("enve Files %1", "OpenDialog_FileType");
-        const QString openPath = eDialogs::openFile(title, defPath, files.arg("(*.ev)"));
+        const QString openPath = eDialogs::openFile(title, defPath,
+                                                    files.arg("(*.ev *.xev)"));
         if(!openPath.isEmpty()) openFile(openPath);
         enable();
     }
@@ -1288,7 +1289,13 @@ void MainWindow::openFile() {
 void MainWindow::openFile(const QString& openPath) {
     clearAll();
     try {
-        loadEVFile(openPath);
+        QFileInfo fi(openPath);
+        const QString suffix = fi.suffix();
+        if(suffix == "ev") {
+            loadEVFile(openPath);
+        } else if(suffix == "xev") {
+            loadXevFile(openPath);
+        } else RuntimeThrow("Unrecognized file extension " + suffix);
         mDocument.setPath(openPath);
         setFileChangedSinceSaving(false);
     } catch(const std::exception& e) {
@@ -1450,16 +1457,7 @@ void MainWindow::importImageSequence() {
 }
 
 void MainWindow::revert() {
-    const auto path = mDocument.fEvFile;
-    clearAll();
-    try {
-        loadEVFile(path);
-        mDocument.setPath(path);
-    } catch(const std::exception& e) {
-        gPrintExceptionCritical(e);
-    }
-    setFileChangedSinceSaving(false);
-    mDocument.actionFinished();
+    openFile(mDocument.fEvFile);
 }
 
 stdsptr<void> MainWindow::lock() {

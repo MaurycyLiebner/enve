@@ -25,13 +25,10 @@ void ZipFileLoader::setZipPath(const QString &path) {
     mFile.setZip(&mZip);
 }
 
-void ZipFileLoader::process(const QString &file, const bool text,
-                            const Processor &func) {
+void ZipFileLoader::process(const QString &file, const Processor &func) {
     if(!mZip.setCurrentFile(file))
         RuntimeThrow("No " + file + " found in " + mZip.getZipName());
-    QIODevice::OpenMode openMode = QIODevice::ReadOnly;
-    if(text) openMode |= QIODevice::Text;
-    if(!mFile.open(openMode))
+    if(!mFile.open(QIODevice::ReadOnly))
         RuntimeThrow("Could not open " + file + " from " + mZip.getZipName());
     try {
         func(&mFile);
@@ -40,4 +37,11 @@ void ZipFileLoader::process(const QString &file, const bool text,
         RuntimeThrow("Could not parse " + file + " from " + mZip.getZipName());
     }
     mFile.close();
+}
+
+void ZipFileLoader::processText(const QString& file, const TextProcessor& func) {
+    process(file, [&](QIODevice* const src) {
+        QTextStream stream(src);
+        func(stream);
+    });
 }

@@ -24,3 +24,8 @@ void CustomPathEffect::writeIdentifier(eWriteStream &dst) const {
     PathEffect::writeIdentifier(dst);
     getIdentifier().write(dst);
 }
+
+void CustomPathEffect::writeIdentifierXEV(QDomElement& ele) const {
+    PathEffect::writeIdentifierXEV(ele);
+    getIdentifier().writeXEV(ele);
+}

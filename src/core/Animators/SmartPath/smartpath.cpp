@@ -16,6 +16,8 @@
 
 #include "smartpath.h"
 
+#include "XML/xmlexporthelpers.h"
+
 SmartPath::SmartPath(const SkPath &path) {
     setPath(path);
 }
@@ -345,7 +347,7 @@ NodeList SmartPath::getAndClearLastDetached() {
 
 QString SmartPath::toXEV() const {
     QString result;
-    const QString blueprint = QStringLiteral("%1 %2 %3 %4 %5 %6");
+    const QString blueprint = QStringLiteral("%1 %2 %3 %4 %5 %6 %7");
     for(const auto& node : mNodesList) {
         if(!result.isEmpty()) result += ',';
         if(node->isDissolved()) {
@@ -365,12 +367,53 @@ QString SmartPath::toXEV() const {
             const QString c2y = node->getC0Enabled() ?
                                 QString::number(c2.y()) : "*";
 
+            const int ctrlMode = static_cast<int>(node->getCtrlsMode());
+
             result += blueprint.arg(c0x).arg(c0y).
                                 arg(p1.x()).arg(p1.y()).
-                                arg(c2x, c2y);
+                                arg(c2x, c2y).arg(ctrlMode);
         }
     }
     return result;
+}
+
+void SmartPath::loadXEV(const QStringRef& xev) {
+    ListOfNodes listOfNodes;
+
+    const auto nodes = xev.split(',', QString::SkipEmptyParts);
+    for(const auto& node : nodes) {
+        const auto values = node.split(' ', QString::SkipEmptyParts);
+        if(values.count() == 1) {
+            const qreal t = XmlExportHelpers::stringToDouble(values[0]);
+            listOfNodes.append(Node(t));
+        } else if(values.count() == 7) {
+            const qreal p1x = XmlExportHelpers::stringToDouble(values[2]);
+            const qreal p1y = XmlExportHelpers::stringToDouble(values[3]);
+
+            const bool c0xEnabled = values[0] != '*';
+            const bool c0yEnabled = values[1] != '*';
+            const qreal c0x = c0xEnabled ? XmlExportHelpers::stringToDouble(values[0]) : p1x;
+            const qreal c0y = c0yEnabled ? XmlExportHelpers::stringToDouble(values[1]) : p1y;
+
+            const bool c2xEnabled = values[4] != '*';
+            const bool c2yEnabled = values[5] != '*';
+            const qreal c2x = c2xEnabled ? XmlExportHelpers::stringToDouble(values[4]) : p1x;
+            const qreal c2y = c2yEnabled ? XmlExportHelpers::stringToDouble(values[5]) : p1y;
+
+            bool ok;
+            const int ctrlMode = values[6].toInt(&ok);
+            ok = ok && qBound(0, ctrlMode, 2) == ctrlMode;
+            if(!ok) RuntimeThrow("Invalid node control mode " + values[6].toString());
+
+            Node node({c0x, c0y}, {p1x, p1y}, {c2x, c2y});
+            node.setC0Enabled(c0xEnabled || c0yEnabled);
+            node.setC2Enabled(c2xEnabled || c2yEnabled);
+            node.assignCtrlsMode(static_cast<CtrlsMode>(ctrlMode));
+            listOfNodes.append(node);
+        } else RuntimeThrow("Invalid node values " + node.toString());
+    }
+
+    mNodesList = NodeList(std::move(listOfNodes));
 }
 
 bool SmartPath::isClockwise() const {

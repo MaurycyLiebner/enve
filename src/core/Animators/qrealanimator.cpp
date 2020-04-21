@@ -25,6 +25,7 @@
 #include "Segments/fitcurves.h"
 #include "svgexporter.h"
 #include "Properties/namedproperty.h"
+#include "XML/xmlexporthelpers.h"
 
 QrealAnimator::QrealAnimator(const qreal iniVal,
                              const qreal minVal,
@@ -812,6 +813,8 @@ QDomElement QrealAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
             if(!frames.isEmpty()) frames += ';';
             frames += blueprint.arg(fc0).arg(f).arg(fc2);
         }
+        result.setAttribute("values", values);
+        result.setAttribute("frames", frames);
     } else result.setAttribute("value", mCurrentBaseValue);
 
     if(hasExpression()) {
@@ -839,4 +842,59 @@ QDomElement QrealAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
     }
 
     return result;
+}
+
+void QrealAnimator::prp_readPropertyXEV(const QDomElement& ele) {
+    const auto values = ele.attribute("values");
+    if(!values.isEmpty()) {
+        const auto frames = ele.attribute("frames");
+        const auto keysValues = values.splitRef(';');
+        const auto keysFrames = frames.splitRef(';');
+        if(keysValues.count() != keysFrames.count())
+            RuntimeThrow("The values count does not match the frames count");
+        const int iMax = keysValues.count();
+        for(int i = 0; i < iMax; i++) {
+            const auto values = keysValues[i].split(' ');
+            if(frames.count() != 3) {
+                RuntimeThrow("Invalid values count " + values[i].toString());
+            }
+            const auto frames = keysFrames[i].split(' ');
+            if(frames.count() != 3) {
+                RuntimeThrow("Invalid frames count " + frames[i].toString());
+            }
+            const qreal value = XmlExportHelpers::stringToDouble(values[1]);
+            const int relFrame = XmlExportHelpers::stringToInt(frames[1]);
+            const auto key = enve::make_shared<QrealKey>(value, relFrame, this);
+
+            key->setC0Frame(XmlExportHelpers::stringToDouble(frames[0]));
+            key->setC1Frame(XmlExportHelpers::stringToDouble(frames[2]));
+            key->setC0Value(XmlExportHelpers::stringToDouble(values[0]));
+            key->setC1Value(XmlExportHelpers::stringToDouble(values[2]));
+
+            anim_appendKey(key);
+        }
+    } else {
+        const auto value = ele.attribute("value");
+        if(value.isEmpty()) RuntimeThrow("No values/frames and no value provided");
+        setCurrentBaseValue(XmlExportHelpers::stringToDouble(value));
+    }
+
+    const auto expression = ele.firstChildElement("Expression");
+    if(!expression.isNull()) {
+        const auto defsEle =  expression.firstChildElement("Definitions");
+        const QString definitions = defsEle.text();
+
+         const auto bindEle =  expression.firstChildElement("Bindings");
+         const QString bindings = bindEle.text();
+
+         const auto scriptEle =  expression.firstChildElement("Script");
+         const QString script = scriptEle.text();
+
+         SimpleTask::sScheduleContexted(this,
+         [this, bindings, definitions, script]() {
+             setExpression(Expression::sCreate(
+                               definitions, bindings, script, this,
+                               Expression::sQrealAnimatorTester));
+         });
+    }
 }

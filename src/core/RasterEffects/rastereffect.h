@@ -48,11 +48,13 @@ public:
     virtual bool forceMargin() const { return false; }
     virtual QMargins getMargin() const { return QMargins(); }
 
-    void writeIdentifier(eWriteStream& dst) const;
+    QMimeData *SWT_createMimeData() final;
 
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
+    QString prp_tagNameXEV() const { return "RasterEffect"; }
 
-    QMimeData *SWT_createMimeData() final;
+    void writeIdentifier(eWriteStream& dst) const;
+    void writeIdentifierXEV(QDomElement& ele) const;
 
     HardwareSupport instanceHwSupport() const {
         return mInstHwSupport;

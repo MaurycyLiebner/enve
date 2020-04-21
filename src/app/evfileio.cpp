@@ -137,7 +137,7 @@ void MainWindow::saveToFileXEV(const QString &path) {
         fileSaver.setIoDevice(&file);
         fileSaver.processText("mimetype", [](QTextStream& stream) {
             stream << "application/enve";
-        });
+        }, false);
 
         fileSaver.process("Thumbnails/thumbnail.png", [this](QIODevice* const dst) {
             const qreal scale = 256./width();
@@ -158,5 +158,20 @@ void MainWindow::saveToFileXEV(const QString &path) {
     file.close();
 
     BoundingBox::sClearWriteBoxes();
+    addRecentFile(path);
+}
+
+
+void MainWindow::loadXevFile(const QString &path) {
+    try {
+        ZipFileLoader fileLoader;
+        fileLoader.setZipPath(path);
+
+        mDocument.readXEV(fileLoader);
+    } catch(...) {
+        RuntimeThrow("Error while reading from file " + path);
+    }
+
+    BoundingBox::sClearReadBoxes();
     addRecentFile(path);
 }

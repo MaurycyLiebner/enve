@@ -115,7 +115,10 @@ public:
     bool shouldScheduleUpdate() { return isLayer(); }
 
     void saveSVG(SvgExporter& exp, DomEleTask* const eleTask) const;
+
     void writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path) const;
+    void readBoxOrSoundXEV(ZipFileLoader& fileLoader, const QString& path);
+    void readAllContainedXEV(ZipFileLoader& fileLoader, const QString& path);
 
     void queChildrenTasks();
     void queTasks();

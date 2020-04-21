@@ -30,3 +30,31 @@ void StaticComplexAnimator::prp_readProperty(eReadStream &src) {
     for(const auto& prop : children)
         prop->prp_readProperty(src);
 }
+
+void StaticComplexAnimator::prp_readPropertyXEV(const QDomElement& ele) {
+    const auto& children = ca_getChildren();
+    const auto childNodes = ele.childNodes();
+    const int count = childNodes.count();
+    for(int i = 0; i < count; i++) {
+        const auto node = childNodes.at(i);
+        if(!node.isElement()) continue;
+        const auto element = node.toElement();
+        const auto& prop = children.at(i);
+        prop->prp_readPropertyXEV(element);
+    }
+}
+
+void StaticComplexAnimator::writeChildPropertiesXEV(
+        QDomElement& prop, QDomDocument& doc) const {
+    const auto& children = ca_getChildren();
+    for(const auto& c : children) {
+        auto child = c->prp_writePropertyXEV(doc);
+        prop.appendChild(child);
+    }
+}
+
+QDomElement StaticComplexAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
+    auto result = doc.createElement(prp_tagNameXEV());
+    writeChildPropertiesXEV(result, doc);
+    return result;
+}

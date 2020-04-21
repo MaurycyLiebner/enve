@@ -20,6 +20,7 @@
 #include "staticcomplexanimator.h"
 
 #include "../zipfilesaver.h"
+#include "../zipfileloader.h"
 
 class ContainerBox;
 class Canvas;
@@ -52,6 +53,8 @@ public:
 
     virtual void writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
                                     const QString& path) const;
+    virtual void readBoxOrSoundXEV(ZipFileLoader& fileLoader,
+                                   const QString& path);
 
     TimelineMovable *anim_getTimelineMovable(
             const int relX, const int minViewedFrame,

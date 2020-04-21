@@ -40,6 +40,10 @@ void RasterEffect::writeIdentifier(eWriteStream &dst) const {
     dst.write(&mType, sizeof(RasterEffectType));
 }
 
+void RasterEffect::writeIdentifierXEV(QDomElement& ele) const {
+    ele.setAttribute("type", static_cast<int>(mType));
+}
+
 void RasterEffect::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     eEffect::prp_setupTreeViewMenu(menu);
     const PropertyMenu::PlainSelectedOp<RasterEffect> dOp =

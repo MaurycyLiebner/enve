@@ -528,7 +528,6 @@ QMatrix AdvancedTransformAnimator::getRelativeTransformAtFrame(const qreal relFr
     return matrix;
 }
 
-
 QDomElement AdvancedTransformAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
     auto result = doc.createElement("Transform");
 
@@ -551,6 +550,26 @@ QDomElement AdvancedTransformAnimator::prp_writePropertyXEV(QDomDocument& doc) c
     result.appendChild(opacity);
 
     return result;
+}
+
+void AdvancedTransformAnimator::prp_readPropertyXEV(const QDomElement& ele) {
+    const auto translation = ele.firstChildElement("Translation");
+    mPosAnimator->prp_readPropertyXEV(translation);
+
+    const auto scale = ele.firstChildElement("Scale");
+    mScaleAnimator->prp_readPropertyXEV(scale);
+
+    const auto rotation = ele.firstChildElement("Rotation");
+    mRotAnimator->prp_readPropertyXEV(rotation);
+
+    const auto pivot = ele.firstChildElement("Pivot");
+    mPivotAnimator->prp_readPropertyXEV(pivot);
+
+    const auto shear = ele.firstChildElement("Shear");
+    mShearAnimator->prp_readPropertyXEV(shear);
+
+    const auto opacity = ele.firstChildElement("Opacity");
+    mOpacityAnimator->prp_readPropertyXEV(opacity);
 }
 
 BoxTransformAnimator::BoxTransformAnimator() {

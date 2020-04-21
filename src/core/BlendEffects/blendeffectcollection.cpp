@@ -5,6 +5,7 @@
 
 #include "moveblendeffect.h"
 #include "targetedblendeffect.h"
+#include "XML/xmlexporthelpers.h"
 
 BlendEffectCollection::BlendEffectCollection() :
     BlendEffectCollectionBase("blend effects") {
@@ -91,9 +92,7 @@ void BlendEffectCollection::prp_readProperty(eReadStream &src) {
     SWT_setVisible(visible);
 }
 
-qsptr<BlendEffect> readIdCreateBlendEffect(eReadStream &src) {
-    BlendEffectType type;
-    src.read(&type, sizeof(BlendEffectType));
+qsptr<BlendEffect> createBlendEffectForType(const BlendEffectType type) {
     switch(type) {
         case(BlendEffectType::move):
             return enve::make_shared<MoveBlendEffect>();
@@ -104,6 +103,23 @@ qsptr<BlendEffect> readIdCreateBlendEffect(eReadStream &src) {
     }
 }
 
+qsptr<BlendEffect> readIdCreateBlendEffect(eReadStream &src) {
+    BlendEffectType type;
+    src.read(&type, sizeof(BlendEffectType));
+    return createBlendEffectForType(type);
+}
+
 void writeBlendEffectType(BlendEffect * const obj, eWriteStream &dst) {
     obj->writeIdentifier(dst);
+}
+
+qsptr<BlendEffect> readIdCreateBlendEffectXEV(const QDomElement& ele) {
+    const QString typeStr = ele.attribute("type");
+    const int typeInt = XmlExportHelpers::stringToInt(typeStr);
+    const auto type = static_cast<BlendEffectType>(typeInt);
+    return createBlendEffectForType(type);
+}
+
+void writeBlendEffectTypeXEV(BlendEffect* const obj, QDomElement& ele) {
+    obj->writeIdentifierXEV(ele);
 }

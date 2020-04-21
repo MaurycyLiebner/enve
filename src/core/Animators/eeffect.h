@@ -24,6 +24,8 @@ public:
     eEffect(const QString &name);
 
     virtual void writeIdentifier(eWriteStream& dst) const = 0;
+    virtual void writeIdentifierXEV(QDomElement& ele) const = 0;
+
     virtual bool skipZeroInfluence(const qreal relFrame) const {
         Q_UNUSED(relFrame)
         return true;

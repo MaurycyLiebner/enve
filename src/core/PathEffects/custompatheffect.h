@@ -26,6 +26,7 @@ public:
     virtual CustomIdentifier getIdentifier() const = 0;
 private:
     void writeIdentifier(eWriteStream& dst) const final;
+    void writeIdentifierXEV(QDomElement& ele) const final;
 };
 
 #endif // CUSTOMPATHEFFECT_H

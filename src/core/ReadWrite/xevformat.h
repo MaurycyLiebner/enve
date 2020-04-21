@@ -14,20 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CUSTOMRASTEREFFECT_H
-#define CUSTOMRASTEREFFECT_H
-#include "rastereffect.h"
-#include "../customidentifier.h"
+#ifndef XEVFORMAT_H
+#define XEVFORMAT_H
 
-class CORE_EXPORT CustomRasterEffect : public RasterEffect {
-protected:
-    CustomRasterEffect(const QString& name,
-                       const HardwareSupport hwSupport,
-                       const bool hwInterchangeable);
-public:
-    virtual CustomIdentifier getIdentifier() const = 0;
-private:
-    void writeIdentifier(eWriteStream &dst) const final;
-    void writeIdentifierXEV(QDomElement& ele) const final;};
+namespace XevFormat {
+    enum {
+        initial,
 
-#endif // CUSTOMRASTEREFFECT_H
+        nextVersion
+    };
+
+    const int version = nextVersion - 1;
+}
+
+#endif // XEVFORMAT_H

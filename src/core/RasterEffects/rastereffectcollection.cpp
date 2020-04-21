@@ -21,6 +21,7 @@
 #include "RasterEffects/rastereffectsinclude.h"
 #include "RasterEffects/customrastereffectcreator.h"
 #include "rastereffectmenucreator.h"
+#include "XML/xmlexporthelpers.h"
 
 RasterEffectCollection::RasterEffectCollection() :
     RasterEffectCollectionBase("raster effects") {
@@ -115,8 +116,8 @@ bool RasterEffectCollection::hasEffects() {
 }
 
 #include "GUI/dialogsinterface.h"
-qsptr<ShaderEffect> readIdCreateShaderEffect(eReadStream& src) {
-    const auto id = ShaderEffectCreator::sReadIdentifier(src);
+
+qsptr<ShaderEffect> createShaderEffect(const ShaderEffectCreator::Identifier id) {
     const auto best = ShaderEffectCreator::sGetBestCompatibleEffects(id);
     if(best.isEmpty()) RuntimeThrow("No compatible ShaderEffect found for " + id.fName);
     std::shared_ptr<ShaderEffectCreator> creator;
@@ -129,15 +130,23 @@ qsptr<ShaderEffect> readIdCreateShaderEffect(eReadStream& src) {
     RuntimeThrow("No compatible ShaderEffect found for " + id.fName);
 }
 
+qsptr<ShaderEffect> readIdCreateShaderEffect(eReadStream& src) {
+    const auto id = ShaderEffectCreator::sReadIdentifier(src);
+    return createShaderEffect(id);
+}
+
+qsptr<ShaderEffect> readIdCreateShaderEffectXEV(const QDomElement& ele) {
+    const auto id = ShaderEffectCreator::sReadIdentifierXEV(ele);
+    return createShaderEffect(id);
+}
+
 #include "customidentifier.h"
 #include "RasterEffects/customrastereffectcreator.h"
 #include "RasterEffects/blureffect.h"
 #include "RasterEffects/shadoweffect.h"
 #include "RasterEffects/motionblureffect.h"
 
-qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream &src) {
-    RasterEffectType type;
-    src.read(&type, sizeof(RasterEffectType));
+qsptr<RasterEffect> createRasterEffectForNonCustomType(const RasterEffectType type) {
     switch(type) {
         case(RasterEffectType::BLUR):
             return enve::make_shared<BlurEffect>();
@@ -145,18 +154,47 @@ qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream &src) {
             return enve::make_shared<ShadowEffect>();
         case(RasterEffectType::MOTION_BLUR):
             return enve::make_shared<MotionBlurEffect>();
-        case(RasterEffectType::CUSTOM): {
-            const auto id = CustomIdentifier::sRead(src);
-            const auto eff = CustomRasterEffectCreator::sCreateForIdentifier(id);
-            if(eff) return eff;
-            RuntimeThrow("Unrecogized CustomRasterEffect identifier " + id.toString());
-        } case(RasterEffectType::CUSTOM_SHADER):
-            return readIdCreateShaderEffect(src);
-        default: RuntimeThrow("Invalid RasterEffect type '" +
-                              QString::number(int(type)) + "'");
+        default: return nullptr;
     }
+}
+
+qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream &src) {
+    RasterEffectType type;
+    src.read(&type, sizeof(RasterEffectType));
+    auto result = createRasterEffectForNonCustomType(type);
+    if(result) return result;
+    if(type == RasterEffectType::CUSTOM) {
+        const auto id = CustomIdentifier::sRead(src);
+        const auto eff = CustomRasterEffectCreator::sCreateForIdentifier(id);
+        if(eff) return eff;
+        RuntimeThrow("Unrecogized CustomRasterEffect identifier " + id.toString());
+    } else if(type == RasterEffectType::CUSTOM_SHADER) {
+        return readIdCreateShaderEffect(src);
+    } else RuntimeThrow("Invalid RasterEffect type '" +
+                        QString::number(int(type)) + "'");
 }
 
 void writeRasterEffectType(RasterEffect * const obj, eWriteStream &dst) {
     obj->writeIdentifier(dst);
+}
+
+qsptr<RasterEffect> readIdCreateRasterEffectXEV(const QDomElement& ele) {
+    const int typeInt = XmlExportHelpers::stringToInt(ele.attribute("type"));
+    const RasterEffectType type = static_cast<RasterEffectType>(typeInt);
+
+    auto result = createRasterEffectForNonCustomType(type);
+    if(result) return result;
+    if(type == RasterEffectType::CUSTOM) {
+        const auto id = CustomIdentifier::sReadXEV(ele);
+        const auto eff = CustomRasterEffectCreator::sCreateForIdentifier(id);
+        if(eff) return eff;
+        RuntimeThrow("Unrecogized CustomRasterEffect identifier " + id.toString());
+    } else if(type == RasterEffectType::CUSTOM_SHADER) {
+        return readIdCreateShaderEffectXEV(ele);
+    } else RuntimeThrow("Invalid RasterEffect type '" +
+                        QString::number(int(type)) + "'");
+}
+
+void writeRasterEffectTypeXEV(RasterEffect* const obj, QDomElement& ele) {
+    obj->writeIdentifierXEV(ele);
 }

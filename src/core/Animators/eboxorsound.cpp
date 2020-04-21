@@ -19,6 +19,7 @@
 #include "canvas.h"
 #include "Timeline/durationrectangle.h"
 #include "Properties/emimedata.h"
+#include "XML/xmlexporthelpers.h"
 #include "Sound/esound.h"
 
 eBoxOrSound::eBoxOrSound(const QString &name) :
@@ -145,9 +146,20 @@ void eBoxOrSound::writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
                           [this](QTextStream& stream) {
         QDomDocument doc;
         auto props = doc.createElement("Object");
-        ca_writeChildPropertiesXEV(props, doc);
+        writeChildPropertiesXEV(props, doc);
         doc.appendChild(props);
         stream << doc.toString();
+    });
+}
+
+void eBoxOrSound::readBoxOrSoundXEV(ZipFileLoader& fileLoader,
+                                    const QString& path) {
+    fileLoader.process(path + "properties.xml",
+                       [&](QIODevice* const src) {
+        QDomDocument doc;
+        doc.setContent(src);
+        const auto obj = XmlExportHelpers::getOnlyElement(doc, "Object");
+        prp_readPropertyXEV(obj);
     });
 }
 

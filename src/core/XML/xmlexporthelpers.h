@@ -19,10 +19,19 @@
 
 #include "skia/skiaincludes.h"
 
+#include <QDomElement>
 #include <QString>
 
 namespace XmlExportHelpers {
+    SkBlendMode stringToBlendMode(const QString& compOpStr);
     QString blendModeToString(const SkBlendMode blendMode);
+
+    qreal stringToDouble(const QStringRef& string);
+    qreal stringToDouble(const QString& string);
+    int stringToInt(const QStringRef& string);
+    int stringToInt(const QString& string);
+
+    QDomElement getOnlyElement(const QDomNode& from, const QString& tagName);
 };
 
 #endif // XMLEXPORTHELPERS_H
