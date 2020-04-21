@@ -132,9 +132,9 @@ void MainWindow::saveToFileXEV(const QString &path) {
 
     if(!file.open(QIODevice::WriteOnly))
         RuntimeThrow("Could not open file for writing " + path + ".");
-    ZipFileSaver fileSaver;
-    fileSaver.setIoDevice(&file);
     try {
+        ZipFileSaver fileSaver;
+        fileSaver.setIoDevice(&file);
         fileSaver.processText("mimetype", [](QTextStream& stream) {
             stream << "application/enve";
         });
