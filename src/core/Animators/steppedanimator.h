@@ -16,6 +16,7 @@
 
 #ifndef STEPPEDANIMATOR_H
 #define STEPPEDANIMATOR_H
+
 #include "animatort.h"
 
 template <typename T>

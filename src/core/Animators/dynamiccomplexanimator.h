@@ -307,19 +307,21 @@ public:
         }
     }
 
-    QDomElement prp_writePropertyXEV(QDomDocument& doc) const override {
-        auto result = doc.createElement(this->prp_tagNameXEV());
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const override {
+        auto result = exp.createElement(this->prp_tagNameXEV());
         const auto& children = this->ca_getChildren();
+        int id = 0;
         for(const auto& c : children) {
             const auto TProp = static_cast<T*>(c.get());
-            auto child = c->prp_writePropertyXEV(doc);
+            const auto path = QString::number(id++) + "/";
+            auto child = c->prp_writePropertyXEV(exp.withAssetsPath(path));
             TWriteTypeXEV(TProp, child);
             result.appendChild(child);
         }
         return result;
     }
 
-    void prp_readPropertyXEV(const QDomElement& ele) override {
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) override {
         const auto childNodes = ele.childNodes();
         const int count = childNodes.count();
         for(int i = 0; i < count; i++) {
@@ -328,7 +330,8 @@ public:
             const auto element = node.toElement();
             try {
                 const auto prop = TReadTypeAndCreateXEV(element);
-                prop->prp_readPropertyXEV(element);
+                const auto path = QString::number(i) + "/";
+                prop->prp_readPropertyXEV(element, imp.withAssetsPath(path));
                 this->addChild(prop);
             } catch(const std::exception& e) {
                 gPrintExceptionCritical(e);

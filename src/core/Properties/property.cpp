@@ -69,8 +69,8 @@ void Property::prp_afterChangedAbsRange(const FrameRange &range,
 }
 
 QDomElement Property::prp_writeNamedPropertyXEV(
-        const QString& name, QDomDocument& doc) const {
-    auto prop = prp_writePropertyXEV(doc);
+        const QString& name, const XevExporter& exp) const {
+    auto prop = prp_writePropertyXEV(exp);
     prop.setTagName(name);
     return prop;
 }

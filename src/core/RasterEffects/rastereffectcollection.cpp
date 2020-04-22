@@ -21,7 +21,6 @@
 #include "RasterEffects/rastereffectsinclude.h"
 #include "RasterEffects/customrastereffectcreator.h"
 #include "rastereffectmenucreator.h"
-#include "XML/xmlexporthelpers.h"
 
 RasterEffectCollection::RasterEffectCollection() :
     RasterEffectCollectionBase("raster effects") {

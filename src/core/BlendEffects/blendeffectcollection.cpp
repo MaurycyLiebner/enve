@@ -5,12 +5,9 @@
 
 #include "moveblendeffect.h"
 #include "targetedblendeffect.h"
-#include "XML/xmlexporthelpers.h"
 
 BlendEffectCollection::BlendEffectCollection() :
-    BlendEffectCollectionBase("blend effects") {
-
-}
+    BlendEffectCollectionBase("blend effects") {}
 
 void BlendEffectCollection::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<BlendEffectCollection>()) return;

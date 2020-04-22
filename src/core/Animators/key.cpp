@@ -133,8 +133,8 @@ qreal Key::absFrameToRelFrameF(const qreal absFrame) const {
 }
 
 void Key::moveToRelFrame(const int frame) {
-    if(!mParentAnimator) return;
-    mParentAnimator->anim_moveKeyToRelFrame(this, frame);
+    if(!mParentAnimator) setRelFrame(frame);
+    else mParentAnimator->anim_moveKeyToRelFrame(this, frame);
 }
 
 void Key::moveToRelFrameAction(const int frame) {

@@ -14,4 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "interpolatedanimator.h"
+#include "xevimporter.h"
+
+#include "../zipfileloader.h"
+
+XevImporter::XevImporter(ZipFileLoader& fileLoader,
+                         const QString& path,
+                         const QString& assetsPath) :
+    mFileLoader(fileLoader), mPath(path),
+    mAssetsPath(assetsPath) {}
+
+XevImporter XevImporter::withAssetsPath(const QString& path) const {
+    return XevImporter(mFileLoader, mPath, mAssetsPath + path);
+}
+
+void XevImporter::processAsset(const QString& file, const Processor& func) const {
+    mFileLoader.process(mPath + "assets/" + mAssetsPath + file, func);
+}

@@ -19,7 +19,6 @@
 #include "Boxes/pathbox.h"
 #include "Boxes/containerbox.h"
 #include "custompatheffectcreator.h"
-#include "XML/xmlexporthelpers.h"
 #include <QDebug>
 
 PathEffectCollection::PathEffectCollection() :

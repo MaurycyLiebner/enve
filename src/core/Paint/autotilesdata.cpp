@@ -1097,7 +1097,7 @@ void AutoTilesData::moveY(const int dy, const bool extend) {
 void AutoTilesData::move(const int dx, const int dy) {
     moveX(dx, true);
     moveY(dy, true);
-    autoCrop();
+    if(dx % TILE_SIZE != 0 || dy % TILE_SIZE != 0) autoCrop();
 }
 
 stdsptr<Tile> AutoTilesData::requestTile(const int tx, const int ty) {

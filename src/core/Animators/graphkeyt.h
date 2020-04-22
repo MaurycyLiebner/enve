@@ -23,14 +23,7 @@ template <typename T>
 class GraphKeyT : public BasedKeyT<GraphKey, T> {
     e_OBJECT
 protected:
-    GraphKeyT(const T &value, const int relFrame,
-              Animator * const parentAnimator) :
-        BasedKeyT<GraphKey, T>(value, relFrame, parentAnimator) {}
-    GraphKeyT(const int relFrame,
-              Animator * const parentAnimator) :
-        BasedKeyT<GraphKey, T>(relFrame, parentAnimator) {}
-    GraphKeyT(Animator * const parentAnimator) :
-        BasedKeyT<GraphKey, T>(parentAnimator) {}
+    using BasedKeyT<GraphKey, T>::BasedKeyT;
 };
 
 #endif // GRAPHKEYT_H

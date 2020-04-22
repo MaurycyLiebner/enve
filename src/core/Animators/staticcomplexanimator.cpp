@@ -31,7 +31,7 @@ void StaticComplexAnimator::prp_readProperty(eReadStream &src) {
         prop->prp_readProperty(src);
 }
 
-void StaticComplexAnimator::prp_readPropertyXEV(const QDomElement& ele) {
+void StaticComplexAnimator::prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) {
     const auto& children = ca_getChildren();
     const auto childNodes = ele.childNodes();
     const int count = childNodes.count();
@@ -40,21 +40,24 @@ void StaticComplexAnimator::prp_readPropertyXEV(const QDomElement& ele) {
         if(!node.isElement()) continue;
         const auto element = node.toElement();
         const auto& prop = children.at(i);
-        prop->prp_readPropertyXEV(element);
+        const auto path = QString::number(i) + "/";
+        prop->prp_readPropertyXEV(element, imp.withAssetsPath(path));
     }
 }
 
 void StaticComplexAnimator::writeChildPropertiesXEV(
-        QDomElement& prop, QDomDocument& doc) const {
+        QDomElement& prop, const XevExporter& exp) const {
     const auto& children = ca_getChildren();
+    int id = 0;
     for(const auto& c : children) {
-        auto child = c->prp_writePropertyXEV(doc);
+        const auto path = QString::number(id++) + "/";
+        auto child = c->prp_writePropertyXEV(exp.withAssetsPath(path));
         prop.appendChild(child);
     }
 }
 
-QDomElement StaticComplexAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
-    auto result = doc.createElement(prp_tagNameXEV());
-    writeChildPropertiesXEV(result, doc);
+QDomElement StaticComplexAnimator::prp_writePropertyXEV(const XevExporter& exp) const {
+    auto result = exp.createElement(prp_tagNameXEV());
+    writeChildPropertiesXEV(result, exp);
     return result;
 }

@@ -64,6 +64,11 @@ protected:
 
     bool resultUpToDate() const { return mResultUpToDate; }
     void setResultUpToDate(const bool upToDate) { mResultUpToDate = upToDate; }
+
+    using StringToValue = std::function<void(T&, QStringRef)>;
+    void readValuesXEV(const QDomElement& ele, const StringToValue& strToVal);
+    using ValueToString = std::function<QString(const T&)>;
+    void writeValuesXEV(QDomElement& ele, const ValueToString& valToStr) const;
 private:
     void updateBaseValue();
     void deepCopyValue(const qreal relFrame,
@@ -198,6 +203,71 @@ void InterOptimalAnimatorT<T, K>::prp_readProperty(eReadStream& src) {
     prp_afterWholeInfluenceRangeChanged();
 }
 
+template<typename T, typename K>
+void InterOptimalAnimatorT<T, K>::readValuesXEV(
+        const QDomElement& ele, const StringToValue& strToVal) {
+    const bool hasValues = ele.hasAttribute("values");
+    const bool hasFrames = ele.hasAttribute("frames");
+    const bool hasKeys = hasValues && hasFrames;
+    if(hasKeys) {
+        const QString valueStrs = ele.attribute("values");
+        const QString frameStrs = ele.attribute("frames");
+
+        const auto values = valueStrs.splitRef(';');
+        const auto framess = frameStrs.splitRef(';');
+        if(values.count() != framess.count())
+            RuntimeThrow("The values count does not match the frames count");
+        const int iMax = values.count();
+        for(int i = 0; i < iMax; i++) {
+            const auto& value = values[i];
+            const auto frames = framess[i].split(' ');
+            if(frames.count() != 3) {
+                RuntimeThrow("Invalid frames count " + framess[i].toString());
+            }
+
+            const int frame = XmlExportHelpers::stringToInt(frames[1]);
+            const auto key = enve::make_shared<K>(frame, this);
+            auto& keyValue = key->getValue();
+            strToVal(keyValue, value);
+            key->setC0Frame(XmlExportHelpers::stringToDouble(frames[0]));
+            key->setC1Frame(XmlExportHelpers::stringToDouble(frames[2]));
+            anim_appendKey(key);
+        }
+    } else if(ele.hasAttribute("value")) {
+        const QString value = ele.attribute("value");
+        auto& baseValue = this->baseValue();
+        strToVal(baseValue, &value);
+    } else RuntimeThrow("No values/frames and no value provided");
+
+    prp_afterWholeInfluenceRangeChanged();
+}
+
+template<typename T, typename K>
+void InterOptimalAnimatorT<T, K>::writeValuesXEV(
+        QDomElement& ele, const ValueToString& valToStr) const {
+    if(anim_hasKeys()) {
+        QString values;
+        QString frames;
+        const QString blueprint = QStringLiteral("%1 %2 %3");
+        const auto& keys = anim_getKeys();
+        for(const auto &key : keys) {
+            const auto smKey = static_cast<K*>(key);
+            const QString v = valToStr(smKey->getValue());
+
+            const qreal fc0 = smKey->getC0Frame();
+            const int f = smKey->getRelFrame();
+            const qreal fc2 = smKey->getC1Frame();
+
+            if(!values.isEmpty()) values += ';';
+            values += v;
+            if(!frames.isEmpty()) frames += ';';
+            frames += blueprint.arg(fc0).arg(f).arg(fc2);
+        }
+        ele.setAttribute("values", values);
+        ele.setAttribute("frames", frames);
+    } else ele.setAttribute("value", valToStr(baseValue()));
+}
+
 template <typename T, typename K>
 void InterOptimalAnimatorT<T, K>::prp_writeProperty(eWriteStream &dst) const {
     anim_writeKeys(dst);
@@ -211,7 +281,7 @@ void InterOptimalAnimatorT<T, K>::anim_setAbsFrame(const int frame) {
     const int lastRelFrame = anim_getCurrentRelFrame();
     Animator::anim_setAbsFrame(frame);
     const bool diff = prp_differencesBetweenRelFrames(
-                anim_getCurrentRelFrame(), lastRelFrame);
+                          anim_getCurrentRelFrame(), lastRelFrame);
     if(diff) {
         updateBaseValue();
         prp_afterChangedCurrent(UpdateReason::frameChange);
@@ -222,7 +292,7 @@ template <typename T, typename K>
 void InterOptimalAnimatorT<T, K>::anim_addKeyAtRelFrame(const int relFrame) {
     if(anim_getKeyAtRelFrame(relFrame)) return;
     const auto newKey = enve::make_shared<K>(this);
-    newKey->setRelFrame(relFrame);
+    newKey->moveToRelFrame(relFrame);
     deepCopyValue(relFrame, newKey->getValue());
     graph_adjustCtrlsForKeyAdd(newKey.get());
     anim_appendKeyAction(newKey);

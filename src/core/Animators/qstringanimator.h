@@ -27,6 +27,9 @@ protected:
 public:
     void saveSVG(SvgExporter& exp,
                  QDomElement& parent) const;
+
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 };
 
 #endif // QSTRINGANIMATOR_H

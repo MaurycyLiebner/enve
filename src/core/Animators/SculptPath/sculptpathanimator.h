@@ -32,6 +32,9 @@ public:
                                 const float invScale,
                                 const bool ctrlPressed);
 
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
+
     void sculpt(const SculptTarget target,
                 const SculptMode mode,
                 const SculptBrush &brush);

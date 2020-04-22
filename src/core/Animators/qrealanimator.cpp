@@ -25,7 +25,6 @@
 #include "Segments/fitcurves.h"
 #include "svgexporter.h"
 #include "Properties/namedproperty.h"
-#include "XML/xmlexporthelpers.h"
 
 QrealAnimator::QrealAnimator(const qreal iniVal,
                              const qreal minVal,
@@ -790,8 +789,8 @@ void QrealAnimator::saveQrealSVG(SvgExporter& exp,
     }
 }
 
-QDomElement QrealAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
-    auto result = doc.createElement("Float");
+QDomElement QrealAnimator::prp_writePropertyXEV(const XevExporter& exp) const {
+    auto result = exp.createElement("Float");
 
     if(anim_hasKeys()) {
         QString values;
@@ -818,23 +817,23 @@ QDomElement QrealAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
     } else result.setAttribute("value", mCurrentBaseValue);
 
     if(hasExpression()) {
-        auto expression = doc.createElement("Expression");
+        auto expression = exp.createElement("Expression");
 
         const auto definitions = mExpression->definitionsString();
-        const auto defsNode = doc.createTextNode(definitions);
-        auto defsEle = doc.createElement("Definitions");
+        const auto defsNode = exp.createTextNode(definitions);
+        auto defsEle = exp.createElement("Definitions");
         defsEle.appendChild(defsNode);
         expression.appendChild(defsEle);
 
         const auto bindings = mExpression->bindingsString();
-        const auto bindNode = doc.createTextNode(bindings);
-        auto bindEle = doc.createElement("Bindings");
+        const auto bindNode = exp.createTextNode(bindings);
+        auto bindEle = exp.createElement("Bindings");
         bindEle.appendChild(bindNode);
         expression.appendChild(bindEle);
 
         const auto script = mExpression->scriptString();
-        const auto scriptNode = doc.createTextNode(script);
-        auto scriptEle = doc.createElement("Script");
+        const auto scriptNode = exp.createTextNode(script);
+        auto scriptEle = exp.createElement("Script");
         scriptEle.appendChild(scriptNode);
         expression.appendChild(scriptEle);
 
@@ -844,7 +843,9 @@ QDomElement QrealAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
     return result;
 }
 
-void QrealAnimator::prp_readPropertyXEV(const QDomElement& ele) {
+void QrealAnimator::prp_readPropertyXEV(
+        const QDomElement& ele, const XevImporter& imp) {
+    Q_UNUSED(imp)
     const auto values = ele.attribute("values");
     if(!values.isEmpty()) {
         const auto frames = ele.attribute("frames");

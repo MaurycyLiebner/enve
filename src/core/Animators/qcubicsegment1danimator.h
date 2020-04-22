@@ -1,4 +1,4 @@
-// enve - 2D animations software
+﻿// enve - 2D animations software
 // Copyright (C) 2016-2020 Maurycy Liebner
 
 // This program is free software: you can redistribute it and/or modify
@@ -30,6 +30,9 @@ protected:
     void afterValueChanged() {
         emit currentValueChanged(mCurrentValue);
     }
+
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 signals:
     void currentValueChanged(qCubicSegment1D);
 };

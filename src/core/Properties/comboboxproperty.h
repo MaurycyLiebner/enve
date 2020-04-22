@@ -29,6 +29,9 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
+
     const QStringList &getValueNames() { return mValueNames; }
     QString getCurrentValueName();
     int getCurrentValue() { return mCurrentValue; }

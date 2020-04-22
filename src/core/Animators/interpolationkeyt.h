@@ -22,13 +22,7 @@ template <typename T>
 class InterpolationKeyT : public GraphKeyT<T> {
     e_OBJECT
 protected:
-    InterpolationKeyT(const T &value, const int frame,
-                      Animator * const parentAnimator) :
-        GraphKeyT<T>(value, frame, parentAnimator) {}
-    InterpolationKeyT(const int frame, Animator * const parentAnimator) :
-        GraphKeyT<T>(frame, parentAnimator) {}
-    InterpolationKeyT(Animator * const parentAnimator) :
-        GraphKeyT<T>(parentAnimator) {}
+    using GraphKeyT<T>::GraphKeyT;
 public:
     qreal getValueForGraph() const {
         return this->mRelFrame;
@@ -37,7 +31,7 @@ public:
     void setValueForGraph(const qreal value) {
         Q_UNUSED(value)
     }
-
+protected:
     void setRelFrame(const int frame) {
         if(frame == this->mRelFrame) return;
         const int dFrame = frame - this->mRelFrame;

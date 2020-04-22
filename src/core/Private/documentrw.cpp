@@ -116,9 +116,7 @@ void Document::writeDoxumentXEV(QDomDocument& doc) const {
 
     auto bBrushes = doc.createElement("BrushBookmarks");
     for(const auto &b : fBrushes) {
-        auto brush = doc.createElement("Brush");
-        brush.setAttribute("collection", b->getCollectionName());
-        brush.setAttribute("name", b->getBrushName());
+        const auto brush = XevExportHelpers::brushToElement(b, doc);
         bBrushes.appendChild(brush);
     }
     document.appendChild(bBrushes);
@@ -158,12 +156,12 @@ void Document::writeXEV(ZipFileSaver& fileSaver) const {
 
 void Document::readDoxumentXEV(const QDomDocument& doc,
                                QList<SceneSettingsXEV>& sceneSetts) {
-    const auto document = XmlExportHelpers::getOnlyElement(doc, "Document");
+    const auto document = doc.firstChildElement("Document");
     const QString versionStr = document.attribute("format-version", "");
     if(versionStr.isEmpty()) RuntimeThrow("No format version specified");
 //    const int version = XmlExportHelpers::stringToInt(versionStr);
 
-    auto bColors = XmlExportHelpers::getOnlyElement(document, "ColorBookmarks");
+    auto bColors = document.firstChildElement("ColorBookmarks");
     const auto colors = bColors.elementsByTagName("Color");
     const int nColors = colors.count();
     for(int i = 0; i < nColors; i++) {
@@ -175,20 +173,18 @@ void Document::readDoxumentXEV(const QDomDocument& doc,
         fColors << QColor(name);
     }
 
-    auto bBrushes = XmlExportHelpers::getOnlyElement(document, "BrushBookmarks");
+    auto bBrushes = document.firstChildElement("BrushBookmarks");
     const auto brushes = bBrushes.elementsByTagName("Brush");
     const int nBrushes = brushes.count();
     for(int i = 0; i < nBrushes; i++) {
         const auto brush = brushes.at(i);
         if(!brush.isElement()) continue;
         const auto brushEle = brush.toElement();
-        const QString coll = brushEle.attribute("collection");
-        const QString name = brushEle.attribute("name");
-        const auto brushPtr = BrushCollectionData::sGetBrush(coll, name);
+        const auto brushPtr = XevExportHelpers::brushFromElement(brushEle);
         if(brushPtr) fBrushes.append(brushPtr);
     }
 
-    auto scenesE = XmlExportHelpers::getOnlyElement(document, "Scenes");
+    auto scenesE = document.firstChildElement("Scenes");
     const auto scenes = scenesE.elementsByTagName("Scene");
     const int nScenes = scenes.count();
     for(int i = 0; i < nScenes; i++) {
@@ -216,7 +212,7 @@ void Document::readScenesXEV(ZipFileLoader& fileLoader,
         newScene->setCanvasSize(sett.fWidth, sett.fHeight);
         newScene->setFps(sett.fFps);
         const QString path = "scenes/" + QString::number(id++) + "/";
-        newScene->readAllContainedXEV(fileLoader, path);
+        newScene->readBoxOrSoundXEV(fileLoader, path);
     }
 }
 

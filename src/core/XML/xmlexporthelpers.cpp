@@ -16,6 +16,8 @@
 
 #include "xmlexporthelpers.h"
 
+#include "Paint/simplebrushwrapper.h"
+#include "Paint/brushescontext.h"
 #include "exceptions.h"
 
 SkBlendMode XmlExportHelpers::stringToBlendMode(const QString& compOpStr) {
@@ -111,15 +113,16 @@ int XmlExportHelpers::stringToInt(const QString& string) {
     return stringToInt(&string);
 }
 
-QDomElement XmlExportHelpers::getOnlyElement(
-        const QDomNode& from, const QString& tagName) {
-    const auto eles = from.childNodes();
-    const int count = eles.count();
-    for(int i = 0; i < count; i++) {
-        const auto node = eles.at(i);
-        if(!node.isElement()) continue;
-        const auto ele = node.toElement();
-        if(ele.tagName() == tagName) return ele;
-    }
-    return QDomElement();
+QDomElement XevExportHelpers::brushToElement(
+        SimpleBrushWrapper* const brush, QDomDocument& doc) {
+    auto ele = doc.createElement("Brush");
+    ele.setAttribute("collection", brush ? brush->getCollectionName() : "");
+    ele.setAttribute("name", brush ? brush->getBrushName() : "");
+    return ele;
+}
+
+SimpleBrushWrapper* XevExportHelpers::brushFromElement(const QDomElement& ele) {
+    const QString coll = ele.attribute("collection");
+    const QString name = ele.attribute("name");
+    return BrushCollectionData::sGetBrush(coll, name);
 }

@@ -19,7 +19,6 @@
 #include "smartpathcollection.h"
 #include "Private/esettings.h"
 #include "MovablePoints/pathpointshandler.h"
-#include "XML/xmlexporthelpers.h"
 
 SmartPathAnimator::SmartPathAnimator() :
     InterOptimalAnimatorT<SmartPath>("path") {
@@ -110,79 +109,30 @@ void SmartPathAnimator::prp_writeProperty(eWriteStream &dst) const {
     dst << prp_getName();
 }
 
-void SmartPathAnimator::prp_readPropertyXEV(const QDomElement& ele) {
+void SmartPathAnimator::prp_readPropertyXEV(
+        const QDomElement& ele, const XevImporter& imp) {
+    Q_UNUSED(imp)
     const bool closed = ele.attribute("closed", "true") == "true";
-
-    const bool hasValues = ele.hasAttribute("values");
-    const bool hasFrames = ele.hasAttribute("frames");
-    const bool hasKeys = hasValues && hasFrames;
-    if(hasKeys) {
-        const QString valueStrs = ele.attribute("values");
-        const QString frameStrs = ele.attribute("frames");
-
-        const auto values = valueStrs.splitRef(';');
-        const auto framess = frameStrs.splitRef(';');
-        if(values.count() != framess.count())
-            RuntimeThrow("The values count does not match the frames count");
-        const int iMax = values.count();
-        for(int i = 0; i < iMax; i++) {
-            const auto& value = values[i];
-            const auto frames = framess[i].split(' ');
-            if(frames.count() != 3) {
-                RuntimeThrow("Invalid frames count " + framess[i].toString());
-            }
-
-            const auto key = enve::make_shared<SmartPathKey>(this);
-            auto& keyValue = key->getValue();
-            keyValue.loadXEV(value);
-            keyValue.setClosed(closed);
-            key->setC0Frame(XmlExportHelpers::stringToDouble(frames[0]));
-            key->setRelFrame(XmlExportHelpers::stringToInt(frames[1]));
-            key->setC1Frame(XmlExportHelpers::stringToDouble(frames[2]));
-            anim_appendKey(key);
-        }
-    } else if(ele.hasAttribute("value")) {
-        const QString value = ele.attribute("value");
-        auto& baseValue = this->baseValue();
-        baseValue.loadXEV(QStringRef(&value));
-        baseValue.setClosed(closed);
-    } else RuntimeThrow("No values/frames and no value provided");
-
     prp_setName(ele.attribute("name", "path"));
     const QString modeStr = ele.attribute("mode", "0");
     const int modeInt = XmlExportHelpers::stringToInt(modeStr);
     mMode = static_cast<Mode>(modeInt);
 
-    prp_afterWholeInfluenceRangeChanged();
+    readValuesXEV(ele, [closed](SmartPath& path, const QStringRef& str) {
+        path.loadXEV(str);
+        path.setClosed(closed);
+    });
 }
 
-QDomElement SmartPathAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
-    auto result = doc.createElement("Path");
+QDomElement SmartPathAnimator::prp_writePropertyXEV(const XevExporter& exp) const {
+    auto result = exp.createElement("Path");
     result.setAttribute("closed", isClosed() ? "true" : "false");
-    if(anim_hasKeys()) {
-        QString values;
-        QString frames;
-        const QString blueprint = QStringLiteral("%1 %2 %3");
-        const auto& keys = anim_getKeys();
-        for(const auto &key : keys) {
-            const auto smKey = static_cast<SmartPathKey*>(key);
-            const QString v = smKey->getValue().toXEV();
-
-            const qreal fc0 = smKey->getC0Frame();
-            const int f = smKey->getRelFrame();
-            const qreal fc2 = smKey->getC1Frame();
-
-            if(!values.isEmpty()) values += ';';
-            values += v;
-            if(!frames.isEmpty()) frames += ';';
-            frames += blueprint.arg(fc0).arg(f).arg(fc2);
-        }
-        result.setAttribute("values", values);
-        result.setAttribute("frames", frames);
-    } else result.setAttribute("value", baseValue().toXEV());
-
     result.setAttribute("name", prp_getName());
     result.setAttribute("mode", int(mMode));
+
+    writeValuesXEV(result, [](const SmartPath& path) {
+        return path.toXEV();
+    });
 
     return result;
 }

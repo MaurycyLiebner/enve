@@ -18,6 +18,7 @@
 #include "Segments/cubiclist.h"
 #include "ReadWrite/ereadstream.h"
 #include "ReadWrite/ewritestream.h"
+#include "XML/xmlexporthelpers.h"
 #include <limits>
 
 SculptPath::SculptPath() {}
@@ -215,6 +216,68 @@ void SculptPath::write(eWriteStream &dst) const {
         dst.write(node.get(), sizeof(SculptNode));
     }
     dst << mBoundingRect;
+}
+
+QString SculptPath::toXEV() const {
+    QString result = QString("%1 %2 %3 %4").arg(mBoundingRect.x()).
+                                            arg(mBoundingRect.y()).
+                                            arg(mBoundingRect.width()).
+                                            arg(mBoundingRect.height());
+    const QString blueprint = QStringLiteral("%1 %2 %3 %4 %5 %6 %7 %8");
+    for(const auto& node : mNodes) {
+        result += ',';
+
+        const qreal t = node->t(); // 0
+        const QPointF pos = node->pos(); // 1 2
+        const qreal width = node->width(); // 3
+        const qreal pressure = node->pressure(); // 4
+        const qreal spacing = node->spacing(); // 5
+        const qreal time = node->time(); // 6
+        const QColor& color = node->color(); // 7
+
+        result += blueprint.arg(t).arg(pos.x()).arg(pos.y()).
+                            arg(width).arg(pressure).arg(spacing).
+                            arg(time).arg(color.name());
+    }
+    return result;
+}
+
+void SculptPath::loadXEV(const QStringRef& xev) {
+    auto nodes = xev.split(',', QString::SkipEmptyParts);
+    if(nodes.isEmpty()) RuntimeThrow("Missing node values");
+    const auto bRectStr = nodes.takeFirst();
+    const auto bRectValStrs = bRectStr.split(' ', QString::SkipEmptyParts);
+    mBoundingRect = QRectF(XmlExportHelpers::stringToDouble(bRectValStrs[0]),
+                           XmlExportHelpers::stringToDouble(bRectValStrs[1]),
+                           XmlExportHelpers::stringToDouble(bRectValStrs[2]),
+                           XmlExportHelpers::stringToDouble(bRectValStrs[3]));
+
+    for(const auto& node : nodes) {
+        const auto values = node.split(' ', QString::SkipEmptyParts);
+        if(values.count() == 8) {
+            const auto tStr = values[0]; // 0
+            const auto xStr = values[1]; // 1
+            const auto yStr = values[2]; // 2
+            const auto widthStr = values[3]; // 3
+            const auto pressureStr = values[4]; // 4
+            const auto spacingStr = values[5]; // 5
+            const auto timeStr = values[6]; // 6
+            const auto colorStr = values[7]; // 7
+
+            const qreal t = XmlExportHelpers::stringToDouble(tStr);
+            const QPointF pos = {XmlExportHelpers::stringToDouble(xStr),
+                                 XmlExportHelpers::stringToDouble(yStr)};
+            const qreal width = XmlExportHelpers::stringToDouble(widthStr);
+            const qreal pressure = XmlExportHelpers::stringToDouble(pressureStr);
+            const qreal spacing = XmlExportHelpers::stringToDouble(spacingStr);
+            const qreal time = XmlExportHelpers::stringToDouble(timeStr);
+            const QColor color(colorStr);
+
+            const auto node = new SculptNode(t, pos, width, pressure,
+                                             spacing, time, color);
+            mNodes << stdsptr<SculptNode>(node);
+        } else RuntimeThrow("Invalid node values " + node.toString());
+    }
 }
 
 void SculptPath::sculpt(const SculptTarget target,

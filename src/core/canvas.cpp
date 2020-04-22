@@ -988,12 +988,13 @@ void Canvas::writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
                                  const QString& path) const {
     ContainerBox::writeBoxOrSoundXEV(fileSaver, path);
     fileSaver.processText(path + "gradients.xml",
-                          [this](QTextStream& stream) {
+                          [&](QTextStream& stream) {
         QDomDocument doc;
         auto gradients = doc.createElement("Gradients");
         int id = 0;
+        const XevExporter exp(doc, fileSaver, path);
         for(const auto &grad : mGradients) {
-            auto gradient = grad->prp_writeNamedPropertyXEV("Gradient", doc);
+            auto gradient = grad->prp_writeNamedPropertyXEV("Gradient", exp);
             gradient.setAttribute("id", id++);
             gradients.appendChild(gradient);
         }

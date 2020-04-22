@@ -109,7 +109,7 @@ public:
                          const qreal multiplier,
                          const bool transform = false,
                          const QString& type = "") const;
-    QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 protected:
     qsptr<QrealAnimator> mXAnimator;
     qsptr<QrealAnimator> mYAnimator;

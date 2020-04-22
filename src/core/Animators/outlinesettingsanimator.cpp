@@ -42,10 +42,10 @@ void OutlineSettingsAnimator::prp_readProperty(eReadStream& src) {
     src.read(&mOutlineCompositionMode, sizeof(QPainter::CompositionMode));
 }
 
-QDomElement OutlineSettingsAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
-    auto props = PaintSettingsAnimator::prp_writePropertyXEV(doc);
+QDomElement OutlineSettingsAnimator::prp_writePropertyXEV(const XevExporter& exp) const {
+    auto props = PaintSettingsAnimator::prp_writePropertyXEV(exp);
 
-    const auto lineWidth = mLineWidth->prp_writeNamedPropertyXEV("Width", doc);
+    const auto lineWidth = mLineWidth->prp_writeNamedPropertyXEV("Width", exp);
     props.appendChild(lineWidth);
 
     switch(mCapStyle) {
@@ -69,11 +69,12 @@ QDomElement OutlineSettingsAnimator::prp_writePropertyXEV(QDomDocument& doc) con
     return props;
 }
 
-void OutlineSettingsAnimator::prp_readPropertyXEV(const QDomElement& ele) {
-    PaintSettingsAnimator::prp_readPropertyXEV(ele);
+void OutlineSettingsAnimator::prp_readPropertyXEV(const QDomElement& ele,
+                                                  const XevImporter& imp) {
+    PaintSettingsAnimator::prp_readPropertyXEV(ele, imp);
 
     const auto lineWidth = ele.firstChildElement("Width");
-    mLineWidth->prp_readPropertyXEV(lineWidth);
+    mLineWidth->prp_readPropertyXEV(lineWidth, imp);
 
     const auto capStyle = ele.attribute("stroke-linecap");
     if(capStyle == "butt") mCapStyle = SkPaint::kButt_Cap;
@@ -178,13 +179,14 @@ void OutlineSettingsAnimator::saveSVG(SvgExporter& exp,
     mLineWidth->saveQrealSVG(exp, parent, visRange, "stroke-width");
 }
 
-QDomElement OutlineSettingsAnimator::writeBrushPaint(QDomDocument& doc) const {
-    return mBrushSettings->prp_writePropertyXEV(doc);
+QDomElement OutlineSettingsAnimator::writeBrushPaint(const XevExporter& exp) const {
+    return mBrushSettings->prp_writePropertyXEV(exp);
 }
 
-void OutlineSettingsAnimator::readBrushPaint(const QDomElement& ele) {
+void OutlineSettingsAnimator::readBrushPaint(const QDomElement& ele,
+                                             const XevImporter& imp) {
     const auto brushSettings = ele.firstChildElement("BrushSettings");
-    mBrushSettings->prp_readPropertyXEV(brushSettings);
+    mBrushSettings->prp_readPropertyXEV(brushSettings, imp);
 }
 
 void OutlineSettingsAnimator::setupStrokeSettings(const qreal relFrame,

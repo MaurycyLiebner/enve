@@ -19,7 +19,6 @@
 #include "canvas.h"
 #include "Timeline/durationrectangle.h"
 #include "Properties/emimedata.h"
-#include "XML/xmlexporthelpers.h"
 #include "Sound/esound.h"
 
 eBoxOrSound::eBoxOrSound(const QString &name) :
@@ -142,25 +141,27 @@ void eBoxOrSound::prp_readProperty(eReadStream& src) {
 
 void eBoxOrSound::writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
                                      const QString& path) const {
+    QDomDocument doc;
+    auto props = doc.createElement("Object");
+    const XevExporter exp(doc, fileSaver, path);
+    writeChildPropertiesXEV(props, exp);
+    doc.appendChild(props);
     fileSaver.processText(path + "properties.xml",
-                          [this](QTextStream& stream) {
-        QDomDocument doc;
-        auto props = doc.createElement("Object");
-        writeChildPropertiesXEV(props, doc);
-        doc.appendChild(props);
+                          [&](QTextStream& stream) {
         stream << doc.toString();
     });
 }
 
 void eBoxOrSound::readBoxOrSoundXEV(ZipFileLoader& fileLoader,
                                     const QString& path) {
+    QDomDocument doc;
     fileLoader.process(path + "properties.xml",
                        [&](QIODevice* const src) {
-        QDomDocument doc;
         doc.setContent(src);
-        const auto obj = XmlExportHelpers::getOnlyElement(doc, "Object");
-        prp_readPropertyXEV(obj);
     });
+    const auto obj = doc.firstChildElement("Object");
+    const XevImporter imp(fileLoader, path);
+    prp_readPropertyXEV(obj, imp);
 }
 
 TimelineMovable *eBoxOrSound::anim_getTimelineMovable(

@@ -26,7 +26,9 @@
 
 using SmartPathKey = InterpolationKeyT<SmartPath>;
 
-class CORE_EXPORT SmartPathAnimator : public InterOptimalAnimatorT<SmartPath> {
+using SmartPathAnimatorBase = InterOptimalAnimatorT<SmartPath>;
+
+class CORE_EXPORT SmartPathAnimator : public SmartPathAnimatorBase {
     e_OBJECT
     Q_OBJECT
 protected:
@@ -52,8 +54,8 @@ public:
     void prp_readProperty(eReadStream& src);
     void prp_writeProperty(eWriteStream& dst) const;
 
-    void prp_readPropertyXEV(const QDomElement& ele);
-    QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 
     SkPath getPathAtAbsFrame(const qreal frame)
     { return getPathAtRelFrame(prp_absFrameToRelFrameF(frame)); }

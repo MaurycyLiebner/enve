@@ -30,6 +30,19 @@ void ComboBoxProperty::prp_readProperty(eReadStream& src) {
     src >> mCurrentValue;
 }
 
+QDomElement ComboBoxProperty::prp_writePropertyXEV(const XevExporter& exp) const {
+    auto result = exp.createElement("Combo");
+    result.setAttribute("value", mCurrentValue);
+    return result;
+}
+
+void ComboBoxProperty::prp_readPropertyXEV(
+        const QDomElement& ele, const XevImporter& imp) {
+    Q_UNUSED(imp)
+    const auto valueStr = ele.attribute("value");
+    mCurrentValue = XmlExportHelpers::stringToInt(valueStr);
+}
+
 QString ComboBoxProperty::getCurrentValueName() {
     if(mCurrentValue >= mValueNames.count()) return "null";
     return mValueNames.at(mCurrentValue);

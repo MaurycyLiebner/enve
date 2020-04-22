@@ -19,7 +19,6 @@
 #include "qrealanimator.h"
 #include "qpointfanimator.h"
 
-#include "XML/xmlexporthelpers.h"
 #include "typemenu.h"
 
 enum class PropertyType {

@@ -22,12 +22,7 @@ template <typename T>
 class KeyT : public BasedKeyT<Key, T> {
     e_OBJECT
 protected:
-    KeyT(const T &value, const int relFrame,
-         Animator * const parentAnimator = nullptr) :
-        BasedKeyT<Key, T>(value, relFrame, parentAnimator) {}
-
-    KeyT(Animator * const parentAnimator = nullptr) :
-        BasedKeyT<Key, T>(parentAnimator) {}
+    using BasedKeyT<Key, T>::BasedKeyT;
 };
 
 #endif // KEYT_H

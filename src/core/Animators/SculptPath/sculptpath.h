@@ -61,6 +61,9 @@ public:
     void read(eReadStream& src);
     void write(eWriteStream &dst) const;
 
+    QString toXEV() const;
+    void loadXEV(const QStringRef& xev);
+
     QRectF boundingRect() const { return mBoundingRect; }
 
     static SculptPath sInterpolate(const SculptPath& path1,

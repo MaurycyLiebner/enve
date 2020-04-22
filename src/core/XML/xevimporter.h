@@ -14,28 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOOLPROPERTY_H
-#define BOOLPROPERTY_H
-#include "property.h"
+#ifndef XEVIMPORTER_H
+#define XEVIMPORTER_H
 
-class CORE_EXPORT BoolProperty : public Property {
-    Q_OBJECT
-    e_OBJECT
-protected:
-    BoolProperty(const QString& name);
+#include "xmlexporthelpers.h"
+
+class ZipFileLoader;
+
+class XevImporter {
 public:
-    void prp_writeProperty(eWriteStream& dst) const;
-    void prp_readProperty(eReadStream& src);
+    XevImporter(ZipFileLoader& fileLoader,
+                const QString& path,
+                const QString& assetsPath = "");
 
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
+    XevImporter withAssetsPath(const QString& path) const;
 
-    bool getValue();
-    void setValue(const bool value);
-signals:
-    void valueChanged(bool);
+    using Processor = std::function<void(QIODevice* const dst)>;
+    void processAsset(const QString& file, const Processor& func) const;
 private:
-    bool mValue = false;
+    ZipFileLoader& mFileLoader;
+    const QString mPath;
+    const QString mAssetsPath;
 };
 
-#endif // BOOLPROPERTY_H
+#endif // XEVIMPORTER_H

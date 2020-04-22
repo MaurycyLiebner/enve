@@ -60,13 +60,15 @@ void BoolPropertyContainer::prp_readProperty(eReadStream& src) {
     StaticComplexAnimator::prp_readProperty(src);
 }
 
-QDomElement BoolPropertyContainer::prp_writePropertyXEV(QDomDocument& doc) const {
-    auto result = StaticComplexAnimator::prp_writePropertyXEV(doc);
+QDomElement BoolPropertyContainer::prp_writePropertyXEV(
+        const XevExporter& exp) const {
+    auto result = StaticComplexAnimator::prp_writePropertyXEV(exp);
     result.setAttribute("checked", mValue ? "true" : "false");
     return result;
 }
 
-void BoolPropertyContainer::prp_readPropertyXEV(const QDomElement& ele) {
-    StaticComplexAnimator::prp_readPropertyXEV(ele);
+void BoolPropertyContainer::prp_readPropertyXEV(
+        const QDomElement& ele, const XevImporter& imp) {
+    StaticComplexAnimator::prp_readPropertyXEV(ele, imp);
     setValue(ele.attribute("checked") == "true");
 }

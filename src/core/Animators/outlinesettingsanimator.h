@@ -30,8 +30,8 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
-    QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
-    void prp_readPropertyXEV(const QDomElement& ele);
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
 
     void setPaintType(const PaintType paintType);
 
@@ -105,8 +105,9 @@ public:
                  const FrameRange& visRange,
                  const bool asFill = false) const;
 protected:
-    QDomElement writeBrushPaint(QDomDocument& doc) const;
-    void readBrushPaint(const QDomElement& ele);
+    QDomElement writeBrushPaint(const XevExporter& exp) const;
+    void readBrushPaint(const QDomElement& ele,
+                        const XevImporter& imp);
 
     QString prp_tagNameXEV() const { return "Outline"; }
 private:

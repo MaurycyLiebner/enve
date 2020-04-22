@@ -107,3 +107,27 @@ void BoxTargetProperty::prp_readProperty(eReadStream& src) {
          setTarget(targetBox);
     });
 }
+
+QDomElement BoxTargetProperty::prp_writePropertyXEV(const XevExporter& exp) const {
+    auto result = exp.createElement("ObjectLink");
+    int targetWriteId = -1;
+
+    if(mTarget_d) {
+        if(mTarget_d->getWriteId() < 0) mTarget_d->assignWriteId();
+        targetWriteId = mTarget_d->getWriteId();
+    }
+    result.setAttribute("targetId", targetWriteId);
+
+    return result;
+}
+
+void BoxTargetProperty::prp_readPropertyXEV(
+        const QDomElement& ele, const XevImporter& imp) {
+    Q_UNUSED(imp)
+    const int targetId = XmlExportHelpers::stringToInt(ele.attribute("targetId"));
+    if(targetId == -1) return;
+    SimpleTask::sScheduleContexted(this, [this, targetId]() {
+        const auto targetObj = BoundingBox::sGetBoxByReadId(targetId);
+        if(targetObj) setTarget(targetObj);
+    });
+}

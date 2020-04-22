@@ -23,15 +23,13 @@
 QStringAnimator::QStringAnimator(const QString &name) :
     SteppedAnimator<QString>(name) {}
 
-QDomElement createTextElement(SvgExporter& exp,
-                              const QString& text) {
+QDomElement createTextElement(SvgExporter& exp, const QString& text) {
     auto ele = exp.createElement("text");
     ele.appendChild(exp.createTextNode(text));
     return ele;
 }
 
-void QStringAnimator::saveSVG(SvgExporter& exp,
-                              QDomElement& parent) const {
+void QStringAnimator::saveSVG(SvgExporter& exp, QDomElement& parent) const {
     const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
     const auto idRange = prp_getIdenticalRelRange(relRange.fMin);
     const int span = exp.fAbsRange.span();
@@ -51,4 +49,18 @@ void QStringAnimator::saveSVG(SvgExporter& exp,
             i = prp_nextDifferentRelFrame(i);
         }
     }
+}
+
+void QStringAnimator::prp_readPropertyXEV(
+        const QDomElement& ele, const XevImporter& imp) {
+    Q_UNUSED(imp)
+    readValuesXEV(ele, [](QString& str, const QStringRef& strRef) {
+        str = strRef.toString();
+    });
+}
+
+QDomElement QStringAnimator::prp_writePropertyXEV(const XevExporter& exp) const {
+    auto result = exp.createElement("Text");
+    writeValuesXEV(result, [](const QString& str) { return str; });
+    return result;
 }

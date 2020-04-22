@@ -43,10 +43,158 @@ AnimatedSurface::AnimatedSurface() : Animator("canvas"),
     });
 }
 
+void AnimatedSurface::setupOnionSkinFor(
+        const int relFrame, const int sideRange, OnionSkin& skins,
+        const std::function<void ()>& missingLoaded) {
+    skins.clear();
+    const auto minId = anim_getNextKeyId(relFrame - sideRange - 1);
+    const auto maxId = anim_getPrevKeyId(relFrame + sideRange + 1);
+    if(minId == -1 || maxId == -1) return;
+    for(int i = minId; i <= maxId; i++) {
+        const auto asKey = anim_getKeyAtIndex<ASKey>(i);
+        if(asKey->getRelFrame() < relFrame)
+            setupOnionSkinFor(relFrame, sideRange, asKey,
+                              skins.fPrev, missingLoaded);
+        else if(asKey->getRelFrame() > relFrame) {
+            setupOnionSkinFor(relFrame, sideRange, asKey,
+                              skins.fNext, missingLoaded);
+        }
+    }
+}
+
+void AnimatedSurface::prp_readProperty(eReadStream& src) {
+    Animator::prp_readProperty(src);
+    anim_readKeys(src);
+    mBaseValue->read(src);
+}
+
+void AnimatedSurface::prp_writeProperty(eWriteStream& dst) const {
+    Animator::prp_writeProperty(dst);
+    anim_writeKeys(dst);
+    mBaseValue->write(dst);
+}
+
+QDomElement AnimatedSurface::prp_writePropertyXEV(const XevExporter& exp) const {
+    auto result = exp.createElement("PaintSurface");
+    if(anim_hasKeys()) {
+        QString frames;
+        QString pivots;
+        for(const auto& key : anim_getKeys()) {
+            if(!frames.isEmpty()) frames += ' ';
+            if(!pivots.isEmpty()) pivots += ',';
+            const auto frameStr = QString::number(key->getRelFrame());
+            frames += frameStr;
+
+            const auto& asKey = static_cast<ASKey*>(key);
+            const auto& surf = asKey->dSurface();
+            const auto pivot = surf.zeroTilePos();
+            pivots += QString("%1 %2").arg(pivot.x()).
+                                       arg(pivot.y());
+            const auto image = surf.toImage(true);
+            exp.processAsset(frameStr + ".png", [&](QIODevice* const dst) {
+                image.save(dst, "PNG");
+            });
+        }
+        result.setAttribute("frames", frames);
+        result.setAttribute("pivots", pivots);
+    } else {
+        const auto pivot = mBaseValue->zeroTilePos();
+        const auto pivotStr = QString("%1 %2").arg(pivot.x()).
+                                               arg(pivot.y());
+        result.setAttribute("pivot", pivotStr);
+        const auto image = mBaseValue->toImage(true);
+        exp.processAsset("value.png", [&](QIODevice* const dst) {
+            image.save(dst, "PNG");
+        });
+    }
+    return result;
+}
+
+void AnimatedSurface::prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) {
+    if(ele.hasAttribute("frames")) {
+        const auto framesStr = ele.attribute("frames");
+        const auto pivotsStr = ele.attribute("pivots");
+
+        const auto frameStrs = framesStr.splitRef(' ', QString::SkipEmptyParts);
+        const auto pivotStrs = pivotsStr.splitRef(',', QString::SkipEmptyParts);
+
+        if(frameStrs.count() != pivotStrs.count())
+            RuntimeThrow("Frames and pivot count does not match");
+        const int iMax = frameStrs.count();
+        for(int i = 0; i < iMax; i++) {
+            const auto& frameStr = frameStrs[i];
+
+            const auto& pivotStr = pivotStrs[i];
+            const auto pivotValStrs = pivotStr.split(' ');
+            if(pivotValStrs.size() != 2)
+                RuntimeThrow("Invalid pivot '" + pivotStr.toString() + "'");
+            const int pivotX = XmlExportHelpers::stringToInt(pivotValStrs[0]);
+            const int pivotY = XmlExportHelpers::stringToInt(pivotValStrs[1]);
+
+            const int frame = XmlExportHelpers::stringToInt(frameStr);
+
+            imp.processAsset(frameStr + ".png", [&](QIODevice* const src) {
+                QImage image;
+                const bool ret = image.load(src, "PNG");
+                if(!ret) RuntimeThrow("Failed to load value.png");
+                const auto key = enve::make_shared<ASKey>(frame, this);
+                auto& surf = key->dSurface();
+                surf.loadPixmap(image);
+                surf.move(-pivotX, -pivotY);
+                anim_appendKey(key);
+            });
+        }
+    } else {
+        const auto pivotStr = ele.attribute("pivot");
+        const auto pivotValStrs = pivotStr.splitRef(' ', QString::SkipEmptyParts);
+        if(pivotValStrs.size() != 2)
+            RuntimeThrow("Invalid pivot '" + pivotStr + "'");
+        const int pivotX = XmlExportHelpers::stringToInt(pivotValStrs[0]);
+        const int pivotY = XmlExportHelpers::stringToInt(pivotValStrs[1]);
+
+        imp.processAsset("value.png", [&](QIODevice* const src) {
+            QImage image;
+            const bool ret = image.load(src, "PNG");
+            if(!ret) RuntimeThrow("Failed to load value.png");
+            mBaseValue->loadPixmap(image);
+            mBaseValue->move(-pivotX, -pivotY);
+        });
+    }
+}
+
 void AnimatedSurface::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) {
     Animator::prp_afterChangedAbsRange(range, clip);
     const auto relRange = prp_absRangeToRelRange(range);
     mFrameImagesCache.remove(relRange);
+}
+
+void AnimatedSurface::anim_addKeyAtRelFrame(const int relFrame) {
+    if(anim_getKeyAtRelFrame(relFrame)) return;
+    const auto prevNextKey = anim_getPrevAndNextKey<ASKey>(relFrame);
+    stdsptr<ASKey> newKey;
+    if(prevNextKey.first) {
+        const auto& value = prevNextKey.first->dSurface();
+        newKey = enve::make_shared<ASKey>(value, relFrame, this);
+    } else if(prevNextKey.second) {
+        const auto& value = prevNextKey.second->dSurface();
+        newKey = enve::make_shared<ASKey>(value, relFrame, this);
+    } else {
+        newKey = enve::make_shared<ASKey>(*mBaseValue.get(), relFrame, this);
+    }
+    anim_appendKeyAction(newKey);
+}
+
+DrawableAutoTiledSurface* AnimatedSurface::getSurface(const int relFrame) {
+    const auto spk = anim_getKeyAtRelFrame<ASKey>(relFrame);
+    if(spk) return &spk->dSurface();
+    const auto prevNextKey = anim_getPrevAndNextKey<ASKey>(relFrame);
+    if(prevNextKey.first) {
+        return &prevNextKey.first->dSurface();
+    } else if(prevNextKey.second) {
+        return &prevNextKey.second->dSurface();
+    } else {
+        return mBaseValue.get();
+    }
 }
 
 void AnimatedSurface::afterSurfaceChanged(DrawableAutoTiledSurface * const surface) {
@@ -60,10 +208,17 @@ void AnimatedSurface::afterSurfaceChanged(DrawableAutoTiledSurface * const surfa
     }
 }
 
+void AnimatedSurface::newEmptyFrame(const int relFrame) {
+    const auto currKey = anim_getKeyAtRelFrame<ASKey>(relFrame);
+    if(currKey) anim_removeKey(currKey->ref<ASKey>());
+    const auto newKey = enve::make_shared<ASKey>(relFrame, this);
+    anim_appendKeyAction(newKey);
+}
+
 template <typename T>
 void AnimatedSurface::loadPixmapT(const T &src) {
     const bool createNewFrame = anim_isRecording() &&
-            !anim_getKeyOnCurrentFrame();
+                                !anim_getKeyOnCurrentFrame();
     if(createNewFrame) newEmptyFrame();
     auto& target = mCurrent_d->surface();
     const bool undoRedo = getParentScene();
@@ -91,6 +246,30 @@ void AnimatedSurface::loadPixmap(const SkPixmap &src) {
     loadPixmapT(src);
 }
 
+eTask* AnimatedSurface::getFrameImage(const int relFrame, sk_sp<SkImage>& img) {
+    const auto cont = mFrameImagesCache.atFrame<ImageCacheContainer>(relFrame);
+    if(cont) {
+        if(cont->storesDataInMemory()) {
+            img = cont->requestImageCopy();
+            return nullptr;
+        }
+        return cont->scheduleLoadFromTmpFile();
+    }
+    const auto surf = getSurface(relFrame);
+    if(surf) {
+        if(!surf->storesDataInMemory())
+            return surf->scheduleLoadFromTmpFile();
+        auto bitmap = surf->surface().toBitmap();
+        img = SkiaHelpers::transferDataToSkImage(bitmap);
+        const auto imgCpy = SkiaHelpers::makeCopy(img);
+        const auto range = prp_getIdenticalRelRange(relFrame);
+        const auto newCont = enve::make_shared<ImageCacheContainer>(
+                                 imgCpy, range, &mFrameImagesCache);
+        mFrameImagesCache.add(newCont);
+    }
+    return nullptr;
+}
+
 void AnimatedSurface::afterChangedCurrentContent() {
     const int relFrame = anim_getCurrentRelFrame();
     const auto identicalRange = prp_getIdenticalRelRange(relFrame);
@@ -107,7 +286,7 @@ void AnimatedSurface::addUndoRedo(const QString& name, const QRect& roi) {
         UndoRedo ur;
 
         const auto replaceTile = [this, undoList, ptr, roi](
-                const stdsptr<Tile>& (UndoTile::*getter)() const) {
+                                 const stdsptr<Tile>& (UndoTile::*getter)() const) {
             if(!ptr) return;
             auto& surface = ptr->surface();
             for(const auto& undoTile : undoList) {
@@ -312,6 +491,28 @@ eTaskBase* AnimatedSurface::savePaintSVG(SvgExporter& exp,
     if(task->done()) return nullptr;
     TaskScheduler::instance()->addComplexTask(taskSPtr);
     return task;
+}
+
+void AnimatedSurface::updateCurrent() {
+    const auto spk = anim_getKeyOnCurrentFrame<ASKey>();
+    if(spk) setCurrent(&spk->dSurface());
+    else {
+        const int relFrame = anim_getCurrentRelFrame();
+        const auto prevNextKey = anim_getPrevAndNextKey<ASKey>(relFrame);
+        if(prevNextKey.first) {
+            setCurrent(&prevNextKey.first->dSurface());
+        } else if(prevNextKey.second) {
+            setCurrent(&prevNextKey.second->dSurface());
+        } else {
+            setCurrent(mBaseValue.get());
+        }
+    }
+}
+
+void AnimatedSurface::setCurrent(DrawableAutoTiledSurface* const surf) {
+    if(mCurrent_d == surf) return;
+    mCurrent_d = surf;
+    emit currentSurfaceChanged(mCurrent_d);
 }
 
 ASKey::ASKey(AnimatedSurface * const parent) :

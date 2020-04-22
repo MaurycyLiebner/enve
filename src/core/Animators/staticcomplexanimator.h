@@ -25,12 +25,12 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
-    void prp_readPropertyXEV(const QDomElement& ele);
-    QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 
     using ComplexAnimator::ca_addChild;
 protected:
-    void writeChildPropertiesXEV(QDomElement& prop, QDomDocument& doc) const;
+    void writeChildPropertiesXEV(QDomElement& prop, const XevExporter& exp) const;
 private:
     using ComplexAnimator::ca_removeAllChildren;
     using ComplexAnimator::ca_removeChild;

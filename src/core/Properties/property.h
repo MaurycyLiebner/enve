@@ -23,6 +23,8 @@
 #include "../framerange.h"
 #include "../MovablePoints/pointshandler.h"
 #include "../ReadWrite/basicreadwrite.h"
+#include "../XML/xevexporter.h"
+#include "../XML/xevimporter.h"
 #include "../conncontextptr.h"
 
 #include <QJSEngine>
@@ -75,6 +77,14 @@ protected:
 
     virtual void prp_updateCanvasProps();
 public:
+    virtual void prp_readProperty(eReadStream& src)
+    { Q_UNUSED(src) }
+    virtual void prp_writeProperty(eWriteStream& dst) const
+    { Q_UNUSED(dst) }
+
+    virtual void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) = 0;
+    virtual QDomElement prp_writePropertyXEV(const XevExporter& exp) const = 0;
+
     virtual QJSValue prp_getBaseJSValue(QJSEngine& e) const {
         Q_UNUSED(e)
         return QJSValue::NullValue;
@@ -132,16 +142,7 @@ public:
     virtual void prp_startTransform() {}
     virtual void prp_finishTransform() {}
 
-    virtual void prp_readProperty(eReadStream& src) { Q_UNUSED(src) }
-    virtual void prp_writeProperty(eWriteStream& dst) const { Q_UNUSED(dst) }
-
     virtual QString prp_tagNameXEV() const { return "Property"; }
-
-    virtual void prp_readPropertyXEV(const QDomElement& ele)
-    { Q_UNUSED(ele) }
-
-    virtual QDomElement prp_writePropertyXEV(QDomDocument& doc) const
-    { Q_UNUSED(doc) return QDomElement(); }
 
     virtual int prp_getTotalFrameShift() const;
     virtual int prp_getInheritedFrameShift() const;
@@ -161,7 +162,7 @@ public:
     { return prop == this; }
 public:
     QDomElement prp_writeNamedPropertyXEV(
-            const QString& name, QDomDocument& doc) const;
+            const QString& name, const XevExporter& exp) const;
 
     QMatrix getTransform() const;
 

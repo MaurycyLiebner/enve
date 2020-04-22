@@ -17,10 +17,12 @@
 #ifndef XMLEXPORTHELPERS_H
 #define XMLEXPORTHELPERS_H
 
-#include "skia/skiaincludes.h"
+#include "../skia/skiaincludes.h"
 
 #include <QDomElement>
 #include <QString>
+
+class SimpleBrushWrapper;
 
 namespace XmlExportHelpers {
     SkBlendMode stringToBlendMode(const QString& compOpStr);
@@ -30,8 +32,12 @@ namespace XmlExportHelpers {
     qreal stringToDouble(const QString& string);
     int stringToInt(const QStringRef& string);
     int stringToInt(const QString& string);
+};
 
-    QDomElement getOnlyElement(const QDomNode& from, const QString& tagName);
+namespace XevExportHelpers {
+    QDomElement brushToElement(SimpleBrushWrapper* const brush,
+                               QDomDocument& doc);
+    SimpleBrushWrapper* brushFromElement(const QDomElement& ele);
 };
 
 #endif // XMLEXPORTHELPERS_H

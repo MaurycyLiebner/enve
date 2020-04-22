@@ -240,6 +240,8 @@ SOURCES += \
     Timeline/animationrect.cpp \
     Timeline/durationrectangle.cpp \
     Timeline/fixedlenanimationrect.cpp \
+    XML/xevexporter.cpp \
+    XML/xevimporter.cpp \
     XML/xmlexporthelpers.cpp \
     action.cpp \
     actions.cpp \
@@ -311,7 +313,6 @@ SOURCES += \
     Segments/qcubicsegment2d.cpp \
     Segments/qcubicsegment1d.cpp \
     Animators/animatort.cpp \
-    Animators/interpolatedanimator.cpp \
     Animators/steppedanimator.cpp \
     differsinterpolate.cpp \
     skia/skiahelpers.cpp \
@@ -564,6 +565,8 @@ HEADERS += \
     Timeline/animationrect.h \
     Timeline/durationrectangle.h \
     Timeline/fixedlenanimationrect.h \
+    XML/xevexporter.h \
+    XML/xevimporter.h \
     XML/xmlexporthelpers.h \
     action.h \
     actions.h \
@@ -643,7 +646,6 @@ HEADERS += \
     Segments/qcubicsegment2d.h \
     Segments/qcubicsegment1d.h \
     Animators/animatort.h \
-    Animators/interpolatedanimator.h \
     Animators/steppedanimator.h \
     differsinterpolate.h \
     skia/skiahelpers.h \

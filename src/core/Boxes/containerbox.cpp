@@ -31,7 +31,6 @@
 #include "BlendEffects/blendeffectboxshadow.h"
 #include "svgexporter.h"
 #include "Private/Tasks/taskscheduler.h"
-#include "XML/xmlexporthelpers.h"
 
 ContainerBox::ContainerBox(const eBoxType type) :
     BoxWithPathEffects(type == eBoxType::group ? "Group" : "Layer",
@@ -1418,7 +1417,7 @@ void ContainerBox::readAllContainedXEV(
     fileLoader.process(path + "stack.xml", [&](QIODevice* const src) {
         QDomDocument doc;
         doc.setContent(src);
-        const auto stack = XmlExportHelpers::getOnlyElement(doc, "Stack");
+        const auto stack = doc.firstChildElement("Stack");
         const auto childNodes = stack.childNodes();
         const int count = childNodes.count();
         for(int i = 0; i < count; i++) {

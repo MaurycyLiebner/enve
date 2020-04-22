@@ -39,16 +39,7 @@ public:
     virtual QMatrix getInheritedTransformAtFrame(const qreal relFrame);
     virtual QMatrix getTotalTransformAtFrame(const qreal relFrame);
 
-    FrameRange prp_getIdenticalRelRange(const int relFrame) const {
-        if(mParentTransform) {
-            const auto thisIdent = ComplexAnimator::prp_getIdenticalRelRange(relFrame);
-            const int absFrame = prp_relFrameToAbsFrame(relFrame);
-            const int pRelFrame = mParentTransform->prp_absFrameToRelFrame(absFrame);
-            const auto parentIdent = mParentTransform->prp_getIdenticalRelRange(pRelFrame);
-            const auto absParentIdent = mParentTransform->prp_relRangeToAbsRange(parentIdent);
-            return thisIdent*prp_absRangeToRelRange(absParentIdent);
-        } else return ComplexAnimator::prp_getIdenticalRelRange(relFrame);
-    }
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
     void resetScale();
     void resetTranslation();
@@ -181,8 +172,8 @@ public:
         return mOpacityAnimator.get();
     }
 
-    QDomElement prp_writePropertyXEV(QDomDocument& doc) const;
-    void prp_readPropertyXEV(const QDomElement& ele);
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
 private:
     qsptr<QPointFAnimator> mPivotAnimator;
     qsptr<QPointFAnimator> mShearAnimator;

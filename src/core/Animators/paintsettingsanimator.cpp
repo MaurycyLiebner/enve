@@ -27,7 +27,6 @@
 #include "transformanimator.h"
 #include "simpletask.h"
 #include "qpointfanimator.h"
-#include "XML/xmlexporthelpers.h"
 
 PaintSettingsAnimator::PaintSettingsAnimator(const QString &name,
                                              BoundingBox * const parent) :
@@ -74,32 +73,32 @@ void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
     setPaintType(paintType);
 }
 
-QDomElement PaintSettingsAnimator::prp_writePropertyXEV(QDomDocument& doc) const {
-    auto result = doc.createElement(prp_tagNameXEV());
+QDomElement PaintSettingsAnimator::prp_writePropertyXEV(const XevExporter& exp) const {
+    auto result = exp.createElement(prp_tagNameXEV());
 
     result.setAttribute("type", static_cast<int>(mPaintType));
 
     switch(mPaintType) {
     case PaintType::FLATPAINT: {
-        const auto color = mColor->prp_writePropertyXEV(doc);
+        const auto color = mColor->prp_writePropertyXEV(exp);
         result.appendChild(color);
     } break;
     case PaintType::BRUSHPAINT: {
-        const auto brushSettings = writeBrushPaint(doc);
+        const auto brushSettings = writeBrushPaint(exp);
         result.appendChild(brushSettings);
     } break;
     case PaintType::GRADIENTPAINT: {
-        auto gradient = doc.createElement("Gradient");
+        auto gradient = exp.createElement("Gradient");
         gradient.setAttribute("type", static_cast<int>(mGradientType));
         const int gradRWId = mGradient ? mGradient->getReadWriteId() : -1;
         gradient.setAttribute("id", gradRWId);
         result.appendChild(gradient);
 
-        const auto transform = mGradientTransform->prp_writePropertyXEV(doc);
+        const auto transform = mGradientTransform->prp_writePropertyXEV(exp);
         result.appendChild(transform);
 
         const auto gradPoints = mGradientPoints->prp_writeNamedPropertyXEV(
-                                    "GradientPoints", doc);
+                                    "GradientPoints", exp);
         result.appendChild(gradPoints);
     } break;
     default: break;
@@ -109,17 +108,18 @@ QDomElement PaintSettingsAnimator::prp_writePropertyXEV(QDomDocument& doc) const
 }
 
 
-void PaintSettingsAnimator::prp_readPropertyXEV(const QDomElement& ele) {
+void PaintSettingsAnimator::prp_readPropertyXEV(const QDomElement& ele,
+                                                const XevImporter& imp) {
     const auto typeStr = ele.attribute("type");
     const int typeInt = XmlExportHelpers::stringToInt(typeStr);
     const auto type = static_cast<PaintType>(typeInt);
     switch(type) {
     case PaintType::FLATPAINT: {
         const auto color = ele.firstChildElement("Color");
-        mColor->prp_readPropertyXEV(color);
+        mColor->prp_readPropertyXEV(color, imp);
     } break;
     case PaintType::BRUSHPAINT: {
-        readBrushPaint(ele);
+        readBrushPaint(ele, imp);
     } break;
     case PaintType::GRADIENTPAINT: {
         const auto gradient = ele.firstChildElement("Gradient");
@@ -140,10 +140,10 @@ void PaintSettingsAnimator::prp_readPropertyXEV(const QDomElement& ele) {
         });
 
         const auto transform = ele.firstChildElement("Transform");
-        mGradientTransform->prp_readPropertyXEV(transform);
+        mGradientTransform->prp_readPropertyXEV(transform, imp);
 
         const auto gradPoints = ele.firstChildElement("GradientPoints");
-        mGradientPoints->prp_readPropertyXEV(gradPoints);
+        mGradientPoints->prp_readPropertyXEV(gradPoints, imp);
     } break;
     default: break;
     }
