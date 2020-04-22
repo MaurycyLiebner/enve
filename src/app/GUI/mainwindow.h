@@ -165,9 +165,8 @@ public:
     void openFile();
     void openFile(const QString& openPath);
     void saveFile();
-    void saveFileXEV();
+    void saveFile(const QString& path);
     void saveFileAs();
-    void saveFileAsXEV();
     void saveBackup();
     void exportSVG();
     bool closeProject();
@@ -179,7 +178,7 @@ protected:
     void lockFinished();
     void resizeEvent(QResizeEvent* e);
     void showEvent(QShowEvent* e);
-private:
+private:    
     QWidget * mWelcomeDialog = nullptr;
     CentralWidget * mCentralWidget = nullptr;
 

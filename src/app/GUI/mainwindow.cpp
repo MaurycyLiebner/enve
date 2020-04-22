@@ -292,10 +292,10 @@ void MainWindow::setupMenuBar() {
                          this, &MainWindow::revert);
     mFileMenu->addSeparator();
     mFileMenu->addAction(tr("Save", "MenuBar_File"),
-                         this, &MainWindow::saveFileXEV,
+                         this, qOverload<>(&MainWindow::saveFile),
                          Qt::CTRL + Qt::Key_S);
     mFileMenu->addAction(tr("Save As...", "MenuBar_File"),
-                         this, &MainWindow::saveFileAsXEV,
+                         this, &MainWindow::saveFileAs,
                          Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     mFileMenu->addAction(tr("Save Backup", "MenuBar_File"),
                          this, &MainWindow::saveBackup);
@@ -1307,44 +1307,21 @@ void MainWindow::openFile(const QString& openPath) {
 void MainWindow::saveFile() {
     if(mDocument.fEvFile.isEmpty()) {
         saveFileAs();
-        return;
-    }
+    } else saveFile(mDocument.fEvFile);
+}
+
+void MainWindow::saveFile(const QString& path) {
     try {
-        saveToFile(mDocument.fEvFile);
+        QFileInfo fi(path);
+        const QString suffix = fi.suffix();
+        if(suffix == "ev") {
+            saveToFile(path);
+        } else if(suffix == "xev") {
+            saveToFileXEV(path);
+        } else RuntimeThrow("Unrecognized file extension " + suffix);
         setFileChangedSinceSaving(false);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
-    }
-}
-
-void MainWindow::saveFileXEV() {
-    if(mDocument.fEvFile.isEmpty()) return saveFileAsXEV();
-    try {
-        saveToFileXEV(mDocument.fEvFile);
-        setFileChangedSinceSaving(false);
-    } catch(const std::exception& e) {
-        gPrintExceptionCritical(e);
-    }
-}
-
-void MainWindow::saveFileAsXEV() {
-    disableEventFilter();
-    const QString defPath = mDocument.fEvFile.isEmpty() ?
-                QDir::homePath() : mDocument.fEvFile;
-
-    const QString title = tr("Save File", "SaveDialog_Title");
-    const QString fileType = tr("xenve Files %1", "SaveDialog_FileType");
-    QString saveAs = eDialogs::saveFile(title, defPath, fileType.arg("(*.xev)"));
-    enableEventFilter();
-    if(!saveAs.isEmpty()) {
-        if(saveAs.right(4) != ".xev") saveAs += ".xev";
-        try {
-            saveToFileXEV(saveAs);
-            mDocument.setPath(saveAs);
-            setFileChangedSinceSaving(false);
-        } catch(const std::exception& e) {
-            gPrintExceptionCritical(e);
-        }
     }
 }
 
@@ -1355,17 +1332,13 @@ void MainWindow::saveFileAs() {
 
     const QString title = tr("Save File", "SaveDialog_Title");
     const QString fileType = tr("enve Files %1", "SaveDialog_FileType");
-    QString saveAs = eDialogs::saveFile(title, defPath, fileType.arg("(*.ev)"));
+    QString saveAs = eDialogs::saveFile(title, defPath, fileType.arg("(*.ev *.xev)"));
     enableEventFilter();
     if(!saveAs.isEmpty()) {
-        if(saveAs.right(3) != ".ev") saveAs += ".ev";
-        try {
-            saveToFile(saveAs);
-            mDocument.setPath(saveAs);
-            setFileChangedSinceSaving(false);
-        } catch(const std::exception& e) {
-            gPrintExceptionCritical(e);
-        }
+        const bool isXEV = saveAs.right(4) == ".xev";
+        if(!isXEV && saveAs.right(3) != ".ev") saveAs += ".ev";
+
+        saveFile(saveAs);
     }
 }
 
