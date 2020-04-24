@@ -110,6 +110,21 @@ void BoundingBox::readBoundingBox(eReadStream& src) {
     BoundingBox::sAddReadBox(this);
 }
 
+void BoundingBox::prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) {
+    const auto readIdStr = ele.attribute("id");
+    mReadId = XmlExportHelpers::stringToInt(readIdStr);
+    BoundingBox::sAddReadBox(this);
+
+    eBoxOrSound::prp_readPropertyXEV(ele, imp);
+}
+
+QDomElement BoundingBox::prp_writePropertyXEV(const XevExporter& exp) const {
+    if(mWriteId < 0) assignWriteId();
+    auto result = eBoxOrSound::prp_writePropertyXEV(exp);
+    result.setAttribute("id", mWriteId);
+    return result;
+}
+
 BoundingBox *BoundingBox::sGetBoxByDocumentId(const int documentId) {
     for(const auto& box : sDocumentBoxes) {
         if(box->getDocumentId() == documentId) return box;

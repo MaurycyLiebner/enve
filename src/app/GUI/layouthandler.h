@@ -54,6 +54,22 @@ struct LayoutData {
         fTimelineLayout->readData(src);
     }
 
+    void writeXEV(QDomElement& ele, QDomDocument& doc) const {
+        ele.setAttribute("name", fName);
+        const auto canvasLayout = fSceneLayout->writeXEV(doc);
+        const auto timelineLayout = fTimelineLayout->writeXEV(doc);
+        ele.appendChild(canvasLayout);
+        ele.appendChild(timelineLayout);
+    }
+
+    void readXEV(const QDomElement& ele) {
+        fName = ele.attribute("name");
+        const auto canvasLayout = ele.firstChildElement("CanvasLayout");
+        const auto timelineLayout = ele.firstChildElement("TimelineLayout");
+        fSceneLayout->readDataXEV(canvasLayout);
+        fTimelineLayout->readDataXEV(timelineLayout);
+    }
+
     QString fName;
     Canvas* const fScene;
 
@@ -108,6 +124,48 @@ public:
         if(relCurrentId == -1) return;
         const int absId = relCurrentId < nLays ? relCurrentId :
                                                  mNumberLayouts - nLays + relCurrentId;
+        setCurrent(absId);
+    }
+
+    void writeXEV(QDomElement& ele, QDomDocument& doc) const {
+        for(int i = mNumberLayouts - 1; i >= 0; i--) {
+            auto layEle = doc.createElement("CustomLayout");
+            mLayouts.at(uint(i))->writeXEV(layEle, doc);
+            ele.appendChild(layEle);
+        }
+        const int nScenes = int(mLayouts.size()) - mNumberLayouts;
+        for(int i = 0; i < nScenes; i++) {
+            auto layEle = doc.createElement("SceneLayout");
+            mLayouts.at(uint(i + mNumberLayouts))->writeXEV(layEle, doc);
+            ele.appendChild(layEle);
+        }
+        ele.setAttribute("currentId", mCurrentId);
+    }
+
+    void readXEV(const QDomElement& ele) {
+        setCurrent(-1);
+
+        const auto cLays = ele.elementsByTagName("CustomLayout");
+        const int nCLays = cLays.count();
+        for(int i = 0; i < nCLays; i++) {
+            const auto layNode = cLays.at(i);
+            const auto layEle = layNode.toElement();
+            newLayout()->readXEV(layEle);
+        }
+
+        const auto sLays = ele.elementsByTagName("SceneLayout");
+        const int nSLays = sLays.count();
+        for(int i = 0; i < nSLays; i++) {
+            const auto layNode = sLays.at(i);
+            const auto layEle = layNode.toElement();
+            mLayouts.at(uint(i + mNumberLayouts))->readXEV(layEle);
+        }
+
+        const auto currentIdStr = ele.attribute("currentId");
+        const int relCurrentId = XmlExportHelpers::stringToInt(currentIdStr);
+        if(relCurrentId == -1) return;
+        const int absId = relCurrentId < nCLays ? relCurrentId :
+                                                 mNumberLayouts - nCLays + relCurrentId;
         setCurrent(absId);
     }
 private:

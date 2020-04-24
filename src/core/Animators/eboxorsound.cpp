@@ -142,10 +142,9 @@ void eBoxOrSound::prp_readProperty(eReadStream& src) {
 void eBoxOrSound::writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
                                      const QString& path) const {
     QDomDocument doc;
-    auto props = doc.createElement("Object");
     const XevExporter exp(doc, fileSaver, path);
-    writeChildPropertiesXEV(props, exp);
-    doc.appendChild(props);
+    const auto obj = prp_writeNamedPropertyXEV("Object", exp);
+    doc.appendChild(obj);
     fileSaver.processText(path + "properties.xml",
                           [&](QTextStream& stream) {
         stream << doc.toString();

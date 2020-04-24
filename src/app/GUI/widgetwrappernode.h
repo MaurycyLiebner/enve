@@ -31,7 +31,7 @@ protected:
 class WidgetWrapperCornerMenu;
 class WidgetWrapperNode : public QWidget, public WrapperNode {
 public:
-    WidgetWrapperNode(const WrapperNodeCreator& creator);
+    WidgetWrapperNode(const WidgetCreator& creator);
 
     void close();
     void splitV();

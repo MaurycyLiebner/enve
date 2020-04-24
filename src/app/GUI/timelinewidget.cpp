@@ -420,10 +420,75 @@ void TimelineWidget::readState(eReadStream &src) {
     //mKeysView->setViewedVerticalRange(sliderPos, sliderPos + mBoxesListScrollArea->height());
 
     mFrameScrollBar->setFirstViewedFrame(frame);
-    mFrameScrollBar->setDisplayedFrameRange({minViewedFrame, maxViewedFrame});
-    mFrameRangeScrollBar->setViewedFrameRange({minViewedFrame, maxViewedFrame});
+    setViewedFrameRange({minViewedFrame, maxViewedFrame});
+}
 
-    mKeysView->setFramesRange({minViewedFrame, maxViewedFrame});
+void TimelineWidget::readStateXEV(const QDomElement& ele) {
+    const auto frameRangeStr = ele.attribute("frameRange");
+    const auto frameStr = ele.attribute("frame");
+
+    const auto frameRangeValStrs = frameRangeStr.splitRef(' ');
+    if(frameRangeValStrs.count() != 2)
+        RuntimeThrow("Invalid frame range value " + frameRangeStr);
+
+    const auto minViewedFrameStr = frameRangeValStrs.first();
+    const int minViewedFrame = XmlExportHelpers::stringToInt(minViewedFrameStr);
+
+    const auto maxViewedFrameStr = frameRangeValStrs.last();
+    const int maxViewedFrame = XmlExportHelpers::stringToInt(maxViewedFrameStr);
+
+    const int frame = XmlExportHelpers::stringToInt(frameStr);
+
+    const auto search = ele.attribute("search");
+
+    const auto sceneIdStr = ele.attribute("sceneId");
+    const int sceneId = XmlExportHelpers::stringToInt(sceneIdStr);
+
+    Canvas* scene = nullptr;
+    if(sceneId != -1) {
+        const auto sceneBox = BoundingBox::sGetBoxByReadId(sceneId);
+        scene = enve_cast<Canvas*>(sceneBox);
+    }
+    setCurrentScene(scene);
+
+    const auto boxRuleStr = ele.attribute("objRule");
+    const auto boxRule = XmlExportHelpers::stringToEnum<SWT_BoxRule>(boxRuleStr);
+    setBoxRule(boxRule);
+
+    const auto typeStr = ele.attribute("objType");
+    const auto type = XmlExportHelpers::stringToEnum<SWT_Type>(typeStr);
+    setType(type);
+
+    const auto targetStr = ele.attribute("objTarget");
+    const auto target = XmlExportHelpers::stringToEnum<SWT_Target>(targetStr);
+    setTarget(target);
+
+    mSearchLine->setText(search);
+
+    mFrameScrollBar->setFirstViewedFrame(frame);
+    setViewedFrameRange({minViewedFrame, maxViewedFrame});
+}
+
+void TimelineWidget::writeStateXEV(QDomElement& ele, QDomDocument& doc) const {
+    Q_UNUSED(doc)
+    const int frame = mFrameScrollBar->getFirstViewedFrame();
+    const int minViewedFrame = mFrameRangeScrollBar->getFirstViewedFrame();
+    const int maxViewedFrame = mFrameRangeScrollBar->getLastViewedFrame();
+    const QString frameRange = QString("%1 %2").arg(minViewedFrame).
+                                                arg(maxViewedFrame);
+
+    ele.setAttribute("frameRange", frameRange);
+    ele.setAttribute("frame", frame);
+
+    const int sceneId = mCurrentScene ? mCurrentScene->getWriteId() : -1;
+    ele.setAttribute("sceneId", sceneId);
+
+    const auto rules = mBoxesListWidget->getRulesCollection();
+    ele.setAttribute("objRule", static_cast<int>(rules.fRule));
+    ele.setAttribute("objType", static_cast<int>(rules.fType));
+    ele.setAttribute("objTarget", static_cast<int>(rules.fTarget));
+
+    ele.setAttribute("search", mSearchLine->text());
 }
 
 void TimelineWidget::moveSlider(int val) {

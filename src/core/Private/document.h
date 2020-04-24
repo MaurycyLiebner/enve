@@ -173,6 +173,7 @@ public:
         int fWidth;
         int fHeight;
         qreal fFps;
+        bool fClip;
     };
 
     void readDoxumentXEV(const QDomDocument& doc,

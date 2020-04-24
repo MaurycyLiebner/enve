@@ -221,6 +221,9 @@ public:
     virtual void writeBoundingBox(eWriteStream& dst) const;
     virtual void readBoundingBox(eReadStream& src);
 
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
+
     virtual SkBlendMode getBlendMode() const
     { return mBlendMode; }
 

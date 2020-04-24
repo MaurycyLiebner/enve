@@ -126,3 +126,21 @@ SimpleBrushWrapper* XevExportHelpers::brushFromElement(const QDomElement& ele) {
     const QString name = ele.attribute("name");
     return BrushCollectionData::sGetBrush(coll, name);
 }
+
+QMatrix XmlExportHelpers::stringToMatrix(const QString& str) {
+    const auto vals = str.split(' ', QString::SkipEmptyParts);
+    if(vals.count() != 6) RuntimeThrow("Invalid matrix value '" + str + "'");
+    const qreal m11 = stringToDouble(vals[0]);
+    const qreal m12 = stringToDouble(vals[1]);
+    const qreal m21 = stringToDouble(vals[2]);
+    const qreal m22 = stringToDouble(vals[3]);
+    const qreal dx = stringToDouble(vals[4]);
+    const qreal dy = stringToDouble(vals[5]);
+    return QMatrix(m11, m12, m21, m22, dx, dy);
+}
+
+QString XmlExportHelpers::matrixToString(const QMatrix& m) {
+    return QString("%1 %2 %3 %4 %5 %6").arg(m.m11()).arg(m.m12()).
+                                        arg(m.m21()).arg(m.m22()).
+                                        arg(m.dx()).arg(m.dy());
+}

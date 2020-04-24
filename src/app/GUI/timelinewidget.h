@@ -21,6 +21,7 @@
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QDomElement>
 
 #include "smartPointers/stdselfref.h"
 #include "framerange.h"
@@ -62,6 +63,9 @@ public:
 
     void writeState(eWriteStream& dst) const;
     void readState(eReadStream& src);
+
+    void readStateXEV(const QDomElement& ele);
+    void writeStateXEV(QDomElement& ele, QDomDocument& doc) const;
 private:
     void setViewedFrameRange(const FrameRange &range);
     void setCanvasFrameRange(const FrameRange &range);

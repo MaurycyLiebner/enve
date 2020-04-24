@@ -18,21 +18,40 @@
 #include "widgetwrappernode.h"
 #include "exceptions.h"
 
+WrapperNode* createForType(const WrapperNodeType type,
+                           const WrapperNode::WidgetCreator &creator) {
+    switch(type) {
+    case WrapperNodeType::widget: return creator(nullptr);
+    case WrapperNodeType::splitH: return new HWidgetStackNode(creator);
+    case WrapperNodeType::splitV: return new VWidgetStackNode(creator);
+    default: RuntimeThrow("Invalid WrapperNodeType, data corrupted");
+    }
+}
+
+QDomElement WrapperNode::writeXEV(QDomDocument& doc) {
+    auto result = doc.createElement(tagNameXEV());
+    writeDataXEV(result, doc);
+    return result;
+}
+
 WrapperNode* WrapperNode::sRead(eReadStream &src,
-                                const WrapperNodeCreator &creator) {
+                                const WidgetCreator &creator) {
     WrapperNodeType type;
     src.read(&type, sizeof(WrapperNodeType));
-    WrapperNode* wid = nullptr;
-    if(type == WrapperNodeType::widget) {
-        wid = creator(nullptr);
-    } else if(type == WrapperNodeType::splitH) {
-        wid = new HWidgetStackNode(creator);
-    } else if(type == WrapperNodeType::splitV) {
-        wid = new VWidgetStackNode(creator);
-    } else if(type == WrapperNodeType::base) {
-        wid = new BaseWrapperNode(creator);
-    } else RuntimeThrow("Invalid WrapperNodeType, data corrupted");
+    const auto wid = createForType(type, creator);
     wid->readData(src);
+    return wid;
+}
+
+WrapperNode* WrapperNode::sReadXEV(const QDomElement& ele,
+                                   const WidgetCreator& creator) {
+    WrapperNodeType type;
+    const auto tag = ele.tagName();
+    if(tag == "HSplit") type = WrapperNodeType::splitH;
+    else if(tag == "VSplit") type = WrapperNodeType::splitV;
+    else type = WrapperNodeType::widget;
+    const auto wid = createForType(type, creator);
+    wid->readDataXEV(ele);
     return wid;
 }
 

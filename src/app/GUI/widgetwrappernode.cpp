@@ -21,7 +21,7 @@ StackWrapperMenu::StackWrapperMenu() {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 }
 
-WidgetWrapperNode::WidgetWrapperNode(const WrapperNode::WrapperNodeCreator &creator) :
+WidgetWrapperNode::WidgetWrapperNode(const WrapperNode::WidgetCreator &creator) :
     WrapperNode(WrapperNodeType::widget, creator) {
     mCornerMenu = new WidgetWrapperCornerMenu(this);
     mLayout = new QVBoxLayout(this);

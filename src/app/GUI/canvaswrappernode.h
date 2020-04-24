@@ -28,6 +28,11 @@ public:
 protected:
     void readData(eReadStream& src);
     void writeData(eWriteStream& dst);
+
+    void readDataXEV(const QDomElement& ele);
+    void writeDataXEV(QDomElement& ele, QDomDocument& doc);
+
+    QString tagNameXEV() const { return "Canvas"; }
 private:
     CanvasWrapperMenuBar* mMenu;
     CanvasWindow* mCanvasWindow;

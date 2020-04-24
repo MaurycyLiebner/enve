@@ -19,6 +19,7 @@
 
 #include <QBoxLayout>
 #include <QtCore>
+#include <QDomElement>
 #include "smartPointers/ememory.h"
 #include "widgetstack.h"
 #include "ReadWrite/basicreadwrite.h"
@@ -37,14 +38,14 @@ class Canvas;
 
 class WrapperNode {
 public:
-    typedef std::function<WidgetWrapperNode*(Canvas*)> WrapperNodeCreator;
+    typedef std::function<WidgetWrapperNode*(Canvas*)> WidgetCreator;
     WrapperNode(const WrapperNodeType type,
-                const WrapperNodeCreator& creator) :
+                const WidgetCreator& creator) :
         fType(type), fCreator(creator) {}
     virtual ~WrapperNode() {}
 
     const WrapperNodeType fType;
-    const WrapperNodeCreator fCreator;
+    const WidgetCreator fCreator;
     ParentWrapperNode* fParent = nullptr;
 
     virtual QWidget* widget() = 0;
@@ -54,11 +55,18 @@ public:
         writeData(dst);
     }
 
+    QDomElement writeXEV(QDomDocument& doc);
+
     static WrapperNode *sRead(eReadStream& src,
-                              const WrapperNodeCreator& creator);
+                              const WidgetCreator& creator);
+    static WrapperNode *sReadXEV(const QDomElement& ele,
+                                 const WidgetCreator& creator);
 protected:
     virtual void readData(eReadStream& src) = 0;
     virtual void writeData(eWriteStream& dst) = 0;
+    virtual void writeDataXEV(QDomElement& ele, QDomDocument& doc) = 0;
+    virtual void readDataXEV(const QDomElement& ele) = 0;
+    virtual QString tagNameXEV() const = 0;
 };
 
 class ParentWrapperNode : public WrapperNode {
@@ -73,8 +81,9 @@ public:
 
 class BaseWrapperNode : public QWidget, public ParentWrapperNode {
 public:
-    BaseWrapperNode(const WrapperNodeCreator& creator) :
-        ParentWrapperNode(WrapperNodeType::base, creator) {
+    BaseWrapperNode(const QString& tagName, const WidgetCreator& creator) :
+        ParentWrapperNode(WrapperNodeType::base, creator),
+        mTagName(tagName) {
         setLayout(new QVBoxLayout);
         layout()->setContentsMargins(0, 0, 0, 0);
     }
@@ -103,6 +112,31 @@ public:
 
     void readData(eReadStream& src) {
         const auto newChild = sRead(src, fCreator);
+        replaceAndDeleteChild(newChild);
+    }
+
+    void writeData(eWriteStream& dst) {
+        fChild->write(dst);
+    }
+
+    void writeDataXEV(QDomElement& ele, QDomDocument& doc) {
+        const auto child = fChild->writeXEV(doc);
+        ele.appendChild(child);
+    }
+
+    void readDataXEV(const QDomElement& ele) {
+        const auto child = ele.firstChildElement();
+        const auto childTag = child.tagName();
+        const auto newChild = sReadXEV(child, fCreator);
+        replaceAndDeleteChild(newChild);
+    }
+
+    QString tagNameXEV() const { return mTagName; }
+private:
+    using WrapperNode::write;
+    const QString mTagName;
+
+    void replaceAndDeleteChild(WrapperNode* newChild) {
         newChild->fParent = this;
         if(fChild) {
             layout()->replaceWidget(fChild->widget(), newChild->widget());
@@ -110,12 +144,6 @@ public:
         } else layout()->addWidget(newChild->widget());
         fChild = newChild;
     }
-
-    void writeData(eWriteStream& dst) {
-        fChild->write(dst);
-    }
-private:
-    using WrapperNode::write;
 };
 
 class SplitWrapperNode : public ParentWrapperNode {
@@ -155,11 +183,30 @@ protected:
         fChild1->write(dst);
         fChild2->write(dst);
     }
+
+    void writeDataXEV(QDomElement& ele, QDomDocument& doc) {
+        const auto child1 = fChild1->writeXEV(doc);
+        const auto child2 = fChild2->writeXEV(doc);
+
+        ele.appendChild(child1);
+        ele.appendChild(child2);
+    }
+
+    void readDataXEV(const QDomElement& ele) {
+        const auto child1 = ele.firstChildElement();
+        const auto child2 = ele.lastChildElement();
+
+        fChild1 = sReadXEV(child1, fCreator);
+        fChild2 = sReadXEV(child2, fCreator);
+
+        fChild1->fParent = this;
+        fChild2->fParent = this;
+    }
 };
 
 class VWidgetStackNode : public VWidgetStack, public SplitWrapperNode {
 public:
-    VWidgetStackNode(const WrapperNodeCreator& creator) :
+    VWidgetStackNode(const WidgetCreator& creator) :
         SplitWrapperNode(WrapperNodeType::splitV, creator) {}
 
     QWidget* widget() { return this; }
@@ -185,11 +232,26 @@ protected:
         SplitWrapperNode::writeData(dst);
         dst << percentAt(1);
     }
+
+    void writeDataXEV(QDomElement& ele, QDomDocument& doc) {
+        SplitWrapperNode::writeDataXEV(ele, doc);
+        ele.setAttribute("proportions", percentAt(1));
+    }
+
+    void readDataXEV(const QDomElement& ele) {
+        SplitWrapperNode::readDataXEV(ele);
+        const QString child2fracStr = ele.attribute("proportions");
+        const qreal child2frac = XmlExportHelpers::stringToDouble(child2fracStr);
+        appendWidget(fChild1->widget());
+        appendWidget(fChild2->widget(), child2frac);
+    }
+
+    QString tagNameXEV() const { return "VSplit"; };
 };
 
 class HWidgetStackNode : public HWidgetStack, public SplitWrapperNode {
 public:
-    HWidgetStackNode(const WrapperNodeCreator& creator) :
+    HWidgetStackNode(const WidgetCreator& creator) :
         SplitWrapperNode(WrapperNodeType::splitH, creator) {}
 
     QWidget* widget() { return this; }
@@ -215,6 +277,21 @@ protected:
         SplitWrapperNode::writeData(dst);
         dst << percentAt(1);
     }
+
+    void writeDataXEV(QDomElement& ele, QDomDocument& doc) {
+        SplitWrapperNode::writeDataXEV(ele, doc);
+        ele.setAttribute("proportions", percentAt(1));
+    }
+
+    void readDataXEV(const QDomElement& ele) {
+        SplitWrapperNode::readDataXEV(ele);
+        const QString child2fracStr = ele.attribute("proportions");
+        const qreal child2frac = XmlExportHelpers::stringToDouble(child2fracStr);
+        appendWidget(fChild1->widget());
+        appendWidget(fChild2->widget(), child2frac);
+    }
+
+    QString tagNameXEV() const { return "HSplit"; };
 };
 
 #endif // WRAPPERNODE_H

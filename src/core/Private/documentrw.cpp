@@ -129,6 +129,7 @@ void Document::writeDoxumentXEV(QDomDocument& doc) const {
         scene.setAttribute("width", s->getCanvasWidth());
         scene.setAttribute("height", s->getCanvasHeight());
         scene.setAttribute("fps", s->getFps());
+        scene.setAttribute("clip", s->clipToCanvas() ? "true" : "false");
 
         scenes.appendChild(scene);
     }
@@ -197,7 +198,7 @@ void Document::readDoxumentXEV(const QDomDocument& doc,
         sett.fWidth = XmlExportHelpers::stringToInt(sceneEle.attribute("width"));
         sett.fHeight = XmlExportHelpers::stringToInt(sceneEle.attribute("height"));
         sett.fFps = XmlExportHelpers::stringToDouble(sceneEle.attribute("fps"));
-
+        sett.fClip = sceneEle.attribute("clip") == "true";
         sceneSetts << sett;
     }
 }
@@ -211,6 +212,7 @@ void Document::readScenesXEV(ZipFileLoader& fileLoader,
         newScene->anim_setAbsFrame(sett.fFrame);
         newScene->setCanvasSize(sett.fWidth, sett.fHeight);
         newScene->setFps(sett.fFps);
+        newScene->setClipToCanvas(sett.fClip);
         const QString path = "scenes/" + QString::number(id++) + "/";
         newScene->readBoxOrSoundXEV(fileLoader, path);
     }

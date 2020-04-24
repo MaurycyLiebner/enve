@@ -61,3 +61,12 @@ void CanvasWrapperNode::readData(eReadStream &src) {
 void CanvasWrapperNode::writeData(eWriteStream &dst) {
     mCanvasWindow->writeState(dst);
 }
+
+void CanvasWrapperNode::readDataXEV(const QDomElement& ele) {
+    mCanvasWindow->readStateXEV(ele);
+    mMenu->setCurrentScene(mCanvasWindow->getCurrentCanvas());
+}
+
+void CanvasWrapperNode::writeDataXEV(QDomElement& ele, QDomDocument& doc) {
+    mCanvasWindow->writeStateXEV(ele, doc);
+}

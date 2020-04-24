@@ -24,6 +24,7 @@
 #include <QMainWindow>
 
 #include "GUI/global.h"
+#include "XML/xmlexporthelpers.h"
 
 #define STACK_TMPL_DEFS \
     int (QWidget::*DimGetter)() const, void (*DimSetter)(QWidget*, int), \

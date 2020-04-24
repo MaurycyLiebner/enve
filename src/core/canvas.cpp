@@ -994,13 +994,31 @@ void Canvas::writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
         int id = 0;
         const XevExporter exp(doc, fileSaver, path);
         for(const auto &grad : mGradients) {
-            auto gradient = grad->prp_writeNamedPropertyXEV("Gradient", exp);
+            auto gradient = grad->prp_writePropertyXEV(exp);
             gradient.setAttribute("id", id++);
             gradients.appendChild(gradient);
         }
         doc.appendChild(gradients);
 
         stream << doc.toString();
+    });
+}
+
+void Canvas::readBoxOrSoundXEV(ZipFileLoader &fileLoader,
+                               const QString &path) {
+    ContainerBox::readBoxOrSoundXEV(fileLoader, path);
+    fileLoader.process(path + "gradients.xml",
+                       [&](QIODevice* const src) {
+        QDomDocument doc;
+        doc.setContent(src);
+        const auto root = doc.firstChildElement("Gradients");
+        const auto gradients = root.elementsByTagName("Gradient");
+        for(int i = 0; i < gradients.count(); i++) {
+            const auto node = gradients.at(i);
+            const auto ele = node.toElement();
+            const XevImporter imp(fileLoader, path);
+            createNewGradient()->prp_readPropertyXEV(ele, imp);
+        }
     });
 }
 

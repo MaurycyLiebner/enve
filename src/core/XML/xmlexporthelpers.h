@@ -17,6 +17,8 @@
 #ifndef XMLEXPORTHELPERS_H
 #define XMLEXPORTHELPERS_H
 
+#include "../exceptions.h"
+
 #include "../skia/skiaincludes.h"
 
 #include <QDomElement>
@@ -32,6 +34,28 @@ namespace XmlExportHelpers {
     qreal stringToDouble(const QString& string);
     int stringToInt(const QStringRef& string);
     int stringToInt(const QString& string);
+
+    template <typename T, typename S>
+    T stringToEnum(const S& string) {
+        const int intVal = stringToInt(string);
+        return static_cast<T>(intVal);
+    }
+
+    template <typename T, typename S>
+    T stringToEnum(const S& string, const T min, const T max) {
+        const auto result = stringToEnum(string);
+        if(result < min || result > max)
+            RuntimeThrow("Value outside of enum value range");
+        return result;
+    }
+
+    template <typename T, typename S>
+    T stringToEnum(const S& string, const T max) {
+        return stringToEnum(string, 0, max);
+    }
+
+    QMatrix stringToMatrix(const QString& str);
+    QString matrixToString(const QMatrix& m);
 };
 
 namespace XevExportHelpers {

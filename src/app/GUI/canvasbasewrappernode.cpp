@@ -17,6 +17,6 @@
 #include "canvasbasewrappernode.h"
 
 CanvasBaseWrapperNode::CanvasBaseWrapperNode() :
-    BaseWrapperNode([](Canvas* const scene) {
+    BaseWrapperNode("CanvasLayout", [](Canvas* const scene) {
         return new CanvasWrapperNode(scene);
     }) {}

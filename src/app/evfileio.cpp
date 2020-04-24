@@ -106,7 +106,7 @@ void MainWindow::saveToFile(const QString &path) {
         mDocument.write(writeStream);
 
         writeStream.writeCheckpoint();
-        mLayoutHandler->write(writeStream);        
+        mLayoutHandler->write(writeStream);
         writeStream.writeCheckpoint();
         const auto renderWidget = mTimeline->getRenderWidget();
         renderWidget->write(writeStream);
@@ -151,6 +151,14 @@ void MainWindow::saveToFileXEV(const QString &path) {
         });
 
         mDocument.writeXEV(fileSaver);
+
+        fileSaver.processText("UI/layouts.xml", [&](QTextStream& stream) {
+            QDomDocument doc;
+            auto ele = doc.createElement("Layouts");
+            mLayoutHandler->writeXEV(ele, doc);
+            doc.appendChild(ele);
+            stream << doc.toString();
+        });
     } catch(...) {
         file.close();
         RuntimeThrow("Error while writing to file " + path);
@@ -168,6 +176,13 @@ void MainWindow::loadXevFile(const QString &path) {
         fileLoader.setZipPath(path);
 
         mDocument.readXEV(fileLoader);
+
+        fileLoader.process("UI/layouts.xml", [&](QIODevice* const src) {
+            QDomDocument doc;
+            doc.setContent(src);
+            const auto ele = doc.firstChildElement("Layouts");
+            mLayoutHandler->readXEV(ele);
+        });
     } catch(...) {
         RuntimeThrow("Error while reading from file " + path);
     }

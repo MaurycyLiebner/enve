@@ -79,6 +79,9 @@ public:
 
     void writeState(eWriteStream& dst) const;
     void readState(eReadStream& src);
+
+    void readStateXEV(const QDomElement& ele);
+    void writeStateXEV(QDomElement& ele, QDomDocument& doc) const;
 protected:
     bool event(QEvent *e);
 

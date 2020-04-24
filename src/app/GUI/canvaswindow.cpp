@@ -324,7 +324,7 @@ void CanvasWindow::readState(eReadStream &src) {
     int sceneReadId; src >> sceneReadId;
     int sceneDocumentId; src >> sceneDocumentId;
 
-    BoundingBox* sceneBox = nullptr;;
+    BoundingBox* sceneBox = nullptr;
     if(sceneReadId != -1)
         sceneBox = BoundingBox::sGetBoxByReadId(sceneReadId);
     if(!sceneBox && sceneDocumentId != -1)
@@ -333,6 +333,31 @@ void CanvasWindow::readState(eReadStream &src) {
     setCurrentCanvas(enve_cast<Canvas*>(sceneBox));
     src >> mViewTransform;
     mFitToSizeBlocked = true;
+}
+
+void CanvasWindow::readStateXEV(const QDomElement& ele) {
+    const auto sceneIdStr = ele.attribute("sceneId");
+    const int sceneId = XmlExportHelpers::stringToInt(sceneIdStr);
+
+    Canvas* scene = nullptr;
+    if(sceneId != -1) {
+        const auto sceneBox = BoundingBox::sGetBoxByReadId(sceneId);
+        scene = enve_cast<Canvas*>(sceneBox);
+    }
+    setCurrentCanvas(scene);
+
+    const auto viewTransformStr = ele.attribute("viewTransform");
+    mViewTransform = XmlExportHelpers::stringToMatrix(viewTransformStr);
+
+    mFitToSizeBlocked = true;
+}
+
+void CanvasWindow::writeStateXEV(QDomElement& ele, QDomDocument& doc) const {
+    Q_UNUSED(doc)
+    const int sceneId = mCurrentCanvas ? mCurrentCanvas->getWriteId() : -1;
+    ele.setAttribute("sceneId", sceneId);
+    const auto viewTransformStr = XmlExportHelpers::matrixToString(mViewTransform);
+    ele.setAttribute("viewTransform", viewTransformStr);
 }
 
 bool CanvasWindow::handleCutCopyPasteKeyPress(QKeyEvent *event) {

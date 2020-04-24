@@ -531,6 +531,7 @@ public:
     void readBoundingBox(eReadStream& src);
 
     void writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path) const;
+    void readBoxOrSoundXEV(ZipFileLoader &fileLoader, const QString &path);
 
     bool anim_prevRelFrameWithKey(const int relFrame, int &prevRelFrame);
     bool anim_nextRelFrameWithKey(const int relFrame, int &nextRelFrame);

@@ -17,6 +17,6 @@
 #include "timelinebasewrappernode.h"
 
 TimelineBaseWrapperNode::TimelineBaseWrapperNode() :
-    BaseWrapperNode([](Canvas* const scene) {
+    BaseWrapperNode("TimelineLayout", [](Canvas* const scene) {
         return new TimelineWrapperNode(scene);
     }) {}
