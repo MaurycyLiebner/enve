@@ -1430,7 +1430,8 @@ void MainWindow::importImageSequence() {
 }
 
 void MainWindow::revert() {
-    openFile(mDocument.fEvFile);
+    const QString path = mDocument.fEvFile;
+    openFile(path);
 }
 
 stdsptr<void> MainWindow::lock() {
