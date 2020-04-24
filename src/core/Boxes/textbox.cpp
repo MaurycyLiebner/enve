@@ -369,6 +369,41 @@ void TextBox::readBoundingBox(eReadStream& src) {
     setFontFamilyAndStyle(fontFamily, style);
 }
 
+QDomElement TextBox::prp_writePropertyXEV(const XevExporter& exp) const {
+    auto result = PathBox::prp_writePropertyXEV(exp);
+    result.setAttribute("hAlign", static_cast<int>(mHAlignment));
+    result.setAttribute("vAlign", static_cast<int>(mVAlignment));
+    result.setAttribute("fontSize", mFont.getSize());
+    result.setAttribute("fontFamily", mFamily);
+    result.setAttribute("fontWeight", mStyle.weight());
+    result.setAttribute("fontWidth", mStyle.width());
+    result.setAttribute("fontSlant", mStyle.slant());
+    return result;
+}
+
+void TextBox::prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) {
+    PathBox::prp_readPropertyXEV(ele, imp);
+    const auto hAlign = ele.attribute("hAlign");
+    const auto vAlign = ele.attribute("vAlign");
+    const auto fontSizeStr = ele.attribute("fontSize");
+    const auto fontFamily = ele.attribute("fontFamily");
+    const auto fontWeightStr = ele.attribute("fontWeight");
+    const auto fontWidthStr = ele.attribute("fontWidth");
+    const auto fontSlantStr = ele.attribute("fontSlant");
+
+    mHAlignment = XmlExportHelpers::stringToEnum<Qt::Alignment>(hAlign);
+    mVAlignment = XmlExportHelpers::stringToEnum<Qt::Alignment>(vAlign);
+    const qreal fontSize = XmlExportHelpers::stringToDouble(fontSizeStr);
+    const int weight = XmlExportHelpers::stringToInt(fontWeightStr);
+    const int width = XmlExportHelpers::stringToInt(fontWidthStr);
+    const auto slant = XmlExportHelpers::stringToEnum<SkFontStyle::Slant>(fontSlantStr);
+
+    SkFontStyle fontStyle(weight, width, slant);
+
+    setFontFamilyAndStyle(fontFamily, fontStyle);
+    mFont.setSize(fontSize);
+}
+
 void saveTextAttributesSVG(QDomElement& ele,
                            const SkFont& font) {
     ele.setAttribute("font-size", font.getSize());

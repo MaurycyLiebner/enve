@@ -27,8 +27,12 @@ public:
     void setFolderPath(const QString &folderPath);
 
     void changeSourceFile();
+
     void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);
+
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 private:
     void fileHandlerConnector(ConnContext& conn,
                               ImageSequenceFileHandler* obj);

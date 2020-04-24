@@ -45,6 +45,19 @@ public:
         setFilePath(path);
     }
 
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const override {
+        auto result = T::prp_writePropertyXEV(exp);
+        result.setAttribute("src", getFilePath());
+        return result;
+    }
+
+    void prp_readPropertyXEV(const QDomElement& ele,
+                             const XevImporter& imp) override {
+        T::prp_readPropertyXEV(ele, imp);
+        const auto src = ele.attribute("src");
+        setFilePath(src);
+    }
+
     void setupCanvasMenu(PropertyMenu * const menu) override;
 
     bool isLink() const final { return true; }

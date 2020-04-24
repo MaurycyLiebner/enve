@@ -33,6 +33,10 @@ public:
 
     void prp_readProperty(eReadStream &src) override;
     void prp_writeProperty(eWriteStream &dst) const override;
+
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const override;
+    void prp_readPropertyXEV(const QDomElement& ele,
+                             const XevImporter& imp) override;
 signals:
     void enabledChanged(const bool enabled);
 private:

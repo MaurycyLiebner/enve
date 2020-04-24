@@ -33,6 +33,9 @@ public:
     void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);
 
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
+
     void setStretch(const qreal stretch);
 
     eVideoSound* sound() const

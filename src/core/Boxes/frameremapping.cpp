@@ -39,6 +39,18 @@ void FrameRemappingBase::prp_writeProperty(eWriteStream &dst) const {
     QrealAnimator::prp_writeProperty(dst);
 }
 
+QDomElement FrameRemappingBase::prp_writePropertyXEV(const XevExporter& exp) const {
+    auto result = QrealAnimator::prp_writePropertyXEV(exp);
+    result.setAttribute("enabled", mEnabled ? "true" : "false");
+    return result;
+}
+
+void FrameRemappingBase::prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) {
+    QrealAnimator::prp_readPropertyXEV(ele, imp);
+    const auto enabled = ele.attribute("enabled");
+    setEnabled(enabled == "true");
+}
+
 void FrameRemappingBase::enableAction(const int minFrame, const int maxFrame,
                                       const int animStartRelFrame) {
     if(mEnabled) return;

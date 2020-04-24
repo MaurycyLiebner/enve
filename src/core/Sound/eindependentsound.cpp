@@ -118,14 +118,23 @@ void eIndependentSound::updateDurationRectLength() {
 #include "ReadWrite/basicreadwrite.h"
 void eIndependentSound::prp_writeProperty(eWriteStream& dst) const {
     eBoxOrSound::prp_writeProperty(dst);
-    const auto cacheHandler = this->cacheHandler();
-    const auto filePath = cacheHandler ? cacheHandler->getFilePath() : "";
-    dst << filePath;
+    dst << mFileHandler.path();
 }
 
 void eIndependentSound::prp_readProperty(eReadStream& src) {
     eBoxOrSound::prp_readProperty(src);
-    QString filePath;
-    src >> filePath;
+    QString filePath; src >> filePath;
     if(!filePath.isEmpty()) setFilePath(filePath);
+}
+
+QDomElement eIndependentSound::prp_writePropertyXEV(const XevExporter& exp) const {
+    auto result = eBoxOrSound::prp_writePropertyXEV(exp);
+    result.setAttribute("src", mFileHandler.path());
+    return result;
+}
+
+void eIndependentSound::prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) {
+    eBoxOrSound::prp_readPropertyXEV(ele, imp);
+    const auto src = ele.attribute("src");
+    if(!src.isEmpty()) setFilePath(src);
 }

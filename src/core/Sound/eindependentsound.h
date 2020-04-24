@@ -33,6 +33,9 @@ public:
 
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
+
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 protected:
     void updateDurationRectLength();
 public:

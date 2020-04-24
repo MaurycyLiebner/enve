@@ -72,3 +72,17 @@ void ImageSequenceBox::readBoundingBox(eReadStream& src) {
     QString dir; src >> dir;
     setFolderPath(dir);
 }
+
+QDomElement ImageSequenceBox::prp_writePropertyXEV(
+        const XevExporter& exp) const {
+    auto result = AnimationBox::prp_writePropertyXEV(exp);
+    result.setAttribute("src", mFileHandler.path());
+    return result;
+}
+
+void ImageSequenceBox::prp_readPropertyXEV(
+        const QDomElement& ele, const XevImporter& imp) {
+    AnimationBox::prp_readPropertyXEV(ele, imp);
+    const auto src = ele.attribute("src");
+    setFolderPath(src);
+}
