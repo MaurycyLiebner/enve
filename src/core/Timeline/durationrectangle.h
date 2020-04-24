@@ -142,8 +142,12 @@ public:
                       const qreal pixelsPerFrame,
                       const int minViewedFrame);
     virtual bool hasAnimationFrameRange() { return false; }
+
     virtual void writeDurationRectangle(eWriteStream& dst);
     virtual void readDurationRectangle(eReadStream &src);
+
+    virtual void writeDurationRectangleXEV(QDomElement& ele) const;
+    virtual void readDurationRectangleXEV(const QDomElement& ele);
 
     void pressed(const bool shiftPressed);
 

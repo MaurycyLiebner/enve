@@ -143,7 +143,9 @@ void eBoxOrSound::writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
                                      const QString& path) const {
     QDomDocument doc;
     const XevExporter exp(doc, fileSaver, path);
-    const auto obj = prp_writeNamedPropertyXEV("Object", exp);
+    auto obj = prp_writeNamedPropertyXEV("Object", exp);
+    if(mDurationRectangle) mDurationRectangle->writeDurationRectangleXEV(obj);
+
     doc.appendChild(obj);
     fileSaver.processText(path + "properties.xml",
                           [&](QTextStream& stream) {
@@ -159,6 +161,11 @@ void eBoxOrSound::readBoxOrSoundXEV(ZipFileLoader& fileLoader,
         doc.setContent(src);
     });
     const auto obj = doc.firstChildElement("Object");
+    const bool hasDurRect = obj.hasAttribute("visRange");
+    if(hasDurRect) {
+        if(!mDurationRectangle) createDurationRectangle();
+        mDurationRectangle->readDurationRectangleXEV(obj);
+    }
     const XevImporter imp(fileLoader, path);
     prp_readPropertyXEV(obj, imp);
 }

@@ -20,14 +20,17 @@
 
 class CORE_EXPORT FixedLenAnimationRect : public AnimationRect {
 public:
-    FixedLenAnimationRect(Property& parentProp) :
-        AnimationRect(parentProp) {}
+    FixedLenAnimationRect(Property& parentProp, const bool bindToRange = false) :
+        AnimationRect(parentProp), mBoundToRange(bindToRange) {}
 
     int getMinAnimRelFrame() const;
     int getMaxAnimRelFrame() const;
 
     void writeDurationRectangle(eWriteStream& dst);
     void readDurationRectangle(eReadStream &src);
+
+    void writeDurationRectangleXEV(QDomElement& ele) const;
+    void readDurationRectangleXEV(const QDomElement& ele);
 
     void setFirstAnimationFrame(const int minAnimationFrame) {
         const int animDur = mMaxAnimationFrame - mMinAnimationFrame;
@@ -36,12 +39,11 @@ public:
     }
 
     void bindToAnimationFrameRange();
-    void setBindToAnimationFrameRange();
 protected:
     void setMinAnimRelFrame(const int min);
     void setMaxAnimRelFrame(const int max);
 
-    bool mBoundToAnimation = false;
+    const bool mBoundToRange;
     bool mSetMaxFrameAtLeastOnce = false;
     int mMinAnimationFrame = 0;
     int mMaxAnimationFrame = 0;

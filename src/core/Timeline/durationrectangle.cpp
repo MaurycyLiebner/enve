@@ -325,3 +325,20 @@ void DurationRectangle::readDurationRectangle(eReadStream& src) {
     mMaxFrame.setValueUnClamped(maxFrame);
     setRelShift(shift);
 }
+
+void DurationRectangle::writeDurationRectangleXEV(QDomElement& ele) const {
+    const auto visRange = QString("%1 %2").arg(getMinRelFrame()).
+                                           arg(getMaxRelFrame());
+    ele.setAttribute("visFrameRange", visRange);
+    ele.setAttribute("frameShift", getRelShift());
+}
+
+void DurationRectangle::readDurationRectangleXEV(const QDomElement& ele) {
+    const auto visRangeStr = ele.attribute("visFrameRange");
+    const auto visRangeStrs = visRangeStr.split(' ', QString::SkipEmptyParts);
+    if(visRangeStrs.count() != 2) RuntimeThrow("Invalid frame range " + visRangeStr);
+    mMinFrame.setValueUnClamped(XmlExportHelpers::stringToInt(visRangeStrs[0]));
+    mMaxFrame.setValueUnClamped(XmlExportHelpers::stringToInt(visRangeStrs[1]));
+    const auto shiftStr = ele.attribute("frameShift");
+    setRelShift(XmlExportHelpers::stringToInt(shiftStr));
+}

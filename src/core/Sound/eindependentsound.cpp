@@ -25,8 +25,7 @@ SoundFileHandler* soundFileHandlerGetter(const QString& path) {
 
 qsptr<FixedLenAnimationRect> createIndependentSoundDur(
         eIndependentSound* const sound) {
-    const auto result = enve::make_shared<FixedLenAnimationRect>(*sound);
-    result->setBindToAnimationFrameRange();
+    const auto result = enve::make_shared<FixedLenAnimationRect>(*sound, true);
     return result;
 }
 

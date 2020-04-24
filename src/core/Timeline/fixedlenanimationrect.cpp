@@ -38,13 +38,9 @@ void FixedLenAnimationRect::bindToAnimationFrameRange() {
     mMaxFrame.setClampMax(getMaxAnimRelFrame());
 }
 
-void FixedLenAnimationRect::setBindToAnimationFrameRange() {
-    mBoundToAnimation = true;
-}
-
 void FixedLenAnimationRect::setMinAnimRelFrame(const int min) {
     mMinAnimationFrame = min;
-    if(mBoundToAnimation) bindToAnimationFrameRange();
+    if(mBoundToRange) bindToAnimationFrameRange();
 }
 
 void FixedLenAnimationRect::setMaxAnimRelFrame(const int max) {
@@ -58,11 +54,11 @@ void FixedLenAnimationRect::setMaxAnimRelFrame(const int max) {
         mMinFrame.setClampMax(max);
     }
     mMaxAnimationFrame = max;
-    if(mBoundToAnimation) bindToAnimationFrameRange();
+    if(mBoundToRange) bindToAnimationFrameRange();
 }
 
 void FixedLenAnimationRect::writeDurationRectangle(eWriteStream &dst) {
-    dst << mBoundToAnimation;
+    dst << mBoundToRange;
     dst << mSetMaxFrameAtLeastOnce;
     dst << mMinAnimationFrame;
     dst << mMaxAnimationFrame;
@@ -70,9 +66,29 @@ void FixedLenAnimationRect::writeDurationRectangle(eWriteStream &dst) {
 }
 
 void FixedLenAnimationRect::readDurationRectangle(eReadStream& src) {
-    src >> mBoundToAnimation;
+    bool boundToRange; src >> boundToRange;
     src >> mSetMaxFrameAtLeastOnce;
     src >> mMinAnimationFrame;
     src >> mMaxAnimationFrame;
     DurationRectangle::readDurationRectangle(src);
+}
+
+void FixedLenAnimationRect::writeDurationRectangleXEV(QDomElement& ele) const {
+    DurationRectangle::writeDurationRectangleXEV(ele);
+    const auto visRange = QString("%1 %2").arg(mMinAnimationFrame).
+                                           arg(mMaxAnimationFrame);
+    ele.setAttribute("animFrameRange", visRange);
+
+    ele.setAttribute("maxFrameSet", mSetMaxFrameAtLeastOnce ? "true" : "false");
+}
+
+void FixedLenAnimationRect::readDurationRectangleXEV(const QDomElement& ele) {
+    DurationRectangle::readDurationRectangleXEV(ele);
+    const auto animRangeStr = ele.attribute("animFrameRange");
+    const auto animRangeStrs = animRangeStr.split(' ', QString::SkipEmptyParts);
+    if(animRangeStrs.count() != 2) RuntimeThrow("Invalid frame range " + animRangeStr);
+    mMinAnimationFrame = XmlExportHelpers::stringToInt(animRangeStrs[0]);
+    mMaxAnimationFrame = XmlExportHelpers::stringToInt(animRangeStrs[1]);
+
+    mSetMaxFrameAtLeastOnce = ele.attribute("maxFrameSet") == "true";
 }
