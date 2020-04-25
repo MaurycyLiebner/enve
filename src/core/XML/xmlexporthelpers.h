@@ -27,12 +27,18 @@
 class SimpleBrushWrapper;
 
 namespace XmlExportHelpers {
+    CORE_EXPORT
     SkBlendMode stringToBlendMode(const QString& compOpStr);
+    CORE_EXPORT
     QString blendModeToString(const SkBlendMode blendMode);
 
+    CORE_EXPORT
     qreal stringToDouble(const QStringRef& string);
+    CORE_EXPORT
     qreal stringToDouble(const QString& string);
+    CORE_EXPORT
     int stringToInt(const QStringRef& string);
+    CORE_EXPORT
     int stringToInt(const QString& string);
 
     template <typename T, typename S>
@@ -54,13 +60,17 @@ namespace XmlExportHelpers {
         return stringToEnum(string, 0, max);
     }
 
+    CORE_EXPORT
     QMatrix stringToMatrix(const QString& str);
+    CORE_EXPORT
     QString matrixToString(const QMatrix& m);
 };
 
 namespace XevExportHelpers {
+    CORE_EXPORT
     QDomElement brushToElement(SimpleBrushWrapper* const brush,
                                QDomDocument& doc);
+    CORE_EXPORT
     SimpleBrushWrapper* brushFromElement(const QDomElement& ele);
 };
 

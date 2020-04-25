@@ -19,7 +19,9 @@
 
 #include <QList>
 
-class RuntimeIdToWriteId {
+#include "../core_global.h"
+
+class CORE_EXPORT RuntimeIdToWriteId {
 public:
     void assign(const int runtimeId) {
         mRuntimeIds << runtimeId;
@@ -27,19 +29,6 @@ public:
 
     int runtimeIdToWriteId(const int runtimeId) const {
         return mRuntimeIds.indexOf(runtimeId);
-    }
-private:
-    QList<int> mRuntimeIds;
-};
-
-class WriteIdToRuntimeId {
-public:
-    void assign(const int runtimeId) {
-        mRuntimeIds << runtimeId;
-    }
-
-    int writeIdToRuntimeId(const int writeId) const {
-        return mRuntimeIds.at(writeId);
     }
 private:
     QList<int> mRuntimeIds;
