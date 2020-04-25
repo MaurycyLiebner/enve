@@ -84,6 +84,7 @@ MainWindow::MainWindow(Document& document,
     Q_ASSERT(!sInstance);
     sInstance = this;
 
+    ImportHandler::sInstance->addImporter<eXevImporter>();
     ImportHandler::sInstance->addImporter<evImporter>();
     ImportHandler::sInstance->addImporter<eSvgImporter>();
     ImportHandler::sInstance->addImporter<eOraImporter>();
@@ -1378,7 +1379,7 @@ void MainWindow::importFile() {
 
     const QString title = tr("Import File(s)", "ImportDialog_Title");
     const QString fileType = tr("Files %1", "ImportDialog_FileTypes");
-    const QString fileTypes = "(*.ev *.svg " +
+    const QString fileTypes = "(*.ev *.xev *.svg " +
             FileExtensions::videoFilters() +
             FileExtensions::imageFilters() +
             FileExtensions::soundFilters() + ")";

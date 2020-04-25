@@ -21,6 +21,12 @@
 #include "svgimporter.h"
 #include "Ora/oraimporter.h"
 
+qsptr<BoundingBox> eXevImporter::import(const QFileInfo &fileInfo, Canvas * const scene) const {
+    Q_UNUSED(scene);
+    MainWindow::sGetInstance()->loadXevFile(fileInfo.absoluteFilePath());
+    return nullptr;
+}
+
 qsptr<BoundingBox> evImporter::import(const QFileInfo &fileInfo, Canvas * const scene) const {
     Q_UNUSED(scene);
     MainWindow::sGetInstance()->loadEVFile(fileInfo.absoluteFilePath());

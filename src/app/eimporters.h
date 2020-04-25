@@ -20,6 +20,16 @@
 #include "Boxes/boundingbox.h"
 #include "importhandler.h"
 
+class eXevImporter : public eImporter {
+public:
+    bool supports(const QFileInfo& fileInfo) const {
+        return fileInfo.suffix() == "xev";
+    }
+
+    qsptr<BoundingBox> import(const QFileInfo& fileInfo,
+                              Canvas* const scene) const;
+};
+
 class evImporter : public eImporter {
 public:
     bool supports(const QFileInfo& fileInfo) const {
