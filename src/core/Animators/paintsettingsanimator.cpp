@@ -73,7 +73,7 @@ void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
     setPaintType(paintType);
 }
 
-QDomElement PaintSettingsAnimator::prp_writePropertyXEV(const XevExporter& exp) const {
+QDomElement PaintSettingsAnimator::prp_writePropertyXEV_impl(const XevExporter& exp) const {
     auto result = exp.createElement(prp_tagNameXEV());
 
     result.setAttribute("type", static_cast<int>(mPaintType));
@@ -108,7 +108,7 @@ QDomElement PaintSettingsAnimator::prp_writePropertyXEV(const XevExporter& exp) 
 }
 
 
-void PaintSettingsAnimator::prp_readPropertyXEV(const QDomElement& ele,
+void PaintSettingsAnimator::prp_readPropertyXEV_impl(const QDomElement& ele,
                                                 const XevImporter& imp) {
     const auto typeStr = ele.attribute("type");
     const int typeInt = XmlExportHelpers::stringToInt(typeStr);

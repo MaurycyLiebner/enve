@@ -163,7 +163,6 @@ void RenderInstanceSettings::write(eWriteStream &dst) const {
     int targetDocumentId = -1;
 
     if(mTargetCanvas) {
-        if(mTargetCanvas->getWriteId() < 0) mTargetCanvas->assignWriteId();
         targetWriteId = mTargetCanvas->getWriteId();
         targetDocumentId = mTargetCanvas->getDocumentId();
     }

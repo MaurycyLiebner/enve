@@ -31,6 +31,19 @@ protected:
         mFileHandler(this, getter, afterAssigned, connector) {
         this->prp_setName("Empty Link");
     }
+
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const override {
+        auto result = T::prp_writePropertyXEV(exp);
+        result.setAttribute("src", getFilePath());
+        return result;
+    }
+
+    void prp_readPropertyXEV_impl(const QDomElement& ele,
+                             const XevImporter& imp) override {
+        T::prp_readPropertyXEV_impl(ele, imp);
+        const auto src = ele.attribute("src");
+        setFilePath(src);
+    }
 public:
     virtual void changeSourceFile() = 0;
 
@@ -43,19 +56,6 @@ public:
         BoundingBox::readBoundingBox(src);
         QString path; src >> path;
         setFilePath(path);
-    }
-
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const override {
-        auto result = T::prp_writePropertyXEV(exp);
-        result.setAttribute("src", getFilePath());
-        return result;
-    }
-
-    void prp_readPropertyXEV(const QDomElement& ele,
-                             const XevImporter& imp) override {
-        T::prp_readPropertyXEV(ele, imp);
-        const auto src = ele.attribute("src");
-        setFilePath(src);
     }
 
     void setupCanvasMenu(PropertyMenu * const menu) override;

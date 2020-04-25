@@ -25,12 +25,12 @@ class CORE_EXPORT ComboBoxProperty : public Property {
 protected:
     ComboBoxProperty(const QString& name,
                      const QStringList &list);
+
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
 public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
-
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
 
     const QStringList &getValueNames() { return mValueNames; }
     QString getCurrentValueName();

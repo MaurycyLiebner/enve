@@ -126,14 +126,14 @@ void eIndependentSound::prp_readProperty(eReadStream& src) {
     if(!filePath.isEmpty()) setFilePath(filePath);
 }
 
-QDomElement eIndependentSound::prp_writePropertyXEV(const XevExporter& exp) const {
-    auto result = eBoxOrSound::prp_writePropertyXEV(exp);
+QDomElement eIndependentSound::prp_writePropertyXEV_impl(const XevExporter& exp) const {
+    auto result = eBoxOrSound::prp_writePropertyXEV_impl(exp);
     result.setAttribute("src", mFileHandler.path());
     return result;
 }
 
-void eIndependentSound::prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) {
-    eBoxOrSound::prp_readPropertyXEV(ele, imp);
+void eIndependentSound::prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) {
+    eBoxOrSound::prp_readPropertyXEV_impl(ele, imp);
     const auto src = ele.attribute("src");
     if(!src.isEmpty()) setFilePath(src);
 }

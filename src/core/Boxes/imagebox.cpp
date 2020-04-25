@@ -70,14 +70,14 @@ void ImageBox::readBoundingBox(eReadStream& src) {
     setFilePath(path);
 }
 
-QDomElement ImageBox::prp_writePropertyXEV(const XevExporter& exp) const {
-    auto result = BoundingBox::prp_writePropertyXEV(exp);
+QDomElement ImageBox::prp_writePropertyXEV_impl(const XevExporter& exp) const {
+    auto result = BoundingBox::prp_writePropertyXEV_impl(exp);
     result.setAttribute("src", mFileHandler.path());
     return result;
 }
 
-void ImageBox::prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) {
-    BoundingBox::prp_readPropertyXEV(ele, imp);
+void ImageBox::prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) {
+    BoundingBox::prp_readPropertyXEV_impl(ele, imp);
     const auto src = ele.attribute("src");
     setFilePath(src);
 }

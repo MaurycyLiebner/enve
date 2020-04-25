@@ -19,13 +19,16 @@
 #include "../zipfileloader.h"
 
 XevImporter::XevImporter(ZipFileLoader& fileLoader,
+                         const RuntimeIdToWriteId& objListIdConv,
                          const QString& path,
                          const QString& assetsPath) :
-    mFileLoader(fileLoader), mPath(path),
-    mAssetsPath(assetsPath) {}
+    mFileLoader(fileLoader),
+    mObjectListIdConv(objListIdConv),
+    mPath(path), mAssetsPath(assetsPath) {}
 
 XevImporter XevImporter::withAssetsPath(const QString& path) const {
-    return XevImporter(mFileLoader, mPath, mAssetsPath + path);
+    return XevImporter(mFileLoader, mObjectListIdConv,
+                       mPath, mAssetsPath + path);
 }
 
 void XevImporter::processAsset(const QString& file, const Processor& func) const {

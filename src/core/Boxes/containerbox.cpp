@@ -1317,17 +1317,18 @@ void ContainerBox::writeAllContained(eWriteStream& dst) const {
 }
 
 void ContainerBox::writeAllContainedXEV(
-        ZipFileSaver& fileSaved, const QString& path) const {
+        ZipFileSaver& fileSaved, const QString& path,
+        const RuntimeIdToWriteId& objListIdConv) const {
     const QString childPath = path + "objects/%1/";
     int id = 0;
     for(const auto& cont : mContained) {
-        cont->writeBoxOrSoundXEV(fileSaved, childPath.arg(id++));
+        cont->writeBoxOrSoundXEV(fileSaved, childPath.arg(id++), objListIdConv);
     }
 }
 
-void ContainerBox::writeBoxOrSoundXEV(
-        ZipFileSaver& fileSaver, const QString& path) const {
-    BoundingBox::writeBoxOrSoundXEV(fileSaver, path);
+void ContainerBox::writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path,
+                                      const RuntimeIdToWriteId& objListIdConv) const {
+    BoundingBox::writeBoxOrSoundXEV(fileSaver, path, objListIdConv);
     fileSaver.processText(path + "stack.xml", [this](QTextStream& stream) {
         QDomDocument doc;
         auto stack = doc.createElement("Stack");
@@ -1356,7 +1357,7 @@ void ContainerBox::writeBoxOrSoundXEV(
         doc.appendChild(stack);
         stream << doc.toString();
     });
-    writeAllContainedXEV(fileSaver, path);
+    writeAllContainedXEV(fileSaver, path, objListIdConv);
 }
 
 #include "smartvectorpath.h"
@@ -1413,7 +1414,8 @@ qsptr<BoundingBox> createBoxOfNonCustomType(const eBoxType type) {
 }
 
 void ContainerBox::readAllContainedXEV(
-        ZipFileLoader& fileLoader, const QString& path) {
+        ZipFileLoader& fileLoader, const QString& path,
+        const RuntimeIdToWriteId& objListIdConv) {
     fileLoader.process(path + "stack.xml", [&](QIODevice* const src) {
         QDomDocument doc;
         doc.setContent(src);
@@ -1472,14 +1474,15 @@ void ContainerBox::readAllContainedXEV(
     const QString childPath = path + "objects/%1/";
     int id = 0;
     for(const auto& cont : mContained) {
-        cont->readBoxOrSoundXEV(fileLoader, childPath.arg(id++));
+        cont->readBoxOrSoundXEV(fileLoader, childPath.arg(id++), objListIdConv);
     }
 }
 
 void ContainerBox::readBoxOrSoundXEV(
-        ZipFileLoader& fileLoader, const QString& path) {
-    BoundingBox::readBoxOrSoundXEV(fileLoader, path);
-    readAllContainedXEV(fileLoader, path);
+        ZipFileLoader& fileLoader, const QString& path,
+        const RuntimeIdToWriteId& objListIdConv) {
+    BoundingBox::readBoxOrSoundXEV(fileLoader, path, objListIdConv);
+    readAllContainedXEV(fileLoader, path, objListIdConv);
 }
 
 void ContainerBox::writeBoundingBox(eWriteStream& dst) const {

@@ -16,10 +16,15 @@
 
 #ifndef SINGLEWIDGETTARGET_H
 #define SINGLEWIDGETTARGET_H
+
 #include <QList>
 #include <map>
+#include <QDomElement>
+
 #include "swt_abstraction.h"
 #include "swt_rulescollection.h"
+#include "XML/xevexporter.h"
+#include "XML/xevimporter.h"
 
 class QMenu;
 class QAction;
@@ -160,6 +165,10 @@ public:
     { return SWT_mDisabled || SWT_mAncestorDisabled; }
 
     void SWT_setAncestorDisabled(const bool disabled);
+
+protected:
+    void SWT_writeAbstractionXEV(QDomElement& ele, const XevExporter& exp) const;
+    void SWT_readAbstractionXEV(const QDomElement& ele, const XevImporter& imp) const;
 signals:
     void SWT_changedDisabled(bool);
 private:

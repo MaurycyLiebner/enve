@@ -74,7 +74,7 @@ void AnimatedSurface::prp_writeProperty(eWriteStream& dst) const {
     mBaseValue->write(dst);
 }
 
-QDomElement AnimatedSurface::prp_writePropertyXEV(const XevExporter& exp) const {
+QDomElement AnimatedSurface::prp_writePropertyXEV_impl(const XevExporter& exp) const {
     auto result = exp.createElement("PaintSurface");
     if(anim_hasKeys()) {
         QString frames;
@@ -110,7 +110,7 @@ QDomElement AnimatedSurface::prp_writePropertyXEV(const XevExporter& exp) const 
     return result;
 }
 
-void AnimatedSurface::prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) {
+void AnimatedSurface::prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) {
     if(ele.hasAttribute("frames")) {
         const auto framesStr = ele.attribute("frames");
         const auto pivotsStr = ele.attribute("pivots");

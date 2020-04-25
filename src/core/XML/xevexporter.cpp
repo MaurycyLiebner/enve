@@ -20,13 +20,16 @@
 
 XevExporter::XevExporter(QDomDocument& doc,
                          ZipFileSaver& fileSaver,
+                         const RuntimeIdToWriteId& objListIdConv,
                          const QString& path,
                          const QString& assetsPath) :
     mDoc(doc), mFileSaver(fileSaver),
+    mObjectListIdConv(objListIdConv),
     mPath(path), mAssetsPath(assetsPath) {}
 
 XevExporter XevExporter::withAssetsPath(const QString& path) const {
-    return XevExporter(mDoc, mFileSaver, mPath, mAssetsPath + path);
+    return XevExporter(mDoc, mFileSaver, mObjectListIdConv,
+                       mPath, mAssetsPath + path);
 }
 
 QDomElement XevExporter::createElement(const QString& tagName) const {

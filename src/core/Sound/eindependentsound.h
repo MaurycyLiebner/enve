@@ -33,10 +33,10 @@ public:
 
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
-
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 protected:
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
+
     void updateDurationRectLength();
 public:
     void setFilePath(const QString &path);

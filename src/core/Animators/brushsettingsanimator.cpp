@@ -44,14 +44,14 @@ void BrushSettingsAnimator::prp_readProperty(eReadStream& src) {
     mBrush = BrushCollectionData::sGetBrush(brushCollection, brushName);
 }
 
-void BrushSettingsAnimator::prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) {
-    StaticComplexAnimator::prp_readPropertyXEV(ele, imp);
+void BrushSettingsAnimator::prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) {
+    StaticComplexAnimator::prp_readPropertyXEV_impl(ele, imp);
     const auto brush = ele.firstChildElement("Brush");
     mBrush = XevExportHelpers::brushFromElement(brush);
 }
 
-QDomElement BrushSettingsAnimator::prp_writePropertyXEV(const XevExporter& exp) const {
-    auto result = StaticComplexAnimator::prp_writePropertyXEV(exp);
+QDomElement BrushSettingsAnimator::prp_writePropertyXEV_impl(const XevExporter& exp) const {
+    auto result = StaticComplexAnimator::prp_writePropertyXEV_impl(exp);
     const auto brush = XevExportHelpers::brushToElement(mBrush.get(), exp.doc());
     result.appendChild(brush);
     return result;

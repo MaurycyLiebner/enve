@@ -29,15 +29,15 @@ class CORE_EXPORT BoxTargetProperty : public Property {
     e_OBJECT
 protected:
     BoxTargetProperty(const QString& name);
+
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
 public:
     bool SWT_dropSupport(const QMimeData* const data);
     bool SWT_drop(const QMimeData* const data);
 
     void prp_writeProperty(eWriteStream &dst) const;
     void prp_readProperty(eReadStream& src);
-
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
 
     BoundingBox *getTarget() const;
     void setTarget(BoundingBox * const box);

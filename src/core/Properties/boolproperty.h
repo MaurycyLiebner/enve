@@ -23,12 +23,12 @@ class CORE_EXPORT BoolProperty : public Property {
     e_OBJECT
 protected:
     BoolProperty(const QString& name);
+
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
 public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
-
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
 
     bool getValue();
     void setValue(const bool value);

@@ -124,6 +124,8 @@ void Document::writeDoxumentXEV(QDomDocument& doc) const {
     auto scenes = doc.createElement("Scenes");
     for(const auto &s : fScenes) {
         auto scene = doc.createElement("Scene");
+        const qreal resolution = s->getResolution();
+        scene.setAttribute("resolution", QString::number(resolution));
         scene.setAttribute("name", s->prp_getName());
         scene.setAttribute("frame", s->getCurrentFrame());
         scene.setAttribute("width", s->getCanvasWidth());
@@ -138,25 +140,36 @@ void Document::writeDoxumentXEV(QDomDocument& doc) const {
     doc.appendChild(document);
 }
 
-void Document::writeScenesXEV(ZipFileSaver& fileSaver) const {
+void Document::writeScenesXEV(ZipFileSaver& fileSaver,
+                              const RuntimeIdToWriteId& objListIdConv) const {
     int id = 0;
     for(const auto &s : fScenes) {
         const QString path = "scenes/" + QString::number(id++) + "/";
-        s->writeBoxOrSoundXEV(fileSaver, path);
+        s->writeBoxOrSoundXEV(fileSaver, path, objListIdConv);
     }
 }
 
-void Document::writeXEV(ZipFileSaver& fileSaver) const {
+void Document::writeXEV(ZipFileSaver& fileSaver,
+                        const RuntimeIdToWriteId& objListIdConv) const {
     fileSaver.processText("document.xml", [&](QTextStream& stream) {
         QDomDocument document;
         writeDoxumentXEV(document);
         stream << document.toString();
     });
-    writeScenesXEV(fileSaver);
+    writeScenesXEV(fileSaver, objListIdConv);
 }
 
-void Document::readDoxumentXEV(const QDomDocument& doc,
-                               QList<SceneSettingsXEV>& sceneSetts) {
+void Document::readDocumentXEV(ZipFileLoader& fileLoader,
+                               QList<Canvas*>& scenes) {
+    fileLoader.process("document.xml", [&](QIODevice* const src) {
+        QDomDocument document;
+        document.setContent(src);
+        readDocumentXEV(document, scenes);
+    });
+}
+
+void Document::readDocumentXEV(const QDomDocument& doc,
+                               QList<Canvas*>& scenes) {
     const auto document = doc.firstChildElement("Document");
     const QString versionStr = document.attribute("format-version", "");
     if(versionStr.isEmpty()) RuntimeThrow("No format version specified");
@@ -186,44 +199,39 @@ void Document::readDoxumentXEV(const QDomDocument& doc,
     }
 
     auto scenesE = document.firstChildElement("Scenes");
-    const auto scenes = scenesE.elementsByTagName("Scene");
-    const int nScenes = scenes.count();
+    const auto sceneEles = scenesE.elementsByTagName("Scene");
+    const int nScenes = sceneEles.count();
     for(int i = 0; i < nScenes; i++) {
-        const auto scene = scenes.at(i);
-        if(!scene.isElement()) continue;
-        const auto sceneEle = scene.toElement();
-        SceneSettingsXEV sett;
-        sett.fName = sceneEle.attribute("name");
-        sett.fFrame = XmlExportHelpers::stringToInt(sceneEle.attribute("frame"));
-        sett.fWidth = XmlExportHelpers::stringToInt(sceneEle.attribute("width"));
-        sett.fHeight = XmlExportHelpers::stringToInt(sceneEle.attribute("height"));
-        sett.fFps = XmlExportHelpers::stringToDouble(sceneEle.attribute("fps"));
-        sett.fClip = sceneEle.attribute("clip") == "true";
-        sceneSetts << sett;
+        const auto sceneNode = sceneEles.at(i);
+        if(!sceneNode.isElement()) continue;
+        const auto sceneEle = sceneNode.toElement();
+
+        const auto resStr = sceneEle.attribute("resolution");
+        const qreal res = XmlExportHelpers::stringToDouble(resStr);
+        const int frame = XmlExportHelpers::stringToInt(sceneEle.attribute("frame"));
+        const int width = XmlExportHelpers::stringToInt(sceneEle.attribute("width"));
+        const int height = XmlExportHelpers::stringToInt(sceneEle.attribute("height"));
+        const qreal fps = XmlExportHelpers::stringToDouble(sceneEle.attribute("fps"));
+        const bool clip = sceneEle.attribute("clip") == "true";
+
+        const auto newScene = createNewScene();
+        newScene->setResolution(res);
+        newScene->prp_setName(sceneEle.attribute("name"));
+        newScene->anim_setAbsFrame(frame);
+        newScene->setCanvasSize(width, height);
+        newScene->setFps(fps);
+        newScene->setClipToCanvas(clip);
+
+        scenes << newScene;
     }
 }
 
 void Document::readScenesXEV(ZipFileLoader& fileLoader,
-                             const QList<SceneSettingsXEV>& sceneSetts) {
+                             const QList<Canvas*>& scenes,
+                             const RuntimeIdToWriteId& objListIdConv) {
     int id = 0;
-    for(const auto& sett : sceneSetts) {
-        const auto newScene = createNewScene();
-        newScene->prp_setName(sett.fName);
-        newScene->anim_setAbsFrame(sett.fFrame);
-        newScene->setCanvasSize(sett.fWidth, sett.fHeight);
-        newScene->setFps(sett.fFps);
-        newScene->setClipToCanvas(sett.fClip);
+    for(const auto& scene : scenes) {
         const QString path = "scenes/" + QString::number(id++) + "/";
-        newScene->readBoxOrSoundXEV(fileLoader, path);
+        scene->readBoxOrSoundXEV(fileLoader, path, objListIdConv);
     }
-}
-
-void Document::readXEV(ZipFileLoader& fileLoader) {
-    QList<SceneSettingsXEV> sceneSetts;
-    fileLoader.process("document.xml", [&](QIODevice* const src) {
-        QDomDocument document;
-        document.setContent(src);
-        readDoxumentXEV(document, sceneSetts);
-    });
-    readScenesXEV(fileLoader, sceneSetts);
 }

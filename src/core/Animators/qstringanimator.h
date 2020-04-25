@@ -24,12 +24,12 @@ class CORE_EXPORT QStringAnimator : public SteppedAnimator<QString> {
     e_OBJECT
 protected:
     QStringAnimator(const QString& name);
+
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
 public:
     void saveSVG(SvgExporter& exp,
                  QDomElement& parent) const;
-
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 };
 
 #endif // QSTRINGANIMATOR_H

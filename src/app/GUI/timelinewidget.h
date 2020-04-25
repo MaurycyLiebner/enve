@@ -27,6 +27,7 @@
 #include "framerange.h"
 #include "ReadWrite/basicreadwrite.h"
 #include "fakemenubar.h"
+#include "XML/runtimewriteid.h"
 
 class SWT_Abstraction;
 class FrameScrollBar;
@@ -64,8 +65,10 @@ public:
     void writeState(eWriteStream& dst) const;
     void readState(eReadStream& src);
 
-    void readStateXEV(const QDomElement& ele);
-    void writeStateXEV(QDomElement& ele, QDomDocument& doc) const;
+    void readStateXEV(const QDomElement& ele,
+                      RuntimeIdToWriteId& objListIdConv);
+    void writeStateXEV(QDomElement& ele, QDomDocument& doc,
+                       RuntimeIdToWriteId& objListIdConv) const;
 private:
     void setViewedFrameRange(const FrameRange &range);
     void setCanvasFrameRange(const FrameRange &range);

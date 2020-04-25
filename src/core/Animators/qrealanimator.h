@@ -34,6 +34,9 @@ protected:
                   const qreal maxVal,
                   const qreal prefferdStep,
                   const QString& name);
+
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
 public:
     QJSValue prp_getBaseJSValue(QJSEngine& e) const {
         Q_UNUSED(e)
@@ -68,9 +71,6 @@ public:
                                   const bool clip = true);
     void prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
                                     const FrameRange &newAbsRange);
-
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
 
     void anim_setAbsFrame(const int frame);
     void anim_removeAllKeys();

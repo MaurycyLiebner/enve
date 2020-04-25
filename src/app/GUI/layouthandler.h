@@ -21,6 +21,7 @@
 #include "canvasbasewrappernode.h"
 #include "canvas.h"
 #include "audiohandler.h"
+#include "XML/runtimewriteid.h"
 #include <QStackedWidget>
 
 struct LayoutData {
@@ -54,20 +55,22 @@ struct LayoutData {
         fTimelineLayout->readData(src);
     }
 
-    void writeXEV(QDomElement& ele, QDomDocument& doc) const {
+    void writeXEV(QDomElement& ele, QDomDocument& doc,
+                  RuntimeIdToWriteId& objListIdConv) const {
         ele.setAttribute("name", fName);
-        const auto canvasLayout = fSceneLayout->writeXEV(doc);
-        const auto timelineLayout = fTimelineLayout->writeXEV(doc);
+        const auto canvasLayout = fSceneLayout->writeXEV(doc, objListIdConv);
+        const auto timelineLayout = fTimelineLayout->writeXEV(doc, objListIdConv);
         ele.appendChild(canvasLayout);
         ele.appendChild(timelineLayout);
     }
 
-    void readXEV(const QDomElement& ele) {
+    void readXEV(const QDomElement& ele,
+                 RuntimeIdToWriteId& objListIdConv) {
         fName = ele.attribute("name");
         const auto canvasLayout = ele.firstChildElement("CanvasLayout");
         const auto timelineLayout = ele.firstChildElement("TimelineLayout");
-        fSceneLayout->readDataXEV(canvasLayout);
-        fTimelineLayout->readDataXEV(timelineLayout);
+        fSceneLayout->readDataXEV(canvasLayout, objListIdConv);
+        fTimelineLayout->readDataXEV(timelineLayout, objListIdConv);
     }
 
     QString fName;
@@ -127,22 +130,25 @@ public:
         setCurrent(absId);
     }
 
-    void writeXEV(QDomElement& ele, QDomDocument& doc) const {
+    void writeXEV(QDomElement& ele, QDomDocument& doc,
+                  RuntimeIdToWriteId& objListIdConv) const {
         for(int i = mNumberLayouts - 1; i >= 0; i--) {
             auto layEle = doc.createElement("CustomLayout");
-            mLayouts.at(uint(i))->writeXEV(layEle, doc);
+            mLayouts.at(uint(i))->writeXEV(layEle, doc, objListIdConv);
             ele.appendChild(layEle);
         }
         const int nScenes = int(mLayouts.size()) - mNumberLayouts;
         for(int i = 0; i < nScenes; i++) {
             auto layEle = doc.createElement("SceneLayout");
-            mLayouts.at(uint(i + mNumberLayouts))->writeXEV(layEle, doc);
+            const uint layoutId = uint(i + mNumberLayouts);
+            mLayouts.at(layoutId)->writeXEV(layEle, doc, objListIdConv);
             ele.appendChild(layEle);
         }
         ele.setAttribute("currentId", mCurrentId);
     }
 
-    void readXEV(const QDomElement& ele) {
+    void readXEV(const QDomElement& ele,
+                 RuntimeIdToWriteId& objListIdConv) {
         setCurrent(-1);
 
         const auto cLays = ele.elementsByTagName("CustomLayout");
@@ -150,7 +156,7 @@ public:
         for(int i = 0; i < nCLays; i++) {
             const auto layNode = cLays.at(i);
             const auto layEle = layNode.toElement();
-            newLayout()->readXEV(layEle);
+            newLayout()->readXEV(layEle, objListIdConv);
         }
 
         const auto sLays = ele.elementsByTagName("SceneLayout");
@@ -158,7 +164,7 @@ public:
         for(int i = 0; i < nSLays; i++) {
             const auto layNode = sLays.at(i);
             const auto layEle = layNode.toElement();
-            mLayouts.at(uint(i + mNumberLayouts))->readXEV(layEle);
+            mLayouts.at(uint(i + mNumberLayouts))->readXEV(layEle, objListIdConv);
         }
 
         const auto currentIdStr = ele.attribute("currentId");

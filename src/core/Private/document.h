@@ -31,6 +31,7 @@
 #include "conncontextptr.h"
 #include "zipfilesaver.h"
 #include "zipfileloader.h"
+#include "XML/runtimewriteid.h"
 
 class SceneBoundGradient;
 class FileDataCacheHandler;
@@ -163,29 +164,25 @@ public:
     void write(eWriteStream &dst) const;
     void read(eReadStream &src);
 
-    void writeXEV(ZipFileSaver& fileSaver) const;
+    void writeXEV(ZipFileSaver& fileSaver,
+                  const RuntimeIdToWriteId& objListIdConv) const;
     void writeDoxumentXEV(QDomDocument& doc) const;
-    void writeScenesXEV(ZipFileSaver& fileSaver) const;
+    void writeScenesXEV(ZipFileSaver& fileSaver,
+                        const RuntimeIdToWriteId& objListIdConv) const;
 
-    struct SceneSettingsXEV {
-        QString fName;
-        int fFrame;
-        int fWidth;
-        int fHeight;
-        qreal fFps;
-        bool fClip;
-    };
-
-    void readDoxumentXEV(const QDomDocument& doc,
-                         QList<SceneSettingsXEV>& sceneSetts);
+    void readDocumentXEV(ZipFileLoader& fileLoader,
+                         QList<Canvas*>& scenes);
     void readScenesXEV(ZipFileLoader& fileLoader,
-                       const QList<SceneSettingsXEV>& nameList);
-    void readXEV(ZipFileLoader& fileLoader);
+                       const QList<Canvas*>& scenes,
+                       const RuntimeIdToWriteId& objListIdConv);
 
     void SWT_setupAbstraction(SWT_Abstraction * const abstraction,
                               const UpdateFuncs &updateFuncs,
                               const int visiblePartWidgetId);
 private:
+    void readDocumentXEV(const QDomDocument& doc,
+                         QList<Canvas*>& scenes);
+
     Clipboard *getClipboard(const ClipboardType type) const;
 
     void writeBookmarked(eWriteStream &dst) const;

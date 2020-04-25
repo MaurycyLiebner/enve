@@ -19,13 +19,18 @@
 
 #include "xmlexporthelpers.h"
 
+#include "runtimewriteid.h"
+
 class ZipFileLoader;
 
 class XevImporter {
 public:
     XevImporter(ZipFileLoader& fileLoader,
+                const RuntimeIdToWriteId& objListIdConv,
                 const QString& path,
                 const QString& assetsPath = "");
+
+    const RuntimeIdToWriteId objListIdConv() const { return mObjectListIdConv; }
 
     XevImporter withAssetsPath(const QString& path) const;
 
@@ -33,6 +38,7 @@ public:
     void processAsset(const QString& file, const Processor& func) const;
 private:
     ZipFileLoader& mFileLoader;
+    const RuntimeIdToWriteId& mObjectListIdConv;
     const QString mPath;
     const QString mAssetsPath;
 };

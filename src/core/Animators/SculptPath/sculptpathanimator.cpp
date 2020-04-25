@@ -120,7 +120,7 @@ void SculptPathAnimator::applyTransform(const QMatrix &transform) {
     prp_afterWholeInfluenceRangeChanged();
 }
 
-void SculptPathAnimator::prp_readPropertyXEV(
+void SculptPathAnimator::prp_readPropertyXEV_impl(
         const QDomElement& ele, const XevImporter& imp) {
     Q_UNUSED(imp)
     prp_setName(ele.attribute("name", "path"));
@@ -130,7 +130,7 @@ void SculptPathAnimator::prp_readPropertyXEV(
     });
 }
 
-QDomElement SculptPathAnimator::prp_writePropertyXEV(const XevExporter& exp) const {
+QDomElement SculptPathAnimator::prp_writePropertyXEV_impl(const XevExporter& exp) const {
     auto result = exp.createElement("SculptPath");
     result.setAttribute("name", prp_getName());
 

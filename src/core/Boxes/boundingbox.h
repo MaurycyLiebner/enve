@@ -116,6 +116,9 @@ private:
     static QList<const BoundingBox*> sBoxesWithWriteIds;
 protected:
     virtual void getMotionBlurProperties(QList<Property*> &list) const;
+
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
 public:
     virtual bool isGroup() const { return false; }
     virtual bool isLayer() const { return false; }
@@ -220,9 +223,6 @@ public:
 
     virtual void writeBoundingBox(eWriteStream& dst) const;
     virtual void readBoundingBox(eReadStream& src);
-
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 
     virtual SkBlendMode getBlendMode() const
     { return mBlendMode; }

@@ -61,6 +61,9 @@ class CORE_EXPORT AnimatedSurface : public Animator {
     //typedef InterpolationKeyT<AutoTiledSurface> ASKey;
 protected:
     AnimatedSurface();
+
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
 public:
     void prp_drawTimelineControls(
             QPainter * const p, const qreal pixelsPerFrame,
@@ -138,9 +141,6 @@ public:
 
     void prp_readProperty(eReadStream& src);
     void prp_writeProperty(eWriteStream& dst) const;
-
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
 
     void prp_afterChangedAbsRange(const FrameRange &range, const bool clip);
 

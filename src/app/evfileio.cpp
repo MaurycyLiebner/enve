@@ -56,6 +56,8 @@
 #include "ReadWrite/filefooter.h"
 #include "GUI/timelinedockwidget.h"
 #include "GUI/RenderWidgets/renderwidget.h"
+#include "GUI/BoxesList/boxscrollwidget.h"
+#include "XML/runtimewriteid.h"
 
 void MainWindow::loadEVFile(const QString &path) {
     QFile file(path);
@@ -150,15 +152,17 @@ void MainWindow::saveToFileXEV(const QString &path) {
             img.save(dst, "PNG");
         });
 
-        mDocument.writeXEV(fileSaver);
-
+        RuntimeIdToWriteId objListIdConv;
+        objListIdConv.assign(mObjectSettingsWidget->getId());
         fileSaver.processText("UI/layouts.xml", [&](QTextStream& stream) {
             QDomDocument doc;
             auto ele = doc.createElement("Layouts");
-            mLayoutHandler->writeXEV(ele, doc);
+            mLayoutHandler->writeXEV(ele, doc, objListIdConv);
             doc.appendChild(ele);
             stream << doc.toString();
         });
+
+        mDocument.writeXEV(fileSaver, objListIdConv);
     } catch(...) {
         file.close();
         RuntimeThrow("Error while writing to file " + path);
@@ -175,14 +179,19 @@ void MainWindow::loadXevFile(const QString &path) {
         ZipFileLoader fileLoader;
         fileLoader.setZipPath(path);
 
-        mDocument.readXEV(fileLoader);
+        QList<Canvas*> scenes;
+        mDocument.readDocumentXEV(fileLoader, scenes);
 
+        RuntimeIdToWriteId objListIdConv;
+        objListIdConv.assign(mObjectSettingsWidget->getId());
         fileLoader.process("UI/layouts.xml", [&](QIODevice* const src) {
             QDomDocument doc;
             doc.setContent(src);
             const auto ele = doc.firstChildElement("Layouts");
-            mLayoutHandler->readXEV(ele);
+            mLayoutHandler->readXEV(ele, objListIdConv);
         });
+
+        mDocument.readScenesXEV(fileLoader, scenes, objListIdConv);
     } catch(...) {
         RuntimeThrow("Error while reading from file " + path);
     }

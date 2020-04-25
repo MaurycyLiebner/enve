@@ -29,15 +29,15 @@ class CORE_EXPORT TextBox : public PathBox {
     e_OBJECT
 protected:
     TextBox();
+
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
 public:
     void setupCanvasMenu(PropertyMenu * const menu);
     SkPath getRelativePath(const qreal relFrame) const;
 
     void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);
-
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 
     bool differenceInEditPathBetweenFrames(
                 const int frame1, const int frame2) const;

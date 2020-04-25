@@ -109,7 +109,7 @@ void SmartPathAnimator::prp_writeProperty(eWriteStream &dst) const {
     dst << prp_getName();
 }
 
-void SmartPathAnimator::prp_readPropertyXEV(
+void SmartPathAnimator::prp_readPropertyXEV_impl(
         const QDomElement& ele, const XevImporter& imp) {
     Q_UNUSED(imp)
     const bool closed = ele.attribute("closed", "true") == "true";
@@ -124,7 +124,7 @@ void SmartPathAnimator::prp_readPropertyXEV(
     });
 }
 
-QDomElement SmartPathAnimator::prp_writePropertyXEV(const XevExporter& exp) const {
+QDomElement SmartPathAnimator::prp_writePropertyXEV_impl(const XevExporter& exp) const {
     auto result = exp.createElement("Path");
     result.setAttribute("closed", isClosed() ? "true" : "false");
     result.setAttribute("name", prp_getName());

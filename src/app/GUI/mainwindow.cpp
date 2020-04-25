@@ -1061,9 +1061,9 @@ void MainWindow::updateCanvasModeButtonsChecked() {
 //    }
 //}
 
-void MainWindow::setResolutionFractionValue(const qreal value) {
+void MainWindow::setResolutionValue(const qreal value) {
     if(!mDocument.fActiveScene) return;
-    mDocument.fActiveScene->setResolutionFraction(value);
+    mDocument.fActiveScene->setResolution(value);
     mDocument.actionFinished();
 }
 

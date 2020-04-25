@@ -76,7 +76,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mResolutionComboBox->setSizePolicy(QSizePolicy::Maximum,
                                        QSizePolicy::Maximum);
     connect(mResolutionComboBox, &QComboBox::currentTextChanged,
-            this, &TimelineDockWidget::setResolutionFractionText);
+            this, &TimelineDockWidget::setResolutionText);
 
     const int iconSize = 5*eSizesUI::widget/4;
     const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
@@ -663,10 +663,10 @@ void TimelineDockWidget::sculptModeChanged() {
     updateSculptPositionEnabled();
 }
 
-void TimelineDockWidget::setResolutionFractionText(QString text) {
+void TimelineDockWidget::setResolutionText(QString text) {
     text = text.remove(" %");
     const qreal res = clamp(text.toDouble(), 1, 200)/100;
-    mMainWindow->setResolutionFractionValue(res);
+    mMainWindow->setResolutionValue(res);
 }
 
 void TimelineDockWidget::clearAll() {
@@ -907,10 +907,10 @@ void TimelineDockWidget::setRenderMode() {
 void TimelineDockWidget::updateSettingsForCurrentCanvas(Canvas* const canvas) {
     if(canvas) {
         disconnect(mResolutionComboBox, &QComboBox::currentTextChanged,
-                   this, &TimelineDockWidget::setResolutionFractionText);
+                   this, &TimelineDockWidget::setResolutionText);
         mResolutionComboBox->setCurrentText(
-                    QString::number(canvas->getResolutionFraction()*100) + " %");
+                    QString::number(canvas->getResolution()*100) + " %");
         connect(mResolutionComboBox, &QComboBox::currentTextChanged,
-                this, &TimelineDockWidget::setResolutionFractionText);
+                this, &TimelineDockWidget::setResolutionText);
     }
 }

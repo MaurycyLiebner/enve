@@ -14,30 +14,35 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CANVASWRAPPERNODE_H
-#define CANVASWRAPPERNODE_H
-#include "widgetwrappernode.h"
-#include "canvaswindow.h"
+#ifndef RUNTIMEWRITEID_H
+#define RUNTIMEWRITEID_H
 
-class CanvasWrapperMenuBar;
+#include <QList>
 
-class CanvasWrapperNode : public WidgetWrapperNode {
+class RuntimeIdToWriteId {
 public:
-    CanvasWrapperNode(Canvas * const scene);
+    void assign(const int runtimeId) {
+        mRuntimeIds << runtimeId;
+    }
 
-protected:
-    void readData(eReadStream& src);
-    void writeData(eWriteStream& dst);
-
-    void readDataXEV(const QDomElement& ele,
-                     RuntimeIdToWriteId& objListIdConv);
-    void writeDataXEV(QDomElement& ele, QDomDocument& doc,
-                      RuntimeIdToWriteId& objListIdConv);
-
-    QString tagNameXEV() const { return "Canvas"; }
+    int runtimeIdToWriteId(const int runtimeId) const {
+        return mRuntimeIds.indexOf(runtimeId);
+    }
 private:
-    CanvasWrapperMenuBar* mMenu;
-    CanvasWindow* mCanvasWindow;
+    QList<int> mRuntimeIds;
 };
 
-#endif // CANVASWRAPPERNODE_H
+class WriteIdToRuntimeId {
+public:
+    void assign(const int runtimeId) {
+        mRuntimeIds << runtimeId;
+    }
+
+    int writeIdToRuntimeId(const int writeId) const {
+        return mRuntimeIds.at(writeId);
+    }
+private:
+    QList<int> mRuntimeIds;
+};
+
+#endif // RUNTIMEWRITEID_H

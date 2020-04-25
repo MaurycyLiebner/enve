@@ -22,19 +22,19 @@
 
 class CORE_EXPORT SculptPathAnimator : public InterOptimalAnimatorT<SculptPath> {
     Q_OBJECT
-public:
+    e_OBJECT
+protected:
     SculptPathAnimator();
-
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
+public:
     QMimeData *SWT_createMimeData();
 
     void prp_drawCanvasControls(SkCanvas * const canvas,
                                 const CanvasMode mode,
                                 const float invScale,
                                 const bool ctrlPressed);
-
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
-
+public:
     void sculpt(const SculptTarget target,
                 const SculptMode mode,
                 const SculptBrush &brush);

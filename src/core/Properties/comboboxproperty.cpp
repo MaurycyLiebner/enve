@@ -30,13 +30,13 @@ void ComboBoxProperty::prp_readProperty(eReadStream& src) {
     src >> mCurrentValue;
 }
 
-QDomElement ComboBoxProperty::prp_writePropertyXEV(const XevExporter& exp) const {
+QDomElement ComboBoxProperty::prp_writePropertyXEV_impl(const XevExporter& exp) const {
     auto result = exp.createElement("Combo");
     result.setAttribute("value", mCurrentValue);
     return result;
 }
 
-void ComboBoxProperty::prp_readPropertyXEV(
+void ComboBoxProperty::prp_readPropertyXEV_impl(
         const QDomElement& ele, const XevImporter& imp) {
     Q_UNUSED(imp)
     const auto valueStr = ele.attribute("value");

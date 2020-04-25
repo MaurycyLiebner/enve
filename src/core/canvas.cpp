@@ -83,12 +83,12 @@ Canvas::~Canvas() {
     clearBoxesSelection();
 }
 
-qreal Canvas::getResolutionFraction() {
-    return mResolutionFraction;
+qreal Canvas::getResolution() const {
+    return mResolution;
 }
 
-void Canvas::setResolutionFraction(const qreal percent) {
-    mResolutionFraction = percent;
+void Canvas::setResolution(const qreal percent) {
+    mResolution = percent;
     prp_afterWholeInfluenceRangeChanged();
     updateAllBoxes(UpdateReason::userChange);
 }
@@ -210,7 +210,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
     paint.setStyle(SkPaint::kFill_Style);
     const SkRect canvasRect = SkRect::MakeWH(mWidth, mHeight);
     const qreal zoom = viewTrans.m11();
-    const auto filter = eFilterSettings::sDisplay(zoom, mResolutionFraction);
+    const auto filter = eFilterSettings::sDisplay(zoom, mResolution);
     const qreal qInvZoom = 1/viewTrans.m11();
     const float invZoom = toSkScalar(qInvZoom);
     const SkMatrix skViewTrans = toSkMatrix(viewTrans);
@@ -984,15 +984,15 @@ void Canvas::readBoundingBox(eReadStream& src) {
     clearGradientRWIds();
 }
 
-void Canvas::writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
-                                 const QString& path) const {
-    ContainerBox::writeBoxOrSoundXEV(fileSaver, path);
+void Canvas::writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path,
+                                const RuntimeIdToWriteId& objListIdConv) const {
+    ContainerBox::writeBoxOrSoundXEV(fileSaver, path, objListIdConv);
     fileSaver.processText(path + "gradients.xml",
                           [&](QTextStream& stream) {
         QDomDocument doc;
         auto gradients = doc.createElement("Gradients");
         int id = 0;
-        const XevExporter exp(doc, fileSaver, path);
+        const XevExporter exp(doc, fileSaver, objListIdConv, path);
         for(const auto &grad : mGradients) {
             auto gradient = grad->prp_writePropertyXEV(exp);
             gradient.setAttribute("id", id++);
@@ -1004,9 +1004,9 @@ void Canvas::writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
     });
 }
 
-void Canvas::readBoxOrSoundXEV(ZipFileLoader &fileLoader,
-                               const QString &path) {
-    ContainerBox::readBoxOrSoundXEV(fileLoader, path);
+void Canvas::readBoxOrSoundXEV(ZipFileLoader &fileLoader, const QString &path,
+                               const RuntimeIdToWriteId& objListIdConv) {
+    ContainerBox::readBoxOrSoundXEV(fileLoader, path, objListIdConv);
     fileLoader.process(path + "gradients.xml",
                        [&](QIODevice* const src) {
         QDomDocument doc;
@@ -1016,10 +1016,14 @@ void Canvas::readBoxOrSoundXEV(ZipFileLoader &fileLoader,
         for(int i = 0; i < gradients.count(); i++) {
             const auto node = gradients.at(i);
             const auto ele = node.toElement();
-            const XevImporter imp(fileLoader, path);
+            const XevImporter imp(fileLoader, objListIdConv, path);
             createNewGradient()->prp_readPropertyXEV(ele, imp);
         }
     });
+}
+
+int Canvas::getByteCountPerFrame() {
+    return qCeil(mWidth*mResolution)*qCeil(mHeight*mResolution)*4;
 }
 
 void Canvas::readGradients(eReadStream& src) {

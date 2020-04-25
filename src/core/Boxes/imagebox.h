@@ -38,6 +38,9 @@ class CORE_EXPORT ImageBox : public BoundingBox {
 protected:
     ImageBox();
     ImageBox(const QString &filePath);
+
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
 public:
     void setupCanvasMenu(PropertyMenu * const menu);
 
@@ -48,9 +51,6 @@ public:
 
     void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);
-
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 
     void saveSVG(SvgExporter& exp, DomEleTask* const eleTask) const;
 

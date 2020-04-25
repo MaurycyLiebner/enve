@@ -19,14 +19,15 @@
 #include "complexanimator.h"
 
 class CORE_EXPORT StaticComplexAnimator : public ComplexAnimator {
-public:
+    e_OBJECT
+protected:
     StaticComplexAnimator(const QString &name);
 
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
+public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
-
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 
     using ComplexAnimator::ca_addChild;
 protected:

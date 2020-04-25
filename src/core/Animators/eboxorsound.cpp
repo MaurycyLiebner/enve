@@ -139,10 +139,10 @@ void eBoxOrSound::prp_readProperty(eReadStream& src) {
     }
 }
 
-void eBoxOrSound::writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
-                                     const QString& path) const {
+void eBoxOrSound::writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path,
+                                     const RuntimeIdToWriteId& objListIdConv) const {
     QDomDocument doc;
-    const XevExporter exp(doc, fileSaver, path);
+    const XevExporter exp(doc, fileSaver, objListIdConv, path);
     auto obj = prp_writeNamedPropertyXEV("Object", exp);
     if(mDurationRectangle) mDurationRectangle->writeDurationRectangleXEV(obj);
 
@@ -153,8 +153,8 @@ void eBoxOrSound::writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
     });
 }
 
-void eBoxOrSound::readBoxOrSoundXEV(ZipFileLoader& fileLoader,
-                                    const QString& path) {
+void eBoxOrSound::readBoxOrSoundXEV(ZipFileLoader& fileLoader, const QString& path,
+                                    const RuntimeIdToWriteId& objListIdConv) {
     QDomDocument doc;
     fileLoader.process(path + "properties.xml",
                        [&](QIODevice* const src) {
@@ -166,7 +166,7 @@ void eBoxOrSound::readBoxOrSoundXEV(ZipFileLoader& fileLoader,
         if(!mDurationRectangle) createDurationRectangle();
         mDurationRectangle->readDurationRectangleXEV(obj);
     }
-    const XevImporter imp(fileLoader, path);
+    const XevImporter imp(fileLoader, objListIdConv, path);
     prp_readPropertyXEV(obj, imp);
 }
 

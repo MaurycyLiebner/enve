@@ -539,7 +539,7 @@ QMatrix AdvancedTransformAnimator::getRelativeTransformAtFrame(const qreal relFr
     return matrix;
 }
 
-QDomElement AdvancedTransformAnimator::prp_writePropertyXEV(const XevExporter& exp) const {
+QDomElement AdvancedTransformAnimator::prp_writePropertyXEV_impl(const XevExporter& exp) const {
     auto result = exp.createElement("Transform");
 
     auto translation = mPosAnimator->prp_writeNamedPropertyXEV("Translation", exp);
@@ -563,7 +563,7 @@ QDomElement AdvancedTransformAnimator::prp_writePropertyXEV(const XevExporter& e
     return result;
 }
 
-void AdvancedTransformAnimator::prp_readPropertyXEV(
+void AdvancedTransformAnimator::prp_readPropertyXEV_impl(
         const QDomElement& ele, const XevImporter& imp) {
     const auto translation = ele.firstChildElement("Translation");
     mPosAnimator->prp_readPropertyXEV(translation, imp);

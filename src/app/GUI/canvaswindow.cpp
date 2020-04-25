@@ -30,6 +30,7 @@
 #include "usagewidget.h"
 #include "memorychecker.h"
 #include "memoryhandler.h"
+#include "simpletask.h"
 
 CanvasWindow::CanvasWindow(Document &document,
                            QWidget * const parent) :
@@ -68,6 +69,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     if(mCurrentCanvas) {
         if(isVisible()) mDocument.removeVisibleScene(mCurrentCanvas);
     }
+    const bool hadScene = mCurrentCanvas;
     auto& conn = mCurrentCanvas.assign(canvas);
     if(KFT_hasFocus()) mDocument.setActiveScene(mCurrentCanvas);
     if(mCurrentCanvas) {
@@ -80,8 +82,10 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
                         this, [this]() { setCurrentCanvas(nullptr); });
     }
 
-    if(mCurrentCanvas) fitCanvasToSize();
+    if(hadScene) fitCanvasToSize();
     updateFix();
+
+    emit currentSceneChanged(canvas);
 }
 
 void CanvasWindow::updatePaintModeCursor() {
@@ -339,12 +343,11 @@ void CanvasWindow::readStateXEV(const QDomElement& ele) {
     const auto sceneIdStr = ele.attribute("sceneId");
     const int sceneId = XmlExportHelpers::stringToInt(sceneIdStr);
 
-    Canvas* scene = nullptr;
-    if(sceneId != -1) {
+    SimpleTask::sScheduleContexted(this, [this, sceneId]() {
         const auto sceneBox = BoundingBox::sGetBoxByReadId(sceneId);
-        scene = enve_cast<Canvas*>(sceneBox);
-    }
-    setCurrentCanvas(scene);
+        const auto scene = enve_cast<Canvas*>(sceneBox);
+        setCurrentCanvas(scene);
+    });
 
     const auto viewTransformStr = ele.attribute("viewTransform");
     mViewTransform = XmlExportHelpers::stringToMatrix(viewTransformStr);
@@ -577,9 +580,9 @@ bool CanvasWindow::KFT_keyPressEvent(QKeyEvent *event) {
     return true;
 }
 
-void CanvasWindow::setResolutionFraction(const qreal percent) {
+void CanvasWindow::setResolution(const qreal fraction) {
     if(!mCurrentCanvas) return;
-    mCurrentCanvas->setResolutionFraction(percent);
+    mCurrentCanvas->setResolution(fraction);
     mCurrentCanvas->prp_afterWholeInfluenceRangeChanged();
     mCurrentCanvas->updateAllBoxes(UpdateReason::userChange);
     finishAction();

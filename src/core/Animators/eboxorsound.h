@@ -51,10 +51,10 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
-    virtual void writeBoxOrSoundXEV(ZipFileSaver& fileSaver,
-                                    const QString& path) const;
-    virtual void readBoxOrSoundXEV(ZipFileLoader& fileLoader,
-                                   const QString& path);
+    virtual void writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path,
+                                    const RuntimeIdToWriteId& objListIdConv) const;
+    virtual void readBoxOrSoundXEV(ZipFileLoader& fileLoader, const QString& path,
+                                   const RuntimeIdToWriteId& objListIdConv);
 
     TimelineMovable *anim_getTimelineMovable(
             const int relX, const int minViewedFrame,

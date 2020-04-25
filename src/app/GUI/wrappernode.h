@@ -23,6 +23,7 @@
 #include "smartPointers/ememory.h"
 #include "widgetstack.h"
 #include "ReadWrite/basicreadwrite.h"
+#include "XML/runtimewriteid.h"
 
 enum class WrapperNodeType {
     base,
@@ -55,17 +56,20 @@ public:
         writeData(dst);
     }
 
-    QDomElement writeXEV(QDomDocument& doc);
+    QDomElement writeXEV(QDomDocument& doc, RuntimeIdToWriteId& objListIdConv);
 
     static WrapperNode *sRead(eReadStream& src,
                               const WidgetCreator& creator);
     static WrapperNode *sReadXEV(const QDomElement& ele,
-                                 const WidgetCreator& creator);
+                                 const WidgetCreator& creator,
+                                 RuntimeIdToWriteId& objListIdConv);
 protected:
     virtual void readData(eReadStream& src) = 0;
     virtual void writeData(eWriteStream& dst) = 0;
-    virtual void writeDataXEV(QDomElement& ele, QDomDocument& doc) = 0;
-    virtual void readDataXEV(const QDomElement& ele) = 0;
+    virtual void writeDataXEV(QDomElement& ele, QDomDocument& doc,
+                              RuntimeIdToWriteId& objListIdConv) = 0;
+    virtual void readDataXEV(const QDomElement& ele,
+                             RuntimeIdToWriteId& objListIdConv) = 0;
     virtual QString tagNameXEV() const = 0;
 };
 
@@ -119,15 +123,17 @@ public:
         fChild->write(dst);
     }
 
-    void writeDataXEV(QDomElement& ele, QDomDocument& doc) {
-        const auto child = fChild->writeXEV(doc);
+    void writeDataXEV(QDomElement& ele, QDomDocument& doc,
+                      RuntimeIdToWriteId& objListIdConv) {
+        const auto child = fChild->writeXEV(doc, objListIdConv);
         ele.appendChild(child);
     }
 
-    void readDataXEV(const QDomElement& ele) {
+    void readDataXEV(const QDomElement& ele,
+                     RuntimeIdToWriteId& objListIdConv) {
         const auto child = ele.firstChildElement();
         const auto childTag = child.tagName();
-        const auto newChild = sReadXEV(child, fCreator);
+        const auto newChild = sReadXEV(child, fCreator, objListIdConv);
         replaceAndDeleteChild(newChild);
     }
 
@@ -184,20 +190,22 @@ protected:
         fChild2->write(dst);
     }
 
-    void writeDataXEV(QDomElement& ele, QDomDocument& doc) {
-        const auto child1 = fChild1->writeXEV(doc);
-        const auto child2 = fChild2->writeXEV(doc);
+    void writeDataXEV(QDomElement& ele, QDomDocument& doc,
+                      RuntimeIdToWriteId& objListIdConv) {
+        const auto child1 = fChild1->writeXEV(doc, objListIdConv);
+        const auto child2 = fChild2->writeXEV(doc, objListIdConv);
 
         ele.appendChild(child1);
         ele.appendChild(child2);
     }
 
-    void readDataXEV(const QDomElement& ele) {
+    void readDataXEV(const QDomElement& ele,
+                     RuntimeIdToWriteId& objListIdConv) {
         const auto child1 = ele.firstChildElement();
         const auto child2 = ele.lastChildElement();
 
-        fChild1 = sReadXEV(child1, fCreator);
-        fChild2 = sReadXEV(child2, fCreator);
+        fChild1 = sReadXEV(child1, fCreator, objListIdConv);
+        fChild2 = sReadXEV(child2, fCreator, objListIdConv);
 
         fChild1->fParent = this;
         fChild2->fParent = this;
@@ -233,13 +241,15 @@ protected:
         dst << percentAt(1);
     }
 
-    void writeDataXEV(QDomElement& ele, QDomDocument& doc) {
-        SplitWrapperNode::writeDataXEV(ele, doc);
+    void writeDataXEV(QDomElement& ele, QDomDocument& doc,
+                      RuntimeIdToWriteId& objListIdConv) {
+        SplitWrapperNode::writeDataXEV(ele, doc, objListIdConv);
         ele.setAttribute("proportions", percentAt(1));
     }
 
-    void readDataXEV(const QDomElement& ele) {
-        SplitWrapperNode::readDataXEV(ele);
+    void readDataXEV(const QDomElement& ele,
+                     RuntimeIdToWriteId& objListIdConv) {
+        SplitWrapperNode::readDataXEV(ele, objListIdConv);
         const QString child2fracStr = ele.attribute("proportions");
         const qreal child2frac = XmlExportHelpers::stringToDouble(child2fracStr);
         appendWidget(fChild1->widget());
@@ -278,13 +288,15 @@ protected:
         dst << percentAt(1);
     }
 
-    void writeDataXEV(QDomElement& ele, QDomDocument& doc) {
-        SplitWrapperNode::writeDataXEV(ele, doc);
+    void writeDataXEV(QDomElement& ele, QDomDocument& doc,
+                      RuntimeIdToWriteId& objListIdConv) {
+        SplitWrapperNode::writeDataXEV(ele, doc, objListIdConv);
         ele.setAttribute("proportions", percentAt(1));
     }
 
-    void readDataXEV(const QDomElement& ele) {
-        SplitWrapperNode::readDataXEV(ele);
+    void readDataXEV(const QDomElement& ele,
+                     RuntimeIdToWriteId& objListIdConv) {
+        SplitWrapperNode::readDataXEV(ele, objListIdConv);
         const QString child2fracStr = ele.attribute("proportions");
         const qreal child2frac = XmlExportHelpers::stringToDouble(child2fracStr);
         appendWidget(fChild1->widget());

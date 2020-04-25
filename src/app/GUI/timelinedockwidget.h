@@ -71,7 +71,7 @@ public:
 
     RenderWidget *getRenderWidget();
 private:
-    void setResolutionFractionText(QString text);
+    void setResolutionText(QString text);
 
     void interruptPreview();
 

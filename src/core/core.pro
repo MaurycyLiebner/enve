@@ -565,6 +565,7 @@ HEADERS += \
     Timeline/animationrect.h \
     Timeline/durationrectangle.h \
     Timeline/fixedlenanimationrect.h \
+    XML/runtimewriteid.h \
     XML/xevexporter.h \
     XML/xevimporter.h \
     XML/xmlexporthelpers.h \

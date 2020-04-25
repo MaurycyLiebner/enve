@@ -64,7 +64,7 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
     setCurrentScene(settings->getTargetCanvas());
     if(VideoEncoder::sStartEncoding(settings)) {
         mSavedCurrentFrame = mCurrentScene->getCurrentFrame();
-        mSavedResolutionFraction = mCurrentScene->getResolutionFraction();
+        mSavedResolutionFraction = mCurrentScene->getResolution();
 
         mCurrentRenderSettings = settings;
         const auto &renderSettings = settings->getRenderSettings();
@@ -99,7 +99,7 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
         TaskScheduler::instance()->setAlwaysQue(true);
         //fitSceneToSize();
         if(!isZero6Dec(mSavedResolutionFraction - resolutionFraction)) {
-            mCurrentScene->setResolutionFraction(resolutionFraction);
+            mCurrentScene->setResolution(resolutionFraction);
             mDocument.actionFinished();
         } else {
             nextCurrentRenderFrame();
@@ -313,8 +313,8 @@ void RenderHandler::finishEncoding() {
     mCurrentScene->setOutputRendering(false);
     TaskScheduler::instance()->setAlwaysQue(false);
     setFrameAction(mSavedCurrentFrame);
-    if(!isZero4Dec(mSavedResolutionFraction - mCurrentScene->getResolutionFraction())) {
-        mCurrentScene->setResolutionFraction(mSavedResolutionFraction);
+    if(!isZero4Dec(mSavedResolutionFraction - mCurrentScene->getResolution())) {
+        mCurrentScene->setResolution(mSavedResolutionFraction);
     }
     mCurrentSoundComposition->clearUseRange();
     VideoEncoder::sFinishEncoding();

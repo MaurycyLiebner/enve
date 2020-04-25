@@ -83,7 +83,6 @@ void BoxTargetProperty::prp_writeProperty(eWriteStream& dst) const {
     int targetDocumentId = -1;
 
     if(mTarget_d) {
-        if(mTarget_d->getWriteId() < 0) mTarget_d->assignWriteId();
         targetWriteId = mTarget_d->getWriteId();
         targetDocumentId = mTarget_d->getDocumentId();
     }
@@ -108,20 +107,17 @@ void BoxTargetProperty::prp_readProperty(eReadStream& src) {
     });
 }
 
-QDomElement BoxTargetProperty::prp_writePropertyXEV(const XevExporter& exp) const {
+QDomElement BoxTargetProperty::prp_writePropertyXEV_impl(const XevExporter& exp) const {
     auto result = exp.createElement("ObjectLink");
-    int targetWriteId = -1;
 
-    if(mTarget_d) {
-        if(mTarget_d->getWriteId() < 0) mTarget_d->assignWriteId();
-        targetWriteId = mTarget_d->getWriteId();
-    }
+    int targetWriteId = -1;
+    if(mTarget_d) targetWriteId = mTarget_d->getWriteId();
     result.setAttribute("targetId", targetWriteId);
 
     return result;
 }
 
-void BoxTargetProperty::prp_readPropertyXEV(
+void BoxTargetProperty::prp_readPropertyXEV_impl(
         const QDomElement& ele, const XevImporter& imp) {
     Q_UNUSED(imp)
     const int targetId = XmlExportHelpers::stringToInt(ele.attribute("targetId"));

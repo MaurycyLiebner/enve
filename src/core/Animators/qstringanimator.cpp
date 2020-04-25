@@ -51,7 +51,7 @@ void QStringAnimator::saveSVG(SvgExporter& exp, QDomElement& parent) const {
     }
 }
 
-void QStringAnimator::prp_readPropertyXEV(
+void QStringAnimator::prp_readPropertyXEV_impl(
         const QDomElement& ele, const XevImporter& imp) {
     Q_UNUSED(imp)
     readValuesXEV(ele, [](QString& str, const QStringRef& strRef) {
@@ -59,7 +59,7 @@ void QStringAnimator::prp_readPropertyXEV(
     });
 }
 
-QDomElement QStringAnimator::prp_writePropertyXEV(const XevExporter& exp) const {
+QDomElement QStringAnimator::prp_writePropertyXEV_impl(const XevExporter& exp) const {
     auto result = exp.createElement("Text");
     writeValuesXEV(result, [](const QString& str) { return str; });
     return result;

@@ -423,7 +423,10 @@ void TimelineWidget::readState(eReadStream &src) {
     setViewedFrameRange({minViewedFrame, maxViewedFrame});
 }
 
-void TimelineWidget::readStateXEV(const QDomElement& ele) {
+void TimelineWidget::readStateXEV(const QDomElement& ele,
+                                  RuntimeIdToWriteId& objListIdConv) {
+    objListIdConv.assign(mBoxesListWidget->getId());
+
     const auto frameRangeStr = ele.attribute("frameRange");
     const auto frameStr = ele.attribute("frame");
 
@@ -444,12 +447,11 @@ void TimelineWidget::readStateXEV(const QDomElement& ele) {
     const auto sceneIdStr = ele.attribute("sceneId");
     const int sceneId = XmlExportHelpers::stringToInt(sceneIdStr);
 
-    Canvas* scene = nullptr;
-    if(sceneId != -1) {
+    SimpleTask::sScheduleContexted(this, [this, sceneId]() {
         const auto sceneBox = BoundingBox::sGetBoxByReadId(sceneId);
-        scene = enve_cast<Canvas*>(sceneBox);
-    }
-    setCurrentScene(scene);
+        const auto scene = enve_cast<Canvas*>(sceneBox);
+        setCurrentScene(scene);
+    });
 
     const auto boxRuleStr = ele.attribute("objRule");
     const auto boxRule = XmlExportHelpers::stringToEnum<SWT_BoxRule>(boxRuleStr);
@@ -469,8 +471,12 @@ void TimelineWidget::readStateXEV(const QDomElement& ele) {
     setViewedFrameRange({minViewedFrame, maxViewedFrame});
 }
 
-void TimelineWidget::writeStateXEV(QDomElement& ele, QDomDocument& doc) const {
+void TimelineWidget::writeStateXEV(QDomElement& ele, QDomDocument& doc,
+                                   RuntimeIdToWriteId& objListIdConv) const {
     Q_UNUSED(doc)
+
+    objListIdConv.assign(mBoxesListWidget->getId());
+
     const int frame = mFrameScrollBar->getFirstViewedFrame();
     const int minViewedFrame = mFrameRangeScrollBar->getFirstViewedFrame();
     const int maxViewedFrame = mFrameRangeScrollBar->getLastViewedFrame();
@@ -508,7 +514,6 @@ void TimelineWidget::setBoxesListWidth(const int width) {
 void TimelineWidget::setBoxRule(const SWT_BoxRule rule) {
     mBoxesListWidget->setCurrentRule(rule);
     emit boxRuleChanged(rule);
-    Document::sInstance->updateScenes();
 }
 
 void TimelineWidget::setTarget(const SWT_Target target) {
@@ -527,18 +532,15 @@ void TimelineWidget::setTarget(const SWT_Target target) {
     }
 
     emit targetChanged(target);
-    Document::sInstance->updateScenes();
 }
 
 void TimelineWidget::setType(const SWT_Type type) {
     mBoxesListWidget->setCurrentType(type);
     emit typeChanged(type);
-    Document::sInstance->updateScenes();
 }
 
 void TimelineWidget::setSearchText(const QString &text) {
     mBoxesListWidget->setCurrentSearchText(text);
-    Document::sInstance->actionFinished();
 }
 
 void TimelineWidget::setViewedFrameRange(const FrameRange& range) {

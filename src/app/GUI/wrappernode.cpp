@@ -28,9 +28,10 @@ WrapperNode* createForType(const WrapperNodeType type,
     }
 }
 
-QDomElement WrapperNode::writeXEV(QDomDocument& doc) {
+QDomElement WrapperNode::writeXEV(QDomDocument& doc,
+                                  RuntimeIdToWriteId& objListIdConv) {
     auto result = doc.createElement(tagNameXEV());
-    writeDataXEV(result, doc);
+    writeDataXEV(result, doc, objListIdConv);
     return result;
 }
 
@@ -44,14 +45,15 @@ WrapperNode* WrapperNode::sRead(eReadStream &src,
 }
 
 WrapperNode* WrapperNode::sReadXEV(const QDomElement& ele,
-                                   const WidgetCreator& creator) {
+                                   const WidgetCreator& creator,
+                                   RuntimeIdToWriteId& objListIdConv) {
     WrapperNodeType type;
     const auto tag = ele.tagName();
     if(tag == "HSplit") type = WrapperNodeType::splitH;
     else if(tag == "VSplit") type = WrapperNodeType::splitV;
     else type = WrapperNodeType::widget;
     const auto wid = createForType(type, creator);
-    wid->readDataXEV(ele);
+    wid->readDataXEV(ele, objListIdConv);
     return wid;
 }
 

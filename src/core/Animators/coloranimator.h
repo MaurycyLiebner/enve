@@ -26,6 +26,9 @@ class CORE_EXPORT ColorAnimator : public StaticComplexAnimator {
     e_OBJECT
 protected:
     ColorAnimator(const QString& name = "color");
+
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
 public:
     QJSValue prp_getBaseJSValue(QJSEngine& e) const;
     QJSValue prp_getBaseJSValue(QJSEngine& e, const qreal relFrame) const;
@@ -35,9 +38,6 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
-
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
 
     QColor getBaseColor() const;
     QColor getBaseColor(const qreal relFrame) const;

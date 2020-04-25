@@ -114,7 +114,7 @@ public:
 //    void nextSaveOutputFrame();
 //    void nextPlayPreviewFrame();
 
-    void setResolutionFraction(qreal percent);
+    void setResolution(qreal percent);
 
     void updateSettingsForCurrentCanvas(Canvas * const scene);
 
@@ -131,7 +131,7 @@ public:
 
     //void playPreview();
    // void stopPreview();
-    void setResolutionFractionValue(const qreal value);
+    void setResolutionValue(const qreal value);
 
     void addCanvasToRenderQue();
 

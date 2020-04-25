@@ -19,14 +19,19 @@
 
 #include "xmlexporthelpers.h"
 
+#include "runtimewriteid.h"
+
 class ZipFileSaver;
 
 class XevExporter {
 public:
     XevExporter(QDomDocument& doc,
                 ZipFileSaver& fileSaver,
+                const RuntimeIdToWriteId& objListIdConv,
                 const QString& path,
                 const QString& assetsPath = "");
+
+    const RuntimeIdToWriteId objListIdConv() const { return mObjectListIdConv; }
 
     QDomDocument& doc() const { return mDoc; }
 
@@ -40,6 +45,7 @@ public:
 private:
     QDomDocument& mDoc;
     ZipFileSaver& mFileSaver;
+    const RuntimeIdToWriteId& mObjectListIdConv;
     const QString mPath;
     const QString mAssetsPath;
 };

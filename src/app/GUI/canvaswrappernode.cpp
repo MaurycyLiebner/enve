@@ -26,6 +26,8 @@ public:
         addMenu(mSceneMenu);
         connect(mSceneMenu, &SceneChooser::currentChanged,
                 this, &CanvasWrapperMenuBar::setCurrentScene);
+        connect(window, &CanvasWindow::currentSceneChanged,
+                mSceneMenu, qOverload<Canvas*>(&SceneChooser::setCurrentScene));
     }
 
     void setCurrentScene(Canvas * const scene) {
@@ -62,11 +64,15 @@ void CanvasWrapperNode::writeData(eWriteStream &dst) {
     mCanvasWindow->writeState(dst);
 }
 
-void CanvasWrapperNode::readDataXEV(const QDomElement& ele) {
+void CanvasWrapperNode::readDataXEV(const QDomElement& ele,
+                                    RuntimeIdToWriteId& objListIdConv) {
+    Q_UNUSED(objListIdConv)
     mCanvasWindow->readStateXEV(ele);
     mMenu->setCurrentScene(mCanvasWindow->getCurrentCanvas());
 }
 
-void CanvasWrapperNode::writeDataXEV(QDomElement& ele, QDomDocument& doc) {
+void CanvasWrapperNode::writeDataXEV(QDomElement& ele, QDomDocument& doc,
+                                     RuntimeIdToWriteId& objListIdConv) {
+    Q_UNUSED(objListIdConv)
     mCanvasWindow->writeStateXEV(ele, doc);
 }

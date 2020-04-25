@@ -27,13 +27,13 @@ void BoolProperty::prp_readProperty(eReadStream& src) {
     src >> mValue;
 }
 
-QDomElement BoolProperty::prp_writePropertyXEV(const XevExporter& exp) const {
+QDomElement BoolProperty::prp_writePropertyXEV_impl(const XevExporter& exp) const {
     auto result = exp.createElement("Combo");
     result.setAttribute("value", mValue ? "true" : "false");
     return result;
 }
 
-void BoolProperty::prp_readPropertyXEV(
+void BoolProperty::prp_readPropertyXEV_impl(
         const QDomElement& ele, const XevImporter& imp) {
     Q_UNUSED(imp)
     const auto valueStr = ele.attribute("value");

@@ -110,17 +110,17 @@ void BoundingBox::readBoundingBox(eReadStream& src) {
     BoundingBox::sAddReadBox(this);
 }
 
-void BoundingBox::prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) {
+void BoundingBox::prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) {
     const auto readIdStr = ele.attribute("id");
     mReadId = XmlExportHelpers::stringToInt(readIdStr);
     BoundingBox::sAddReadBox(this);
 
-    eBoxOrSound::prp_readPropertyXEV(ele, imp);
+    eBoxOrSound::prp_readPropertyXEV_impl(ele, imp);
 }
 
-QDomElement BoundingBox::prp_writePropertyXEV(const XevExporter& exp) const {
+QDomElement BoundingBox::prp_writePropertyXEV_impl(const XevExporter& exp) const {
     if(mWriteId < 0) assignWriteId();
-    auto result = eBoxOrSound::prp_writePropertyXEV(exp);
+    auto result = eBoxOrSound::prp_writePropertyXEV_impl(exp);
     result.setAttribute("id", mWriteId);
     return result;
 }
@@ -791,7 +791,7 @@ void BoundingBox::setupWithoutRasterEffects(const qreal relFrame,
     data->fRelTransform = getRelativeTransformAtFrame(relFrame);
     data->fInheritedTransform = getInheritedTransformAtFrame(relFrame);
     data->fTotalTransform = getTotalTransformAtFrame(relFrame);
-    data->fResolution = scene->getResolutionFraction();
+    data->fResolution = scene->getResolution();
     data->fResolutionScale.reset();
     data->fResolutionScale.scale(data->fResolution, data->fResolution);
     data->fOpacity = mTransformAnimator->getOpacity(relFrame);
@@ -1073,6 +1073,7 @@ int BoundingBox::getReadId() const {
 }
 
 int BoundingBox::getWriteId() const {
+    if(mWriteId < 0) assignWriteId();
     return mWriteId;
 }
 

@@ -107,3 +107,36 @@ void SingleWidgetTarget::SWT_setAncestorDisabled(const bool disabled) {
     SWT_setChildrenAncestorDisabled(SWT_isDisabled());
     emit SWT_changedDisabled(SWT_isDisabled());
 }
+
+void SingleWidgetTarget::SWT_writeAbstractionXEV(
+        QDomElement& ele, const XevExporter& exp) const {
+    QString absOpen;
+    const auto& objListIdConv = exp.objListIdConv();
+    for(const auto& abs : SWT_mAllAbstractions) {
+        const int writeId = objListIdConv.runtimeIdToWriteId(abs.first);
+        const bool vis = abs.second->contentVisible();
+        if(vis) {
+            if(!absOpen.isEmpty()) absOpen += ' ';
+            absOpen += QString::number(writeId);
+        }
+    }
+    if(!absOpen.isEmpty()) ele.setAttribute("open", absOpen);
+}
+
+void SingleWidgetTarget::SWT_readAbstractionXEV(
+        const QDomElement& ele, const XevImporter& imp) const {
+    const QString absOpenStr = ele.attribute("open");
+    if(absOpenStr.isEmpty()) return;
+    const auto absOpenStrs = absOpenStr.splitRef(' ');
+    QList<int> open;
+    for(const auto& val : absOpenStrs) {
+        open << XmlExportHelpers::stringToInt(val);
+    }
+
+    const auto& objListIdConv = imp.objListIdConv();
+    for(const auto& abs : SWT_mAllAbstractions) {
+        const int writeId = objListIdConv.runtimeIdToWriteId(abs.first);
+        const bool contVisible = open.contains(writeId);
+        if(contVisible) abs.second->setContentVisible(true);
+    }
+}

@@ -35,6 +35,9 @@ protected:
     SmartPathAnimator();
     SmartPathAnimator(const SkPath& path);
     SmartPathAnimator(const SmartPath& baseValue);
+
+    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
+    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
 public:
     enum class Mode {
         normal,
@@ -53,9 +56,6 @@ public:
 
     void prp_readProperty(eReadStream& src);
     void prp_writeProperty(eWriteStream& dst) const;
-
-    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
-    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
 
     SkPath getPathAtAbsFrame(const qreal frame)
     { return getPathAtRelFrame(prp_absFrameToRelFrameF(frame)); }

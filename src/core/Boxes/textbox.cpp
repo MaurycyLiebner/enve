@@ -369,8 +369,8 @@ void TextBox::readBoundingBox(eReadStream& src) {
     setFontFamilyAndStyle(fontFamily, style);
 }
 
-QDomElement TextBox::prp_writePropertyXEV(const XevExporter& exp) const {
-    auto result = PathBox::prp_writePropertyXEV(exp);
+QDomElement TextBox::prp_writePropertyXEV_impl(const XevExporter& exp) const {
+    auto result = PathBox::prp_writePropertyXEV_impl(exp);
     result.setAttribute("hAlign", static_cast<int>(mHAlignment));
     result.setAttribute("vAlign", static_cast<int>(mVAlignment));
     result.setAttribute("fontSize", mFont.getSize());
@@ -381,8 +381,8 @@ QDomElement TextBox::prp_writePropertyXEV(const XevExporter& exp) const {
     return result;
 }
 
-void TextBox::prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) {
-    PathBox::prp_readPropertyXEV(ele, imp);
+void TextBox::prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) {
+    PathBox::prp_readPropertyXEV_impl(ele, imp);
     const auto hAlign = ele.attribute("hAlign");
     const auto vAlign = ele.attribute("vAlign");
     const auto fontSizeStr = ele.attribute("fontSize");

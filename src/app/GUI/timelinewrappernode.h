@@ -27,8 +27,10 @@ protected:
     void readData(eReadStream& src);
     void writeData(eWriteStream& dst);
 
-    void readDataXEV(const QDomElement& ele);
-    void writeDataXEV(QDomElement& ele, QDomDocument& doc);
+    void readDataXEV(const QDomElement& ele,
+                     RuntimeIdToWriteId& objListIdConv);
+    void writeDataXEV(QDomElement& ele, QDomDocument& doc,
+                      RuntimeIdToWriteId& objListIdConv);
 
     QString tagNameXEV() const { return "Timeline"; }
 private:

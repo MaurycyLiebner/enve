@@ -61,7 +61,7 @@ public:
     bool KFT_keyReleaseEvent(QKeyEvent *event);
     bool KFT_keyPressEvent(QKeyEvent *event);
 
-    void setResolutionFraction(const qreal percent);
+    void setResolution(const qreal fraction);
     void updatePivotIfNeeded();
     void schedulePivotUpdate();
 
@@ -147,6 +147,7 @@ private:
     bool handleShiftKeysKeyPress(QKeyEvent *event);    
 signals:
     void changeCanvasFrameRange(FrameRange);
+    void currentSceneChanged(Canvas* const scene);
 public:
     void setCurrentCanvas(const int id);
 

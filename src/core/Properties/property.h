@@ -23,12 +23,9 @@
 #include "../framerange.h"
 #include "../MovablePoints/pointshandler.h"
 #include "../ReadWrite/basicreadwrite.h"
-#include "../XML/xevexporter.h"
-#include "../XML/xevimporter.h"
 #include "../conncontextptr.h"
 
 #include <QJSEngine>
-#include <QDomElement>
 
 class Canvas;
 class ComplexAnimator;
@@ -76,14 +73,13 @@ protected:
     Property(const QString &name);
 
     virtual void prp_updateCanvasProps();
+    virtual QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const = 0;
+    virtual void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) = 0;
 public:
     virtual void prp_readProperty(eReadStream& src)
     { Q_UNUSED(src) }
     virtual void prp_writeProperty(eWriteStream& dst) const
     { Q_UNUSED(dst) }
-
-    virtual void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp) = 0;
-    virtual QDomElement prp_writePropertyXEV(const XevExporter& exp) const = 0;
 
     virtual QJSValue prp_getBaseJSValue(QJSEngine& e) const {
         Q_UNUSED(e)
@@ -161,6 +157,8 @@ public:
     virtual bool prp_dependsOn(const Property* const prop) const
     { return prop == this; }
 public:
+    QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
+    void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
     QDomElement prp_writeNamedPropertyXEV(
             const QString& name, const XevExporter& exp) const;
 

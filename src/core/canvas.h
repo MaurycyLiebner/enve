@@ -249,8 +249,8 @@ public:
     void scaleSelectedBy(const qreal scaleXBy, const qreal scaleYBy,
                          const QPointF &absOrigin, const bool startTrans);
 
-    qreal getResolutionFraction();
-    void setResolutionFraction(const qreal percent);
+    qreal getResolution() const;
+    void setResolution(const qreal percent);
 
     void applyCurrentTransformToSelected();
     QPointF getSelectedPointsAbsPivotPos();
@@ -530,8 +530,10 @@ public:
     void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);
 
-    void writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path) const;
-    void readBoxOrSoundXEV(ZipFileLoader &fileLoader, const QString &path);
+    void writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path,
+                            const RuntimeIdToWriteId& objListIdConv) const;
+    void readBoxOrSoundXEV(ZipFileLoader &fileLoader, const QString &path,
+                           const RuntimeIdToWriteId& objListIdConv);
 
     bool anim_prevRelFrameWithKey(const int relFrame, int &prevRelFrame);
     bool anim_nextRelFrameWithKey(const int relFrame, int &nextRelFrame);
@@ -542,11 +544,7 @@ public:
     void revertAllPoints();
     void flipSelectedBoxesHorizontally();
     void flipSelectedBoxesVertically();
-    int getByteCountPerFrame() {
-        return qCeil(mWidth*mResolutionFraction)*
-                qCeil(mHeight*mResolutionFraction)*4;
-        //return mCurrentPreviewContainer->getByteCount();
-    }
+    int getByteCountPerFrame();
     int getMaxPreviewFrame(const int minFrame, const int maxFrame);
     void selectedPathsCombine();
     void selectedPathsBreakApart();
@@ -699,7 +697,7 @@ protected:
     bool mLocalPivot = false;
     FrameRange mRange{0, 200};
 
-    qreal mResolutionFraction = 0.5;
+    qreal mResolution = 0.5;
 
     qptr<BoundingBox> mCurrentBox;
     qptr<Circle> mCurrentCircle;
