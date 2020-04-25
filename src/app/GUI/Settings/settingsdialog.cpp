@@ -32,8 +32,8 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
     const auto performance = new PerformanceSettingsWidget(this);
     addSettingsWidget(performance, "Performance");
 
-    const auto interface = new InterfaceSettingsWidget(this);
-    addSettingsWidget(interface, "Interface");
+    const auto ui = new InterfaceSettingsWidget(this);
+    addSettingsWidget(ui, "Interface");
 
     const auto canvas = new CanvasSettingsWidget(this);
     addSettingsWidget(canvas, "Canvas");
