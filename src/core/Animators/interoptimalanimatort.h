@@ -291,8 +291,7 @@ void InterOptimalAnimatorT<T, K>::anim_setAbsFrame(const int frame) {
 template <typename T, typename K>
 void InterOptimalAnimatorT<T, K>::anim_addKeyAtRelFrame(const int relFrame) {
     if(anim_getKeyAtRelFrame(relFrame)) return;
-    const auto newKey = enve::make_shared<K>(this);
-    newKey->moveToRelFrame(relFrame);
+    const auto newKey = enve::make_shared<K>(relFrame, this);
     deepCopyValue(relFrame, newKey->getValue());
     graph_adjustCtrlsForKeyAdd(newKey.get());
     anim_appendKeyAction(newKey);
