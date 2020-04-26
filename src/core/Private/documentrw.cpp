@@ -184,7 +184,7 @@ void Document::readDocumentXEV(const QDomDocument& doc,
         const auto colorEle = color.toElement();
         const QString name = colorEle.attribute("name");
         if(name.isEmpty()) continue;
-        fColors << QColor(name);
+        addBookmarkColor(QColor(name));
     }
 
     auto bBrushes = document.firstChildElement("BrushBookmarks");
@@ -195,7 +195,7 @@ void Document::readDocumentXEV(const QDomDocument& doc,
         if(!brush.isElement()) continue;
         const auto brushEle = brush.toElement();
         const auto brushPtr = XevExportHelpers::brushFromElement(brushEle);
-        if(brushPtr) fBrushes.append(brushPtr);
+        if(brushPtr) addBookmarkBrush(brushPtr);
     }
 
     auto scenesE = document.firstChildElement("Scenes");
