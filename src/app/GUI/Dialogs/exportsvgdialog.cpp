@@ -138,7 +138,7 @@ ExportSvgDialog::ExportSvgDialog(QWidget* const parent) :
     buttons->addButton(mPreviewButton, QDialogButtonBox::ActionRole);
     connect(mPreviewButton, &QPushButton::released, this, [this]() {
         if(!mPreviewFile) {
-            const QString templ = "enve_svg_preview_XXXXXX.svg";
+            const QString templ = QDir::tempPath() + "/enve_svg_preview_XXXXXX.svg";
             mPreviewFile = qsptr<QTemporaryFile>::create(templ);
             mPreviewFile->open();
             mPreviewFile->close();
