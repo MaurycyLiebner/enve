@@ -848,15 +848,15 @@ void QrealAnimator::prp_readPropertyXEV_impl(
     Q_UNUSED(imp)
     const auto values = ele.attribute("values");
     if(!values.isEmpty()) {
-        const auto frames = ele.attribute("frames");
+        const auto allFrames = ele.attribute("frames");
         const auto keysValues = values.splitRef(';');
-        const auto keysFrames = frames.splitRef(';');
+        const auto keysFrames = allFrames.splitRef(';');
         if(keysValues.count() != keysFrames.count())
             RuntimeThrow("The values count does not match the frames count");
         const int iMax = keysValues.count();
         for(int i = 0; i < iMax; i++) {
             const auto values = keysValues[i].split(' ');
-            if(frames.count() != 3) {
+            if(values.count() != 3) {
                 RuntimeThrow("Invalid values count " + values[i].toString());
             }
             const auto frames = keysFrames[i].split(' ');
