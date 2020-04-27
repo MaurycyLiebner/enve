@@ -65,6 +65,8 @@ public:
     void setCurrentValue(const QString &text);
 
     void saveSVG(SvgExporter& doc, DomEleTask* const task) const;
+protected:
+    void getMotionBlurProperties(QList<Property*>& list) const;
 private:
     void textToPath(const qreal x, const qreal y,
                     const QString& text, SkPath& path) const;

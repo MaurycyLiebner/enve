@@ -82,6 +82,13 @@ void TextBox::openTextEditor(QWidget* dialogParent) {
     }
 }
 
+void TextBox::getMotionBlurProperties(QList<Property*> &list) const {
+    PathBox::getMotionBlurProperties(list);
+    list.append(mSpacingCont.get());
+    list.append(mText.get());
+    list.append(mTextEffects.get());
+}
+
 void TextBox::setTextHAlignment(const Qt::Alignment alignment) {
     if(mHAlignment == alignment) return;
     {
