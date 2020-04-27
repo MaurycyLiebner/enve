@@ -76,6 +76,7 @@ eTexture &GpuRenderTools::getSrcTexture() {
 }
 
 bool GpuRenderTools::imageToTexture(sk_sp<SkImage> img, eTexture& texture) {
+    if(!img) return false;
     mContext.switchToSkia();
     if(!img->isTextureBacked())
         img = img->makeTextureImage(mContext.grContext(), GrMipMapped::kNo);

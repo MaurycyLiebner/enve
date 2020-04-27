@@ -22,7 +22,7 @@ PathBoxRenderData::PathBoxRenderData(BoundingBox * const parentBox) :
 
 void PathBoxRenderData::setupRenderData() {
     const bool isBrush = fStrokeSettings.fPaintType == PaintType::BRUSHPAINT;
-    mDirectDraw = !isBrush && !hasEffects() &&
+    mDirectDraw = !fForceRasterize && !isBrush && !hasEffects() &&
                   fBlendMode == SkBlendMode::kSrcOver;
     if(mDirectDraw) setupDirectDraw();
 }

@@ -258,7 +258,8 @@ public:
 
     stdsptr<BoxRenderData> createRenderData(const qreal relFrame);
     stdsptr<BoxRenderData> queRender(const qreal relFrame);
-    stdsptr<BoxRenderData> queExternalRender(const qreal relFrame);
+    stdsptr<BoxRenderData> queExternalRender(
+            const qreal relFrame, const bool forceRasterize);
 
     void setupWithoutRasterEffects(const qreal relFrame,
                                    BoxRenderData * const data,

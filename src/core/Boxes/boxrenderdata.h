@@ -74,6 +74,8 @@ public:
     stdsptr<BoxRenderData> makeCopy();
     sk_sp<SkImage> requestImageCopy();
 
+    bool fForceRasterize = false;
+
     uint fBoxStateId = 0;
 
     QMatrix fResolutionScale;

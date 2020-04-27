@@ -106,15 +106,15 @@ stdsptr<RasterEffectCaller> MotionBlurEffect::getEffectCaller(
     QList<stdsptr<BoxRenderData>> samples;
     for(int i = 0; i < nSamples; i++) {
         if(!idRange.inRange(sampleRelFrame)) {
-            const auto sampleRenderData = mParentBox->queExternalRender(sampleRelFrame);
-            if(sampleRenderData) {
-                if(sampleRenderData->finished()) {
-                    data->fOtherGlobalRects << sampleRenderData->fGlobalRect;
+            const auto sample = mParentBox->queExternalRender(sampleRelFrame, true);
+            if(sample) {
+                if(sample->finished()) {
+                    data->fOtherGlobalRects << sample->fGlobalRect;
                 } else {
-                    sampleRenderData->fMotionBlurTarget = data;
-                    sampleRenderData->addDependent(data);
+                    sample->fMotionBlurTarget = data;
+                    sample->addDependent(data);
                 }
-                samples << sampleRenderData;
+                samples << sample;
             }
         }
 
@@ -224,6 +224,7 @@ void MotionBlurCaller::sDrawSample(const stdsptr<BoxRenderData>& sample,
                                    GpuRenderTools &renderTools,
                                    QGL33 * const gl) {
     const auto& sampleImg = sample->fRenderedImage;
+    if(!sampleImg) return;
     eTexture texture2;
     renderTools.imageToTexture(sampleImg, texture2);
     renderTools.switchToOpenGL(gl);

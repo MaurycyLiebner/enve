@@ -481,10 +481,12 @@ void BoundingBox::planUpdate(const UpdateReason reason) {
 }
 
 
-stdsptr<BoxRenderData> BoundingBox::queExternalRender(const qreal relFrame) {
+stdsptr<BoxRenderData> BoundingBox::queExternalRender(
+        const qreal relFrame, const bool forceRasterize) {
     const auto renderData = createRenderData(relFrame);
     if(!renderData) return nullptr;
     renderData->fParentIsTarget = false;
+    renderData->fForceRasterize = forceRasterize;
     setupRenderData(relFrame, renderData.get(), getParentScene());
     renderData->queTask();
     return renderData;
