@@ -29,7 +29,7 @@ void ImageRenderData::updateRelBoundingRect() {
 
 void ImageRenderData::setupRenderData() {
     if(!fImage) loadImageFromHandler();
-    if(!hasEffects()) setupDirectDraw();
+    if(!fForceRasterize && !hasEffects()) setupDirectDraw();
 }
 
 void ImageRenderData::setupDirectDraw() {
