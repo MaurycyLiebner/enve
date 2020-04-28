@@ -171,6 +171,15 @@ public:
                       const bool transform = false,
                       const QString& type = "",
                       const QString& templ = "%1");
+    using Mangler = std::function<qreal(qreal)>;
+    void saveQrealSVG(SvgExporter& exp,
+                      QDomElement& parent,
+                      const FrameRange& visRange,
+                      const QString& attrName,
+                      const Mangler& mangler,
+                      const bool transform = false,
+                      const QString& type = "",
+                      const QString& templ = "%1");
 private:
     qreal calculateBaseValueAtRelFrame(const qreal frame) const;
     void startBaseValueTransform();

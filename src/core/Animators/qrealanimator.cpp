@@ -766,24 +766,30 @@ void QrealAnimator::saveQrealSVG(SvgExporter& exp,
                                  const bool transform,
                                  const QString& type,
                                  const QString& templ) {
+    const auto mangler = [multiplier](const qreal value) {
+        return value*multiplier;
+    };
+    saveQrealSVG(exp, parent, visRange, attrName,
+                 mangler, transform, type, templ);
+}
+
+void QrealAnimator::saveQrealSVG(SvgExporter& exp, QDomElement& parent,
+                                 const FrameRange& visRange, const QString& attrName,
+                                 const Mangler& mangler, const bool transform,
+                                 const QString& type, const QString& templ) {
     if(hasValidExpression()) {
-//        Animator::saveSVG(exp, parent, attrName,
-//                          [this, multiplier, &templ](const int relFrame) {
-//            const qreal val = getEffectiveValue(relFrame)*multiplier;
-//            return templ.arg(val);
-//        }, transform, type);
         const auto copy = enve::make_shared<QrealAnimator>("");
         const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
         copy->prp_setInheritedFrameShift(prp_getTotalFrameShift(), nullptr);
         copy->setExpression(mExpression.sptr());
         copy->applyExpression(relRange, 10, false);
         copy->saveQrealSVG(exp, parent, visRange, attrName,
-                           multiplier, transform, type, templ);
+                           mangler, transform, type, templ);
         setExpression(mExpression.sptr());
     } else {
         graph_saveSVG(exp, parent, visRange, attrName,
-                      [this, multiplier, &templ](const int relFrame) {
-            const qreal val = getEffectiveValue(relFrame)*multiplier;
+                      [this, mangler, &templ](const int relFrame) {
+            const qreal val = mangler(getEffectiveValue(relFrame));
             return templ.arg(val);
         }, transform, type);
     }

@@ -465,6 +465,7 @@ void TextBox::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
     auto& ele = task->initialize("g");
     saveTextAttributesSVG(ele, mFont);
     savePathBoxSVG(exp, ele, task->visRange());
+
     QString textAnchor;
     switch(mHAlignment) {
     case Qt::AlignLeft: textAnchor = "start"; break;
@@ -472,5 +473,14 @@ void TextBox::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
     case Qt::AlignRight: textAnchor = "end"; break;
     }
     ele.setAttribute("text-anchor", textAnchor);
-    mText->saveSVG(exp, ele);
+
+    const auto propSetter = [&](QDomElement& ele) {
+        mLetterSpacing->saveQrealSVG(exp, ele, task->visRange(), "letter-spacing",
+                                     1, false, "", "%1em");
+        mWordSpacing->saveQrealSVG(exp, ele, task->visRange(), "word-spacing",
+                                   [](const qreal value) { return 0.25*(value - 1); },
+                                   false, "", "%1em");
+    };
+
+    mText->saveSVG(exp, ele, propSetter);
 }

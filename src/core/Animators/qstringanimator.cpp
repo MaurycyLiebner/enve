@@ -29,12 +29,14 @@ QDomElement createTextElement(SvgExporter& exp, const QString& text) {
     return ele;
 }
 
-void QStringAnimator::saveSVG(SvgExporter& exp, QDomElement& parent) const {
+void QStringAnimator::saveSVG(SvgExporter& exp, QDomElement& parent,
+                              const PropSetter& propSetter) const {
     const auto relRange = prp_absRangeToRelRange(exp.fAbsRange);
     const auto idRange = prp_getIdenticalRelRange(relRange.fMin);
     const int span = exp.fAbsRange.span();
     if(idRange.inRange(relRange) || span == 1) {
         auto ele = createTextElement(exp, getValueAtRelFrame(relRange.fMin));
+        propSetter(ele);
         parent.appendChild(ele);
     } else {
         int i = relRange.fMin;
@@ -42,6 +44,7 @@ void QStringAnimator::saveSVG(SvgExporter& exp, QDomElement& parent) const {
             const auto iRange = exp.fAbsRange*prp_getIdenticalAbsRange(i);
 
             auto ele = createTextElement(exp, getValueAtRelFrame(i));
+            propSetter(ele);
             SvgExportHelpers::assignVisibility(exp, ele, iRange);
             parent.appendChild(ele);
 
