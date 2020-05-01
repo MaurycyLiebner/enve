@@ -116,8 +116,9 @@ public:
 
     void saveSVG(SvgExporter& exp, DomEleTask* const eleTask) const;
 
-    void writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path,
-                            const RuntimeIdToWriteId& objListIdConv) const;
+    void writeBoxOrSoundXEV(const stdsptr<XevZipFileSaver>& xevFileSaver,
+                            const RuntimeIdToWriteId& objListIdConv,
+                            const QString& path) const;
     void readBoxOrSoundXEV(ZipFileLoader& fileLoader, const QString& path,
                            const RuntimeIdToWriteId& objListIdConv);
     void readAllContainedXEV(ZipFileLoader& fileLoader, const QString& path,
@@ -127,8 +128,9 @@ public:
     void queTasks();
 
     void writeAllContained(eWriteStream &dst) const;
-    void writeAllContainedXEV(ZipFileSaver& fileSaved, const QString& path,
-                              const RuntimeIdToWriteId& objListIdConv) const;
+    void writeAllContainedXEV(const stdsptr<XevZipFileSaver>& fileSaver,
+                              const RuntimeIdToWriteId& objListIdConv,
+                              const QString& path) const;
 
     void writeBoundingBox(eWriteStream& dst) const;
     void readContained(eReadStream &src);

@@ -1317,18 +1317,21 @@ void ContainerBox::writeAllContained(eWriteStream& dst) const {
 }
 
 void ContainerBox::writeAllContainedXEV(
-        ZipFileSaver& fileSaved, const QString& path,
-        const RuntimeIdToWriteId& objListIdConv) const {
+        const stdsptr<XevZipFileSaver>& fileSaver,
+        const RuntimeIdToWriteId& objListIdConv,
+        const QString& path) const {
     const QString childPath = path + "objects/%1/";
     int id = 0;
     for(const auto& cont : mContained) {
-        cont->writeBoxOrSoundXEV(fileSaved, childPath.arg(id++), objListIdConv);
+        cont->writeBoxOrSoundXEV(fileSaver, objListIdConv, childPath.arg(id++));
     }
 }
 
-void ContainerBox::writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path,
-                                      const RuntimeIdToWriteId& objListIdConv) const {
-    BoundingBox::writeBoxOrSoundXEV(fileSaver, path, objListIdConv);
+void ContainerBox::writeBoxOrSoundXEV(const stdsptr<XevZipFileSaver>& xevFileSaver,
+                                      const RuntimeIdToWriteId& objListIdConv,
+                                      const QString& path) const {
+    BoundingBox::writeBoxOrSoundXEV(xevFileSaver, objListIdConv, path);
+    auto& fileSaver = xevFileSaver->fileSaver();
     fileSaver.processText(path + "stack.xml", [this](QTextStream& stream) {
         QDomDocument doc;
         auto stack = doc.createElement("Stack");
@@ -1357,7 +1360,7 @@ void ContainerBox::writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& pa
         doc.appendChild(stack);
         stream << doc.toString();
     });
-    writeAllContainedXEV(fileSaver, path, objListIdConv);
+    writeAllContainedXEV(xevFileSaver, objListIdConv, path);
 }
 
 #include "smartvectorpath.h"

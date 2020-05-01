@@ -16,20 +16,23 @@
 
 #include "xevexporter.h"
 
-#include "../zipfilesaver.h"
+#include "../XML/xevzipfilesaver.h"
+
+#include "smartPointers/ememory.h"
 
 XevExporter::XevExporter(QDomDocument& doc,
-                         ZipFileSaver& fileSaver,
+                         const std::shared_ptr<XevZipFileSaver>& xevFileSaver,
                          const RuntimeIdToWriteId& objListIdConv,
                          const QString& path,
                          const QString& assetsPath) :
-    mDoc(doc), mFileSaver(fileSaver),
+    mDoc(doc), mFileSaver(xevFileSaver),
     mObjectListIdConv(objListIdConv),
     mPath(path), mAssetsPath(assetsPath) {}
 
-XevExporter XevExporter::withAssetsPath(const QString& path) const {
-    return XevExporter(mDoc, mFileSaver, mObjectListIdConv,
-                       mPath, mAssetsPath + path);
+stdsptr<XevExporter> XevExporter::withAssetsPath(const QString& path) const {
+    return enve::make_shared<XevExporter>(
+                mDoc, mFileSaver, mObjectListIdConv,
+                mPath, mAssetsPath + path);
 }
 
 QDomElement XevExporter::createElement(const QString& tagName) const {
@@ -40,6 +43,8 @@ QDomText XevExporter::createTextNode(const QString& data) const {
     return mDoc.createTextNode(data);
 }
 
-void XevExporter::processAsset(const QString& file, const Processor& func) const {
-    mFileSaver.process(mPath + "assets/" + mAssetsPath + file, func);
+void XevExporter::processAsset(const QString& file, const Processor& func,
+                               const bool compress) const {
+    auto& fileSaver = mFileSaver->fileSaver();
+    fileSaver.process(mPath + "assets/" + mAssetsPath + file, func, false);
 }

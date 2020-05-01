@@ -17,34 +17,36 @@
 #ifndef XEVEXPORTER_H
 #define XEVEXPORTER_H
 
-#include "xmlexporthelpers.h"
+#include "../smartPointers/stdselfref.h"
 
+#include "xmlexporthelpers.h"
 #include "runtimewriteid.h"
 
-class ZipFileSaver;
+class XevZipFileSaver;
 
-class XevExporter {
+class XevExporter : public StdSelfRef {
 public:
     XevExporter(QDomDocument& doc,
-                ZipFileSaver& fileSaver,
+                const std::shared_ptr<XevZipFileSaver>& xevFileSaver,
                 const RuntimeIdToWriteId& objListIdConv,
                 const QString& path,
                 const QString& assetsPath = "");
 
-    const RuntimeIdToWriteId objListIdConv() const { return mObjectListIdConv; }
+    const RuntimeIdToWriteId& objListIdConv() const { return mObjectListIdConv; }
 
     QDomDocument& doc() const { return mDoc; }
 
-    XevExporter withAssetsPath(const QString& path) const;
+    stdsptr<XevExporter> withAssetsPath(const QString& path) const;
 
     QDomElement createElement(const QString& tagName) const;
     QDomText createTextNode(const QString& data) const;
 
     using Processor = std::function<void(QIODevice* const dst)>;
-    void processAsset(const QString& file, const Processor& func) const;
+    void processAsset(const QString& file, const Processor& func,
+                      const bool compress = true) const;
 private:
     QDomDocument& mDoc;
-    ZipFileSaver& mFileSaver;
+    const stdsptr<XevZipFileSaver> mFileSaver;
     const RuntimeIdToWriteId& mObjectListIdConv;
     const QString mPath;
     const QString mAssetsPath;

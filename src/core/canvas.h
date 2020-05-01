@@ -530,8 +530,9 @@ public:
     void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);
 
-    void writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path,
-                            const RuntimeIdToWriteId& objListIdConv) const;
+    void writeBoxOrSoundXEV(const stdsptr<XevZipFileSaver>& xevFileSaver,
+                            const RuntimeIdToWriteId& objListIdConv,
+                            const QString& path) const;
     void readBoxOrSoundXEV(ZipFileLoader &fileLoader, const QString &path,
                            const RuntimeIdToWriteId& objListIdConv);
 

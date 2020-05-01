@@ -51,7 +51,8 @@ void StaticComplexAnimator::writeChildPropertiesXEV(
     int id = 0;
     for(const auto& c : children) {
         const auto path = QString::number(id++) + "/";
-        auto child = c->prp_writePropertyXEV(exp.withAssetsPath(path));
+        const auto expc = exp.withAssetsPath(path);
+        auto child = c->prp_writePropertyXEV(*expc);
         prop.appendChild(child);
     }
 }

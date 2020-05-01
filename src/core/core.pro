@@ -242,6 +242,7 @@ SOURCES += \
     Timeline/fixedlenanimationrect.cpp \
     XML/xevexporter.cpp \
     XML/xevimporter.cpp \
+    XML/xevzipfilesaver.cpp \
     XML/xmlexporthelpers.cpp \
     action.cpp \
     actions.cpp \
@@ -568,6 +569,7 @@ HEADERS += \
     XML/runtimewriteid.h \
     XML/xevexporter.h \
     XML/xevimporter.h \
+    XML/xevzipfilesaver.h \
     XML/xmlexporthelpers.h \
     action.h \
     actions.h \

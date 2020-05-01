@@ -32,6 +32,7 @@
 #include "zipfilesaver.h"
 #include "zipfileloader.h"
 #include "XML/runtimewriteid.h"
+#include "XML/xevzipfilesaver.h"
 
 class SceneBoundGradient;
 class FileDataCacheHandler;
@@ -164,10 +165,10 @@ public:
     void write(eWriteStream &dst) const;
     void read(eReadStream &src);
 
-    void writeXEV(ZipFileSaver& fileSaver,
+    void writeXEV(const std::shared_ptr<XevZipFileSaver>& xevFileSaver,
                   const RuntimeIdToWriteId& objListIdConv) const;
     void writeDoxumentXEV(QDomDocument& doc) const;
-    void writeScenesXEV(ZipFileSaver& fileSaver,
+    void writeScenesXEV(const std::shared_ptr<XevZipFileSaver>& xevFileSaver,
                         const RuntimeIdToWriteId& objListIdConv) const;
 
     void readDocumentXEV(ZipFileLoader& fileLoader,

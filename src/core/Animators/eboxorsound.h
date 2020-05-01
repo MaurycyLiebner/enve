@@ -21,6 +21,7 @@
 
 #include "../zipfilesaver.h"
 #include "../zipfileloader.h"
+#include "../XML/xevzipfilesaver.h"
 
 class ContainerBox;
 class Canvas;
@@ -51,8 +52,9 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
-    virtual void writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path,
-                                    const RuntimeIdToWriteId& objListIdConv) const;
+    virtual void writeBoxOrSoundXEV(const std::shared_ptr<XevZipFileSaver>& xevFileSaver,
+                                    const RuntimeIdToWriteId& objListIdConv,
+                                    const QString& path) const;
     virtual void readBoxOrSoundXEV(ZipFileLoader& fileLoader, const QString& path,
                                    const RuntimeIdToWriteId& objListIdConv);
 

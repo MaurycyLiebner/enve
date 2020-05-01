@@ -126,17 +126,14 @@ void MainWindow::saveToFile(const QString &path) {
     addRecentFile(path);
 }
 
-#include "zipfilesaver.h"
+#include "XML/xevzipfilesaver.h"
 
 void MainWindow::saveToFileXEV(const QString &path) {
-    QFile file(path);
-    if(file.exists()) file.remove();
-
-    if(!file.open(QIODevice::WriteOnly))
-        RuntimeThrow("Could not open file for writing " + path + ".");
     try {
-        ZipFileSaver fileSaver;
-        fileSaver.setIoDevice(&file);
+        const auto xevfileSaver = std::make_shared<XevZipFileSaver>();
+        xevfileSaver->setPath(path);
+        auto& fileSaver = xevfileSaver->fileSaver();
+
         fileSaver.processText("mimetype", [](QTextStream& stream) {
             stream << "application/enve";
         }, false);
@@ -150,7 +147,7 @@ void MainWindow::saveToFileXEV(const QString &path) {
             p.scale(scale, scale);
             render(&p);
             img.save(dst, "PNG");
-        });
+        }, false);
 
         RuntimeIdToWriteId objListIdConv;
         objListIdConv.assign(mObjectSettingsWidget->getId());
@@ -162,17 +159,14 @@ void MainWindow::saveToFileXEV(const QString &path) {
             stream << doc.toString();
         });
 
-        mDocument.writeXEV(fileSaver, objListIdConv);
+        mDocument.writeXEV(xevfileSaver, objListIdConv);
     } catch(...) {
-        file.close();
         RuntimeThrow("Error while writing to file " + path);
     }
-    file.close();
 
     BoundingBox::sClearWriteBoxes();
     addRecentFile(path);
 }
-
 
 void MainWindow::loadXevFile(const QString &path) {
     try {

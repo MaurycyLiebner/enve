@@ -139,14 +139,17 @@ void eBoxOrSound::prp_readProperty(eReadStream& src) {
     }
 }
 
-void eBoxOrSound::writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path,
-                                     const RuntimeIdToWriteId& objListIdConv) const {
+void eBoxOrSound::writeBoxOrSoundXEV(const std::shared_ptr<XevZipFileSaver>& xevFileSaver,
+                                     const RuntimeIdToWriteId& objListIdConv,
+                                     const QString& path) const {
     QDomDocument doc;
-    const XevExporter exp(doc, fileSaver, objListIdConv, path);
-    auto obj = prp_writeNamedPropertyXEV("Object", exp);
+    const auto exp = enve::make_shared<XevExporter>(
+                         doc, xevFileSaver, objListIdConv, path);
+    auto obj = prp_writeNamedPropertyXEV("Object", *exp);
     if(mDurationRectangle) mDurationRectangle->writeDurationRectangleXEV(obj);
 
     doc.appendChild(obj);
+    auto& fileSaver = xevFileSaver->fileSaver();
     fileSaver.processText(path + "properties.xml",
                           [&](QTextStream& stream) {
         stream << doc.toString();

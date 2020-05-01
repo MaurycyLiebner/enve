@@ -314,7 +314,8 @@ protected:
         for(const auto& c : children) {
             const auto TProp = static_cast<T*>(c.get());
             const auto path = QString::number(id++) + "/";
-            auto child = c->prp_writePropertyXEV(exp.withAssetsPath(path));
+            const auto expc = exp.withAssetsPath(path);
+            auto child = c->prp_writePropertyXEV(*expc);
             TWriteTypeXEV(TProp, child);
             result.appendChild(child);
         }

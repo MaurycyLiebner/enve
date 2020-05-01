@@ -140,23 +140,24 @@ void Document::writeDoxumentXEV(QDomDocument& doc) const {
     doc.appendChild(document);
 }
 
-void Document::writeScenesXEV(ZipFileSaver& fileSaver,
+void Document::writeScenesXEV(const std::shared_ptr<XevZipFileSaver>& xevFileSaver,
                               const RuntimeIdToWriteId& objListIdConv) const {
     int id = 0;
     for(const auto &s : fScenes) {
         const QString path = "scenes/" + QString::number(id++) + "/";
-        s->writeBoxOrSoundXEV(fileSaver, path, objListIdConv);
+        s->writeBoxOrSoundXEV(xevFileSaver, objListIdConv, path);
     }
 }
 
-void Document::writeXEV(ZipFileSaver& fileSaver,
+void Document::writeXEV(const std::shared_ptr<XevZipFileSaver>& xevFileSaver,
                         const RuntimeIdToWriteId& objListIdConv) const {
+    auto& fileSaver = xevFileSaver->fileSaver();
     fileSaver.processText("document.xml", [&](QTextStream& stream) {
         QDomDocument document;
         writeDoxumentXEV(document);
         stream << document.toString();
     });
-    writeScenesXEV(fileSaver, objListIdConv);
+    writeScenesXEV(xevFileSaver, objListIdConv);
 }
 
 void Document::readDocumentXEV(ZipFileLoader& fileLoader,

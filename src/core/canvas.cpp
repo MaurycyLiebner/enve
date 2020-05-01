@@ -984,17 +984,20 @@ void Canvas::readBoundingBox(eReadStream& src) {
     clearGradientRWIds();
 }
 
-void Canvas::writeBoxOrSoundXEV(ZipFileSaver& fileSaver, const QString& path,
-                                const RuntimeIdToWriteId& objListIdConv) const {
-    ContainerBox::writeBoxOrSoundXEV(fileSaver, path, objListIdConv);
+void Canvas::writeBoxOrSoundXEV(const stdsptr<XevZipFileSaver>& xevFileSaver,
+                                const RuntimeIdToWriteId& objListIdConv,
+                                const QString& path) const {
+    ContainerBox::writeBoxOrSoundXEV(xevFileSaver, objListIdConv, path);
+    auto& fileSaver = xevFileSaver->fileSaver();
     fileSaver.processText(path + "gradients.xml",
                           [&](QTextStream& stream) {
         QDomDocument doc;
         auto gradients = doc.createElement("Gradients");
         int id = 0;
-        const XevExporter exp(doc, fileSaver, objListIdConv, path);
+        const auto exp = enve::make_shared<XevExporter>(
+                    doc, xevFileSaver, objListIdConv, path);
         for(const auto &grad : mGradients) {
-            auto gradient = grad->prp_writePropertyXEV(exp);
+            auto gradient = grad->prp_writePropertyXEV(*exp);
             gradient.setAttribute("id", id++);
             gradients.appendChild(gradient);
         }

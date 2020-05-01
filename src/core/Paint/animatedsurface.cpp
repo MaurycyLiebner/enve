@@ -74,6 +74,14 @@ void AnimatedSurface::prp_writeProperty(eWriteStream& dst) const {
     mBaseValue->write(dst);
 }
 
+void savePaintImageXEV(const QString& path, const XevExporter& exp,
+                       const DrawableAutoTiledSurface& surf) {
+    const auto image = surf.toImage(true);
+    exp.processAsset(path, [&](QIODevice* const dst) {
+        image.save(dst, "PNG");
+    }, false);
+}
+
 QDomElement AnimatedSurface::prp_writePropertyXEV_impl(const XevExporter& exp) const {
     auto result = exp.createElement("PaintSurface");
     if(anim_hasKeys()) {
@@ -86,14 +94,22 @@ QDomElement AnimatedSurface::prp_writePropertyXEV_impl(const XevExporter& exp) c
             frames += frameStr;
 
             const auto& asKey = static_cast<ASKey*>(key);
-            const auto& surf = asKey->dSurface();
+            auto& surf = asKey->dSurface();
             const auto pivot = surf.zeroTilePos();
             pivots += QString("%1 %2").arg(pivot.x()).
                                        arg(pivot.y());
-            const auto image = surf.toImage(true);
-            exp.processAsset(frameStr + ".png", [&](QIODevice* const dst) {
-                image.save(dst, "PNG");
-            });
+            const auto loadTask = surf.scheduleLoadFromTmpFile();
+            if(loadTask) {
+                const stdptr<DrawableAutoTiledSurface> surfPtr = &surf;
+                const auto expPtr = exp.ref<const XevExporter>();
+                const auto saveImage = [surfPtr, expPtr, frameStr]() {
+                    if(!surfPtr) return;
+                    savePaintImageXEV(frameStr + ".png", *expPtr, *surfPtr);
+                };
+                loadTask->addDependent({saveImage, nullptr});
+            } else {
+                savePaintImageXEV(frameStr + ".png", exp, surf);
+            }
         }
         result.setAttribute("frames", frames);
         result.setAttribute("pivots", pivots);
@@ -102,10 +118,7 @@ QDomElement AnimatedSurface::prp_writePropertyXEV_impl(const XevExporter& exp) c
         const auto pivotStr = QString("%1 %2").arg(pivot.x()).
                                                arg(pivot.y());
         result.setAttribute("pivot", pivotStr);
-        const auto image = mBaseValue->toImage(true);
-        exp.processAsset("value.png", [&](QIODevice* const dst) {
-            image.save(dst, "PNG");
-        });
+        savePaintImageXEV("value.png", exp, *mBaseValue);
     }
     return result;
 }
