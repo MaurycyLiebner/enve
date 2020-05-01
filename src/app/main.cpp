@@ -29,6 +29,9 @@
 #include "videoencoder.h"
 #include "iconloader.h"
 #include "GUI/envesplash.h"
+#ifdef Q_OS_WIN
+    #include "windowsincludes.h"
+#endif // Q_OS_WIN
 extern "C" {
     #include <libavformat/avformat.h>
 }
@@ -83,8 +86,13 @@ void generateAlphaMesh(QPixmap& alphaMesh, const int dim) {
 
 int main(int argc, char *argv[]) {
     std::cout << "Entered main()" << std::endl;
+#ifdef Q_OS_WIN
+    SetProcessDPIAware(); // call before the main event loop
+#endif // Q_OS_WIN
+    QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+
     setDefaultFormat();
     std::cout << "Setup Default QSurfaceFormat" << std::endl;
     QApplication app(argc, argv);
