@@ -41,7 +41,7 @@ Make sure you have **git** installed on your system.
 
 Clone the enve repository:
 ```
-git clone https://github.com/MaurycyLiebner/enve
+git clone --recurse-submodules https://github.com/MaurycyLiebner/enve
 ```
 Enter enve directory:
 ```
@@ -50,10 +50,6 @@ cd enve
 Enter the folder with third party dependencies:
 ```
 cd third_party
-```
-Initialize and checkout all submodules:
-```
-git submodule update --init
 ```
 Apply enve-specific library patches (not needed for Windows):
 ```
