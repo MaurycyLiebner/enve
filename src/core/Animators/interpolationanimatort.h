@@ -82,11 +82,20 @@ void InterpolationAnimatorT<T, K>::readValuesXEV(
     if(hasKeys) {
         const QString valueStrs = ele.attribute("values");
         const QString frameStrs = ele.attribute("frames");
+        const QString ctrlModeStrs = ele.attribute("ctrlModes");
+        const QString ctrlValueStrs = ele.attribute("ctrlValues");
 
         const auto values = valueStrs.splitRef(';');
         const auto framess = frameStrs.splitRef(';');
+        const auto ctrlModes = ctrlModeStrs.splitRef(';');
+        const auto ctrlValuess = ctrlValueStrs.splitRef(';');
+
         if(values.count() != framess.count())
             RuntimeThrow("The values count does not match the frames count");
+        if(ctrlModes.count() != framess.count())
+            RuntimeThrow("The ctrlModes count does not match the frames count");
+        if(ctrlValuess.count() != framess.count())
+            RuntimeThrow("The ctrlValues count does not match the frames count");
         const int iMax = values.count();
         for(int i = 0; i < iMax; i++) {
             const auto& value = values[i];
@@ -94,13 +103,40 @@ void InterpolationAnimatorT<T, K>::readValuesXEV(
             if(frames.count() != 3) {
                 RuntimeThrow("Invalid frames count " + framess[i].toString());
             }
+            const auto ctrlValues = ctrlValuess[i].split(' ');
+            if(ctrlValues.count() != 2) {
+                RuntimeThrow("Invalid ctrlValues count " + ctrlValuess[i].toString());
+            }
+            const auto ctrlModeStr = ctrlModes[i];
+            const auto ctrlMode = XmlExportHelpers::stringToEnum<CtrlsMode>(
+                                        ctrlModeStr, CtrlsMode::smooth,
+                                        CtrlsMode::corner);
 
             const int frame = XmlExportHelpers::stringToInt(frames[1]);
             const auto key = enve::make_shared<K>(frame, this);
             auto& keyValue = key->getValue();
             strToVal(keyValue, value);
-            key->setC0Frame(XmlExportHelpers::stringToDouble(frames[0]));
-            key->setC1Frame(XmlExportHelpers::stringToDouble(frames[2]));
+
+            const auto f0Str = frames[0];
+            const auto f2Str = frames[2];
+
+            const auto& v0Str = ctrlValues[0];
+            const auto& v2Str = ctrlValues[1];
+
+            const bool c0Enabled = f0Str != '*' && v0Str != '*';
+            const bool c1Enabled = f2Str != '*' && v2Str != '*';
+
+            key->setC0Enabled(c0Enabled);
+            key->setC1Enabled(c1Enabled);
+
+            key->setC0FrameVar(c0Enabled ? XmlExportHelpers::stringToDouble(f0Str) : frame);
+            key->setC1FrameVar(c1Enabled ? XmlExportHelpers::stringToDouble(f2Str) : frame);
+
+            key->setC0ValueVar(c0Enabled ? XmlExportHelpers::stringToDouble(v0Str) : frame);
+            key->setC1ValueVar(c1Enabled ? XmlExportHelpers::stringToDouble(v2Str) : frame);
+
+            key->setCtrlsMode(ctrlMode);
+
             this->anim_appendKey(key);
         }
     } else if(ele.hasAttribute("value")) {
@@ -115,23 +151,46 @@ void InterpolationAnimatorT<T, K>::writeValuesXEV(
     if(this->anim_hasKeys()) {
         QString values;
         QString frames;
-        const QString blueprint = QStringLiteral("%1 %2 %3");
+        QString ctrlModes;
+        QString ctrlValues;
+
+        const QString framesBP = QStringLiteral("%1 %2 %3");
+        const QString ctrlValsBP = QStringLiteral("%1 %2");
         const auto& keys = this->anim_getKeys();
         for(const auto &key : keys) {
             const auto smKey = static_cast<K*>(key);
             const QString v = valToStr(smKey->getValue());
 
             const qreal fc0 = smKey->getC0Frame();
+            const qreal vc0 = smKey->getC0Value();
             const int f = smKey->getRelFrame();
-            const qreal fc2 = smKey->getC1Frame();
+            const qreal fc1 = smKey->getC1Frame();
+            const qreal vc1 = smKey->getC1Value();
+
+            const QString fc0Str = smKey->getC0Enabled() ?
+                                       QString::number(fc0) : "*";
+            const QString fc1Str = smKey->getC1Enabled() ?
+                                       QString::number(fc1) : "*";
+
+            const QString vc0Str = smKey->getC0Enabled() ?
+                                       QString::number(vc0) : "*";
+            const QString vc1Str = smKey->getC1Enabled() ?
+                                       QString::number(vc1) : "*";
 
             if(!values.isEmpty()) values += ';';
             values += v;
             if(!frames.isEmpty()) frames += ';';
-            frames += blueprint.arg(fc0).arg(f).arg(fc2);
+            frames += framesBP.arg(fc0Str).arg(f).arg(fc1Str);
+            if(!ctrlModes.isEmpty()) ctrlModes += ';';
+            const auto ctrlMode = smKey->getCtrlsMode();
+            ctrlModes += QString::number(static_cast<int>(ctrlMode));
+            if(!ctrlValues.isEmpty()) ctrlValues += ';';
+            ctrlValues += ctrlValsBP.arg(vc0Str).arg(vc1Str);
         }
         ele.setAttribute("values", values);
         ele.setAttribute("frames", frames);
+        ele.setAttribute("ctrlModes", ctrlModes);
+        ele.setAttribute("ctrlValues", ctrlValues);
     } else ele.setAttribute("value", valToStr(this->mCurrentValue));
 }
 

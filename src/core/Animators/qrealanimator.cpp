@@ -799,6 +799,7 @@ QDomElement QrealAnimator::prp_writePropertyXEV_impl(const XevExporter& exp) con
     auto result = exp.createElement("Float");
 
     if(anim_hasKeys()) {
+        QString ctrlModes;
         QString values;
         QString frames;
         const QString blueprint = QStringLiteral("%1 %2 %3");
@@ -807,19 +808,33 @@ QDomElement QrealAnimator::prp_writePropertyXEV_impl(const XevExporter& exp) con
             const auto qaKey = static_cast<QrealKey*>(key);
             const qreal vc0 = qaKey->getC0Value();
             const qreal v = qaKey->getValue();
-            const qreal vc2 = qaKey->getC1Value();
+            const qreal vc1 = qaKey->getC1Value();
 
             const qreal fc0 = qaKey->getC0Frame();
             const int f = qaKey->getRelFrame();
-            const qreal fc2 = qaKey->getC1Frame();
+            const qreal fc1 = qaKey->getC1Frame();
+
+            const QString vc0Str = qaKey->getC0Enabled() ?
+                                       QString::number(vc0) : "*";
+            const QString vc1Str = qaKey->getC1Enabled() ?
+                                       QString::number(vc1) : "*";
+
+            const QString fc0Str = qaKey->getC0Enabled() ?
+                                       QString::number(fc0) : "*";
+            const QString fc1Str = qaKey->getC1Enabled() ?
+                                       QString::number(fc1) : "*";
 
             if(!values.isEmpty()) values += ';';
-            values += blueprint.arg(vc0).arg(v).arg(vc2);
+            values += blueprint.arg(vc0Str).arg(v).arg(vc1Str);
             if(!frames.isEmpty()) frames += ';';
-            frames += blueprint.arg(fc0).arg(f).arg(fc2);
+            frames += blueprint.arg(fc0Str).arg(f).arg(fc1Str);
+            if(!ctrlModes.isEmpty()) ctrlModes += ';';
+            const auto ctrlMode = qaKey->getCtrlsMode();
+            ctrlModes += QString::number(static_cast<int>(ctrlMode));
         }
         result.setAttribute("values", values);
         result.setAttribute("frames", frames);
+        result.setAttribute("ctrlModes", ctrlModes);
     } else result.setAttribute("value", mCurrentBaseValue);
 
     if(hasExpression()) {
@@ -855,10 +870,14 @@ void QrealAnimator::prp_readPropertyXEV_impl(
     const auto values = ele.attribute("values");
     if(!values.isEmpty()) {
         const auto allFrames = ele.attribute("frames");
+        const auto ctrlModes = ele.attribute("ctrlModes");
         const auto keysValues = values.splitRef(';');
         const auto keysFrames = allFrames.splitRef(';');
+        const auto keysCtrlModes = ctrlModes.splitRef(';');
         if(keysValues.count() != keysFrames.count())
             RuntimeThrow("The values count does not match the frames count");
+        if(keysCtrlModes.count() != keysFrames.count())
+            RuntimeThrow("The ctrlModes count does not match the frames count");
         const int iMax = keysValues.count();
         for(int i = 0; i < iMax; i++) {
             const auto values = keysValues[i].split(' ');
@@ -869,14 +888,34 @@ void QrealAnimator::prp_readPropertyXEV_impl(
             if(frames.count() != 3) {
                 RuntimeThrow("Invalid frames count " + frames[i].toString());
             }
+            const auto ctrlModeStr = keysCtrlModes[i];
+            const auto ctrlMode = XmlExportHelpers::stringToEnum<CtrlsMode>(
+                                        ctrlModeStr, CtrlsMode::smooth,
+                                        CtrlsMode::corner);
+
             const qreal value = XmlExportHelpers::stringToDouble(values[1]);
             const int relFrame = XmlExportHelpers::stringToInt(frames[1]);
+
+            const auto f0Str = frames[0];
+            const auto f2Str = frames[2];
+
+            const auto v0Str = values[0];
+            const auto v2Str = values[2];
+
             const auto key = enve::make_shared<QrealKey>(value, relFrame, this);
 
-            key->setC0Frame(XmlExportHelpers::stringToDouble(frames[0]));
-            key->setC1Frame(XmlExportHelpers::stringToDouble(frames[2]));
-            key->setC0Value(XmlExportHelpers::stringToDouble(values[0]));
-            key->setC1Value(XmlExportHelpers::stringToDouble(values[2]));
+            const bool c0Enabled = f0Str != '*' && v0Str != '*';
+            const bool c1Enabled = f2Str != '*' && v2Str != '*';
+
+            key->setC0Enabled(c0Enabled);
+            key->setC1Enabled(c1Enabled);
+
+            key->setC0Frame(c0Enabled ? XmlExportHelpers::stringToDouble(f0Str) : relFrame);
+            key->setC1Frame(c1Enabled ? XmlExportHelpers::stringToDouble(f2Str) : relFrame);
+            key->setC0Value(c0Enabled ? XmlExportHelpers::stringToDouble(v0Str) : value);
+            key->setC1Value(c1Enabled ? XmlExportHelpers::stringToDouble(v2Str) : value);
+
+            key->setCtrlsMode(ctrlMode);
 
             anim_appendKey(key);
         }

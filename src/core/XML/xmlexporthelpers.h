@@ -49,7 +49,7 @@ namespace XmlExportHelpers {
 
     template <typename T, typename S>
     T stringToEnum(const S& string, const T min, const T max) {
-        const auto result = stringToEnum(string);
+        const auto result = stringToEnum<T>(string);
         if(result < min || result > max)
             RuntimeThrow("Value outside of enum value range");
         return result;
