@@ -1,6 +1,8 @@
 TEMPLATE = subdirs
 
-SUBDIRS = src \
-          examples
+SUBDIRS = src
 
-examples.depends = src
+build_examples {
+    SUBDIRS += examples
+    examples.depends = src
+}
