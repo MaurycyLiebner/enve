@@ -165,8 +165,8 @@ public:
     void openFile();
     void openFile(const QString& openPath);
     void saveFile();
-    void saveFile(const QString& path);
-    void saveFileAs();
+    void saveFile(const QString& path, const bool setPath = true);
+    void saveFileAs(const bool setPath = false);
     void saveBackup();
     void exportSVG();
     bool closeProject();
