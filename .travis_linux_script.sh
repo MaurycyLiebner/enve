@@ -18,7 +18,7 @@ LATEST_COMMIT_DATE=\"$(git log -1 --format=%ai)\"
 echo "#ifndef LATEST_COMMIT_DATE" >> $enveSplash
 echo "#define LATEST_COMMIT_DATE $LATEST_COMMIT_DATE" >> $enveSplash
 echo "#endif" >> $enveSplash
-qmake ../../enve.pro
+qmake CONFIG+=build_examples ../../enve.pro
 make -j 2 CC=gcc-7 CPP=g++-7 CXX=g++-7 LD=g++-7
 cd ..
 

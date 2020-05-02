@@ -10,6 +10,6 @@ LATEST_COMMIT_DATE=\"$(git log -1 --format=%ai)\"
 echo "#ifndef LATEST_COMMIT_DATE" >> $enveSplash
 echo "#define LATEST_COMMIT_DATE $LATEST_COMMIT_DATE" >> $enveSplash
 echo "#endif" >> $enveSplash
-qmake ../../enve.pro
+qmake CONFIG+=build_examples ../../enve.pro
 make -j 2
 cd src/app
