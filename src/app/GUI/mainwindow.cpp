@@ -295,11 +295,8 @@ void MainWindow::setupMenuBar() {
     mFileMenu->addAction(tr("Save", "MenuBar_File"),
                          this, qOverload<>(&MainWindow::saveFile),
                          Qt::CTRL + Qt::Key_S);
-    const auto saveAs = [this]() {
-        saveFileAs(mDocument.fEvFile.isEmpty());
-    };
     mFileMenu->addAction(tr("Save As...", "MenuBar_File"),
-                         this, saveAs,
+                         this, &MainWindow::saveFileAs,
                          Qt::CTRL + Qt::SHIFT + Qt::Key_S);
     mFileMenu->addAction(tr("Save Backup", "MenuBar_File"),
                          this, &MainWindow::saveBackup);
