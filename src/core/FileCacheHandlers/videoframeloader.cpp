@@ -157,11 +157,15 @@ void VideoFrameLoader::readFrame() {
                 minPositiveDist = dist;
                 excessId = i;
             }
-            const auto frame = excessId == -1 ?
-                        decodedFrame : mExcessFrames.takeAt(excessId).second;
+            AVFrame* frame;
+            if(excessId == -1) {
+                frame = decodedFrame;
+                decodedFrame = av_frame_alloc();
+            } else {
+                frame = mExcessFrames.takeAt(excessId).second;
+                av_frame_unref(decodedFrame);
+            }
             setFrameToConvert(frame, codecContext);
-            if(frame == decodedFrame) decodedFrame = av_frame_alloc();
-            else av_frame_unref(decodedFrame);
             break;
         } else if(currFrame == mFrameId || (!reseek && currFrame > mFrameId)) {
             if(currFrame > mFrameId)
@@ -191,6 +195,11 @@ void VideoFrameLoader::afterProcessing() {
         }
         const auto currFL = mCacheHandler->getFrameLoader(excess.first);
         if(currFL) {
+            if(currFL->getState() >= eTaskState::processing) {
+                av_frame_unref(excess.second);
+                av_frame_free(&excess.second);
+                continue;
+            }
             currFL->setFrameToConvert(excess.second, mOpenedVideo->fCodecContext);
         } else {
             const auto newFL = mCacheHandler->addFrameConverter(
