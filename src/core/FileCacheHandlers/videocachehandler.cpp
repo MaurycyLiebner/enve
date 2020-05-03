@@ -236,3 +236,8 @@ void VideoFileHandler::afterPathSet(const QString &path) {
     if(!hasSound(path.toUtf8().data())) return mSoundHandler.reset();
     mSoundHandler = SoundDataHandler::sGetCreateDataHandler<SoundDataHandler>(path);
 }
+
+void VideoFileHandler::reload() {
+    mDataHandler->reload();
+    if(mSoundHandler) mSoundHandler->reload();
+}

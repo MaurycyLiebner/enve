@@ -92,10 +92,7 @@ protected:
     VideoFileHandler() {}
     void afterPathSet(const QString& path);
 
-    void reload() {
-        mDataHandler->reload();
-        mSoundHandler->reload();
-    }
+    void reload();
 public:
     void replace();
 
