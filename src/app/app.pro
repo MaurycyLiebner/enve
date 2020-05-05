@@ -106,6 +106,7 @@ SOURCES += main.cpp\
     GUI/timelinehighlightwidget.cpp \
     GUI/timelinewidget.cpp \
     GUI/timelinewrappernode.cpp \
+    GUI/tipswidget.cpp \
     GUI/triggerlabel.cpp \
     GUI/twocolumnlayout.cpp \
     GUI/welcomedialog.cpp \
@@ -232,6 +233,7 @@ HEADERS  += \
     GUI/timelinehighlightwidget.h \
     GUI/timelinewidget.h \
     GUI/timelinewrappernode.h \
+    GUI/tipswidget.h \
     GUI/triggerlabel.h \
     GUI/twocolumnlayout.h \
     GUI/welcomedialog.h \
@@ -346,6 +348,9 @@ RESOURCES += brushesRamon
 
 brushesTanda.files = $$files(brushes/Tanda/*)
 RESOURCES += brushesTanda
+
+tips.files = $$files(tips/*)
+RESOURCES += tips
 
 DISTFILES += \
     icons/promoteToLayer \

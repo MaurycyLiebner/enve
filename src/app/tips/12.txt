@@ -1,0 +1,3 @@
+Blend Modes
+Every object can be drawn onto its parent layer using different composition modes.
+You can select the blend mode from the combo-box next to the object name.

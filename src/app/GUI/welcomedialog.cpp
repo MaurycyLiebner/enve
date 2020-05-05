@@ -19,11 +19,13 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QFontMetrics>
+#include <QPainter>
 #include <QDir>
 
 #include "GUI/global.h"
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
 #include "buttonslist.h"
+#include "tipswidget.h"
 
 WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
                              const std::function<void()>& newFunc,
@@ -40,11 +42,13 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
     setLayout(thisLay);
     thisLay->addWidget(mainWid, 0, Qt::AlignHCenter | Qt::AlignVCenter);
 
-    const auto mainLay = new QVBoxLayout;
+    const auto mainLay = new QHBoxLayout;
     mainWid->setLayout(mainLay);
 
+    const auto sceneLay = new QVBoxLayout;
+
     const auto buttonLay = new QHBoxLayout;
-    mainLay->addLayout(buttonLay);
+    sceneLay->addLayout(buttonLay);
 
     const auto newButton = new QPushButton("New", this);
     connect(newButton, &QPushButton::released, newFunc);
@@ -69,16 +73,21 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
             openRecentFunc(path);
         }};
     };
-    const int count = qMin(recentPaths.count(), 8);
+    const int count = qMin(recentPaths.count(), 11);
     const auto recentWidget = new ButtonsList(textTriggerGetter, count, this);
 
+    eSizesUI::widget.addSpacing(sceneLay);
+
+    sceneLay->addWidget(recentWidget);
+
+    const auto tipWidget = new TipsWidget(this);
+    tipWidget->load();
+
+    mainLay->addLayout(sceneLay);
     eSizesUI::widget.addSpacing(mainLay);
-//    const auto recentScroll = new ScrollArea(this);
-//    recentScroll->setWidget(recentWidget);
-//    mainLay->addWidget(recentScroll);
-    mainLay->addWidget(recentWidget);
+    mainLay->addWidget(tipWidget);
 }
-#include <QPainter>
+
 void WelcomeDialog::paintEvent(QPaintEvent *) {
     QPainter p(this);
     p.fillRect(0, 0, width(), height(), Qt::black);

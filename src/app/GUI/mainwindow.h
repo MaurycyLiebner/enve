@@ -206,7 +206,7 @@ private:
     void addRecentFile(const QString& recent) {
         if(mRecentFiles.contains(recent))
             mRecentFiles.removeOne(recent);
-        while(mRecentFiles.count() >= 8)
+        while(mRecentFiles.count() >= 11)
             mRecentFiles.removeLast();
         mRecentFiles.prepend(recent);
         updateRecentMenu();
