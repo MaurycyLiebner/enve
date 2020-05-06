@@ -162,8 +162,7 @@ eSettings::eSettings(const int cpuThreads, const intKB ramKB,
                      static_cast<int>(AccPreference::defaultPreference));
     gSettings << std::make_shared<eBoolSetting>(
                      fPathGpuAcc,
-                     "pathGpuAcc",
-                     fGpuVendor != GpuVendor::nvidia);
+                     "pathGpuAcc", true);
     gSettings << std::make_shared<eBoolSetting>(
                      fHddCache,
                      "hddCache", true);
@@ -317,8 +316,6 @@ void eSettings::loadFromFile() {
         if(!ok) invalidLines << line;
     }
     file.close();
-
-    if(fGpuVendor == GpuVendor::nvidia) fPathGpuAcc = false;
 
     eSizesUI::font.updateSize();
     eSizesUI::widget.updateSize();
