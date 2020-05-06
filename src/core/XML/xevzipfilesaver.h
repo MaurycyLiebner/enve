@@ -19,7 +19,7 @@
 
 #include "zipfilesaver.h"
 
-class XevZipFileSaver {
+class CORE_EXPORT XevZipFileSaver {
 public:
     XevZipFileSaver();
 
