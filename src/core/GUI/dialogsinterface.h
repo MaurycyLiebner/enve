@@ -34,17 +34,17 @@ public:
     virtual stdsptr<ShaderEffectCreator> execShaderChooser(
             const QString& name, const ShaderOptions& options) const = 0;
     virtual void showExpressionDialog(
-            QrealAnimator* const target, QWidget* const parent) const = 0;
+            QrealAnimator* const target) const = 0;
     virtual void showApplyExpressionDialog(
-            QrealAnimator* const target, QWidget* const parent) const = 0;
+            QrealAnimator* const target) const = 0;
     virtual void showDurationSettingsDialog(
-            DurationRectangle* const target, QWidget* const parent) const = 0;
+            DurationRectangle* const target) const = 0;
     virtual bool execAnimationToPaint(
             const AnimationBox* const src,
             int& firstAbsFrame, int& lastAbsFrame,
-            int& increment, QWidget* const parent) const = 0;
+            int& increment) const = 0;
     virtual void showSceneSettingsDialog(
-            Canvas* const scene, QWidget* const parent) const = 0;
+            Canvas* const scene) const = 0;
 };
 
 #endif // DIALOGSINTERFACE_H

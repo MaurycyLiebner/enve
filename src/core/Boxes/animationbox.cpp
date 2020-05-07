@@ -240,13 +240,13 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
 
     menu->addSeparator();
     const PropertyMenu::PlainSelectedOp<AnimationBox> createPaintObj =
-    [widget](AnimationBox * box) {
+    [](AnimationBox * box) {
         int firstAbsFrame;
         int lastAbsFrame;
         int increment;
         const auto& instance = DialogsInterface::instance();
         const bool ok = instance.execAnimationToPaint(
-                    box, firstAbsFrame, lastAbsFrame, increment, widget);
+                    box, firstAbsFrame, lastAbsFrame, increment);
         if(ok) box->createPaintObject(firstAbsFrame, lastAbsFrame, increment);
     };
     menu->addPlainAction("Create Paint Object...", createPaintObj);

@@ -24,17 +24,13 @@ class DialogsInterfaceImpl : public DialogsInterface {
 public:
     stdsptr<ShaderEffectCreator> execShaderChooser(
             const QString& name, const ShaderOptions& options) const;
-    void showExpressionDialog(
-            QrealAnimator* const target, QWidget* const parent) const;
-    virtual void showApplyExpressionDialog(
-            QrealAnimator* const target, QWidget* const parent) const;
-    void showDurationSettingsDialog(
-            DurationRectangle* const target, QWidget* const parent) const;
+    void showExpressionDialog(QrealAnimator* const target) const;
+    void showApplyExpressionDialog(QrealAnimator* const target) const;
+    void showDurationSettingsDialog(DurationRectangle* const target) const;
     bool execAnimationToPaint(const AnimationBox* const src,
                               int& firstAbsFrame, int& lastAbsFrame,
-                              int& increment, QWidget* const parent) const;
-    void showSceneSettingsDialog(
-            Canvas* const scene, QWidget* const parent) const;
+                              int& increment) const;
+    void showSceneSettingsDialog(Canvas* const scene) const;
 };
 
 #endif // DIALOGSINTERFACEIMPL_H

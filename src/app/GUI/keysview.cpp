@@ -313,7 +313,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                     const auto durRect = static_cast<DurationRectangle*>(movable);
                     if(!durRect) return;
                     const auto& instance = DialogsInterface::instance();
-                    instance.showDurationSettingsDialog(durRect, this);
+                    instance.showDurationSettingsDialog(durRect);
                 }
             }
         }

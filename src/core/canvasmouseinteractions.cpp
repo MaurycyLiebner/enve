@@ -89,9 +89,9 @@ void Canvas::addActionsToMenu(QMenu *const menu) {
         if(ok) changeFpsTo(newFps);
     });
 
-    menu->addAction("Settings...", [this, parentWidget]() {
+    menu->addAction("Settings...", [this]() {
         const auto& dialogs = DialogsInterface::instance();
-        dialogs.showSceneSettingsDialog(this, parentWidget);
+        dialogs.showSceneSettingsDialog(this);
     });
 }
 

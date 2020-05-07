@@ -73,28 +73,30 @@ private:
 
 stdsptr<ShaderEffectCreator> DialogsInterfaceImpl::execShaderChooser(
         const QString& name, const ShaderOptions& options) const {
-    ShaderChoiceDialog dialog(name, options, MainWindow::sGetInstance());
+    const auto parent = MainWindow::sGetInstance();
+    ShaderChoiceDialog dialog(name, options, parent);
     const bool accepted = dialog.exec() == QDialog::Accepted;
     if(accepted) return dialog.getSelected();
     return nullptr;
 }
 
-void DialogsInterfaceImpl::showExpressionDialog(
-        QrealAnimator* const target, QWidget* const parent) const {
+void DialogsInterfaceImpl::showExpressionDialog(QrealAnimator* const target) const {
+    const auto parent = MainWindow::sGetInstance();
     const auto dialog = new ExpressionDialog(target, parent);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
 
-void DialogsInterfaceImpl::showApplyExpressionDialog(
-        QrealAnimator* const target, QWidget* const parent) const {
+void DialogsInterfaceImpl::showApplyExpressionDialog(QrealAnimator* const target) const {
+    const auto parent = MainWindow::sGetInstance();
     const auto dialog = new ApplyExpressionDialog(target, parent);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
 
 void DialogsInterfaceImpl::showDurationSettingsDialog(
-        DurationRectangle* const target, QWidget* const parent) const {
+        DurationRectangle* const target) const {
+    const auto parent = MainWindow::sGetInstance();
     const auto dialog = new DurationRectSettingsDialog(target, parent);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
@@ -103,13 +105,14 @@ void DialogsInterfaceImpl::showDurationSettingsDialog(
 bool DialogsInterfaceImpl::execAnimationToPaint(
         const AnimationBox* const src,
         int& firstAbsFrame, int& lastAbsFrame,
-        int& increment, QWidget* const parent) const {
+        int& increment) const {
+    const auto parent = MainWindow::sGetInstance();
     return AnimationToPaintDialog::sExec(src, firstAbsFrame, lastAbsFrame,
                                          increment, parent);
 }
 
-void DialogsInterfaceImpl::showSceneSettingsDialog(
-        Canvas* const scene, QWidget* const parent) const {
+void DialogsInterfaceImpl::showSceneSettingsDialog(Canvas* const scene) const {
+    const auto parent = MainWindow::sGetInstance();
     const auto dialog = new SceneSettingsDialog(scene, parent);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     QObject::connect(dialog, &QDialog::accepted, scene, [scene, dialog]() {

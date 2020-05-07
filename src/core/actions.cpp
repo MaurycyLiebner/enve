@@ -71,7 +71,7 @@ Actions::Actions(Document &document) : mDocument(document) {
         const auto sceneSettingsActionExec = [this]() {
             if(!mActiveScene) return;
             const auto& intr = DialogsInterface::instance();
-            intr.showSceneSettingsDialog(mActiveScene, nullptr);
+            intr.showSceneSettingsDialog(mActiveScene);
         };
 
         sceneSettingsAction = new Action(sceneSettingsActionCan,

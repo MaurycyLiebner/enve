@@ -1012,11 +1012,11 @@ void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
                              hasDurationRectangle(),
                              visRangeOp)->setEnabled(!durationRectangleLocked());
     menu->addPlainAction("Visibility Range Settings...",
-                         [this, parentWidget]() {
+                         [this]() {
         const auto durRect = getDurationRectangle();
         if(!durRect) return;
         const auto& instance = DialogsInterface::instance();
-        instance.showDurationSettingsDialog(durRect, parentWidget);
+        instance.showDurationSettingsDialog(durRect);
     })->setEnabled(hasDurationRectangle());
     menu->addSeparator();
     setupCanvasMenu(menu->addMenu("Actions"));
