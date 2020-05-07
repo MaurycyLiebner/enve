@@ -58,8 +58,6 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
     connect(openButton, &QPushButton::released, openFunc);
     buttonLay->addWidget(openButton);
 
-    if(recentPaths.isEmpty()) return;
-
     const auto homePath = QDir::homePath();
 
     const auto textTriggerGetter = [&](const int id) {
