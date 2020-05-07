@@ -134,8 +134,10 @@ struct CORE_EXPORT KeyEvent : public MouseEvent {
                  scale, globalPos, Qt::NoButton,
                  buttons, e->modifiers(), e->timestamp(),
                  releaseMouse, grabMouse, widget),
+                 fAutorepeat(e->isAutoRepeat()),
                  fType(e->type()), fKey(e->key()) {}
 
+    bool fAutorepeat;
     QEvent::Type fType;
     int fKey;
 };

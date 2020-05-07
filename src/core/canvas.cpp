@@ -634,9 +634,11 @@ bool Canvas::handleTransormationInputKeyEvent(const KeyEvent &e) {
               e.fKey == Qt::Key_Enter) {
         handleLeftMouseRelease(e);
     } else if(e.fKey == Qt::Key_X) {
+        if(e.fAutorepeat) return false;
         mValueInput.switchXOnlyMode();
         updateTransformation(e);
     } else if(e.fKey == Qt::Key_Y) {
+        if(e.fAutorepeat) return false;
         mValueInput.switchYOnlyMode();
         updateTransformation(e);
     } else return false;
