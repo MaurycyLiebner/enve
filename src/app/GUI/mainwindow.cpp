@@ -577,6 +577,14 @@ void MainWindow::setupMenuBar() {
     mSceneMenu->addAction(tr("Add to Render Queue", "MenuBar_Scene"),
                           this, &MainWindow::addCanvasToRenderQue);
 
+    mSceneMenu->addSeparator();
+
+    {
+        const auto qAct = mSceneMenu->addAction(
+                    tr("Settings...", "MenuBar_Scene"));
+        mActions.sceneSettingsAction->connect(qAct);
+    }
+
     mViewMenu = mMenuBar->addMenu(tr("View", "MenuBar"));
 
     const auto filteringMenu = mViewMenu->addMenu(

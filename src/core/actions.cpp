@@ -21,6 +21,7 @@
 #include "paintsettingsapplier.h"
 #include "Sound/eindependentsound.h"
 #include "Boxes/externallinkboxt.h"
+#include "GUI/dialogsinterface.h"
 
 #include <QMessageBox>
 
@@ -61,6 +62,22 @@ Actions::Actions(Document &document) : mDocument(document) {
                                        deleteSceneActionExec,
                                        deleteSceneActionText,
                                        this);
+    }
+
+    { // sceneSettingsAction
+        const auto sceneSettingsActionCan = [this]() {
+            return static_cast<bool>(mActiveScene);
+        };
+        const auto sceneSettingsActionExec = [this]() {
+            if(!mActiveScene) return;
+            const auto& intr = DialogsInterface::instance();
+            intr.showSceneSettingsDialog(mActiveScene, nullptr);
+        };
+
+        sceneSettingsAction = new Action(sceneSettingsActionCan,
+                                         sceneSettingsActionExec,
+                                         "Settings...",
+                                         this);
     }
 
     { // undoAction
@@ -801,6 +818,7 @@ void Actions::connectToActiveScene(Canvas* const scene) {
         conn << connect(mActiveScene, &Canvas::prp_nameChanged,
                         deleteSceneAction, &Action::raiseTextChanged);
     }
+    sceneSettingsAction->raiseCanExecuteChanged();
 
     undoAction->raiseCanExecuteChanged();
     undoAction->raiseTextChanged();

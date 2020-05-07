@@ -111,6 +111,7 @@ public:
     void finishSmoothChange();
 
     Action* deleteSceneAction;
+    Action* sceneSettingsAction;
 
     UndoableAction* raiseAction;
     UndoableAction* lowerAction;
