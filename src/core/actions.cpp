@@ -367,8 +367,7 @@ Actions::Actions(Document &document) : mDocument(document) {
 
     { // pasteAction
         const auto actionCan = [this]() {
-            if(!mActiveScene) return false;
-            return !mActiveScene->isBoxSelectionEmpty();
+            return !!mActiveScene;
         };
         const auto actionExec = [this]() {
             mActiveScene->pasteAction();
