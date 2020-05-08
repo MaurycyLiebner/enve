@@ -37,7 +37,7 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
 
     const auto mainWid = new QWidget(this);
     eSizesUI::widget.add(mainWid, [mainWid](const int size) {
-        mainWid->setMinimumWidth(12*size);
+        mainWid->setMinimumWidth(24*size);
     });
     setLayout(thisLay);
     thisLay->addWidget(mainWid, 0, Qt::AlignHCenter | Qt::AlignVCenter);
