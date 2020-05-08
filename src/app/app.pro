@@ -393,3 +393,26 @@ macx {
     # Use -appstore-compliant flag to workaround the inclusion of OBDC and PostgreSQL plugins.
     CONFIG(release, debug|release): QMAKE_POST_LINK += && macdeployqt $$MAC_APP_FOLDER -appstore-compliant -dmg
 }
+
+unix:!macx {
+    target.path = $$PREFIX/bin
+
+    metainfo.files = XDGData/io.github.maurycyliebner.enve.metainfo.xml
+    metainfo.path = $$PREFIX/share/metainfo
+
+    desktop.files = XDGData/enve.desktop
+    desktop.path = $$PREFIX/share/applications
+
+    icon16.files = XDGData/icons/16x16/enve.png
+    icon16.path = $$PREFIX/share/icons/hicolor/16x16/apps
+    icon32.files = XDGData/icons/32x32/enve.png
+    icon32.path = $$PREFIX/share/icons/hicolor/32x32/apps
+    icon48.files = XDGData/icons/48x48/enve.png
+    icon48.path = $$PREFIX/share/icons/hicolor/48x48/apps
+    icon256.files = XDGData/icons/256x256/enve.png
+    icon256.path = $$PREFIX/share/icons/hicolor/256x256/apps
+    iconsvg.files = XDGData/icons/scalable/enve.svg
+    iconsvg.path = $$PREFIX/share/icons/hicolor/scalable/apps
+
+    INSTALLS += target metainfo desktop icon16 icon32 icon48 icon256 iconsvg
+}
