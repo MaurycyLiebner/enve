@@ -57,7 +57,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     setFocusPolicy(Qt::NoFocus);
 
     eSizesUI::widget.add(this, [this](const int size) {
-        setMinimumSize(10*size, 12*size);
+        setMinimumSize(10*size, 10*size);
     });
     mMainLayout = new QVBoxLayout(this);
     setLayout(mMainLayout);
