@@ -69,7 +69,7 @@ void EnveSplash::drawContents(QPainter * const p) {
     const QString date(LATEST_COMMIT_DATE);
     rightTxt = QString(LATEST_COMMIT_HASH) + " " + date.split(" ").first();
 #else
-    rightTxt = "0.0.0";
+    rightTxt = ENVE_VERSION;
 #endif
     p->drawText(mBottomRect, Qt::AlignVCenter | Qt::AlignRight, rightTxt);
 }

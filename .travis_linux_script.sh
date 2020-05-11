@@ -9,17 +9,6 @@ chmod +x AppRun
 wget https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/exec-x86_64.so
 mv exec-x86_64.so exec.so
 cd Release
-
-# embed commit hash and date
-LATEST_COMMIT_HASH=\"$(git log --pretty=format:'%h' -n 1)\"
-enveSplash=../../src/app/GUI/envesplash.h
-echo "#ifndef LATEST_COMMIT_HASH" >> $enveSplash
-echo "#define LATEST_COMMIT_HASH $LATEST_COMMIT_HASH" >> $enveSplash
-echo "#endif" >> $enveSplash
-LATEST_COMMIT_DATE=\"$(git log -1 --format=%ai)\"
-echo "#ifndef LATEST_COMMIT_DATE" >> $enveSplash
-echo "#define LATEST_COMMIT_DATE $LATEST_COMMIT_DATE" >> $enveSplash
-echo "#endif" >> $enveSplash
 qmake PREFIX=$INSTALL_PREFIX CONFIG+=build_examples ../../enve.pro
 make -j 2 CC=gcc-7 CPP=g++-7 CXX=g++-7 LD=g++-7
 make install
