@@ -270,7 +270,7 @@ int main(int argc, char *argv[]) {
         try {
             splash->showMessage("Load file...");
             app.processEvents();
-            w.loadEVFile(argv[1]);
+            w.openFile(argv[1]);
         } catch(const std::exception& e) {
             gPrintExceptionCritical(e);
         }
