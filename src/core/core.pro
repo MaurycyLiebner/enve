@@ -688,7 +688,7 @@ HEADERS += \
     zipfilesaver.h
 
 unix {
-    target.path = /usr/lib
+    target.path = $$PREFIX/lib
     INSTALLS += target
 }
 
