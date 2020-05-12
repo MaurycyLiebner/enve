@@ -397,7 +397,20 @@ macx {
 unix:!macx {
     target.path = $$PREFIX/bin
 
-    metainfo.files = XDGData/io.github.maurycyliebner.enve.metainfo.xml
+    isEmpty(LATEST_COMMIT_HASH) {
+        METAINFO_RELEASE_VERSION = $$ENVE_VERSION
+        METAINFO_RELEASE_DATE = $$system(date -u -d "@${SOURCE_DATE_EPOCH:-$(date +%s)}" "+%Y-%m-%d" 2>/dev/null || date -u -r "${SOURCE_DATE_EPOCH:-$(date +%s)}" "+%Y-%m-%d")
+    } else {
+        METAINFO_RELEASE_VERSION = $$ENVE_VERSION-$$LATEST_COMMIT_HASH
+        METAINFO_RELEASE_DATE = $$LATEST_COMMIT_DATE
+    }
+
+    metainfo_in = $$cat(XDGData/io.github.maurycyliebner.enve.metainfo.xml.in, blob)
+    metainfo_in = $$replace(metainfo_in, @METAINFO_RELEASE_VERSION@, $$METAINFO_RELEASE_VERSION)
+    metainfo_in = $$replace(metainfo_in, @METAINFO_RELEASE_DATE@, $$METAINFO_RELEASE_DATE)
+    write_file($$OUT_PWD/io.github.maurycyliebner.enve.metainfo.xml, metainfo_in)
+
+    metainfo.files = $$OUT_PWD/io.github.maurycyliebner.enve.metainfo.xml
     metainfo.path = $$PREFIX/share/metainfo
 
     desktop.files = XDGData/enve.desktop

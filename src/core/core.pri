@@ -1,3 +1,15 @@
+ENVE_VERSION = 0.0.0c
+
+DEFINES += ENVE_VERSION=\\\"$$ENVE_VERSION\\\"
+
+exists(../../.git/index) {
+    LATEST_COMMIT_HASH = $$system(git log --pretty=format:'%h' -n 1)
+    LATEST_COMMIT_DATE = $$system(git log -1 --pretty=%cd --date=short)
+
+    DEFINES += LATEST_COMMIT_HASH=\\\"$$LATEST_COMMIT_HASH\\\"
+    DEFINES += LATEST_COMMIT_DATE=\\\"$$LATEST_COMMIT_DATE\\\"
+}
+
 # Header for third-party dependencies
 
 ENVE_FOLDER = $$_PRO_FILE_PWD_/../..

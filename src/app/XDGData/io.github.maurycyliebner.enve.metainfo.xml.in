@@ -22,6 +22,6 @@
   </screenshots>
   <content_rating type="oars-1.1"/>
   <releases>
-    <release version="0.0.0" date="2019-09-10"/>
+    <release version="@METAINFO_RELEASE_VERSION@" date="@METAINFO_RELEASE_DATE@"/>
   </releases>
 </component>
