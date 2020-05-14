@@ -166,14 +166,6 @@ public:
 	void drawCanvas(float x, float y) const;
 
 	/**
-	 * @brief Draws the similar color pixels array on the screen
-	 *
-	 * @param x the screen x position
-	 * @param y the screen y position
-	 */
-	void drawSimilarColorPixels(float x, float y) const;
-
-	/**
 	 * @brief Indicates if the simulator finished the painting
 	 *
 	 * @return true if the painting is finished
@@ -268,11 +260,6 @@ protected:
 	 * @brief Container with the colors of the currently painted pixels
 	 */
     SkBitmap mPaintedPixels;
-
-	/**
-	 * @brief Container indicating which painted pixels have colors that are similar to the original image
-	 */
-	ofPixels similarColorPixels;
 
 	/**
 	 * @brief Container with the indices of pixels that are currently bad painted

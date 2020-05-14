@@ -81,7 +81,6 @@ void OilSimulator::setImagePixels(const SkBitmap& imagePixels, bool clearCanvas)
 
 		// Initialize all the pixel arrays
         mVisitedPixels.resize(imgWidth*imgHeight);
-		similarColorPixels.allocate(imgWidth, imgHeight, OF_PIXELS_GRAY);
 		badPaintedPixels = vector<unsigned int>(imgWidth * imgHeight);
 		nBadPaintedPixels = 0;
 	}
@@ -164,9 +163,7 @@ void OilSimulator::updatePixelArrays() {
                 && abs(imgPixels[imgPix] - paintedPixels[canvasPix]) < MAX_COLOR_DIFFERENCE[0]
                 && abs(imgPixels[imgPix + 1] - paintedPixels[canvasPix + 1]) < MAX_COLOR_DIFFERENCE[1]
                 && abs(imgPixels[imgPix + 2] - paintedPixels[canvasPix + 2]) < MAX_COLOR_DIFFERENCE[2]) {
-			similarColorPixels[pixel] = 0;
 		} else {
-			similarColorPixels[pixel] = 255;
 			badPaintedPixels[nBadPaintedPixels] = pixel;
 			++nBadPaintedPixels;
 		}
@@ -541,12 +538,6 @@ void OilSimulator::paintTraceStep() {
 
 void OilSimulator::drawCanvas(float x, float y) const {
     canvas.draw(x, y);
-}
-
-void OilSimulator::drawSimilarColorPixels(float x, float y) const {
-    ofImage similarColorPixelsImg;
-	similarColorPixelsImg.setFromPixels(similarColorPixels);
-	similarColorPixelsImg.draw(x, y);
 }
 
 bool OilSimulator::isFinished() const {
