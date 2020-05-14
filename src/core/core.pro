@@ -204,9 +204,15 @@ SOURCES += \
     Properties/boolpropertycontainer.cpp \
     Properties/boxtargetproperty.cpp \
     Properties/emimedata.cpp \
+    RasterEffects/OilImpl/oilbristle.cpp \
+    RasterEffects/OilImpl/oilbrush.cpp \
+    RasterEffects/OilImpl/oilhelpers.cpp \
+    RasterEffects/OilImpl/oilsimulator.cpp \
+    RasterEffects/OilImpl/oiltrace.cpp \
     RasterEffects/blureffect.cpp \
     RasterEffects/customrastereffect.cpp \
     RasterEffects/motionblureffect.cpp \
+    RasterEffects/oileffect.cpp \
     RasterEffects/rastereffect.cpp \
     RasterEffects/rastereffectcaller.cpp \
     RasterEffects/rastereffectcollection.cpp \
@@ -520,9 +526,16 @@ HEADERS += \
     Properties/boxtargetproperty.h \
     Properties/emimedata.h \
     Properties/namedproperty.h \
+    RasterEffects/OilImpl/oilPaint.h \
+    RasterEffects/OilImpl/oilbristle.h \
+    RasterEffects/OilImpl/oilbrush.h \
+    RasterEffects/OilImpl/oilhelpers.h \
+    RasterEffects/OilImpl/oilsimulator.h \
+    RasterEffects/OilImpl/oiltrace.h \
     RasterEffects/blureffect.h \
     RasterEffects/customrastereffect.h \
     RasterEffects/motionblureffect.h \
+    RasterEffects/oileffect.h \
     RasterEffects/rastereffect.h \
     RasterEffects/customrastereffectcreator.h \
     RasterEffects/rastereffectcaller.h \
