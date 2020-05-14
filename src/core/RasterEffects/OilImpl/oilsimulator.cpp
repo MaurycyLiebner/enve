@@ -137,15 +137,17 @@ void OilSimulator::updatePixelArrays() {
 
 	// Update the painted pixels array
 	if (useCanvasBuffer) {
-		canvasBuffer.readToPixels(paintedPixels);
+        canvasBuffer.readToPixels(mPaintedPixels);
 	} else {
-		canvas.readToPixels(paintedPixels);
+        canvas.readToPixels(mPaintedPixels);
 	}
 
 	// Update the similar color pixels and the bad painted pixels arrays
     const auto imgPixels = mImg.getAddr8(0, 0);
+    const auto paintedPixels = mPaintedPixels.getAddr8(0, 0);
+
     unsigned int imgNumChannels = 4;
-	unsigned int canvasNumChannels = paintedPixels.getNumChannels();
+    unsigned int canvasNumChannels = 4;
 	nBadPaintedPixels = 0;
 
     const int bgRed = SkColorGetR(BACKGROUND_COLOR);
@@ -159,9 +161,9 @@ void OilSimulator::updatePixelArrays() {
 		// Check if the pixel is well painted
         if (paintedPixels[canvasPix] != bgRed && paintedPixels[canvasPix + 1] != bgGreen
                 && paintedPixels[canvasPix + 2] != bgBlue
-				&& abs(imgPixels[imgPix] - paintedPixels[canvasPix]) < MAX_COLOR_DIFFERENCE[0]
-				&& abs(imgPixels[imgPix + 1] - paintedPixels[canvasPix + 1]) < MAX_COLOR_DIFFERENCE[1]
-				&& abs(imgPixels[imgPix + 2] - paintedPixels[canvasPix + 2]) < MAX_COLOR_DIFFERENCE[2]) {
+                && abs(imgPixels[imgPix] - paintedPixels[canvasPix]) < MAX_COLOR_DIFFERENCE[0]
+                && abs(imgPixels[imgPix + 1] - paintedPixels[canvasPix + 1]) < MAX_COLOR_DIFFERENCE[1]
+                && abs(imgPixels[imgPix + 2] - paintedPixels[canvasPix + 2]) < MAX_COLOR_DIFFERENCE[2]) {
 			similarColorPixels[pixel] = 0;
 		} else {
 			similarColorPixels[pixel] = 255;
@@ -270,7 +272,7 @@ void OilSimulator::getNewTrace() {
 
 				// Calculate the trace average color and the bristle colors along the trajectory
                 trace.calculateAverageColor(mImg);
-				trace.calculateBristleColors(paintedPixels, BACKGROUND_COLOR);
+                trace.calculateBristleColors(mPaintedPixels, BACKGROUND_COLOR);
 
 				// Check if painting the trace will improve the painting
 				if (traceImprovesPainting()) {
@@ -354,7 +356,7 @@ bool OilSimulator::validTrajectory() const {
 
 				// Get the image color and the painted color at the trajectory position
                 const SkColor imgColor = mImg.getColor(x, y);
-                const SkColor paintedColor = paintedPixels.getColor(x, y);
+                const SkColor paintedColor = mPaintedPixels.getColor(x, y);
 
                 // Extract the pixel color properties
                 const int imgRed = SkColorGetR(imgColor);
@@ -538,11 +540,11 @@ void OilSimulator::paintTraceStep() {
 }
 
 void OilSimulator::drawCanvas(float x, float y) const {
-	canvas.draw(x, y);
+    canvas.draw(x, y);
 }
 
 void OilSimulator::drawSimilarColorPixels(float x, float y) const {
-	ofImage similarColorPixelsImg;
+    ofImage similarColorPixelsImg;
 	similarColorPixelsImg.setFromPixels(similarColorPixels);
 	similarColorPixelsImg.draw(x, y);
 }

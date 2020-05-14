@@ -182,10 +182,10 @@ public:
 
 protected:
 
-	/**
-	 * @brief Updates the pixel arrays
-	 */
-	void updatePixelArrays();
+    /**
+     * @brief Updates the pixel arrays
+     */
+    void updatePixelArrays();
 
 	/**
 	 * @brief Updates the visited pixels array
@@ -267,7 +267,7 @@ protected:
 	/**
 	 * @brief Container with the colors of the currently painted pixels
 	 */
-	ofPixels paintedPixels;
+    SkBitmap mPaintedPixels;
 
 	/**
 	 * @brief Container indicating which painted pixels have colors that are similar to the original image

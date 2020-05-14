@@ -82,7 +82,8 @@ public:
 	 * @param paintedPixels the painted pixels
 	 * @param backgroundColor the background color
 	 */
-    void calculateBristleColors(const ofPixels& paintedPixels, const SkColor& backgroundColor);
+    void calculateBristleColors(const SkBitmap& paintedPixels,
+                                const SkColor& backgroundColor);
 
 	/**
 	 * @brief Paints the trace
@@ -204,7 +205,8 @@ protected:
 	 * @param paintedPixels the painted pixels
 	 * @param backgroundColor the canvas background color
 	 */
-    void calculateBristlePaintedColors(const ofPixels& paintedPixels, const SkColor& backgroundColor);
+    void calculateBristlePaintedColors(const SkBitmap& paintedPixels,
+                                       const SkColor& backgroundColor);
 
 	/**
 	 * @brief The trace trajectory positions
