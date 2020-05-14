@@ -80,7 +80,7 @@ void OilSimulator::setImagePixels(const SkBitmap& imagePixels, bool clearCanvas)
 		}
 
 		// Initialize all the pixel arrays
-		visitedPixels.allocate(imgWidth, imgHeight, OF_PIXELS_GRAY);
+        mVisitedPixels.resize(imgWidth*imgHeight);
 		similarColorPixels.allocate(imgWidth, imgHeight, OF_PIXELS_GRAY);
 		badPaintedPixels = vector<unsigned int>(imgWidth * imgHeight);
 		nBadPaintedPixels = 0;
@@ -175,13 +175,13 @@ void OilSimulator::updateVisitedPixels() {
 	// Check if we are at the beginning of a simulation
 	if (nTraces == 0) {
 		// Reset the visited pixels array
-		visitedPixels.setColor(255);
+        for(auto& pix : mVisitedPixels) pix = 255;
 	} else {
 		// Update the visited pixels arrays with the trace bristle positions
 		const vector<unsigned char>& alphas = trace.getTrajectoryAphas();
         const vector<vector<SkPoint>>& bristlePositions = trace.getBristlePositions();
-		int width = visitedPixels.getWidth();
-		int height = visitedPixels.getHeight();
+        int width = mImg.width();
+        int height = mImg.height();
 
 		for (unsigned int i = 0, nSteps = trace.getNSteps(); i < nSteps; ++i) {
 			// Fill the visited pixels array if alpha is high enough
@@ -191,7 +191,7 @@ void OilSimulator::updateVisitedPixels() {
                     int y = pos.y();
 
 					if (x >= 0 && x < width && y >= 0 && y < height) {
-						visitedPixels.setColor(x, y, 0);
+                        mVisitedPixels.at(y*width + x) = 0;
 					}
 				}
 			}
@@ -239,7 +239,7 @@ void OilSimulator::getNewTrace() {
 				invalidTracesCounter = 0;
 
 				// Reset the visited pixels array
-				visitedPixels.setColor(255);
+                for(auto& pix : mVisitedPixels) pix = 255;
 			}
 
 			// Create new traces until one of them has a valid trajectory or we exceed a number of tries
@@ -295,8 +295,8 @@ bool OilSimulator::alreadyVisitedTrajectory() const {
 	// Extract some useful information
     const vector<SkPoint>& positions = trace.getTrajectoryPositions();
 	const vector<unsigned char>& alphas = trace.getTrajectoryAphas();
-	int width = visitedPixels.getWidth();
-	int height = visitedPixels.getHeight();
+    int width = mImg.width();
+    int height = mImg.height();
 
 	// Check if the trace trajectory has been visited before
 	int insideCounter = 0;
@@ -313,7 +313,7 @@ bool OilSimulator::alreadyVisitedTrajectory() const {
 			if (x >= 0 && x < width && y >= 0 && y < height) {
 				++insideCounter;
 
-				if (visitedPixels.getColor(x, y) == 0) {
+                if (mVisitedPixels.at(y*width + x) == 0) {
 					++visitedCounter;
 				}
 			}
@@ -539,12 +539,6 @@ void OilSimulator::paintTraceStep() {
 
 void OilSimulator::drawCanvas(float x, float y) const {
 	canvas.draw(x, y);
-}
-
-void OilSimulator::drawVisitedPixels(float x, float y) const {
-	ofImage visitedPixelsImg;
-	visitedPixelsImg.setFromPixels(visitedPixels);
-	visitedPixelsImg.draw(x, y);
 }
 
 void OilSimulator::drawSimilarColorPixels(float x, float y) const {

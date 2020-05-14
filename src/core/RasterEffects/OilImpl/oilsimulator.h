@@ -166,14 +166,6 @@ public:
 	void drawCanvas(float x, float y) const;
 
 	/**
-	 * @brief Draws the visited pixels array on the screen
-	 *
-	 * @param x the screen x position
-	 * @param y the screen y position
-	 */
-	void drawVisitedPixels(float x, float y) const;
-
-	/**
 	 * @brief Draws the similar color pixels array on the screen
 	 *
 	 * @param x the screen x position
@@ -270,7 +262,7 @@ protected:
 	/**
 	 * @brief Container indicating which canvas pixels have been visited by previous traces
 	 */
-	ofPixels visitedPixels;
+    vector<unsigned char> mVisitedPixels;
 
 	/**
 	 * @brief Container with the colors of the currently painted pixels
