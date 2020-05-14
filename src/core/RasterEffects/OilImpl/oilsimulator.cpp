@@ -57,11 +57,11 @@ OilSimulator::OilSimulator(bool _useCanvasBuffer, bool _verbose) :
 	nTraces = 0;
 }
 
-void OilSimulator::setImagePixels(const ofPixels& imagePixels, bool clearCanvas) {
+void OilSimulator::setImagePixels(const SkBitmap& imagePixels, bool clearCanvas) {
 	// Set the image pixels
-	img = ofImage(imagePixels);
-	int imgWidth = img.getWidth();
-	int imgHeight = img.getHeight();
+    mImg = imagePixels;
+    int imgWidth = mImg.width();
+    int imgHeight = mImg.height();
 
 	// Initialize the canvas and pixel containers if necessary
 	if (clearCanvas || imgWidth != canvas.getWidth() || imgHeight != canvas.getHeight()) {
@@ -143,12 +143,12 @@ void OilSimulator::updatePixelArrays() {
 	}
 
 	// Update the similar color pixels and the bad painted pixels arrays
-	const ofPixels& imgPixels = img.getPixels();
-	unsigned int imgNumChannels = imgPixels.getNumChannels();
+    const auto imgPixels = mImg.getAddr8(0, 0);
+    unsigned int imgNumChannels = 4;
 	unsigned int canvasNumChannels = paintedPixels.getNumChannels();
 	nBadPaintedPixels = 0;
 
-	for (unsigned int pixel = 0, nPixels = img.getWidth() * img.getHeight(); pixel < nPixels; ++pixel) {
+    for (unsigned int pixel = 0, nPixels = mImg.width() * mImg.height(); pixel < nPixels; ++pixel) {
 		unsigned int imgPix = pixel * imgNumChannels;
 		unsigned int canvasPix = pixel * canvasNumChannels;
 
@@ -199,7 +199,7 @@ void OilSimulator::getNewTrace() {
 	// Loop until a new trace is found or the painting is finished
 	unsigned int invalidTrajectoriesCounter = 0;
 	unsigned int invalidTracesCounter = 0;
-	int imgWidth = img.getWidth();
+    int imgWidth = mImg.width();
 
 	while (true) {
 		// Check if we should stop the painting simulation
@@ -265,7 +265,7 @@ void OilSimulator::getNewTrace() {
 				trace.setBrushSize(brushSize);
 
 				// Calculate the trace average color and the bristle colors along the trajectory
-				trace.calculateAverageColor(img);
+                trace.calculateAverageColor(mImg);
 				trace.calculateBristleColors(paintedPixels, BACKGROUND_COLOR);
 
 				// Check if painting the trace will improve the painting
@@ -323,8 +323,8 @@ bool OilSimulator::validTrajectory() const {
 	// Extract some useful information
     const vector<SkPoint>& positions = trace.getTrajectoryPositions();
 	const vector<unsigned char>& alphas = trace.getTrajectoryAphas();
-	int width = img.getWidth();
-	int height = img.getHeight();
+    int width = mImg.width();
+    int height = mImg.height();
 
 	// Obtain some pixel statistics along the trajectory
 	int insideCounter = 0;
@@ -349,20 +349,21 @@ bool OilSimulator::validTrajectory() const {
 				++insideCounter;
 
 				// Get the image color and the painted color at the trajectory position
-				const QColor& imgColor = img.getColor(x, y);
+                const SkColor imgColor = mImg.getColor(x, y);
 				const QColor& paintedColor = paintedPixels.getColor(x, y);
 
+                // Extract the pixel color properties
+                const int imgRed = SkColorGetR(imgColor);
+                const int imgGreen = SkColorGetG(imgColor);
+                const int imgBlue = SkColorGetB(imgColor);
+
 				// Check if the two colors are similar
-                if (paintedColor != BACKGROUND_COLOR && abs(imgColor.red() - paintedColor.red()) < MAX_COLOR_DIFFERENCE[0]
-                        && abs(imgColor.green() - paintedColor.green()) < MAX_COLOR_DIFFERENCE[1]
-                        && abs(imgColor.blue() - paintedColor.blue()) < MAX_COLOR_DIFFERENCE[2]) {
+                if (paintedColor != BACKGROUND_COLOR && abs(imgRed - paintedColor.red()) < MAX_COLOR_DIFFERENCE[0]
+                        && abs(imgGreen - paintedColor.green()) < MAX_COLOR_DIFFERENCE[1]
+                        && abs(imgBlue - paintedColor.blue()) < MAX_COLOR_DIFFERENCE[2]) {
 					++similarColorCounter;
 				}
 
-				// Extract the pixel color properties
-                int imgRed = imgColor.red();
-                int imgGreen = imgColor.green();
-                int imgBlue = imgColor.blue();
 				imgRedSum += imgRed;
 				imgRedSqSum += imgRed * imgRed;
 				imgGreenSum += imgGreen;
@@ -517,10 +518,6 @@ void OilSimulator::paintTraceStep() {
 
 void OilSimulator::drawCanvas(float x, float y) const {
 	canvas.draw(x, y);
-}
-
-void OilSimulator::drawImage(float x, float y) const {
-	img.draw(x, y);
 }
 
 void OilSimulator::drawVisitedPixels(float x, float y) const {

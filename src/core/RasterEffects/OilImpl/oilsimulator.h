@@ -139,7 +139,7 @@ public:
 	 * @param imagePixels the pixels of the image that should be painted
 	 * @param clearCanvas if true the canvas will be cleared before the painting starts
 	 */
-	void setImagePixels(const ofPixels& imagePixels, bool clearCanvas);
+    void setImagePixels(const SkBitmap& imagePixels, bool clearCanvas);
 
 	/**
 	 * @brief Sets the image that should be painted
@@ -164,14 +164,6 @@ public:
 	 * @param y the screen y position
 	 */
 	void drawCanvas(float x, float y) const;
-
-	/**
-	 * @brief Draws the painted image on the screen
-	 *
-	 * @param x the screen x position
-	 * @param y the screen y position
-	 */
-	void drawImage(float x, float y) const;
 
 	/**
 	 * @brief Draws the visited pixels array on the screen
@@ -263,7 +255,7 @@ protected:
 	/**
 	 * @brief The image to paint
 	 */
-	ofImage img;
+    SkBitmap mImg;
 
 	/**
 	 * @brief The canvas where the oil painting is done

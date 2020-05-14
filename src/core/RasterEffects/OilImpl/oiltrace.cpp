@@ -85,10 +85,10 @@ void OilTrace::calculateBristlePositions() {
 	brush.resetPosition(positions[0]);
 }
 
-void OilTrace::calculateBristleImageColors(const ofImage& img) {
+void OilTrace::calculateBristleImageColors(const SkBitmap& img) {
 	// Extract some useful information
-	int width = img.getWidth();
-	int height = img.getHeight();
+    int width = img.width();
+    int height = img.height();
 
 	// Calculate the bristle positions if necessary
 	if (bPositions.size() == 0) {
@@ -108,7 +108,7 @@ void OilTrace::calculateBristleImageColors(const ofImage& img) {
             int y = pos.y();
 
 			if (x >= 0 && x < width && y >= 0 && y < height) {
-				bic.push_back(img.getColor(x, y));
+                bic.push_back(img.getColor(x, y));
 			} else {
 				bic.emplace_back(0, 0);
 			}
@@ -161,7 +161,7 @@ void OilTrace::setAverageColor(const QColor& color) {
 	bColors.clear();
 }
 
-void OilTrace::calculateAverageColor(const ofImage& img) {
+void OilTrace::calculateAverageColor(const SkBitmap& img) {
 	// Calculate the bristle image colors if necessary
 	if (bImgColors.size() == 0) {
 		calculateBristleImageColors(img);

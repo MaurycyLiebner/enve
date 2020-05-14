@@ -74,7 +74,7 @@ public:
 	 *
 	 * @param img the painted image
 	 */
-	void calculateAverageColor(const ofImage& img);
+    void calculateAverageColor(const SkBitmap& img);
 
 	/**
 	 * @brief Calculates the trace bristle colors
@@ -196,7 +196,7 @@ protected:
 	 *
 	 * @param img the painted image
 	 */
-	void calculateBristleImageColors(const ofImage& img);
+    void calculateBristleImageColors(const SkBitmap& img);
 
 	/**
 	 * @brief Calculates the painted colors at the bristles positions
