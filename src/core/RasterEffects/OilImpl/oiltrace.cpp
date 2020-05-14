@@ -208,16 +208,18 @@ void OilTrace::calculateBristleColors(const ofPixels& paintedPixels,
 	// Calculate the starting colors for each bristle
     vector<SkColor> startingColors = vector<SkColor>(nBristles);
     float noiseSeed = gRandF(0, 1000);
-	float averageHue, averageSaturation, averageBrightness;
-    averageHue = averageColor.hsvHue();
-    averageSaturation = averageColor.hsvSaturation();
-    averageBrightness = averageColor.value();
+    vector<float> averageHSV = {0.f, 0.f, 0.f};
+    SkColorToHSV(averageColor, averageHSV.data());
+    float& averageBrightness = averageHSV[2];
 
 	for (unsigned int bristle = 0; bristle < nBristles; ++bristle) {
 		// Add some brightness changes to make it more realistic
 		float deltaBrightness = BRIGHTNESS_RELATIVE_CHANGE * averageBrightness
 				* (ofNoise(noiseSeed + 0.4 * bristle) - 0.5);
-        startingColors[bristle].setHsv(averageHue, averageSaturation, averageBrightness + deltaBrightness);
+        averageBrightness += deltaBrightness;
+        startingColors[bristle] = SkHSVToColor(averageHSV.data());
+        averageBrightness -= deltaBrightness;
+
 	}
 
 	// Use the bristle starting colors until the step where the mixing starts
