@@ -39,7 +39,7 @@ OilTrace::OilTrace(const SkPoint& startingPosition, unsigned int nSteps, float s
 	}
 
 	// Set the average color as totally transparent
-    averageColor = Qt::transparent;
+    averageColor = SK_ColorTRANSPARENT;
 }
 
 OilTrace::OilTrace(const vector<SkPoint>& _positions, const vector<unsigned char>& _alphas) {
@@ -52,7 +52,7 @@ OilTrace::OilTrace(const vector<SkPoint>& _positions, const vector<unsigned char
 
 	positions = _positions;
 	alphas = _alphas;
-    averageColor = Qt::transparent;
+    averageColor = SK_ColorTRANSPARENT;
 }
 
 void OilTrace::setBrushSize(float brushSize) {
@@ -60,7 +60,7 @@ void OilTrace::setBrushSize(float brushSize) {
     brush = OilBrush(positions[0], brushSize);
 
 	// Reset the average color
-    averageColor = Qt::transparent;
+    averageColor = SK_ColorTRANSPARENT;
 
 	// Reset the bristle containers
 	bPositions.clear();
@@ -100,7 +100,7 @@ void OilTrace::calculateBristleImageColors(const SkBitmap& img) {
 
     for (const vector<SkPoint>& bp : bPositions) {
 		bImgColors.emplace_back();
-        vector<QColor>& bic = bImgColors.back();
+        vector<SkColor>& bic = bImgColors.back();
 
 		for (const SkPoint& pos : bp) {
 			// Check that the bristle is inside the image
@@ -117,7 +117,7 @@ void OilTrace::calculateBristleImageColors(const SkBitmap& img) {
 }
 
 void OilTrace::calculateBristlePaintedColors(const ofPixels& paintedPixels,
-                                             const QColor& backgroundColor) {
+                                             const SkColor& backgroundColor) {
 	// Extract some useful information
 	int width = paintedPixels.getWidth();
 	int height = paintedPixels.getHeight();
@@ -132,7 +132,7 @@ void OilTrace::calculateBristlePaintedColors(const ofPixels& paintedPixels,
 
     for (const vector<SkPoint>& bp : bPositions) {
 		bPaintedColors.emplace_back();
-        vector<QColor>& bpc = bPaintedColors.back();
+        vector<SkColor>& bpc = bPaintedColors.back();
 
 		for (const SkPoint& pos : bp) {
 			// Check that the bristle is inside the canvas
@@ -140,9 +140,9 @@ void OilTrace::calculateBristlePaintedColors(const ofPixels& paintedPixels,
             int y = pos.y();
 
 			if (x >= 0 && x < width && y >= 0 && y < height) {
-				const QColor& color = paintedPixels.getColor(x, y);
+                const SkColor color = paintedPixels.getColor(x, y);
 
-                if (color != backgroundColor && color.alpha() != 0) {
+                if (color != backgroundColor && SkColorGetA(color) != 0) {
 					bpc.push_back(color);
 				} else {
 					bpc.emplace_back(0, 0);
@@ -154,7 +154,7 @@ void OilTrace::calculateBristlePaintedColors(const ofPixels& paintedPixels,
 	}
 }
 
-void OilTrace::setAverageColor(const QColor& color) {
+void OilTrace::setAverageColor(const SkColor& color) {
     averageColor = color;
 
 	// Reset the bristle colors since they are not valid anymore
@@ -176,11 +176,11 @@ void OilTrace::calculateAverageColor(const SkBitmap& img) {
 	for (unsigned int i = 0, nSteps = getNSteps(); i < nSteps; ++i) {
 		// Check that the alpha value is high enough for the average color calculation
 		if (alphas[i] >= MIN_ALPHA) {
-			for (const QColor& color : bImgColors[i]) {
-                if (color.alpha() != 0) {
-                    redSum += color.red();
-                    greenSum += color.green();
-                    blueSum += color.blue();
+            for (const SkColor& color : bImgColors[i]) {
+                if (SkColorGetA(color) != 0) {
+                    redSum += SkColorGetR(color);
+                    greenSum += SkColorGetG(color);
+                    blueSum += SkColorGetB(color);
 					++counter;
 				}
 			}
@@ -188,14 +188,14 @@ void OilTrace::calculateAverageColor(const SkBitmap& img) {
 	}
 
 	if (counter > 0) {
-        averageColor = QColor(redSum / counter, greenSum / counter, blueSum / counter, 255);
+        averageColor = SkColorSetARGB(255, redSum / counter, greenSum / counter, blueSum / counter);
 	} else {
-        averageColor = Qt::transparent;
+        averageColor = SK_ColorTRANSPARENT;
 	}
 }
 
 void OilTrace::calculateBristleColors(const ofPixels& paintedPixels,
-                                      const QColor& backgroundColor) {
+                                      const SkColor& backgroundColor) {
 	// Get some useful information
 	unsigned int nSteps = getNSteps();
 	unsigned int nBristles = getNBristles();
@@ -206,7 +206,7 @@ void OilTrace::calculateBristleColors(const ofPixels& paintedPixels,
 	}
 
 	// Calculate the starting colors for each bristle
-    vector<QColor> startingColors = vector<QColor>(nBristles);
+    vector<SkColor> startingColors = vector<SkColor>(nBristles);
     float noiseSeed = gRandF(0, 1000);
 	float averageHue, averageSaturation, averageBrightness;
     averageHue = averageColor.hsvHue();
@@ -222,17 +222,17 @@ void OilTrace::calculateBristleColors(const ofPixels& paintedPixels,
 
 	// Use the bristle starting colors until the step where the mixing starts
     unsigned int mixStartingStep = qBound(1u, TYPICAL_MIX_STARTING_STEP, nSteps);
-    bColors = vector<vector<QColor>>(mixStartingStep, startingColors);
+    bColors = vector<vector<SkColor>>(mixStartingStep, startingColors);
 
 	// Mix the previous step colors with the already painted colors
     vector<float> redPrevious;
     vector<float> greenPrevious;
     vector<float> bluePrevious;
 
-	for (const QColor& color : startingColors) {
-        redPrevious.push_back(color.red());
-        greenPrevious.push_back(color.green());
-        bluePrevious.push_back(color.blue());
+    for (const SkColor& color : startingColors) {
+        redPrevious.push_back(SkColorGetR(color));
+        greenPrevious.push_back(SkColorGetG(color));
+        bluePrevious.push_back(SkColorGetB(color));
 	}
 
 	float f = 1 - MIX_STRENGTH;
@@ -244,21 +244,21 @@ void OilTrace::calculateBristleColors(const ofPixels& paintedPixels,
 		// Check that the alpha value is high enough for mixing
 		if (alphas[i] >= MIN_ALPHA) {
 			// Calculate the bristle colors for this step
-            vector<QColor>& bc = bColors.back();
-            const vector<QColor>& bpc = bPaintedColors[i];
+            vector<SkColor>& bc = bColors.back();
+            const vector<SkColor>& bpc = bPaintedColors[i];
 
 			if (bpc.size() > 0) {
 				for (unsigned int bristle = 0; bristle < nBristles; ++bristle) {
-					const QColor& paintedColor = bpc[bristle];
+                    const SkColor& paintedColor = bpc[bristle];
 
-                    if (paintedColor.alpha() != 0) {
-                        float redMix = f * redPrevious[bristle] + MIX_STRENGTH * paintedColor.red();
-                        float greenMix = f * greenPrevious[bristle] + MIX_STRENGTH * paintedColor.green();
-                        float blueMix = f * bluePrevious[bristle] + MIX_STRENGTH * paintedColor.blue();
+                    if (SkColorGetA(paintedColor) != 0) {
+                        float redMix = f * redPrevious[bristle] + MIX_STRENGTH * SkColorGetR(paintedColor);
+                        float greenMix = f * greenPrevious[bristle] + MIX_STRENGTH * SkColorGetG(paintedColor);
+                        float blueMix = f * bluePrevious[bristle] + MIX_STRENGTH * SkColorGetB(paintedColor);
 						redPrevious[bristle] = redMix;
 						greenPrevious[bristle] = greenMix;
 						bluePrevious[bristle] = blueMix;
-                        bc[bristle] = QColor(redMix, greenMix, blueMix);
+                        bc[bristle] = SkColorSetARGB(255, redMix, greenMix, blueMix);
 					}
 				}
 			}
@@ -370,7 +370,7 @@ const vector<unsigned char>& OilTrace::getTrajectoryAphas() const {
 	return alphas;
 }
 
-const QColor& OilTrace::getAverageColor() const {
+const SkColor& OilTrace::getAverageColor() const {
 	return averageColor;
 }
 
@@ -382,14 +382,14 @@ const vector<vector<SkPoint>>& OilTrace::getBristlePositions() const {
 	return bPositions;
 }
 
-const vector<vector<QColor>>& OilTrace::getBristleImageColors() const {
+const vector<vector<SkColor>>& OilTrace::getBristleImageColors() const {
 	return bImgColors;
 }
 
-const vector<vector<QColor>>& OilTrace::getBristlePaintedColors() const {
+const vector<vector<SkColor>>& OilTrace::getBristlePaintedColors() const {
 	return bPaintedColors;
 }
 
-const vector<vector<QColor>>& OilTrace::getBristleColors() const {
+const vector<vector<SkColor>>& OilTrace::getBristleColors() const {
 	return bColors;
 }

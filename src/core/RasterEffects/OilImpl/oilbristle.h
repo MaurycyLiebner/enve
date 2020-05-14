@@ -4,7 +4,7 @@
 using std::vector;
 
 #include "skia/skiaincludes.h"
-#include <QColor>
+#include <SkColor>
 
 /**
  * @brief Class that simulates the movement of a bristle
@@ -49,7 +49,7 @@ public:
 	 * @param color the color to use
 	 * @param thickness the thickness of the first bristle element
 	 */
-    void paint(const QColor& color, float thickness) const;
+    void paint(const SkColor& color, float thickness) const;
 
 	/**
 	 * @brief Returns the number of bristle elements

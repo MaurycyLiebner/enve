@@ -58,7 +58,7 @@ public:
 	/**
 	 * @brief The canvas background color
 	 */
-	static QColor BACKGROUND_COLOR;
+    static SkColor BACKGROUND_COLOR;
 
 	/**
 	 * @brief The maximum color difference between the painted image and the already painted color to consider it well

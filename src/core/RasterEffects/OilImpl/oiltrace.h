@@ -67,7 +67,7 @@ public:
 	 *
 	 * @param color the trace average color
 	 */
-	void setAverageColor(const QColor& color);
+    void setAverageColor(const SkColor& color);
 
 	/**
 	 * @brief Calculates the trace average color along the painted image
@@ -82,7 +82,7 @@ public:
 	 * @param paintedPixels the painted pixels
 	 * @param backgroundColor the background color
 	 */
-	void calculateBristleColors(const ofPixels& paintedPixels, const QColor& backgroundColor);
+    void calculateBristleColors(const ofPixels& paintedPixels, const SkColor& backgroundColor);
 
 	/**
 	 * @brief Paints the trace
@@ -147,7 +147,7 @@ public:
 	 *
 	 * @return the trace average color
 	 */
-	const QColor& getAverageColor() const;
+    const SkColor& getAverageColor() const;
 
 	/**
 	 * @brief Returns the number of bristles in the brush
@@ -168,21 +168,21 @@ public:
 	 *
 	 * @return the brush bristle image colors along the trace trajectory
 	 */
-    const vector<vector<QColor>>& getBristleImageColors() const;
+    const vector<vector<SkColor>>& getBristleImageColors() const;
 
 	/**
 	 * @brief Returns the brush bristle painted colors along the trace trajectory
 	 *
 	 * @return the brush bristle painted colors along the trace trajectory
 	 */
-    const vector<vector<QColor>>& getBristlePaintedColors() const;
+    const vector<vector<SkColor>>& getBristlePaintedColors() const;
 
 	/**
 	 * @brief Returns the brush bristle colors along the trace trajectory
 	 *
 	 * @return the brush bristle colors along the trace trajectory
 	 */
-    const vector<vector<QColor>>& getBristleColors() const;
+    const vector<vector<SkColor>>& getBristleColors() const;
 
 protected:
 
@@ -204,7 +204,7 @@ protected:
 	 * @param paintedPixels the painted pixels
 	 * @param backgroundColor the canvas background color
 	 */
-	void calculateBristlePaintedColors(const ofPixels& paintedPixels, const QColor& backgroundColor);
+    void calculateBristlePaintedColors(const ofPixels& paintedPixels, const SkColor& backgroundColor);
 
 	/**
 	 * @brief The trace trajectory positions
@@ -219,7 +219,7 @@ protected:
 	/**
 	 * @brief The trace average color
 	 */
-	QColor averageColor;
+    SkColor averageColor;
 
 	/**
 	 * @brief The trace brush
@@ -234,15 +234,15 @@ protected:
 	/**
 	 * @brief The trace bristle image colors along the trajectory
 	 */
-    vector<vector<QColor>> bImgColors;
+    vector<vector<SkColor>> bImgColors;
 
 	/**
 	 * @brief The trace bristle painted colors along the trajectory
 	 */
-    vector<vector<QColor>> bPaintedColors;
+    vector<vector<SkColor>> bPaintedColors;
 
 	/**
      * @brief The trace bristle colors along the trajectory
 	 */
-    vector<vector<QColor>> bColors;
+    vector<vector<SkColor>> bColors;
 };

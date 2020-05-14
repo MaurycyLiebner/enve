@@ -48,7 +48,7 @@ void OilBristle::setElementsLengths(const vector<float>& newLengths) {
 	lengths = newLengths;
 }
 
-void OilBristle::paint(const QColor& color, float thickness) const {
+void OilBristle::paint(const SkColor& color, float thickness) const {
 	// Set the stroke color
 	ofSetColor(color);
 

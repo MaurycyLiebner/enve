@@ -126,7 +126,7 @@ void OilBrush::updatePosition(const SkPoint& newPosition, bool updateBristlesEle
 	}
 }
 
-void OilBrush::paint(const QColor& color) const {
+void OilBrush::paint(const SkColor& color) const {
 	if (positionsHistory.size() == POSITIONS_FOR_AVERAGE) {
 		ofPushStyle();
 
@@ -138,7 +138,7 @@ void OilBrush::paint(const QColor& color) const {
 	}
 }
 
-void OilBrush::paint(const vector<QColor>& colors, unsigned char alpha) const {
+void OilBrush::paint(const vector<SkColor>& colors, unsigned char alpha) const {
 	// Check that the input makes sense
 	if (colors.size() != getNBristles()) {
         RuntimeThrow("There should be one color for each bristle in the brush.");
@@ -148,7 +148,7 @@ void OilBrush::paint(const vector<QColor>& colors, unsigned char alpha) const {
 		ofPushStyle();
 
         for (int i = 0, nBristles = getNBristles(); i < nBristles; ++i) {
-            QColor iCol = colors[i];
+            SkColor iCol = colors[i];
             iCol.setAlpha(alpha);
             bristles[i].paint(iCol, bristlesThickness);
 		}

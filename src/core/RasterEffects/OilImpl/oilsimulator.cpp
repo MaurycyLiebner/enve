@@ -21,7 +21,7 @@ float OilSimulator::RELATIVE_TRACE_LENGTH = 2.3;
 
 float OilSimulator::MIN_TRACE_LENGTH = 16;
 
-QColor OilSimulator::BACKGROUND_COLOR = QColor(255);
+SkColor OilSimulator::BACKGROUND_COLOR = SkColor(255);
 
 vector<int> OilSimulator::MAX_COLOR_DIFFERENCE = { 40, 40, 40 };
 
@@ -148,13 +148,17 @@ void OilSimulator::updatePixelArrays() {
 	unsigned int canvasNumChannels = paintedPixels.getNumChannels();
 	nBadPaintedPixels = 0;
 
+    const int bgRed = SkColorGetR(BACKGROUND_COLOR);
+    const int bgGreen = SkColorGetG(BACKGROUND_COLOR);
+    const int bgBlue = SkColorGetB(BACKGROUND_COLOR);
+
     for (unsigned int pixel = 0, nPixels = mImg.width() * mImg.height(); pixel < nPixels; ++pixel) {
 		unsigned int imgPix = pixel * imgNumChannels;
 		unsigned int canvasPix = pixel * canvasNumChannels;
 
 		// Check if the pixel is well painted
-        if (paintedPixels[canvasPix] != BACKGROUND_COLOR.red() && paintedPixels[canvasPix + 1] != BACKGROUND_COLOR.green()
-                && paintedPixels[canvasPix + 2] != BACKGROUND_COLOR.blue()
+        if (paintedPixels[canvasPix] != bgRed && paintedPixels[canvasPix + 1] != bgGreen
+                && paintedPixels[canvasPix + 2] != bgBlue
 				&& abs(imgPixels[imgPix] - paintedPixels[canvasPix]) < MAX_COLOR_DIFFERENCE[0]
 				&& abs(imgPixels[imgPix + 1] - paintedPixels[canvasPix + 1]) < MAX_COLOR_DIFFERENCE[1]
 				&& abs(imgPixels[imgPix + 2] - paintedPixels[canvasPix + 2]) < MAX_COLOR_DIFFERENCE[2]) {
@@ -350,17 +354,21 @@ bool OilSimulator::validTrajectory() const {
 
 				// Get the image color and the painted color at the trajectory position
                 const SkColor imgColor = mImg.getColor(x, y);
-				const QColor& paintedColor = paintedPixels.getColor(x, y);
+                const SkColor paintedColor = paintedPixels.getColor(x, y);
 
                 // Extract the pixel color properties
                 const int imgRed = SkColorGetR(imgColor);
                 const int imgGreen = SkColorGetG(imgColor);
                 const int imgBlue = SkColorGetB(imgColor);
 
+                const int paintedRed = SkColorGetR(paintedColor);
+                const int paintedGreen = SkColorGetG(paintedColor);
+                const int paintedBlue = SkColorGetB(paintedColor);
+
 				// Check if the two colors are similar
-                if (paintedColor != BACKGROUND_COLOR && abs(imgRed - paintedColor.red()) < MAX_COLOR_DIFFERENCE[0]
-                        && abs(imgGreen - paintedColor.green()) < MAX_COLOR_DIFFERENCE[1]
-                        && abs(imgBlue - paintedColor.blue()) < MAX_COLOR_DIFFERENCE[2]) {
+                if (paintedColor != BACKGROUND_COLOR && abs(imgRed - paintedRed) < MAX_COLOR_DIFFERENCE[0]
+                        && abs(imgGreen - paintedGreen) < MAX_COLOR_DIFFERENCE[1]
+                        && abs(imgBlue - paintedBlue) < MAX_COLOR_DIFFERENCE[2]) {
 					++similarColorCounter;
 				}
 
@@ -399,9 +407,9 @@ bool OilSimulator::validTrajectory() const {
 bool OilSimulator::traceImprovesPainting() const {
 	// Extract some useful information
 	const vector<unsigned char>& alphas = trace.getTrajectoryAphas();
-    const vector<vector<QColor>>& bristleImgColors = trace.getBristleImageColors();
-    const vector<vector<QColor>>& bristlePaintedColors = trace.getBristlePaintedColors();
-    const vector<vector<QColor>>& bristleColors = trace.getBristleColors();
+    const vector<vector<SkColor>>& bristleImgColors = trace.getBristleImageColors();
+    const vector<vector<SkColor>>& bristlePaintedColors = trace.getBristlePaintedColors();
+    const vector<vector<SkColor>>& bristleColors = trace.getBristleColors();
 
 	// Obtain some trace statistics
 	int insideCounter = 0;
@@ -416,33 +424,46 @@ bool OilSimulator::traceImprovesPainting() const {
 		// Check that the alpha value is high enough
         if (alphas[i] >= OilTrace::MIN_ALPHA) {
 			// Get the bristles image colors and painted colors for this step
-            const vector<QColor>& bic = bristleImgColors[i];
-            const vector<QColor>& bpc = bristlePaintedColors[i];
-            const vector<QColor>& bc = bristleColors[i];
+            const vector<SkColor>& bic = bristleImgColors[i];
+            const vector<SkColor>& bpc = bristlePaintedColors[i];
+            const vector<SkColor>& bc = bristleColors[i];
 
 			// Make sure that the containers are not empty
 			if (bic.size() > 0) {
 				for (unsigned int bristle = 0, nBristles = trace.getNBristles(); bristle < nBristles; ++bristle) {
 					// Get the image color and the painted color at the bristle position
-					const QColor& imgColor = bic[bristle];
-					const QColor& paintedColor = bpc[bristle];
-					const QColor& bristleColor = bc[bristle];
+                    const SkColor& imgColor = bic[bristle];
+                    const SkColor& paintedColor = bpc[bristle];
+                    const SkColor& bristleColor = bc[bristle];
 
 					// Check that the bristle is inside the image
-                    if (imgColor.alpha() != 0) {
+                    if (SkColorGetA(imgColor) != 0) {
 						++insideCounter;
 
 						// Count the number of painted pixels
-                        bool paintedPixel = paintedColor.alpha() != 0;
+                        bool paintedPixel = SkColorGetA(paintedColor) != 0;
 
 						if (paintedPixel) {
 							++paintedCounter;
 						}
 
+                        // Extract the pixel color properties
+                        const int imgRed = SkColorGetR(imgColor);
+                        const int imgGreen = SkColorGetG(imgColor);
+                        const int imgBlue = SkColorGetB(imgColor);
+
+                        const int paintedRed = SkColorGetR(paintedColor);
+                        const int paintedGreen = SkColorGetG(paintedColor);
+                        const int paintedBlue = SkColorGetB(paintedColor);
+
+                        const int bristleRed = SkColorGetR(bristleColor);
+                        const int bristleGreen = SkColorGetG(bristleColor);
+                        const int bristleBlue = SkColorGetB(bristleColor);
+
 						// Count the number of painted pixels whose color is similar to the image color
-                        int redPaintedDiff = abs(imgColor.red() - paintedColor.red());
-                        int greenPaintedDiff = abs(imgColor.green() - paintedColor.green());
-                        int bluePaintedDiff = abs(imgColor.blue() - paintedColor.blue());
+                        int redPaintedDiff = abs(imgRed - paintedRed);
+                        int greenPaintedDiff = abs(imgGreen - paintedGreen);
+                        int bluePaintedDiff = abs(imgBlue - paintedBlue);
 						bool similarColorPixel = paintedPixel && redPaintedDiff < MAX_COLOR_DIFFERENCE[0]
 								&& greenPaintedDiff < MAX_COLOR_DIFFERENCE[1]
 								&& bluePaintedDiff < MAX_COLOR_DIFFERENCE[2];
@@ -452,9 +473,9 @@ bool OilSimulator::traceImprovesPainting() const {
 						}
 
 						// Count the number of pixels that will be well painted
-                        int redAverageDiff = abs(imgColor.red() - bristleColor.red());
-                        int greenAverageDiff = abs(imgColor.green() - bristleColor.green());
-                        int blueAverageDiff = abs(imgColor.blue() - bristleColor.blue());
+                        int redAverageDiff = abs(imgRed - bristleRed);
+                        int greenAverageDiff = abs(imgGreen - bristleGreen);
+                        int blueAverageDiff = abs(imgBlue - bristleBlue);
 						bool wellPaintedPixel = redAverageDiff < MAX_COLOR_DIFFERENCE[0]
 								&& greenAverageDiff < MAX_COLOR_DIFFERENCE[1]
 								&& blueAverageDiff < MAX_COLOR_DIFFERENCE[2];
