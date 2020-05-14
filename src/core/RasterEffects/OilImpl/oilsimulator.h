@@ -134,20 +134,12 @@ public:
     OilSimulator(bool _useCanvasBuffer = true, bool _verbose = true);
 
 	/**
-	 * @brief Sets the pixels of the image that should be painted
-	 *
-	 * @param imagePixels the pixels of the image that should be painted
-	 * @param clearCanvas if true the canvas will be cleared before the painting starts
-	 */
-    void setImagePixels(const SkBitmap& imagePixels, bool clearCanvas);
-
-	/**
 	 * @brief Sets the image that should be painted
 	 *
 	 * @param image the image that should be painted
 	 * @param clearCanvas if true the canvas will be cleared before the painting starts
 	 */
-	void setImage(const ofImage& image, bool clearCanvas);
+    void setImage(const SkBitmap& image, bool clearCanvas);
 
 	/**
 	 * @brief Updates the simulation

@@ -57,7 +57,7 @@ OilSimulator::OilSimulator(bool _useCanvasBuffer, bool _verbose) :
 	nTraces = 0;
 }
 
-void OilSimulator::setImagePixels(const SkBitmap& imagePixels, bool clearCanvas) {
+void OilSimulator::setImage(const SkBitmap& imagePixels, bool clearCanvas) {
 	// Set the image pixels
     mImg = imagePixels;
     int imgWidth = mImg.width();
@@ -91,10 +91,6 @@ void OilSimulator::setImagePixels(const SkBitmap& imagePixels, bool clearCanvas)
 	obtainNewTrace = true;
 	traceStep = 0;
 	nTraces = 0;
-}
-
-void OilSimulator::setImage(const ofImage& image, bool clearCanvas) {
-	setImagePixels(image.getPixels(), clearCanvas);
 }
 
 void OilSimulator::update(bool stepByStep) {
