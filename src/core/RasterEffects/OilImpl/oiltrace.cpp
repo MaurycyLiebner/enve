@@ -18,7 +18,7 @@ unsigned int OilTrace::TYPICAL_MIX_STARTING_STEP = 5;
 
 float OilTrace::MIX_STRENGTH = 0.012;
 
-OilTrace::OilTrace(const QPointF& startingPosition, unsigned int nSteps, float speed) {
+OilTrace::OilTrace(const SkPoint& startingPosition, unsigned int nSteps, float speed) {
 	// Check that the input makes sense
 	if (nSteps == 0) {
         RuntimeThrow("The trace should have at least one step.");
@@ -42,7 +42,7 @@ OilTrace::OilTrace(const QPointF& startingPosition, unsigned int nSteps, float s
     averageColor = Qt::transparent;
 }
 
-OilTrace::OilTrace(const vector<QPointF>& _positions, const vector<unsigned char>& _alphas) {
+OilTrace::OilTrace(const vector<SkPoint>& _positions, const vector<unsigned char>& _alphas) {
 	// Check that the input makes sense
 	if (_positions.size() == 0) {
         RuntimeThrow("The trace should have at least one step.");
@@ -73,7 +73,7 @@ void OilTrace::calculateBristlePositions() {
 	// Reset the container
 	bPositions.clear();
 
-	for (const QPointF& pos : positions) {
+	for (const SkPoint& pos : positions) {
 		// Move the brush
 		brush.updatePosition(pos, false);
 
@@ -98,11 +98,11 @@ void OilTrace::calculateBristleImageColors(const ofImage& img) {
 	// Calculate the image colors at the bristles positions
 	bImgColors.clear();
 
-    for (const vector<QPointF>& bp : bPositions) {
+    for (const vector<SkPoint>& bp : bPositions) {
 		bImgColors.emplace_back();
         vector<QColor>& bic = bImgColors.back();
 
-		for (const QPointF& pos : bp) {
+		for (const SkPoint& pos : bp) {
 			// Check that the bristle is inside the image
             int x = pos.x();
             int y = pos.y();
@@ -130,11 +130,11 @@ void OilTrace::calculateBristlePaintedColors(const ofPixels& paintedPixels,
 	// Calculate the painted colors at the bristles positions
 	bPaintedColors.clear();
 
-    for (const vector<QPointF>& bp : bPositions) {
+    for (const vector<SkPoint>& bp : bPositions) {
 		bPaintedColors.emplace_back();
         vector<QColor>& bpc = bPaintedColors.back();
 
-		for (const QPointF& pos : bp) {
+		for (const SkPoint& pos : bp) {
 			// Check that the bristle is inside the canvas
             int x = pos.x();
             int y = pos.y();
@@ -362,7 +362,7 @@ unsigned int OilTrace::getNSteps() const {
 	return positions.size();
 }
 
-const vector<QPointF>& OilTrace::getTrajectoryPositions() const {
+const vector<SkPoint>& OilTrace::getTrajectoryPositions() const {
 	return positions;
 }
 
@@ -378,7 +378,7 @@ unsigned int OilTrace::getNBristles() const {
 	return brush.getNBristles();
 }
 
-const vector<vector<QPointF>>& OilTrace::getBristlePositions() const {
+const vector<vector<SkPoint>>& OilTrace::getBristlePositions() const {
 	return bPositions;
 }
 

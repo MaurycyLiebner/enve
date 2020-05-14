@@ -3,7 +3,7 @@
 #include <vector>
 using std::vector;
 
-#include <QPointF>
+#include "skia/skiaincludes.h"
 #include <QColor>
 
 /**
@@ -20,21 +20,21 @@ public:
 	 * @param position the bristle position
 	 * @param length the bristle total length
 	 */
-    OilBristle(const QPointF& position = QPointF(), float length = 10);
+    OilBristle(const SkPoint& position = SkPoint(), float length = 10);
 
 	/**
 	 * @brief Updates the bristle position
 	 *
 	 * @param newPosition the new bristle position
 	 */
-    void updatePosition(const QPointF& newPosition);
+    void updatePosition(const SkPoint& newPosition);
 
 	/**
 	 * @brief Sets the bristle elements positions
 	 *
 	 * @param newPosition the new bristle elements position
 	 */
-    void setElementsPositions(const QPointF& newPosition);
+    void setElementsPositions(const SkPoint& newPosition);
 
 	/**
 	 * @brief Sets the bristle elements lengths
@@ -63,7 +63,7 @@ protected:
 	/**
 	 * @brief The bristle elements positions
 	 */
-    vector<QPointF> positions;
+    vector<SkPoint> positions;
 
 	/**
 	 * @brief The bristle elements lengths

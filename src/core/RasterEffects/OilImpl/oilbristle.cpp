@@ -4,37 +4,37 @@
 
 #include "exceptions.h"
 
-OilBristle::OilBristle(const QPointF& position, float length) {
+OilBristle::OilBristle(const SkPoint& position, float length) {
 	// Check that the input makes sense
     if(length <= 0) RuntimeThrow("There bristle length should be higher than zero.");
 
 	// Fill the positions and lengths containers
 	unsigned int nElements = round(sqrt(2 * length));
-    positions = vector<QPointF>(nElements + 1, position);
+    positions = vector<SkPoint>(nElements + 1, position);
 
 	for (unsigned int i = 0; i < nElements; ++i) {
 		lengths.push_back(nElements - i);
 	}
 }
 
-void OilBristle::updatePosition(const QPointF& newPosition) {
+void OilBristle::updatePosition(const SkPoint& newPosition) {
 	// Set the first element head position
 	positions[0] = newPosition;
 
 	// Set the elements tail positions
 	for (unsigned int i = 0, nElements = getNElements(); i < nElements; ++i) {
-        const QPointF& headPos = positions[i];
-        QPointF& tailPos = positions[i + 1];
+        const SkPoint& headPos = positions[i];
+        SkPoint& tailPos = positions[i + 1];
         float length = lengths[i];
         float ang = std::atan2(headPos.y() - tailPos.y(),
                                headPos.x() - tailPos.x());
-        tailPos.setX(headPos.x() - length * cos(ang));
-        tailPos.setY(headPos.y() - length * sin(ang));
+        tailPos.set(headPos.x() - length * cos(ang),
+                    headPos.y() - length * sin(ang));
 	}
 }
 
-void OilBristle::setElementsPositions(const QPointF& newPosition) {
-    for (QPointF& pos : positions) {
+void OilBristle::setElementsPositions(const SkPoint& newPosition) {
+    for (SkPoint& pos : positions) {
 		pos = newPosition;
 	}
 }

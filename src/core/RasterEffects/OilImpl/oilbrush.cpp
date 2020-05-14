@@ -19,7 +19,7 @@ float OilBrush::NOISE_SPEED_FACTOR = 0.04;
 
 unsigned int OilBrush::POSITIONS_FOR_AVERAGE = 4;
 
-OilBrush::OilBrush(const QPointF& _position, float _size) :
+OilBrush::OilBrush(const SkPoint& _position, float _size) :
 		position(_position), size(_size) {
 	// Calculate some of the bristles properties
     bristlesLength = qMin(size, MAX_BRISTLE_LENGTH);
@@ -29,13 +29,13 @@ OilBrush::OilBrush(const QPointF& _position, float _size) :
 
 	// Initialize the bristles offsets and positions containers with default values
     unsigned int nBristles = floor(size * gRandF(1.6, 1.9));
-    bOffsets = vector<QPointF>(nBristles);
-    bPositions = vector<QPointF>(nBristles);
+    bOffsets = vector<SkPoint>(nBristles);
+    bPositions = vector<SkPoint>(nBristles);
 
 	// Randomize the bristle offset positions
-	for (QPointF& offset : bOffsets) {
-        offset.setX(size * gRandF(-0.5, 0.5));
-        offset.setY(BRISTLE_VERTICAL_NOISE * gRandF(-0.5, 0.5));
+	for (SkPoint& offset : bOffsets) {
+        offset.set(size * gRandF(-0.5, 0.5),
+                   BRISTLE_VERTICAL_NOISE * gRandF(-0.5, 0.5));
 	}
 
 	// Initialize the variables used to calculate the brush average position
@@ -44,7 +44,7 @@ OilBrush::OilBrush(const QPointF& _position, float _size) :
 	updatesCounter = 0;
 }
 
-void OilBrush::resetPosition(const QPointF& newPosition) {
+void OilBrush::resetPosition(const SkPoint& newPosition) {
 	// Reset the brush position
 	position = newPosition;
 
@@ -55,7 +55,7 @@ void OilBrush::resetPosition(const QPointF& newPosition) {
 	updatesCounter = 0;
 }
 
-void OilBrush::updatePosition(const QPointF& newPosition, bool updateBristlesElements) {
+void OilBrush::updatePosition(const SkPoint& newPosition, bool updateBristlesElements) {
 	// Update the brush position
 	position = newPosition;
 
@@ -70,17 +70,17 @@ void OilBrush::updatePosition(const QPointF& newPosition, bool updateBristlesEle
 	}
 
 	// Update the average position
-	QPointF prevAveragePosition = averagePosition;
-    averagePosition.setX(0);
-    averagePosition.setY(0);
+	SkPoint prevAveragePosition = averagePosition;
+    averagePosition.set(0, 0);
 	int counter = 0;
 
-	for (const QPointF& pos : positionsHistory) {
+	for (const SkPoint& pos : positionsHistory) {
 		averagePosition += pos;
 		++counter;
 	}
 
-	averagePosition /= counter;
+    averagePosition.set(averagePosition.x()/counter,
+                        averagePosition.y()/counter);
 
 	// Update the bristles containers only if the average position is stable or is close to be stable
 	if (positionsHistory.size() >= POSITIONS_FOR_AVERAGE - 1) {
@@ -97,20 +97,20 @@ void OilBrush::updatePosition(const QPointF& newPosition, bool updateBristlesEle
 
 		for (unsigned int i = 0; i < nBristles; ++i) {
 			// Add some horizontal noise to the offset to make it look more realistic
-			const QPointF& offset = bOffsets[i];
+			const SkPoint& offset = bOffsets[i];
             float x = offset.x() + bristlesHorizontalNoise * (ofNoise(noisePos + 0.1 * i) - 0.5);
             float y = offset.y();
 
 			// Rotate the offset and add it to the brush central position
-            bPositions[i].setX(position.x() + (x * cosAng - y * sinAng));
-            bPositions[i].setY(position.y() + (x * sinAng + y * cosAng));
+            bPositions[i].set(position.x() + (x * cosAng - y * sinAng),
+                              position.y() + (x * sinAng + y * cosAng));
 		}
 
 		// Update the bristles elements to their new positions if necessary
 		if (updateBristlesElements) {
 			// Check if the bristles container should be initialized
 			if (bristles.size() == 0) {
-                bristles = vector<OilBristle>(nBristles, OilBristle(QPointF(), bristlesLength));
+                bristles = vector<OilBristle>(nBristles, OilBristle(SkPoint(), bristlesLength));
 			}
 
 			if (positionsHistory.size() == POSITIONS_FOR_AVERAGE - 1) {
@@ -161,6 +161,6 @@ unsigned int OilBrush::getNBristles() const {
 	return bOffsets.size();
 }
 
-const vector<QPointF> OilBrush::getBristlesPositions() const {
-    return positionsHistory.size() == POSITIONS_FOR_AVERAGE ? bPositions : vector<QPointF>();
+const vector<SkPoint> OilBrush::getBristlesPositions() const {
+    return positionsHistory.size() == POSITIONS_FOR_AVERAGE ? bPositions : vector<SkPoint>();
 }

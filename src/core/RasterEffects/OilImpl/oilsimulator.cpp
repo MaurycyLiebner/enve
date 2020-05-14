@@ -175,14 +175,14 @@ void OilSimulator::updateVisitedPixels() {
 	} else {
 		// Update the visited pixels arrays with the trace bristle positions
 		const vector<unsigned char>& alphas = trace.getTrajectoryAphas();
-        const vector<vector<QPointF>>& bristlePositions = trace.getBristlePositions();
+        const vector<vector<SkPoint>>& bristlePositions = trace.getBristlePositions();
 		int width = visitedPixels.getWidth();
 		int height = visitedPixels.getHeight();
 
 		for (unsigned int i = 0, nSteps = trace.getNSteps(); i < nSteps; ++i) {
 			// Fill the visited pixels array if alpha is high enough
             if (alphas[i] >= OilTrace::MIN_ALPHA) {
-				for (const QPointF& pos : bristlePositions[i]) {
+				for (const SkPoint& pos : bristlePositions[i]) {
                     int x = pos.x();
                     int y = pos.y();
 
@@ -246,7 +246,7 @@ void OilSimulator::getNewTrace() {
 			while (!isValidTrajectory && invalidTrajectoriesCounter % 500 != 499) {
 				// Create the trace starting from a bad painted pixel
                 unsigned int pixel = badPaintedPixels[floor(gRandF(0, nBadPaintedPixels))];
-				QPointF startingPosition = QPointF(pixel % imgWidth, pixel / imgWidth);
+                SkPoint startingPosition = SkPoint::Make(pixel % imgWidth, pixel / imgWidth);
                 trace = OilTrace(startingPosition, nSteps, TRACE_SPEED);
 
 				// Check if the trace has a valid trajectory
@@ -289,7 +289,7 @@ void OilSimulator::getNewTrace() {
 
 bool OilSimulator::alreadyVisitedTrajectory() const {
 	// Extract some useful information
-    const vector<QPointF>& positions = trace.getTrajectoryPositions();
+    const vector<SkPoint>& positions = trace.getTrajectoryPositions();
 	const vector<unsigned char>& alphas = trace.getTrajectoryAphas();
 	int width = visitedPixels.getWidth();
 	int height = visitedPixels.getHeight();
@@ -302,7 +302,7 @@ bool OilSimulator::alreadyVisitedTrajectory() const {
 		// Check that the alpha value is high enough
         if (alphas[i] >= OilTrace::MIN_ALPHA) {
 			// Check that the position is inside the image
-			const QPointF& pos = positions[i];
+			const SkPoint& pos = positions[i];
             int x = pos.x();
             int y = pos.y();
 
@@ -321,7 +321,7 @@ bool OilSimulator::alreadyVisitedTrajectory() const {
 
 bool OilSimulator::validTrajectory() const {
 	// Extract some useful information
-    const vector<QPointF>& positions = trace.getTrajectoryPositions();
+    const vector<SkPoint>& positions = trace.getTrajectoryPositions();
 	const vector<unsigned char>& alphas = trace.getTrajectoryAphas();
 	int width = img.getWidth();
 	int height = img.getHeight();
@@ -341,7 +341,7 @@ bool OilSimulator::validTrajectory() const {
 		// Check that the alpha value is high enough
         if (alphas[i] >= OilTrace::MIN_ALPHA) {
 			// Check that the position is inside the image
-			const QPointF& pos = positions[i];
+			const SkPoint& pos = positions[i];
             int x = pos.x();
             int y = pos.y();
 

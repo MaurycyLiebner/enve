@@ -46,14 +46,14 @@ public:
 	 * @param _position the brush central position
 	 * @param _size the brush size
 	 */
-    OilBrush(const QPointF& _position = QPointF(), float _size = 5);
+    OilBrush(const SkPoint& _position = SkPoint(), float _size = 5);
 
 	/**
 	 * @brief Moves the brush to a new position and resets some internal variables
 	 *
 	 * @param newPosition the new brush central position
 	 */
-	void resetPosition(const QPointF& newPosition);
+	void resetPosition(const SkPoint& newPosition);
 
 	/**
 	 * @brief Updates the brush to a new central position
@@ -61,7 +61,7 @@ public:
 	 * @param newPosition the new brush central position
 	 * @param updateBristlesElements true if the bristles elements positions should be updated
 	 */
-	void updatePosition(const QPointF& newPosition, bool updateBristlesElements = true);
+	void updatePosition(const SkPoint& newPosition, bool updateBristlesElements = true);
 
 	/**
 	 * @brief Paints the brush using the provided color
@@ -90,14 +90,14 @@ public:
 	 *
 	 * @return a vector with the current bristles positions
 	 */
-    const vector<QPointF> getBristlesPositions() const;
+    const vector<SkPoint> getBristlesPositions() const;
 
 protected:
 
 	/**
 	 * @brief The brush central position
 	 */
-	QPointF position;
+	SkPoint position;
 
 	/**
 	 * @brief The brush size
@@ -127,12 +127,12 @@ protected:
 	/**
 	 * @brief The bristles offset positions relative to the brush center
 	 */
-    vector<QPointF> bOffsets;
+    vector<SkPoint> bOffsets;
 
 	/**
 	 * @brief The bristles positions
 	 */
-    vector<QPointF> bPositions;
+    vector<SkPoint> bPositions;
 
 	/**
 	 * @brief The brush bristles
@@ -142,12 +142,12 @@ protected:
 	/**
 	 * @brief The average bush central position, considering the last position updates
 	 */
-	QPointF averagePosition;
+	SkPoint averagePosition;
 
 	/**
 	 * @brief An array containing the bush central positions from the last position updates
 	 */
-    vector<QPointF> positionsHistory;
+    vector<SkPoint> positionsHistory;
 
 	/**
 	 * @brief Counts the number of times that the brush central position has been updated

@@ -45,7 +45,7 @@ public:
 	 * @param nSteps the total number of steps in the trace trajectory
 	 * @param speed the trace moving speed (pixels/step)
 	 */
-	OilTrace(const QPointF& startingPosition = QPointF(), unsigned int nSteps = 20, float speed = 2);
+	OilTrace(const SkPoint& startingPosition = SkPoint(), unsigned int nSteps = 20, float speed = 2);
 
 	/**
 	 * @brief Constructor
@@ -53,7 +53,7 @@ public:
 	 * @param _positions the trace trajectory positions
 	 * @param _alphas the trace alpha values at each trajectory step
 	 */
-    OilTrace(const vector<QPointF>& _positions, const vector<unsigned char>& _alphas);
+    OilTrace(const vector<SkPoint>& _positions, const vector<unsigned char>& _alphas);
 
 	/**
 	 * @brief Sets the trace brush size
@@ -133,7 +133,7 @@ public:
 	 *
 	 * @return the trace trajectory positions
 	 */
-    const vector<QPointF>& getTrajectoryPositions() const;
+    const vector<SkPoint>& getTrajectoryPositions() const;
 
 	/**
 	 * @brief Returns the trace alpha values along the trace trajectory
@@ -161,7 +161,7 @@ public:
 	 *
 	 * @return the brush bristle positions along the trace trajectory
 	 */
-    const vector<vector<QPointF>>& getBristlePositions() const;
+    const vector<vector<SkPoint>>& getBristlePositions() const;
 
 	/**
 	 * @brief Returns the brush bristle image colors along the trace trajectory
@@ -209,7 +209,7 @@ protected:
 	/**
 	 * @brief The trace trajectory positions
 	 */
-    vector<QPointF> positions;
+    vector<SkPoint> positions;
 
 	/**
 	 * @brief The bristle colors alpha values at each trajectory position
@@ -229,7 +229,7 @@ protected:
 	/**
 	 * @brief The trace bristle positions along the trajectory
 	 */
-    vector<vector<QPointF>> bPositions;
+    vector<vector<SkPoint>> bPositions;
 
 	/**
 	 * @brief The trace bristle image colors along the trajectory
