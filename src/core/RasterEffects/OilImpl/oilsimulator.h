@@ -13,12 +13,14 @@ public:
 	/**
 	 * @brief The smaller brush size allowed
 	 */
-	static float SMALLER_BRUSH_SIZE;
+    float SMALLER_BRUSH_SIZE = 4;
+
+    float BIGGER_BRUSH_SIZE = 4;
 
 	/**
 	 * @brief The brush size decrement ratio
 	 */
-	static float BRUSH_SIZE_DECREMENT;
+    float BRUSH_SIZE_DECREMENT = 1.3;
 
 	/**
 	 * @brief The maximum number of invalid trajectories allowed before the brush size is reduced
@@ -64,7 +66,7 @@ public:
 	 * @brief The maximum color difference between the painted image and the already painted color to consider it well
 	 * painted
 	 */
-    static vector<int> MAX_COLOR_DIFFERENCE;
+    vector<int> MAX_COLOR_DIFFERENCE = { 40, 40, 40 };
 
 	/**
 	 * @brief The maximum allowed fraction of pixels in the trace trajectory that have been visited before

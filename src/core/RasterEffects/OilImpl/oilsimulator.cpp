@@ -4,10 +4,6 @@
 #include "skia/skiahelpers.h"
 #include "simplemath.h"
 
-float OilSimulator::SMALLER_BRUSH_SIZE = 4;
-
-float OilSimulator::BRUSH_SIZE_DECREMENT = 1.3;
-
 unsigned int OilSimulator::MAX_INVALID_TRAJECTORIES = 5000;
 
 unsigned int OilSimulator::MAX_INVALID_TRAJECTORIES_FOR_SMALLER_SIZE = 10000;
@@ -23,8 +19,6 @@ float OilSimulator::RELATIVE_TRACE_LENGTH = 2.3;
 float OilSimulator::MIN_TRACE_LENGTH = 16;
 
 SkColor OilSimulator::BACKGROUND_COLOR = SK_ColorTRANSPARENT;
-
-vector<int> OilSimulator::MAX_COLOR_DIFFERENCE = { 40, 40, 40 };
 
 float OilSimulator::MAX_VISITS_FRACTION_IN_TRAJECTORY = 0.35;
 
@@ -49,7 +43,7 @@ float OilSimulator::MIN_BAD_PAINTED_REDUCTION_FRACTION = 0.45; // 0.45 - 0.3 - 0
 float OilSimulator::MAX_WELL_PAINTED_DESTRUCTION_FRACTION = 0.4; // 0.4 - 0.55 - 0.4
 
 OilSimulator::OilSimulator(SkBitmap& dst, bool _useCanvasBuffer, bool _verbose) :
-        mDst(dst), useCanvasBuffer(_useCanvasBuffer), verbose(_verbose) {
+        useCanvasBuffer(_useCanvasBuffer), verbose(_verbose), mDst(dst) {
 	nBadPaintedPixels = 0;
 	averageBrushSize = SMALLER_BRUSH_SIZE;
 	paintingIsFinised = true;
@@ -91,7 +85,7 @@ void OilSimulator::setImage(const SkBitmap& imagePixels, bool clearCanvas) {
 	}
 
 	// Initialize the rest of the simulator variables
-    averageBrushSize = qMax(SMALLER_BRUSH_SIZE, qMax(imgWidth, imgHeight) / 6.0f);
+    averageBrushSize = qMax(SMALLER_BRUSH_SIZE, BIGGER_BRUSH_SIZE);
 	paintingIsFinised = false;
 	obtainNewTrace = true;
 	traceStep = 0;
