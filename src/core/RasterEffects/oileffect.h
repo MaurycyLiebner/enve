@@ -18,6 +18,8 @@ public:
 private:
     qsptr<QPointFAnimator> mBrushSize;
     qsptr<QrealAnimator> mAccuracy;
+    qsptr<QrealAnimator> mStrokeLength;
+    qsptr<QrealAnimator> mMaxStrokes;
 };
 
 #endif // OILEFFECT_H

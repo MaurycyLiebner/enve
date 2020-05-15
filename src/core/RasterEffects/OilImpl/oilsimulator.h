@@ -50,12 +50,12 @@ public:
 	/**
 	 * @brief The typical trace length, relative to the brush size
 	 */
-	static float RELATIVE_TRACE_LENGTH;
+    float RELATIVE_TRACE_LENGTH = 2.3;
 
 	/**
 	 * @brief The minimum trace length allowed
 	 */
-	static float MIN_TRACE_LENGTH;
+    float MIN_TRACE_LENGTH = 16;
 
 	/**
 	 * @brief The canvas background color

@@ -22,7 +22,7 @@ void OilBristle::updatePosition(const SkPoint& newPosition) {
 	positions[0] = newPosition;
 
 	// Set the elements tail positions
-	for (unsigned int i = 0, nElements = getNElements(); i < nElements; ++i) {
+    for (unsigned int i = 0, nElements = getNElements(); i < nElements; ++i) {
         const SkPoint& headPos = positions[i];
         SkPoint& tailPos = positions[i + 1];
         float length = lengths[i];
@@ -51,18 +51,17 @@ void OilBristle::setElementsLengths(const vector<float>& newLengths) {
 void OilBristle::paint(SkCanvas& canvas, const SkColor& color, float thickness) const {
 	// Set the stroke color
     SkPaint paint;
-    paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(color);
 
 	// Paint the bristle elements
 	unsigned int nElements = getNElements();
 	float deltaThickness = thickness / nElements;
 
-	for (unsigned int i = 0; i < nElements; ++i) {
+    for (unsigned int i = 0; i < nElements; ++i) {
         paint.setStrokeWidth(thickness - i * deltaThickness);
         canvas.drawLine(positions[i].x(), positions[i].y(),
                         positions[i + 1].x(), positions[i + 1].y(), paint);
-	}
+    }
 }
 
 unsigned int OilBristle::getNElements() const {

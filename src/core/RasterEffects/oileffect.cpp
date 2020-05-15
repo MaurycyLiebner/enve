@@ -14,23 +14,40 @@ OilEffect::OilEffect() :
     connect(mBrushSize->getYAnimator(),
             &QrealAnimator::effectiveValueChanged,
             this, &RasterEffect::forcedMarginChanged);
+
     mAccuracy = enve::make_shared<QrealAnimator>(0.7, 0, 1, 0.01, "accuracy");
     ca_addChild(mAccuracy);
+
+    mStrokeLength = enve::make_shared<QrealAnimator>(2.3, 0.2, 5, 0.01, "stroke length");
+    ca_addChild(mStrokeLength);
+    connect(mStrokeLength.get(),
+            &QrealAnimator::effectiveValueChanged,
+            this, &RasterEffect::forcedMarginChanged);
+
+    mMaxStrokes = enve::make_shared<QrealAnimator>(100, 0, 9999.999, 1, "max strokes");
+    ca_addChild(mMaxStrokes);
 }
 
 QMargins OilEffect::getMargin() const {
-    return QMargins() + qCeil(2*mBrushSize->getEffectiveYValue());
+    return QMargins() + qCeil(mStrokeLength->getEffectiveValue()*
+                              mBrushSize->getEffectiveYValue());
 }
 
 class OilEffectCaller : public RasterEffectCaller {
 public:
     OilEffectCaller(const QPointF& brushSize,
                     const qreal accuracy,
+                    const qreal strokeLength,
+                    const qreal resolution,
+                    const int maxStrokes,
                     const HardwareSupport hwSupport) :
         RasterEffectCaller(hwSupport),
         mMinBrushSize(brushSize.x()),
         mMaxBrushSize(brushSize.y()),
-        mAccuracy(accuracy) {}
+        mAccuracy(accuracy),
+        mStrokeLength(strokeLength),
+        mResolution(resolution),
+        mMaxStrokes(maxStrokes) {}
 
     int cpuThreads(const int available, const int area) const {
         Q_UNUSED(available) Q_UNUSED(area)
@@ -40,16 +57,21 @@ public:
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData &data) {
         Q_UNUSED(data);
+        if(mMaxStrokes <= 0) return;
+
         OilSimulator simulator(renderTools.fDstBtmp, false, false);
         simulator.SMALLER_BRUSH_SIZE = mMinBrushSize;
         simulator.BIGGER_BRUSH_SIZE = mMaxBrushSize;
         const int accVal = 100*(1 - 0.7*mAccuracy);
         simulator.MAX_COLOR_DIFFERENCE = {accVal, accVal, accVal};
+        simulator.RELATIVE_TRACE_LENGTH = mStrokeLength;
+        simulator.MIN_TRACE_LENGTH = 16*mResolution;
 
         simulator.setImage(renderTools.fSrcBtmp, true);
 
-        while(!simulator.isFinished()) {
+        for(int i = 0; i < mMaxStrokes; i++) {
             simulator.update(false);
+            if(simulator.isFinished()) break;
         }
     }
 
@@ -57,6 +79,9 @@ private:
     const qreal mMinBrushSize;
     const qreal mMaxBrushSize;
     const qreal mAccuracy;
+    const qreal mStrokeLength;
+    const qreal mResolution;
+    const int mMaxStrokes;
 };
 
 stdsptr<RasterEffectCaller> OilEffect::getEffectCaller(
@@ -66,5 +91,8 @@ stdsptr<RasterEffectCaller> OilEffect::getEffectCaller(
     Q_UNUSED(influence)
     const QPointF size = mBrushSize->getEffectiveValue(relFrame)*resolution;
     const qreal acc = mAccuracy->getEffectiveValue(relFrame);
-    return enve::make_shared<OilEffectCaller>(size, acc, instanceHwSupport());
+    const qreal len = mStrokeLength->getEffectiveValue(relFrame);
+    const int maxStrokes = qRound(mMaxStrokes->getEffectiveValue(relFrame));
+    return enve::make_shared<OilEffectCaller>(size, acc, len, resolution,
+                                              maxStrokes, instanceHwSupport());
 }

@@ -14,10 +14,6 @@ unsigned int OilSimulator::MAX_INVALID_TRACES_FOR_SMALLER_SIZE = 350;
 
 float OilSimulator::TRACE_SPEED = 2;
 
-float OilSimulator::RELATIVE_TRACE_LENGTH = 2.3;
-
-float OilSimulator::MIN_TRACE_LENGTH = 16;
-
 SkColor OilSimulator::BACKGROUND_COLOR = SK_ColorTRANSPARENT;
 
 float OilSimulator::MAX_VISITS_FRACTION_IN_TRAJECTORY = 0.35;
