@@ -33,8 +33,8 @@ OilTrace::OilTrace(const SkPoint& startingPosition, unsigned int nSteps, float s
 
 	for (unsigned int i = 1; i < nSteps; ++i) {
         float ang = initAng + 2*PI * (ofNoise(noiseSeed + NOISE_FACTOR * i) - 0.5);
-        positions.emplace_back(positions[i - 1].x() + speed * cos(ang),
-                               positions[i - 1].y() + speed * sin(ang));
+        positions.emplace_back(SkPoint{positions[i - 1].x() + speed * cos(ang),
+                                       positions[i - 1].y() + speed * sin(ang)});
 		alphas.push_back(255 - alphaDecrement * i);
 	}
 
@@ -110,7 +110,7 @@ void OilTrace::calculateBristleImageColors(const SkBitmap& img) {
 			if (x >= 0 && x < width && y >= 0 && y < height) {
                 bic.push_back(img.getColor(x, y));
 			} else {
-				bic.emplace_back(0, 0);
+                bic.emplace_back(SK_ColorTRANSPARENT);
 			}
 		}
 	}
@@ -145,10 +145,10 @@ void OilTrace::calculateBristlePaintedColors(const SkBitmap& paintedPixels,
                 if (color != backgroundColor && SkColorGetA(color) != 0) {
 					bpc.push_back(color);
 				} else {
-					bpc.emplace_back(0, 0);
+                    bpc.emplace_back(SK_ColorTRANSPARENT);
 				}
 			} else {
-				bpc.emplace_back(0, 0);
+                bpc.emplace_back(SK_ColorTRANSPARENT);
 			}
 		}
 	}
@@ -268,7 +268,7 @@ void OilTrace::calculateBristleColors(const SkBitmap& paintedPixels,
 	}
 }
 
-void OilTrace::paint() {
+void OilTrace::paint(SkCanvas& canvas) {
 	// Check that the bristle colors have been calculated before running this method
 	if (bColors.size() == 0) {
         RuntimeThrow("Please, run calculateBristleColors method before paint.");
@@ -279,14 +279,14 @@ void OilTrace::paint() {
 		brush.updatePosition(positions[i], true);
 
 		// Paint the brush
-		brush.paint(bColors[i], alphas[i]);
+        brush.paint(canvas, bColors[i], alphas[i]);
 	}
 
 	// Reset the brush to the initial position
 	brush.resetPosition(positions[0]);
 }
 
-void OilTrace::paint(ofFbo& canvasBuffer) {
+void OilTrace::paint(SkCanvas& canvas, SkCanvas& canvasBuffer) {
 	// Check that the bristle colors have been calculated before running this method
 	if (bColors.size() == 0) {
         RuntimeThrow("Please, run calculateBristleColors method before paint.");
@@ -297,13 +297,11 @@ void OilTrace::paint(ofFbo& canvasBuffer) {
 		brush.updatePosition(positions[i], true);
 
 		// Paint the brush
-		brush.paint(bColors[i], alphas[i]);
+        brush.paint(canvas, bColors[i], alphas[i]);
 
 		// Paint the trace on the canvas only if alpha is high enough
 		if (alphas[i] >= MIN_ALPHA) {
-			canvasBuffer.begin();
-			brush.paint(bColors[i], 255);
-			canvasBuffer.end();
+            brush.paint(canvasBuffer, bColors[i], 255);
 		}
 	}
 
@@ -311,7 +309,7 @@ void OilTrace::paint(ofFbo& canvasBuffer) {
 	brush.resetPosition(positions[0]);
 }
 
-void OilTrace::paintStep(unsigned int step) {
+void OilTrace::paintStep(SkCanvas& canvas, unsigned int step) {
 	// Check that the bristle colors have been calculated before running this method
 	if (bColors.size() == 0) {
         RuntimeThrow("Please, run calculateBristleColors method before paint.");
@@ -323,7 +321,7 @@ void OilTrace::paintStep(unsigned int step) {
 		brush.updatePosition(positions[step], true);
 
 		// Paint the brush
-		brush.paint(bColors[step], alphas[step]);
+        brush.paint(canvas, bColors[step], alphas[step]);
 
 		// Reset the brush to the initial position if we are at the last trajectory step
 		if (step == getNSteps() - 1) {
@@ -332,7 +330,7 @@ void OilTrace::paintStep(unsigned int step) {
 	}
 }
 
-void OilTrace::paintStep(unsigned int step, ofFbo& canvasBuffer) {
+void OilTrace::paintStep(SkCanvas& canvas, unsigned int step, SkCanvas& canvasBuffer) {
 	// Check that the bristle colors have been calculated before running this method
 	if (bColors.size() == 0) {
         RuntimeThrow("Please, run calculateBristleColors method before paint.");
@@ -344,13 +342,11 @@ void OilTrace::paintStep(unsigned int step, ofFbo& canvasBuffer) {
 		brush.updatePosition(positions[step], true);
 
 		// Paint the brush
-		brush.paint(bColors[step], alphas[step]);
+        brush.paint(canvas, bColors[step], alphas[step]);
 
 		// Paint the trace on the canvas only if alpha is high enough
 		if (alphas[step] >= MIN_ALPHA) {
-			canvasBuffer.begin();
-			brush.paint(bColors[step], 255);
-			canvasBuffer.end();
+            brush.paint(canvasBuffer, bColors[step], 255);
 		}
 
 		// Reset the brush to the initial position if we are at the last trajectory step

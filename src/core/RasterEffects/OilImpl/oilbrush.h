@@ -68,7 +68,7 @@ public:
 	 *
 	 * @param color the brush color
 	 */
-	void paint(const SkColor& color) const;
+    void paint(SkCanvas& canvas, const SkColor& color) const;
 
 	/**
 	 * @brief Paints the brush using the provided bristles colors
@@ -76,7 +76,7 @@ public:
 	 * @param colors the bristles colors
 	 * @param alpha the colors alpha value
 	 */
-    void paint(const vector<SkColor>& colors, unsigned char alpha) const;
+    void paint(SkCanvas& canvas, const vector<SkColor>& colors, unsigned char alpha) const;
 
 	/**
 	 * @brief Returns the total number of bristles in the brush

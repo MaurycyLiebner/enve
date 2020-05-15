@@ -150,14 +150,6 @@ public:
 	void update(bool stepByStep);
 
 	/**
-	 * @brief Draws the canvas on the screen
-	 *
-	 * @param x the screen x position
-	 * @param y the screen y position
-	 */
-	void drawCanvas(float x, float y) const;
-
-	/**
 	 * @brief Indicates if the simulator finished the painting
 	 *
 	 * @return true if the painting is finished
@@ -236,12 +228,14 @@ protected:
 	/**
 	 * @brief The canvas where the oil painting is done
 	 */
-	ofFbo canvas;
+    SkCanvas mCanvas;
+    int mCanvasWidth = 0;
+    int mCanvasHeight = 0;
 
 	/**
 	 * @brief The canvas buffer used for the color mixing calculation
 	 */
-	ofFbo canvasBuffer;
+    SkCanvas mCanvasBuffer;
 
 	/**
 	 * @brief Container indicating which canvas pixels have been visited by previous traces

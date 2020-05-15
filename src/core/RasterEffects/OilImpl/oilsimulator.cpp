@@ -1,6 +1,7 @@
 #include "oilsimulator.h"
 #include "oiltrace.h"
 
+#include "skia/skiahelpers.h"
 #include "simplemath.h"
 
 float OilSimulator::SMALLER_BRUSH_SIZE = 4;
@@ -64,19 +65,18 @@ void OilSimulator::setImage(const SkBitmap& imagePixels, bool clearCanvas) {
     int imgHeight = mImg.height();
 
 	// Initialize the canvas and pixel containers if necessary
-	if (clearCanvas || imgWidth != canvas.getWidth() || imgHeight != canvas.getHeight()) {
+    if (clearCanvas || imgWidth != mCanvasWidth || imgHeight != mCanvasHeight) {
+        const auto imgInfo = SkiaHelpers::getPremulRGBAInfo(imgWidth, imgHeight);
 		// Initialize the canvas where the image will be painted
-		canvas.allocate(imgWidth, imgHeight, GL_RGB, 2);
-		canvas.begin();
-		ofClear(BACKGROUND_COLOR);
-		canvas.end();
+        mCanvas.makeSurface(imgInfo);
+        mCanvas.clear(BACKGROUND_COLOR);
+        mCanvasWidth = imgWidth;
+        mCanvasHeight = imgHeight;
 
 		// Initialize the canvas buffer if necessary
-		if (useCanvasBuffer) {
-			canvasBuffer.allocate(imgWidth, imgHeight, GL_RGB);
-			canvasBuffer.begin();
-			ofClear(BACKGROUND_COLOR);
-			canvasBuffer.end();
+        if (useCanvasBuffer) {
+            mCanvasBuffer.makeSurface(imgInfo);
+            mCanvasBuffer.clear(BACKGROUND_COLOR);
 		}
 
 		// Initialize all the pixel arrays
@@ -132,9 +132,11 @@ void OilSimulator::updatePixelArrays() {
 
 	// Update the painted pixels array
 	if (useCanvasBuffer) {
-        canvasBuffer.readToPixels(mPaintedPixels);
+        const bool ret = mCanvasBuffer.readPixels(mPaintedPixels, 0, 0);
+        if(!ret) RuntimeThrow("Could not read canvas buffer pixels");
 	} else {
-        canvas.readToPixels(mPaintedPixels);
+        const bool ret = mCanvas.readPixels(mPaintedPixels, 0, 0);
+        if(!ret) RuntimeThrow("Could not read canvas pixels");
 	}
 
 	// Update the similar color pixels and the bad painted pixels arrays
@@ -517,23 +519,23 @@ bool OilSimulator::traceImprovesPainting() const {
 
 void OilSimulator::paintTrace() {
 	// Pain the trace in the canvas and the canvas buffer if necessary
-	canvas.begin();
-	useCanvasBuffer ? trace.paint(canvasBuffer) : trace.paint();
-	canvas.end();
+    if(useCanvasBuffer) {
+        trace.paint(mCanvas, mCanvasBuffer);
+    } else {
+        trace.paint(mCanvas);
+    }
 }
 
 void OilSimulator::paintTraceStep() {
 	// Pain the trace step in the canvas and the canvas buffer if necessary
-	canvas.begin();
-	useCanvasBuffer ? trace.paintStep(traceStep, canvasBuffer) : trace.paintStep(traceStep);
-	canvas.end();
+    if(useCanvasBuffer) {
+        trace.paintStep(mCanvas, traceStep, mCanvasBuffer);
+    } else {
+        trace.paintStep(mCanvas, traceStep);
+    }
 
 	// Increment the trace step
 	++traceStep;
-}
-
-void OilSimulator::drawCanvas(float x, float y) const {
-    canvas.draw(x, y);
 }
 
 bool OilSimulator::isFinished() const {

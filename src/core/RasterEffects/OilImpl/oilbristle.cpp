@@ -48,18 +48,20 @@ void OilBristle::setElementsLengths(const vector<float>& newLengths) {
 	lengths = newLengths;
 }
 
-void OilBristle::paint(const SkColor& color, float thickness) const {
+void OilBristle::paint(SkCanvas& canvas, const SkColor& color, float thickness) const {
 	// Set the stroke color
-	ofSetColor(color);
+    SkPaint paint;
+    paint.setStyle(SkPaint::kStroke_Style);
+    paint.setColor(color);
 
 	// Paint the bristle elements
 	unsigned int nElements = getNElements();
 	float deltaThickness = thickness / nElements;
 
 	for (unsigned int i = 0; i < nElements; ++i) {
-		ofSetLineWidth(thickness - i * deltaThickness);
-        ofDrawLine(positions[i].x(), positions[i].y(), 0,
-                   positions[i + 1].x(), positions[i + 1].y(), 0);
+        paint.setStrokeWidth(thickness - i * deltaThickness);
+        canvas.drawLine(positions[i].x(), positions[i].y(),
+                        positions[i + 1].x(), positions[i + 1].y(), paint);
 	}
 }
 

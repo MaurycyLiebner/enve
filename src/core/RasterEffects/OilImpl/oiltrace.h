@@ -90,7 +90,7 @@ public:
 	 *
 	 * Note that the calculateBristleColors method should have been run before.
 	 */
-	void paint();
+    void paint(SkCanvas& canvas);
 
 	/**
 	 * @brief Paints the trace
@@ -100,7 +100,7 @@ public:
 	 * @param canvasBuffer the canvas buffer where the trace should also be painted when the color exceeds a minimum
 	 * alpha value
 	 */
-	void paint(ofFbo& canvasBuffer);
+    void paint(SkCanvas& canvas, SkCanvas& canvasBuffer);
 
 	/**
 	 * @brief Paints a given step in the trace trajectory
@@ -109,7 +109,7 @@ public:
 	 *
 	 * @param step the trace trajectory step to paint
 	 */
-	void paintStep(unsigned int step);
+    void paintStep(SkCanvas& canvas, unsigned int step);
 
 	/**
 	 * @brief Paints a given step in the trace trajectory
@@ -120,7 +120,7 @@ public:
 	 * @param canvasBuffer the canvas buffer where the trace should also be painted when the color exceeds a minimum
 	 * alpha value
 	 */
-	void paintStep(unsigned int step, ofFbo& canvasBuffer);
+    void paintStep(SkCanvas& canvas, unsigned int step, SkCanvas& canvasBuffer);
 
 	/**
 	 * @brief Returns the number of steps in the trace trajectory
