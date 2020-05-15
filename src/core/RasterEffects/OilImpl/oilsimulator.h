@@ -157,8 +157,6 @@ public:
 	 * @return true if the painting is finished
 	 */
 	bool isFinished() const;
-
-    SkBitmap& result() { return mPaintedPixels; }
 protected:
 
     /**

@@ -62,8 +62,6 @@ void OilSimulator::setImage(const SkBitmap& imagePixels, bool clearCanvas) {
     if (clearCanvas || imgWidth != mCanvasWidth || imgHeight != mCanvasHeight) {
         const auto imgInfo = SkiaHelpers::getPremulRGBAInfo(imgWidth, imgHeight);
 
-        mPaintedPixels.allocPixels(imgInfo);
-
 		// Initialize the canvas where the image will be painted
         mCanvas = std::make_shared<SkCanvas>(mDst);
         mCanvas->clear(BACKGROUND_COLOR);
@@ -72,6 +70,8 @@ void OilSimulator::setImage(const SkBitmap& imagePixels, bool clearCanvas) {
 
 		// Initialize the canvas buffer if necessary
         if (useCanvasBuffer) {
+            mPaintedPixels.allocPixels(imgInfo);
+
             SkBitmap canvasBuffer;
             canvasBuffer.allocPixels(imgInfo);
             mCanvasBuffer = std::make_shared<SkCanvas>(canvasBuffer);
@@ -133,14 +133,13 @@ void OilSimulator::updatePixelArrays() {
 	if (useCanvasBuffer) {
         const bool ret = mCanvasBuffer->readPixels(mPaintedPixels, 0, 0);
         if(!ret) RuntimeThrow("Could not read canvas buffer pixels");
-	} else {
-        const bool ret = mCanvas->readPixels(mPaintedPixels, 0, 0);
-        if(!ret) RuntimeThrow("Could not read canvas pixels");
-	}
+    }
 
 	// Update the similar color pixels and the bad painted pixels arrays
     const auto imgPixels = static_cast<uchar*>(mImg.getAddr(0, 0));
-    const auto paintedPixels = static_cast<uchar*>(mPaintedPixels.getAddr(0, 0));
+    const auto paintedPixels = static_cast<uchar*>(useCanvasBuffer ?
+                                                   mPaintedPixels.getAddr(0, 0) :
+                                                   mDst.getAddr(0, 0));
 
     unsigned int imgNumChannels = 4;
     unsigned int canvasNumChannels = 4;
@@ -264,7 +263,8 @@ void OilSimulator::getNewTrace() {
 
 				// Calculate the trace average color and the bristle colors along the trajectory
                 trace.calculateAverageColor(mImg);
-                trace.calculateBristleColors(mPaintedPixels, BACKGROUND_COLOR);
+                trace.calculateBristleColors(useCanvasBuffer ? mPaintedPixels : mDst,
+                                             BACKGROUND_COLOR);
 
 				// Check if painting the trace will improve the painting
 				if (traceImprovesPainting()) {
@@ -348,7 +348,9 @@ bool OilSimulator::validTrajectory() const {
 
 				// Get the image color and the painted color at the trajectory position
                 const SkColor imgColor = mImg.getColor(x, y);
-                const SkColor paintedColor = mPaintedPixels.getColor(x, y);
+                const SkColor paintedColor = useCanvasBuffer ?
+                                     mPaintedPixels.getColor(x, y) :
+                                     mDst.getColor(x, y);
 
                 // Extract the pixel color properties
                 const int imgRed = SkColorGetR(imgColor);
