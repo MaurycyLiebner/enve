@@ -51,6 +51,7 @@ void OilBristle::setElementsLengths(const vector<float>& newLengths) {
 void OilBristle::paint(SkCanvas& canvas, const SkColor& color, float thickness) const {
 	// Set the stroke color
     SkPaint paint;
+    paint.setAntiAlias(true);
     paint.setColor(color);
 
 	// Paint the bristle elements
