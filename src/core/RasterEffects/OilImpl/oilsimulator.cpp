@@ -48,8 +48,8 @@ float OilSimulator::MIN_BAD_PAINTED_REDUCTION_FRACTION = 0.45; // 0.45 - 0.3 - 0
 
 float OilSimulator::MAX_WELL_PAINTED_DESTRUCTION_FRACTION = 0.4; // 0.4 - 0.55 - 0.4
 
-OilSimulator::OilSimulator(bool _useCanvasBuffer, bool _verbose) :
-		useCanvasBuffer(_useCanvasBuffer), verbose(_verbose) {
+OilSimulator::OilSimulator(SkBitmap& dst, bool _useCanvasBuffer, bool _verbose) :
+        mDst(dst), useCanvasBuffer(_useCanvasBuffer), verbose(_verbose) {
 	nBadPaintedPixels = 0;
 	averageBrushSize = SMALLER_BRUSH_SIZE;
 	paintingIsFinised = true;
@@ -71,9 +71,7 @@ void OilSimulator::setImage(const SkBitmap& imagePixels, bool clearCanvas) {
         mPaintedPixels.allocPixels(imgInfo);
 
 		// Initialize the canvas where the image will be painted
-        SkBitmap canvas;
-        canvas.allocPixels(imgInfo);
-        mCanvas = std::make_shared<SkCanvas>(canvas);
+        mCanvas = std::make_shared<SkCanvas>(mDst);
         mCanvas->clear(BACKGROUND_COLOR);
         mCanvasWidth = imgWidth;
         mCanvasHeight = imgHeight;

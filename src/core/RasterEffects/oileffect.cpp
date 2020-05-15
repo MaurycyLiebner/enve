@@ -25,17 +25,13 @@ public:
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData &data) {
         Q_UNUSED(data);
-        OilSimulator simulator(false, false);
+        OilSimulator simulator(renderTools.fDstBtmp, false, false);
 
         simulator.setImage(renderTools.fSrcBtmp, true);
 
         while(!simulator.isFinished()) {
             simulator.update(false);
         }
-
-        SkCanvas canvas(renderTools.fDstBtmp);
-        canvas.clear(SK_ColorTRANSPARENT);
-        canvas.drawBitmap(simulator.result(), 0.f, 0.f);
     }
 };
 

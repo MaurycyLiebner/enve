@@ -131,7 +131,7 @@ public:
 	 * @param _useCanvasBuffer sets if the simulator should use a canvas buffer for the color mixing calculation
 	 * @param _verbose sets if the simulator should print some debugging information
 	 */
-    OilSimulator(bool _useCanvasBuffer = true, bool _verbose = true);
+    OilSimulator(SkBitmap& dst, bool _useCanvasBuffer = true, bool _verbose = true);
 
 	/**
 	 * @brief Sets the image that should be painted
@@ -220,6 +220,8 @@ protected:
 	 * @brief Sets if the simulator should print debugging information
 	 */
 	bool verbose;
+
+    SkBitmap& mDst;
 
 	/**
 	 * @brief The image to paint
