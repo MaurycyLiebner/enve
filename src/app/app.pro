@@ -413,19 +413,22 @@ unix:!macx {
     metainfo.files = $$OUT_PWD/io.github.maurycyliebner.enve.metainfo.xml
     metainfo.path = $$PREFIX/share/metainfo
 
-    desktop.files = XDGData/enve.desktop
+    desktop.files = XDGData/io.github.maurycyliebner.enve.desktop
     desktop.path = $$PREFIX/share/applications
 
-    icon16.files = XDGData/icons/16x16/enve.png
+    mime.files = XDGData/io.github.maurycyliebner.enve.xml
+    mime.path = $$PREFIX/share/mime/packages
+
+    icon16.files = XDGData/icons/16x16/io.github.maurycyliebner.enve.png
     icon16.path = $$PREFIX/share/icons/hicolor/16x16/apps
-    icon32.files = XDGData/icons/32x32/enve.png
+    icon32.files = XDGData/icons/32x32/io.github.maurycyliebner.enve.png
     icon32.path = $$PREFIX/share/icons/hicolor/32x32/apps
-    icon48.files = XDGData/icons/48x48/enve.png
+    icon48.files = XDGData/icons/48x48/io.github.maurycyliebner.enve.png
     icon48.path = $$PREFIX/share/icons/hicolor/48x48/apps
-    icon256.files = XDGData/icons/256x256/enve.png
+    icon256.files = XDGData/icons/256x256/io.github.maurycyliebner.enve.png
     icon256.path = $$PREFIX/share/icons/hicolor/256x256/apps
-    iconsvg.files = XDGData/icons/scalable/enve.svg
+    iconsvg.files = XDGData/icons/scalable/io.github.maurycyliebner.enve.svg
     iconsvg.path = $$PREFIX/share/icons/hicolor/scalable/apps
 
-    INSTALLS += target metainfo desktop icon16 icon32 icon48 icon256 iconsvg
+    INSTALLS += target metainfo desktop mime icon16 icon32 icon48 icon256 iconsvg
 }
