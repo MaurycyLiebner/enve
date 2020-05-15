@@ -156,6 +156,7 @@ public:
 	 */
 	bool isFinished() const;
 
+    SkBitmap& result() { return mPaintedPixels; }
 protected:
 
     /**
@@ -228,14 +229,14 @@ protected:
 	/**
 	 * @brief The canvas where the oil painting is done
 	 */
-    SkCanvas mCanvas;
+    std::shared_ptr<SkCanvas> mCanvas;
     int mCanvasWidth = 0;
     int mCanvasHeight = 0;
 
 	/**
 	 * @brief The canvas buffer used for the color mixing calculation
 	 */
-    SkCanvas mCanvasBuffer;
+    std::shared_ptr<SkCanvas> mCanvasBuffer;
 
 	/**
 	 * @brief Container indicating which canvas pixels have been visited by previous traces

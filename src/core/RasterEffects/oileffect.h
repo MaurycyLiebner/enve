@@ -8,6 +8,8 @@ class CORE_EXPORT OilEffect : public RasterEffect {
 private:
     OilEffect();
 public:
+    QMargins getMargin() const;
+
     stdsptr<RasterEffectCaller> getEffectCaller(
             const qreal relFrame, const qreal resolution,
             const qreal influence, BoxRenderData* const data) const;
