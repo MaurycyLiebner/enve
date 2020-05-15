@@ -9,7 +9,7 @@ OilBristle::OilBristle(const SkPoint& position, float length) {
     if(length <= 0) RuntimeThrow("There bristle length should be higher than zero.");
 
 	// Fill the positions and lengths containers
-	unsigned int nElements = round(sqrt(2 * length));
+    unsigned int nElements = round(sqrt(length / 2)); // round(sqrt(2 * length));
     positions = vector<SkPoint>(nElements + 1, position);
 
 	for (unsigned int i = 0; i < nElements; ++i) {
