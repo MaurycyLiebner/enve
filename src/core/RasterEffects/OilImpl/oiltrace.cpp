@@ -25,8 +25,8 @@ OilTrace::OilTrace(const SkPoint& startingPosition, unsigned int nSteps, float s
 	}
 
 	// Fill the positions and alphas containers
-    float initAng = gRandF(0, 2*PI);
-    float noiseSeed = gRandF(0, 1000);
+    float initAng = gSkRandF(0, 2*PI);
+    float noiseSeed = gSkRandF(0, 1000);
     float alphaDecrement = qMin(255.0 / nSteps, 25.0);
 	positions.push_back(startingPosition);
 	alphas.push_back(255);
@@ -207,7 +207,7 @@ void OilTrace::calculateBristleColors(const SkBitmap& paintedPixels,
 
 	// Calculate the starting colors for each bristle
     vector<SkColor> startingColors = vector<SkColor>(nBristles);
-    float noiseSeed = gRandF(0, 1000);
+    float noiseSeed = gSkRandF(0, 1000);
     vector<float> averageHSV = {0.f, 0.f, 0.f};
     SkColorToHSV(averageColor, averageHSV.data());
     float& averageBrightness = averageHSV[2];

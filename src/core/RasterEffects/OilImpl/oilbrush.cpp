@@ -25,17 +25,17 @@ OilBrush::OilBrush(const SkPoint& _position, float _size) :
     bristlesLength = qMin(size, MAX_BRISTLE_LENGTH);
     bristlesThickness = qMin(0.8f * bristlesLength, MAX_BRISTLE_THICKNESS);
     bristlesHorizontalNoise = qMin(0.3f * size, MAX_BRISTLE_HORIZONTAL_NOISE);
-    bristlesHorizontalNoiseSeed = gRandF(0, 1000);
+    bristlesHorizontalNoiseSeed = gSkRandF(0, 1000);
 
 	// Initialize the bristles offsets and positions containers with default values
-    unsigned int nBristles = floor(size * gRandF(1.6, 1.9));
+    unsigned int nBristles = floor(size * gSkRandF(1.6, 1.9));
     bOffsets = vector<SkPoint>(nBristles);
     bPositions = vector<SkPoint>(nBristles);
 
 	// Randomize the bristle offset positions
 	for (SkPoint& offset : bOffsets) {
-        offset.set(size * gRandF(-0.5, 0.5),
-                   BRISTLE_VERTICAL_NOISE * gRandF(-0.5, 0.5));
+        offset.set(size * gSkRandF(-0.5, 0.5),
+                   BRISTLE_VERTICAL_NOISE * gSkRandF(-0.5, 0.5));
 	}
 
 	// Initialize the variables used to calculate the brush average position

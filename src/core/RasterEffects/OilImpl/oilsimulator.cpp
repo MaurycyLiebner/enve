@@ -260,7 +260,7 @@ void OilSimulator::getNewTrace() {
 
 			while (!isValidTrajectory && invalidTrajectoriesCounter % 500 != 499) {
 				// Create the trace starting from a bad painted pixel
-                unsigned int pixel = badPaintedPixels[floor(gRandF(0, nBadPaintedPixels))];
+                unsigned int pixel = badPaintedPixels[floor(gSkRandF(0, nBadPaintedPixels))];
                 SkPoint startingPosition = SkPoint::Make(pixel % imgWidth, pixel / imgWidth);
                 trace = OilTrace(startingPosition, nSteps, TRACE_SPEED);
 
