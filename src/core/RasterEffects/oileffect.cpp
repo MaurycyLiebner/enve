@@ -5,8 +5,10 @@
 
 #define TIME_BEGIN const auto t1 = std::chrono::high_resolution_clock::now();
 #define TIME_END(name) const auto t2 = std::chrono::high_resolution_clock::now(); \
-                       const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count(); \
-                       qDebug() << name << duration << "ns" << endl;
+                       const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count(); \
+                       qDebug() << name << duration << "ms" << endl;
+
+//#define OilEffect_TIMING
 
 OilEffect::OilEffect() :
     RasterEffect("oil painting", HardwareSupport::cpuPreffered,
@@ -72,8 +74,9 @@ public:
                     const CpuRenderData &data) {
         Q_UNUSED(data);
         if(mMaxStrokes <= 0) return;
-
+#ifdef OilEffect_TIMING
         TIME_BEGIN
+#endif
         OilSimulator simulator(renderTools.fDstBtmp, false, false);
         setupSimulator(simulator);
 
@@ -83,13 +86,17 @@ public:
             simulator.update(false);
             if(simulator.isFinished()) break;
         }
-        TIME_END("whole") // whole 4522840291 ns
+#ifdef OilEffect_TIMING
+        TIME_END("CPU Oil Painting")
+#endif
     }
 
     void processGpu(QGL33 * const gl, GpuRenderTools &renderTools) {
         Q_UNUSED(gl)
         if(mMaxStrokes <= 0) return;
-
+#ifdef OilEffect_TIMING
+        TIME_BEGIN
+#endif
         const auto& src = renderTools.getSrcTexture();
         auto srcBtmp = src.bitmapSnapshot(gl);
 
@@ -109,7 +116,6 @@ public:
         renderTools.switchToSkia();
         const auto canvas = renderTools.requestTargetCanvas();
 
-        TIME_BEGIN
         OilSimulator simulator(*canvas, false, false);
         setupSimulator(simulator);
 
@@ -122,7 +128,9 @@ public:
 
         canvas->flush();
         renderTools.swapTextures();
-        TIME_END("whole") // whole 4522840291 ns
+#ifdef OilEffect_TIMING
+        TIME_END("GPU Oil Painting")
+#endif
     }
 private:
     const qreal mMinBrushSize;
