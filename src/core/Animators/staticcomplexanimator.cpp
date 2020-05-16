@@ -34,7 +34,7 @@ void StaticComplexAnimator::prp_readProperty(eReadStream &src) {
 void StaticComplexAnimator::prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) {
     const auto& children = ca_getChildren();
     const auto childNodes = ele.childNodes();
-    const int count = childNodes.count();
+    const int count = qMin(childNodes.count(), children.count());
     for(int i = 0; i < count; i++) {
         const auto node = childNodes.at(i);
         if(!node.isElement()) continue;
