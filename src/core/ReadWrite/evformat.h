@@ -21,6 +21,7 @@ namespace EvFormat {
     enum {
         dataCompression = 16,
         textSkFont = 17,
+        oilEffectImprov = 18,
 
         nextVersion
     };

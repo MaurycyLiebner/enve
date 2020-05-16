@@ -2,6 +2,7 @@
 
 #include "Animators/qrealanimator.h"
 #include "OilImpl/oilsimulator.h"
+#include "ReadWrite/evformat.h"
 
 #define TIME_BEGIN const auto t1 = std::chrono::high_resolution_clock::now();
 #define TIME_END(name) const auto t2 = std::chrono::high_resolution_clock::now(); \
@@ -33,6 +34,16 @@ OilEffect::OilEffect() :
 
     mMaxStrokes = enve::make_shared<QrealAnimator>(100, 0, 9999.999, 1, "max strokes");
     ca_addChild(mMaxStrokes);
+}
+
+void OilEffect::prp_readProperty(eReadStream &src) {
+    if(src.evFileVersion() < EvFormat::oilEffectImprov) {
+        mBrushSize->prp_readProperty(src);
+        mAccuracy->prp_readProperty(src);
+
+        bool visible; src >> visible;
+        setVisible(visible);
+    } else RasterEffect::prp_readProperty(src);
 }
 
 QMargins OilEffect::getMargin() const {

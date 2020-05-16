@@ -10,6 +10,8 @@ class CORE_EXPORT OilEffect : public RasterEffect {
 private:
     OilEffect();
 public:
+    void prp_readProperty(eReadStream &src);
+
     QMargins getMargin() const;
 
     stdsptr<RasterEffectCaller> getEffectCaller(
