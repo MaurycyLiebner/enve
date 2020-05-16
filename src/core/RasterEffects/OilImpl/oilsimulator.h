@@ -133,7 +133,11 @@ public:
 	 * @param _useCanvasBuffer sets if the simulator should use a canvas buffer for the color mixing calculation
 	 * @param _verbose sets if the simulator should print some debugging information
 	 */
-    OilSimulator(SkBitmap& dst, bool _useCanvasBuffer = true, bool _verbose = true);
+private:
+    OilSimulator(const bool _useGpu, bool _useCanvasBuffer, bool _verbose);
+public:
+    OilSimulator(SkBitmap& dst, bool _useCanvasBuffer, bool _verbose);
+    OilSimulator(SkCanvas& dst, bool _useCanvasBuffer, bool _verbose);
 
 	/**
 	 * @brief Sets the image that should be painted
@@ -156,7 +160,7 @@ public:
 	 *
 	 * @return true if the painting is finished
 	 */
-	bool isFinished() const;
+    bool isFinished() const;
 protected:
 
     /**
@@ -211,6 +215,11 @@ protected:
 	 */
 	void paintTraceStep();
 
+    /**
+     * @brief Sets if a canvas should be GPU accelarated
+     */
+    const bool mUseGpu;
+
 	/**
 	 * @brief Sets if a canvas buffer should be used for the color mixing calculation
 	 */
@@ -221,7 +230,8 @@ protected:
 	 */
 	bool verbose;
 
-    SkBitmap& mDst;
+    SkCanvas* mGpuDst = nullptr;
+    SkBitmap mCpuDst;
 
 	/**
 	 * @brief The image to paint

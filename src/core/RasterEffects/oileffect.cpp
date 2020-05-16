@@ -3,9 +3,14 @@
 #include "Animators/qrealanimator.h"
 #include "OilImpl/oilsimulator.h"
 
+#define TIME_BEGIN const auto t1 = std::chrono::high_resolution_clock::now();
+#define TIME_END(name) const auto t2 = std::chrono::high_resolution_clock::now(); \
+                       const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count(); \
+                       qDebug() << name << duration << "ns" << endl;
+
 OilEffect::OilEffect() :
-    RasterEffect("oil painting", HardwareSupport::cpuOnly,
-                 false, RasterEffectType::OIL) {
+    RasterEffect("oil painting", HardwareSupport::cpuPreffered,
+                 true, RasterEffectType::OIL) {
     mBrushSize = enve::make_shared<QPointFAnimator>(
         QPointF{16., 64.}, QPointF{4., 4.},
         QPointF{999.999, 999.999}, QPointF{1., 1.},
@@ -54,18 +59,23 @@ public:
         return 1;
     }
 
-    void processCpu(CpuRenderTools& renderTools,
-                    const CpuRenderData &data) {
-        Q_UNUSED(data);
-        if(mMaxStrokes <= 0) return;
-
-        OilSimulator simulator(renderTools.fDstBtmp, false, false);
+    void setupSimulator(OilSimulator& simulator) {
         simulator.SMALLER_BRUSH_SIZE = mMinBrushSize;
         simulator.BIGGER_BRUSH_SIZE = mMaxBrushSize;
         const int accVal = 100*(1 - 0.7*mAccuracy);
         simulator.MAX_COLOR_DIFFERENCE = {accVal, accVal, accVal};
         simulator.RELATIVE_TRACE_LENGTH = mStrokeLength;
         simulator.MIN_TRACE_LENGTH = 16*mResolution;
+    }
+
+    void processCpu(CpuRenderTools& renderTools,
+                    const CpuRenderData &data) {
+        Q_UNUSED(data);
+        if(mMaxStrokes <= 0) return;
+
+        TIME_BEGIN
+        OilSimulator simulator(renderTools.fDstBtmp, false, false);
+        setupSimulator(simulator);
 
         simulator.setImage(renderTools.fSrcBtmp, true);
 
@@ -73,8 +83,47 @@ public:
             simulator.update(false);
             if(simulator.isFinished()) break;
         }
+        TIME_END("whole") // whole 4522840291 ns
     }
 
+    void processGpu(QGL33 * const gl, GpuRenderTools &renderTools) {
+        Q_UNUSED(gl)
+        if(mMaxStrokes <= 0) return;
+
+        const auto& src = renderTools.getSrcTexture();
+        auto srcBtmp = src.bitmapSnapshot(gl);
+
+        const int width = srcBtmp.width();
+        const int height = srcBtmp.height();
+        for(int y = 0; y < height/2; y++) {
+            const int invY = height - 1 - y;
+
+            auto srcAddr1 = srcBtmp.getAddr32(0, invY);
+            auto srcAddr2 = srcBtmp.getAddr32(0, y);
+
+            for(int x = 0; x < width; x++) {
+                std::swap(*srcAddr1++, *srcAddr2++);
+            }
+        }
+
+        renderTools.switchToSkia();
+        const auto canvas = renderTools.requestTargetCanvas();
+
+        TIME_BEGIN
+        OilSimulator simulator(*canvas, false, false);
+        setupSimulator(simulator);
+
+        simulator.setImage(srcBtmp, true);
+
+        for(int i = 0; i < mMaxStrokes; i++) {
+            simulator.update(false);
+            if(simulator.isFinished()) break;
+        }
+
+        canvas->flush();
+        renderTools.swapTextures();
+        TIME_END("whole") // whole 4522840291 ns
+    }
 private:
     const qreal mMinBrushSize;
     const qreal mMaxBrushSize;

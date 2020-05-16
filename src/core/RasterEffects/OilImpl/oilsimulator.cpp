@@ -38,14 +38,29 @@ float OilSimulator::MIN_BAD_PAINTED_REDUCTION_FRACTION = 0.45; // 0.45 - 0.3 - 0
 
 float OilSimulator::MAX_WELL_PAINTED_DESTRUCTION_FRACTION = 0.4; // 0.4 - 0.55 - 0.4
 
+OilSimulator::OilSimulator(const bool _useGpu,
+                           bool _useCanvasBuffer,
+                           bool _verbose) :
+    mUseGpu(_useGpu),
+    useCanvasBuffer(_useCanvasBuffer),
+    verbose(_verbose) {
+    nBadPaintedPixels = 0;
+    averageBrushSize = SMALLER_BRUSH_SIZE;
+    paintingIsFinised = true;
+    obtainNewTrace = false;
+    traceStep = 0;
+    nTraces = 0;
+}
+
 OilSimulator::OilSimulator(SkBitmap& dst, bool _useCanvasBuffer, bool _verbose) :
-        useCanvasBuffer(_useCanvasBuffer), verbose(_verbose), mDst(dst) {
-	nBadPaintedPixels = 0;
-	averageBrushSize = SMALLER_BRUSH_SIZE;
-	paintingIsFinised = true;
-	obtainNewTrace = false;
-	traceStep = 0;
-	nTraces = 0;
+        OilSimulator(false, _useCanvasBuffer, _verbose) {
+    mCpuDst = dst;
+}
+
+OilSimulator::OilSimulator(SkCanvas& dst, bool _useCanvasBuffer, bool _verbose) :
+        OilSimulator(true, _useCanvasBuffer, _verbose) {
+    mGpuDst = &dst;
+    mCanvas = std::shared_ptr<SkCanvas>(&dst, [](SkCanvas*){});
 }
 
 void OilSimulator::setImage(const SkBitmap& imagePixels, bool clearCanvas) {
@@ -59,7 +74,8 @@ void OilSimulator::setImage(const SkBitmap& imagePixels, bool clearCanvas) {
         const auto imgInfo = SkiaHelpers::getPremulRGBAInfo(imgWidth, imgHeight);
 
 		// Initialize the canvas where the image will be painted
-        mCanvas = std::make_shared<SkCanvas>(mDst);
+        if(mUseGpu) mCpuDst.allocPixels(imgInfo);
+        else mCanvas = std::make_shared<SkCanvas>(mCpuDst);
         mCanvas->clear(BACKGROUND_COLOR);
         mCanvasWidth = imgWidth;
         mCanvasHeight = imgHeight;
@@ -125,6 +141,12 @@ void OilSimulator::updatePixelArrays() {
 	// Update the visited pixels array
 	updateVisitedPixels();
 
+    if(mUseGpu) {
+        mGpuDst->flush();
+        const bool ret = mGpuDst->readPixels(mCpuDst, 0, 0);
+        if(!ret) RuntimeThrow("Could not read gpu canvas pixels");
+    }
+
 	// Update the painted pixels array
 	if (useCanvasBuffer) {
         const bool ret = mCanvasBuffer->readPixels(mPaintedPixels, 0, 0);
@@ -135,7 +157,7 @@ void OilSimulator::updatePixelArrays() {
     const auto imgPixels = static_cast<uchar*>(mImg.getAddr(0, 0));
     const auto paintedPixels = static_cast<uchar*>(useCanvasBuffer ?
                                                    mPaintedPixels.getAddr(0, 0) :
-                                                   mDst.getAddr(0, 0));
+                                                   mCpuDst.getAddr(0, 0));
 
     unsigned int imgNumChannels = 4;
     unsigned int canvasNumChannels = 4;
@@ -259,7 +281,7 @@ void OilSimulator::getNewTrace() {
 
 				// Calculate the trace average color and the bristle colors along the trajectory
                 trace.calculateAverageColor(mImg);
-                trace.calculateBristleColors(useCanvasBuffer ? mPaintedPixels : mDst,
+                trace.calculateBristleColors(useCanvasBuffer ? mPaintedPixels : mCpuDst,
                                              BACKGROUND_COLOR);
 
 				// Check if painting the trace will improve the painting
@@ -346,7 +368,7 @@ bool OilSimulator::validTrajectory() const {
                 const SkColor imgColor = mImg.getColor(x, y);
                 const SkColor paintedColor = useCanvasBuffer ?
                                      mPaintedPixels.getColor(x, y) :
-                                     mDst.getColor(x, y);
+                                     mCpuDst.getColor(x, y);
 
                 // Extract the pixel color properties
                 const int imgRed = SkColorGetR(imgColor);
