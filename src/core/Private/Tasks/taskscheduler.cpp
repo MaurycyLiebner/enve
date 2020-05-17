@@ -129,7 +129,8 @@ void TaskScheduler::callAllTasksFinishedFunc() const {
 
 bool TaskScheduler::shouldQueMoreCpuTasks() const {
     return !mCpuQueing && !overflowed() &&
-            availableCpuThreads() > 0;
+            availableCpuThreads() > 0 &&
+            (mAlwaysQue || GpuTaskExecutor::sUsageCount() == 0);
 }
 
 bool TaskScheduler::shouldQueMoreHddTasks() const {
