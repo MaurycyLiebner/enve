@@ -37,13 +37,13 @@ SculptPathCollection::SculptPathCollection() :
     });
 }
 
-void SculptPathCollection::prp_writeProperty(eWriteStream &dst) const {
-    SculptPathCollectionBase::prp_writeProperty(dst);
+void SculptPathCollection::prp_writeProperty_impl(eWriteStream &dst) const {
+    SculptPathCollectionBase::prp_writeProperty_impl(dst);
     dst.write(&mFillType, sizeof(SkPathFillType));
 }
 
-void SculptPathCollection::prp_readProperty(eReadStream &src) {
-    SculptPathCollectionBase::prp_readProperty(src);
+void SculptPathCollection::prp_readProperty_impl(eReadStream &src) {
+    SculptPathCollectionBase::prp_readProperty_impl(src);
     src.read(&mFillType, sizeof(SkPathFillType));
 }
 

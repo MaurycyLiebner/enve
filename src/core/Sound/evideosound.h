@@ -28,8 +28,8 @@ protected:
 public:
     QMimeData *SWT_createMimeData() { return nullptr; }
 
-    void prp_writeProperty(eWriteStream& dst) const;
-    void prp_readProperty(eReadStream& src);
+    void prp_writeProperty_impl(eWriteStream& dst) const;
+    void prp_readProperty_impl(eReadStream& src);
 
     int prp_getRelFrameShift() const { return 0; }
 protected:

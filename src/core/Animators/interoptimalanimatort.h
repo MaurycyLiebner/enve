@@ -33,8 +33,8 @@ public:
     void prp_cancelTransform() override;
     void prp_finishTransform() override;
 
-    void prp_writeProperty(eWriteStream &dst) const override;
-    void prp_readProperty(eReadStream& src) override;
+    void prp_writeProperty_impl(eWriteStream &dst) const override;
+    void prp_readProperty_impl(eReadStream& src) override;
 
     void prp_afterChangedAbsRange(const FrameRange &range,
                                   const bool clip) override;
@@ -193,7 +193,7 @@ void InterOptimalAnimatorT<T, K>::prp_finishTransform() {
 }
 
 template <typename T, typename K>
-void InterOptimalAnimatorT<T, K>::prp_readProperty(eReadStream& src) {
+void InterOptimalAnimatorT<T, K>::prp_readProperty_impl(eReadStream& src) {
     anim_readKeys(src);
     mBaseValue.read(src);
     if(src.evFileVersion() > 3) {
@@ -327,7 +327,7 @@ void InterOptimalAnimatorT<T, K>::writeValuesXEV(
 }
 
 template <typename T, typename K>
-void InterOptimalAnimatorT<T, K>::prp_writeProperty(eWriteStream &dst) const {
+void InterOptimalAnimatorT<T, K>::prp_writeProperty_impl(eWriteStream &dst) const {
     anim_writeKeys(dst);
     mBaseValue.write(dst);
     dst << prp_getName();

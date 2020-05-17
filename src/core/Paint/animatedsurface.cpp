@@ -62,14 +62,14 @@ void AnimatedSurface::setupOnionSkinFor(
     }
 }
 
-void AnimatedSurface::prp_readProperty(eReadStream& src) {
-    Animator::prp_readProperty(src);
+void AnimatedSurface::prp_readProperty_impl(eReadStream& src) {
+    Animator::prp_readProperty_impl(src);
     anim_readKeys(src);
     mBaseValue->read(src);
 }
 
-void AnimatedSurface::prp_writeProperty(eWriteStream& dst) const {
-    Animator::prp_writeProperty(dst);
+void AnimatedSurface::prp_writeProperty_impl(eWriteStream& dst) const {
+    Animator::prp_writeProperty_impl(dst);
     anim_writeKeys(dst);
     mBaseValue->write(dst);
 }

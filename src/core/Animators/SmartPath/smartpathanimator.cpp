@@ -91,7 +91,7 @@ void SmartPathAnimator::prp_drawCanvasControls(
     Property::prp_drawCanvasControls(canvas, mode, invScale, ctrlPressed);
 }
 
-void SmartPathAnimator::prp_readProperty(eReadStream& src) {
+void SmartPathAnimator::prp_readProperty_impl(eReadStream& src) {
     anim_readKeys(src);
     src >> baseValue();
     src.read(&mMode, sizeof(Mode));
@@ -102,7 +102,7 @@ void SmartPathAnimator::prp_readProperty(eReadStream& src) {
     prp_afterWholeInfluenceRangeChanged();
 }
 
-void SmartPathAnimator::prp_writeProperty(eWriteStream &dst) const {
+void SmartPathAnimator::prp_writeProperty_impl(eWriteStream &dst) const {
     anim_writeKeys(dst);
     dst << baseValue();
     dst.write(&mMode, sizeof(Mode));

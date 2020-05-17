@@ -44,13 +44,13 @@ SmartPathCollection::SmartPathCollection() :
     });
 }
 
-void SmartPathCollection::prp_writeProperty(eWriteStream &dst) const {
-    SmartPathCollectionBase::prp_writeProperty(dst);
+void SmartPathCollection::prp_writeProperty_impl(eWriteStream &dst) const {
+    SmartPathCollectionBase::prp_writeProperty_impl(dst);
     dst.write(&mFillType, sizeof(SkPathFillType));
 }
 
-void SmartPathCollection::prp_readProperty(eReadStream &src) {
-    SmartPathCollectionBase::prp_readProperty(src);
+void SmartPathCollection::prp_readProperty_impl(eReadStream &src) {
+    SmartPathCollectionBase::prp_readProperty_impl(src);
     src.read(&mFillType, sizeof(SkPathFillType));
 }
 

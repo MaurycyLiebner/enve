@@ -278,7 +278,7 @@ public:
         return duplicate;
     }
 
-    void prp_writeProperty(eWriteStream& dst) const override {
+    void prp_writeProperty_impl(eWriteStream& dst) const override {
         const auto& children = this->ca_getChildren();
         const int nProps = children.count();
         dst << nProps;
@@ -291,7 +291,7 @@ public:
         }
     }
 
-    void prp_readProperty(eReadStream& src) override {
+    void prp_readProperty_impl(eReadStream& src) override {
         int nProps;
         src >> nProps;
         for(int i = 0; i < nProps; i++) {

@@ -78,7 +78,7 @@ bool BoxTargetProperty::SWT_drop(const QMimeData * const data) {
     return true;
 }
 
-void BoxTargetProperty::prp_writeProperty(eWriteStream& dst) const {
+void BoxTargetProperty::prp_writeProperty_impl(eWriteStream& dst) const {
     int targetWriteId = -1;
     int targetDocumentId = -1;
 
@@ -91,7 +91,7 @@ void BoxTargetProperty::prp_writeProperty(eWriteStream& dst) const {
 }
 
 #include "simpletask.h"
-void BoxTargetProperty::prp_readProperty(eReadStream& src) {
+void BoxTargetProperty::prp_readProperty_impl(eReadStream& src) {
     int targetReadId;
     src >> targetReadId;
     int targetDocumentId;

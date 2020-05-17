@@ -36,20 +36,20 @@ PaintSettingsAnimator::PaintSettingsAnimator(const QString &name,
     mGradientTransform = enve::make_shared<AdvancedTransformAnimator>();
 }
 
-void PaintSettingsAnimator::prp_writeProperty(eWriteStream& dst) const {
-    mColor->prp_writeProperty(dst);
+void PaintSettingsAnimator::prp_writeProperty_impl(eWriteStream& dst) const {
+    mColor->prp_writeProperty_impl(dst);
     dst.write(&mPaintType, sizeof(PaintType));
     dst.write(&mGradientType, sizeof(GradientType));
     const int gradRWId = mGradient ? mGradient->getReadWriteId() : -1;
     const int gradDocId = mGradient ? mGradient->getDocumentId() : -1;
     dst << gradRWId;
     dst << gradDocId;
-    mGradientPoints->prp_writeProperty(dst);
-    mGradientTransform->prp_writeProperty(dst);
+    mGradientPoints->prp_writeProperty_impl(dst);
+    mGradientTransform->prp_writeProperty_impl(dst);
 }
 
-void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
-    mColor->prp_readProperty(src);
+void PaintSettingsAnimator::prp_readProperty_impl(eReadStream& src) {
+    mColor->prp_readProperty_impl(src);
     PaintType paintType;
     src.read(&paintType, sizeof(PaintType));
     src.read(&mGradientType, sizeof(GradientType));
@@ -66,9 +66,9 @@ void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
         setGradientVar(gradient);
     });
 
-    mGradientPoints->prp_readProperty(src);
+    mGradientPoints->prp_readProperty_impl(src);
     if(src.evFileVersion() > 7) {
-        mGradientTransform->prp_readProperty(src);
+        mGradientTransform->prp_readProperty_impl(src);
     }
     setPaintType(paintType);
 }

@@ -54,8 +54,8 @@ public:
             SkCanvas * const canvas, const CanvasMode mode,
             const float invScale, const bool ctrlPressed);
 
-    void prp_readProperty(eReadStream& src);
-    void prp_writeProperty(eWriteStream& dst) const;
+    void prp_readProperty_impl(eReadStream& src);
+    void prp_writeProperty_impl(eWriteStream& dst) const;
 
     SkPath getPathAtAbsFrame(const qreal frame)
     { return getPathAtRelFrame(prp_absFrameToRelFrameF(frame)); }

@@ -139,8 +139,8 @@ public:
         return enve::make_shared<ASKey>(this);
     }
 
-    void prp_readProperty(eReadStream& src);
-    void prp_writeProperty(eWriteStream& dst) const;
+    void prp_readProperty_impl(eReadStream& src);
+    void prp_writeProperty_impl(eWriteStream& dst) const;
 
     void prp_afterChangedAbsRange(const FrameRange &range, const bool clip);
 

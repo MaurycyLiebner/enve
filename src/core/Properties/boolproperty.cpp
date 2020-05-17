@@ -19,11 +19,11 @@
 BoolProperty::BoolProperty(const QString &name) :
     Property(name) {}
 
-void BoolProperty::prp_writeProperty(eWriteStream& dst) const {
+void BoolProperty::prp_writeProperty_impl(eWriteStream& dst) const {
     dst << mValue;
 }
 
-void BoolProperty::prp_readProperty(eReadStream& src) {
+void BoolProperty::prp_readProperty_impl(eReadStream& src) {
     src >> mValue;
 }
 

@@ -22,6 +22,7 @@ namespace EvFormat {
         dataCompression = 16,
         textSkFont = 17,
         oilEffectImprov = 18,
+        betterSWTAbsReadWrite = 19,
 
         nextVersion
     };

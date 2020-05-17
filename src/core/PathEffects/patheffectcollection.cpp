@@ -41,7 +41,7 @@ bool PathEffectCollection::hasEffects() {
 
 void PathEffectCollection::readPathEffect(eReadStream& src) {
     const auto pathEffect = readIdCreatePathEffect(src);
-    pathEffect->prp_readProperty(src);
+    pathEffect->prp_readProperty_impl(src);
     addChild(pathEffect);
 }
 

@@ -22,11 +22,11 @@ ComboBoxProperty::ComboBoxProperty(const QString &name,
     mValueNames = list;
 }
 
-void ComboBoxProperty::prp_writeProperty(eWriteStream& dst) const {
+void ComboBoxProperty::prp_writeProperty_impl(eWriteStream& dst) const {
     dst << mCurrentValue;
 }
 
-void ComboBoxProperty::prp_readProperty(eReadStream& src) {
+void ComboBoxProperty::prp_readProperty_impl(eReadStream& src) {
     src >> mCurrentValue;
 }
 

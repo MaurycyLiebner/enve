@@ -77,14 +77,14 @@ void BlendEffectCollection::detachedBlendSetup(
     }
 }
 
-void BlendEffectCollection::prp_writeProperty(eWriteStream &dst) const {
-    BlendEffectCollectionBase::prp_writeProperty(dst);
+void BlendEffectCollection::prp_writeProperty_impl(eWriteStream &dst) const {
+    BlendEffectCollectionBase::prp_writeProperty_impl(dst);
     dst << SWT_isVisible();
 }
 
-void BlendEffectCollection::prp_readProperty(eReadStream &src) {
+void BlendEffectCollection::prp_readProperty_impl(eReadStream &src) {
     if(src.evFileVersion() < 12) return;
-    BlendEffectCollectionBase::prp_readProperty(src);
+    BlendEffectCollectionBase::prp_readProperty_impl(src);
     bool visible; src >> visible;
     SWT_setVisible(visible);
 }

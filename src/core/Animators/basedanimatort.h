@@ -71,8 +71,8 @@ public:
 
     void anim_removeAllKeys() override;
 
-    void prp_writeProperty(eWriteStream& dst) const override;
-    void prp_readProperty(eReadStream& src) override;
+    void prp_writeProperty_impl(eWriteStream& dst) const override;
+    void prp_readProperty_impl(eReadStream& src) override;
 
     stdsptr<Key> anim_createKey() override;
 
@@ -195,13 +195,13 @@ void BasedAnimatorT<B, K, T>::anim_addKeyAtRelFrame(const int relFrame) {
 }
 
 template<typename B, typename K, typename T>
-void BasedAnimatorT<B, K, T>::prp_writeProperty(eWriteStream &dst) const {
+void BasedAnimatorT<B, K, T>::prp_writeProperty_impl(eWriteStream &dst) const {
     this->anim_writeKeys(dst);
     dst << mCurrentValue;
 }
 
 template<typename B, typename K, typename T>
-void BasedAnimatorT<B, K, T>::prp_readProperty(eReadStream &src) {
+void BasedAnimatorT<B, K, T>::prp_readProperty_impl(eReadStream &src) {
     this->anim_readKeys(src);
     src >> mCurrentValue;
     afterValueChanged();

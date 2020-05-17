@@ -161,7 +161,7 @@ protected:
         const auto writer = [&source](eWriteStream& writeStream) {
             writeStream << source.count();
             for(const auto& src : source)
-                src->prp_writeProperty(writeStream);
+                src->prp_writeProperty_impl(writeStream);
         };
         write(writer);
     }
@@ -170,7 +170,7 @@ public:
     bool paste(DynamicComplexAnimatorBase<T> * const target) {
         if(!compatibleTarget(target)) return false;
         const auto reader = [target](eReadStream& readStream) {
-            target->prp_readProperty(readStream);
+            target->prp_readProperty_impl(readStream);
         };
         read(reader);
         return true;

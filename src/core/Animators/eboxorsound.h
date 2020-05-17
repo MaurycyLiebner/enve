@@ -49,8 +49,8 @@ public:
     void prp_afterChangedAbsRange(const FrameRange &range,
                                   const bool clip = true);
 
-    void prp_writeProperty(eWriteStream& dst) const;
-    void prp_readProperty(eReadStream& src);
+    void prp_writeProperty_impl(eWriteStream& dst) const;
+    void prp_readProperty_impl(eReadStream& src);
 
     virtual void writeBoxOrSoundXEV(const std::shared_ptr<XevZipFileSaver>& xevFileSaver,
                                     const RuntimeIdToWriteId& objListIdConv,

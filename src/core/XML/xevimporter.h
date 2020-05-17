@@ -30,7 +30,7 @@ public:
                 const QString& path,
                 const QString& assetsPath = "");
 
-    const RuntimeIdToWriteId objListIdConv() const { return mObjectListIdConv; }
+    const RuntimeIdToWriteId& objListIdConv() const { return mObjectListIdConv; }
 
     XevImporter withAssetsPath(const QString& path) const;
 

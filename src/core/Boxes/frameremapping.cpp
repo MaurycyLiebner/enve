@@ -28,15 +28,15 @@ void FrameRemappingBase::setFrameCount(const int count) {
     setValueRange(0, count - 1);
 }
 
-void FrameRemappingBase::prp_readProperty(eReadStream &src) {
+void FrameRemappingBase::prp_readProperty_impl(eReadStream &src) {
     bool enabled; src >> enabled;
     setEnabled(enabled);
-    QrealAnimator::prp_readProperty(src);
+    QrealAnimator::prp_readProperty_impl(src);
 }
 
-void FrameRemappingBase::prp_writeProperty(eWriteStream &dst) const {
+void FrameRemappingBase::prp_writeProperty_impl(eWriteStream &dst) const {
     dst << mEnabled;
-    QrealAnimator::prp_writeProperty(dst);
+    QrealAnimator::prp_writeProperty_impl(dst);
 }
 
 QDomElement FrameRemappingBase::prp_writePropertyXEV_impl(const XevExporter& exp) const {

@@ -65,13 +65,13 @@ QJSValue ColorAnimator::prp_getEffectiveJSValue(QJSEngine& e, const qreal relFra
     return toArray(e, getColor(relFrame));
 }
 
-void ColorAnimator::prp_writeProperty(eWriteStream& dst) const {
-    StaticComplexAnimator::prp_writeProperty(dst);
+void ColorAnimator::prp_writeProperty_impl(eWriteStream& dst) const {
+    StaticComplexAnimator::prp_writeProperty_impl(dst);
     dst.write(&mColorMode, sizeof(ColorMode));
 }
 
-void ColorAnimator::prp_readProperty(eReadStream& src) {
-    StaticComplexAnimator::prp_readProperty(src);
+void ColorAnimator::prp_readProperty_impl(eReadStream& src) {
+    StaticComplexAnimator::prp_readProperty_impl(src);
     src.read(&mColorMode, sizeof(ColorMode));
     setColorMode(mColorMode);
 }

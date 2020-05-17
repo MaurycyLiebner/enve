@@ -349,10 +349,7 @@ void TimelineWidget::setGraphEnabled(const bool enabled) {
 
 void TimelineWidget::writeState(eWriteStream &dst) const {
     const int id = mBoxesListWidget->getId();
-    for(const auto& scene : mDocument.fScenes) {
-        const auto abs = scene->SWT_getAbstractionForWidget(id);
-        abs->writeAll(dst);
-    }
+    dst.objListIdConv().assign(id);
 
     if(mCurrentScene) {
         dst << mCurrentScene->getWriteId();
@@ -377,12 +374,7 @@ void TimelineWidget::writeState(eWriteStream &dst) const {
 
 void TimelineWidget::readState(eReadStream &src) {
     const int id = mBoxesListWidget->getId();
-    BoundingBox::sForEveryReadBox([id, &src](BoundingBox* const box) {
-        if(const auto scene = enve_cast<Canvas*>(box)) {
-            const auto abs = scene->SWT_getAbstractionForWidget(id);
-            if(abs) abs->readAll(src);
-        }
-    });
+    src.objListIdConv().assign(id);
 
     int sceneReadId; src >> sceneReadId;
     int sceneDocumentId; src >> sceneDocumentId;
@@ -406,13 +398,15 @@ void TimelineWidget::readState(eReadStream &src) {
         setTarget(target);
     }
 
-    BoundingBox* sceneBox = nullptr;;
-    if(sceneReadId != -1)
-        sceneBox = BoundingBox::sGetBoxByReadId(sceneReadId);
-    if(!sceneBox && sceneDocumentId != -1)
-        sceneBox = BoundingBox::sGetBoxByDocumentId(sceneDocumentId);
+    SimpleTask::sScheduleContexted(this, [this, sceneReadId, sceneDocumentId]() {
+        BoundingBox* sceneBox = nullptr;;
+        if(sceneReadId != -1)
+            sceneBox = BoundingBox::sGetBoxByReadId(sceneReadId);
+        if(!sceneBox && sceneDocumentId != -1)
+            sceneBox = BoundingBox::sGetBoxByDocumentId(sceneDocumentId);
 
-    setCurrentScene(enve_cast<Canvas*>(sceneBox));
+        setCurrentScene(enve_cast<Canvas*>(sceneBox));
+    });
 
     mSearchLine->setText(search);
 

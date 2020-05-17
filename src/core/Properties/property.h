@@ -75,12 +75,9 @@ protected:
     virtual void prp_updateCanvasProps();
     virtual QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const = 0;
     virtual void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) = 0;
+    virtual void prp_readProperty_impl(eReadStream& src) { Q_UNUSED(src) }
+    virtual void prp_writeProperty_impl(eWriteStream& dst) const { Q_UNUSED(dst) }
 public:
-    virtual void prp_readProperty(eReadStream& src)
-    { Q_UNUSED(src) }
-    virtual void prp_writeProperty(eWriteStream& dst) const
-    { Q_UNUSED(dst) }
-
     virtual QJSValue prp_getBaseJSValue(QJSEngine& e) const {
         Q_UNUSED(e)
         return QJSValue::NullValue;
@@ -157,6 +154,9 @@ public:
     virtual bool prp_dependsOn(const Property* const prop) const
     { return prop == this; }
 public:
+    void prp_readProperty(eReadStream& src);
+    void prp_writeProperty(eWriteStream& dst) const;
+
     QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
     void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);
     QDomElement prp_writeNamedPropertyXEV(

@@ -57,6 +57,7 @@
 #include "GUI/timelinedockwidget.h"
 #include "GUI/RenderWidgets/renderwidget.h"
 #include "GUI/BoxesList/boxscrollwidget.h"
+#include "ReadWrite/evformat.h"
 #include "XML/runtimewriteid.h"
 
 void MainWindow::loadEVFile(const QString &path) {
@@ -76,11 +77,15 @@ void MainWindow::loadEVFile(const QString &path) {
         readStream.readFutureTable();
         file.seek(savedPos);
         readStream.readCheckpoint("File beginning pos mismatch");
-        mDocument.read(readStream);
+        if(evVersion >= EvFormat::betterSWTAbsReadWrite) {
+            int nScenes; readStream >> nScenes;
+            for(int i = 0; i < nScenes; i++) mDocument.createNewScene();
+            mLayoutHandler->read(readStream);
+            readStream.readCheckpoint("Error reading Layout");
+        }
+        mDocument.readScenes(readStream);
         readStream.readCheckpoint("Error reading Document");
-        mLayoutHandler->read(readStream);
-        readStream.readCheckpoint("Error reading Layout");
-        if(readStream.evFileVersion() > 4) {
+        if(evVersion >= EvFormat::betterSWTAbsReadWrite) {
             const auto renderWidget = mTimeline->getRenderWidget();
             renderWidget->read(readStream);
             readStream.readCheckpoint("Error reading Render Widget");
@@ -105,10 +110,10 @@ void MainWindow::saveToFile(const QString &path) {
 
     try {
         writeStream.writeCheckpoint();
-        mDocument.write(writeStream);
-
-        writeStream.writeCheckpoint();
+        writeStream << mDocument.fScenes.count();
         mLayoutHandler->write(writeStream);
+        writeStream.writeCheckpoint();
+        mDocument.writeScenes(writeStream);
         writeStream.writeCheckpoint();
         const auto renderWidget = mTimeline->getRenderWidget();
         renderWidget->write(writeStream);

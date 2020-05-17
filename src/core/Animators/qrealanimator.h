@@ -86,8 +86,8 @@ public:
 
     qreal graph_clampGraphValue(const qreal value);
 
-    void prp_writeProperty(eWriteStream& dst) const;
-    void prp_readProperty(eReadStream& src);
+    void prp_writeProperty_impl(eWriteStream& dst) const;
+    void prp_readProperty_impl(eReadStream& src);
     stdsptr<Key> anim_createKey();
 protected:
     void graph_getValueConstraints(GraphKey *key, const QrealPointType type,

@@ -67,7 +67,7 @@ void QrealAnimator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     Animator::prp_setupTreeViewMenu(menu);
 }
 
-void QrealAnimator::prp_writeProperty(eWriteStream& dst) const {
+void QrealAnimator::prp_writeProperty_impl(eWriteStream& dst) const {
     anim_writeKeys(dst);
     dst << mCurrentBaseValue;
     dst << !!mExpression;
@@ -82,7 +82,7 @@ stdsptr<Key> QrealAnimator::anim_createKey() {
     return enve::make_shared<QrealKey>(this);
 }
 
-void QrealAnimator::prp_readProperty(eReadStream& src) {
+void QrealAnimator::prp_readProperty_impl(eReadStream& src) {
     anim_readKeys(src);
 
     qreal val; src >> val;

@@ -31,8 +31,8 @@ public:
 
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
-    void prp_writeProperty(eWriteStream& dst) const;
-    void prp_readProperty(eReadStream& src);
+    void prp_writeProperty_impl(eWriteStream& dst) const;
+    void prp_readProperty_impl(eReadStream& src);
 protected:
     void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
     QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;

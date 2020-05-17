@@ -4,6 +4,7 @@
 #include <QFile>
 
 #include "efuturepos.h"
+#include "../XML/runtimewriteid.h"
 
 class SimpleBrushWrapper;
 struct iValueRange;
@@ -41,6 +42,8 @@ public:
     };
 
     eWriteStream(QIODevice* const dst);
+
+    RuntimeIdToWriteId& objListIdConv() { return mObjectListIdConv; }
 
     void writeFutureTable();
 
@@ -82,5 +85,7 @@ public:
 private:
     QIODevice* const mDst;
     eWriteFutureTable mFutureTable;
+    RuntimeIdToWriteId mObjectListIdConv;
 };
+
 #endif // EWRITESTREAM_H

@@ -45,8 +45,8 @@ protected:
 public:
     void prp_setupTreeViewMenu(PropertyMenu * const menu) override;
 
-    void prp_writeProperty(eWriteStream& dst) const override;
-    void prp_readProperty(eReadStream& src) override;
+    void prp_writeProperty_impl(eWriteStream& dst) const override;
+    void prp_readProperty_impl(eReadStream& src) override;
 
     QString prp_tagNameXEV() const override { return "CustomProperties"; }
 

@@ -18,10 +18,10 @@ BlendEffect::BlendEffect(const QString& name,
     ca_addChild(mClipPath);
 }
 
-void BlendEffect::prp_readProperty(eReadStream& src) {
+void BlendEffect::prp_readProperty_impl(eReadStream& src) {
     if(src.evFileVersion() < 13) {
-        StaticComplexAnimator::prp_readProperty(src);
-    } else eEffect::prp_readProperty(src);
+        StaticComplexAnimator::prp_readProperty_impl(src);
+    } else eEffect::prp_readProperty_impl(src);
 }
 
 void BlendEffect::writeIdentifier(eWriteStream& dst) const {

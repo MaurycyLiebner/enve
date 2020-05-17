@@ -23,6 +23,7 @@
 
 #include "swt_abstraction.h"
 #include "swt_rulescollection.h"
+#include "ReadWrite/basicreadwrite.h"
 #include "XML/xevexporter.h"
 #include "XML/xevimporter.h"
 
@@ -165,8 +166,10 @@ public:
     { return SWT_mDisabled || SWT_mAncestorDisabled; }
 
     void SWT_setAncestorDisabled(const bool disabled);
-
 protected:
+    void SWT_writeAbstraction(eWriteStream& dst) const;
+    void SWT_readAbstraction(eReadStream& src) const;
+
     void SWT_writeAbstractionXEV(QDomElement& ele, const XevExporter& exp) const;
     void SWT_readAbstractionXEV(const QDomElement& ele, const XevImporter& imp) const;
 signals:

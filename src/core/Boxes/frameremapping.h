@@ -35,8 +35,8 @@ public:
 
     void setFrameCount(const int count);
 
-    void prp_readProperty(eReadStream &src) override;
-    void prp_writeProperty(eWriteStream &dst) const override;
+    void prp_readProperty_impl(eReadStream &src) override;
+    void prp_writeProperty_impl(eWriteStream &dst) const override;
 signals:
     void enabledChanged(const bool enabled);
 private:

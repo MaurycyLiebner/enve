@@ -28,8 +28,8 @@ protected:
     QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
     void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
 public:
-    void prp_writeProperty(eWriteStream& dst) const;
-    void prp_readProperty(eReadStream& src);
+    void prp_writeProperty_impl(eWriteStream& dst) const;
+    void prp_readProperty_impl(eReadStream& src);
 
     void setValue(const bool value);
     bool getValue();

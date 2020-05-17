@@ -3,6 +3,7 @@
 
 #include "../core_global.h"
 #include "efuturepos.h"
+#include "../XML/runtimewriteid.h"
 
 #include <QIODevice>
 
@@ -33,6 +34,8 @@ class CORE_EXPORT eReadStream {
 public:
     eReadStream(const int evFileVersion, QIODevice* const src);
     eReadStream(QIODevice* const src);
+
+    RuntimeIdToWriteId& objListIdConv() { return mObjectListIdConv; }
 
     void readFutureTable();
 
@@ -73,6 +76,7 @@ private:
     const int mEvFileVersion;
     QIODevice* const mSrc;
     eReadFutureTable mFutureTable;
+    RuntimeIdToWriteId mObjectListIdConv;
 };
 
 #endif // EREADSTREAM_H

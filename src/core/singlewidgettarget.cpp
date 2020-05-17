@@ -108,12 +108,46 @@ void SingleWidgetTarget::SWT_setAncestorDisabled(const bool disabled) {
     emit SWT_changedDisabled(SWT_isDisabled());
 }
 
+void SingleWidgetTarget::SWT_writeAbstraction(eWriteStream& dst) const {
+    QVector<int> absOpen;
+    absOpen.reserve(SWT_mAllAbstractions.size());
+    const auto& objListIdConv = dst.objListIdConv();
+    for(const auto& abs : SWT_mAllAbstractions) {
+        const int writeId = objListIdConv.runtimeIdToWriteId(abs.first);
+        if(writeId == -1) continue;
+        const bool vis = abs.second->contentVisible();
+        if(vis) absOpen << writeId;
+    }
+    dst << absOpen.count();
+    for(const int& open : absOpen) dst << open;
+}
+
+void SingleWidgetTarget::SWT_readAbstraction(eReadStream& src) const {
+    int count; src >> count;
+    if(count <= 0) return;
+    QVector<int> absOpen;
+    absOpen.reserve(count);
+    for(int i = 0; i < count; i++) {
+        int id; src >> id;
+        absOpen << id;
+    }
+
+    const auto& objListIdConv = src.objListIdConv();
+    for(const auto& abs : SWT_mAllAbstractions) {
+        const int writeId = objListIdConv.runtimeIdToWriteId(abs.first);
+        if(writeId == -1) continue;
+        const bool contVisible = absOpen.contains(writeId);
+        if(contVisible) abs.second->setContentVisible(true);
+    }
+}
+
 void SingleWidgetTarget::SWT_writeAbstractionXEV(
         QDomElement& ele, const XevExporter& exp) const {
     QString absOpen;
     const auto& objListIdConv = exp.objListIdConv();
     for(const auto& abs : SWT_mAllAbstractions) {
         const int writeId = objListIdConv.runtimeIdToWriteId(abs.first);
+        if(writeId == -1) continue;
         const bool vis = abs.second->contentVisible();
         if(vis) {
             if(!absOpen.isEmpty()) absOpen += ' ';
@@ -136,6 +170,7 @@ void SingleWidgetTarget::SWT_readAbstractionXEV(
     const auto& objListIdConv = imp.objListIdConv();
     for(const auto& abs : SWT_mAllAbstractions) {
         const int writeId = objListIdConv.runtimeIdToWriteId(abs.first);
+        if(writeId == -1) continue;
         const bool contVisible = open.contains(writeId);
         if(contVisible) abs.second->setContentVisible(true);
     }

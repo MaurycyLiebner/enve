@@ -58,14 +58,14 @@ void CustomProperties::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     CustomPropertiesBase::prp_setupTreeViewMenu(menu);
 }
 
-void CustomProperties::prp_writeProperty(eWriteStream &dst) const {
-    CustomPropertiesBase::prp_writeProperty(dst);
+void CustomProperties::prp_writeProperty_impl(eWriteStream &dst) const {
+    CustomPropertiesBase::prp_writeProperty_impl(dst);
     dst << SWT_isVisible();
 }
 
-void CustomProperties::prp_readProperty(eReadStream &src) {
+void CustomProperties::prp_readProperty_impl(eReadStream &src) {
     if(src.evFileVersion() < 11) return;
-    CustomPropertiesBase::prp_readProperty(src);
+    CustomPropertiesBase::prp_readProperty_impl(src);
     bool visible; src >> visible;
     SWT_setVisible(visible);
 }

@@ -20,6 +20,7 @@
 #include "Animators/transformanimator.h"
 #include "typemenu.h"
 #include "Private/document.h"
+#include "ReadWrite/evformat.h"
 #include "canvas.h"
 
 Property::Property(const QString& name) :
@@ -66,6 +67,17 @@ void Property::prp_afterChangedAbsRange(const FrameRange &range,
                                         const bool clip) {
     prp_afterChangedCurrent(UpdateReason::userChange);
     emit prp_absFrameRangeChanged(range, clip);
+}
+
+void Property::prp_readProperty(eReadStream& src) {
+    prp_readProperty_impl(src);
+    if(src.evFileVersion() >= EvFormat::betterSWTAbsReadWrite)
+        SWT_readAbstraction(src);
+}
+
+void Property::prp_writeProperty(eWriteStream& dst) const {
+    prp_writeProperty_impl(dst);
+    SWT_writeAbstraction(dst);
 }
 
 QDomElement Property::prp_writePropertyXEV(const XevExporter& exp) const {

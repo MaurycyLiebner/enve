@@ -26,9 +26,9 @@ public:
 
     QMimeData *SWT_createMimeData() { return nullptr; }
 
-    void prp_writeProperty(eWriteStream& dst) const
+    void prp_writeProperty_impl(eWriteStream& dst) const
     { Q_UNUSED(dst) Q_ASSERT(false); }
-    void prp_readProperty(eReadStream& src)
+    void prp_readProperty_impl(eReadStream& src)
     { Q_UNUSED(src) Q_ASSERT(false); }
 
     qsptr<BlendEffectBoxShadow> createLink() const;

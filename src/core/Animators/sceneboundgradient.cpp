@@ -39,11 +39,11 @@ void SceneBoundGradient::prp_setInheritedFrameShift(
 void SceneBoundGradient::write(const int id, eWriteStream& dst) {
     mReadWriteId = id;
     dst << id;
-    prp_writeProperty(dst);
+    prp_writeProperty_impl(dst);
 }
 
 int SceneBoundGradient::read(eReadStream& src) {
     src >> mReadWriteId;
-    prp_readProperty(src);
+    prp_readProperty_impl(src);
     return mReadWriteId;
 }

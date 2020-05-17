@@ -21,13 +21,13 @@ eEffect::eEffect(const QString &name) :
     ca_setDisabledWhenEmpty(false);
 }
 
-void eEffect::prp_writeProperty(eWriteStream& dst) const {
-    StaticComplexAnimator::prp_writeProperty(dst);
+void eEffect::prp_writeProperty_impl(eWriteStream& dst) const {
+    StaticComplexAnimator::prp_writeProperty_impl(dst);
     dst << mVisible;
 }
 
-void eEffect::prp_readProperty(eReadStream& src) {
-    StaticComplexAnimator::prp_readProperty(src);
+void eEffect::prp_readProperty_impl(eReadStream& src) {
+    StaticComplexAnimator::prp_readProperty_impl(src);
     bool visible; src >> visible;
     setVisible(visible);
 }

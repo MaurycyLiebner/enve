@@ -24,12 +24,12 @@ Gradient::Gradient() : DynamicComplexAnimator<ColorAnimator>("gradient") {
             this, &Gradient::updateQGradientStops);
 }
 
-void Gradient::prp_writeProperty(eWriteStream &dst) const {
-    DynamicComplexAnimator<ColorAnimator>::prp_writeProperty(dst);
+void Gradient::prp_writeProperty_impl(eWriteStream &dst) const {
+    DynamicComplexAnimator<ColorAnimator>::prp_writeProperty_impl(dst);
 }
 
-void Gradient::prp_readProperty(eReadStream &src) {
-    DynamicComplexAnimator<ColorAnimator>::prp_readProperty(src);
+void Gradient::prp_readProperty_impl(eReadStream &src) {
+    DynamicComplexAnimator<ColorAnimator>::prp_readProperty_impl(src);
 }
 
 QColor Gradient::getLastQGradientStopQColor() {

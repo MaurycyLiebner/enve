@@ -30,8 +30,8 @@ protected:
 public:
     void showHideChildrenBeforeChaningPaintType(const PaintType newPaintType);
 
-    void prp_writeProperty(eWriteStream& dst) const;
-    void prp_readProperty(eReadStream& src);
+    void prp_writeProperty_impl(eWriteStream& dst) const;
+    void prp_readProperty_impl(eReadStream& src);
 
     void setPaintType(const PaintType paintType);
 

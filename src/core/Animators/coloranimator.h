@@ -35,8 +35,8 @@ public:
     QJSValue prp_getEffectiveJSValue(QJSEngine& e) const;
     QJSValue prp_getEffectiveJSValue(QJSEngine& e, const qreal relFrame) const;
 
-    void prp_writeProperty(eWriteStream& dst) const;
-    void prp_readProperty(eReadStream& src);
+    void prp_writeProperty_impl(eWriteStream& dst) const;
+    void prp_readProperty_impl(eReadStream& src);
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     QColor getBaseColor() const;

@@ -233,10 +233,10 @@ void PathBox::duplicateFillSettingsFrom(
         QBuffer buffer;
         buffer.open(QIODevice::ReadWrite);
         eWriteStream writeStream(&buffer);
-        fillSettings->prp_writeProperty(writeStream);
+        fillSettings->prp_writeProperty_impl(writeStream);
         if(buffer.reset()) {
             eReadStream readStream(&buffer);
-            mFillSettings->prp_readProperty(readStream);
+            mFillSettings->prp_readProperty_impl(readStream);
         }
         buffer.close();
     }
@@ -250,10 +250,10 @@ void PathBox::duplicateStrokeSettingsFrom(
         QBuffer buffer;
         buffer.open(QIODevice::ReadWrite);
         eWriteStream writeStream(&buffer);
-        strokeSettings->prp_writeProperty(writeStream);
+        strokeSettings->prp_writeProperty_impl(writeStream);
         if(buffer.reset()) {
             eReadStream readStream(&buffer);
-            mStrokeSettings->prp_readProperty(readStream);
+            mStrokeSettings->prp_readProperty_impl(readStream);
         }
         buffer.close();
     }

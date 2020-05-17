@@ -110,8 +110,8 @@ void eBoxOrSound::prp_afterChangedAbsRange(const FrameRange &range,
     StaticComplexAnimator::prp_afterChangedAbsRange(croppedRange);
 }
 
-void eBoxOrSound::prp_writeProperty(eWriteStream& dst) const {
-    StaticComplexAnimator::prp_writeProperty(dst);
+void eBoxOrSound::prp_writeProperty_impl(eWriteStream& dst) const {
+    StaticComplexAnimator::prp_writeProperty_impl(dst);
     dst << mVisible;
     dst << mLocked;
 
@@ -122,8 +122,8 @@ void eBoxOrSound::prp_writeProperty(eWriteStream& dst) const {
     dst << prp_getName();
 }
 
-void eBoxOrSound::prp_readProperty(eReadStream& src) {
-    StaticComplexAnimator::prp_readProperty(src);
+void eBoxOrSound::prp_readProperty_impl(eReadStream& src) {
+    StaticComplexAnimator::prp_readProperty_impl(src);
     src >> mVisible;
     src >> mLocked;
 

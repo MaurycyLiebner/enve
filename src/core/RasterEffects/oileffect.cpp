@@ -36,14 +36,14 @@ OilEffect::OilEffect() :
     ca_addChild(mMaxStrokes);
 }
 
-void OilEffect::prp_readProperty(eReadStream &src) {
+void OilEffect::prp_readProperty_impl(eReadStream &src) {
     if(src.evFileVersion() < EvFormat::oilEffectImprov) {
-        mBrushSize->prp_readProperty(src);
-        mAccuracy->prp_readProperty(src);
+        mBrushSize->prp_readProperty_impl(src);
+        mAccuracy->prp_readProperty_impl(src);
 
         bool visible; src >> visible;
         setVisible(visible);
-    } else RasterEffect::prp_readProperty(src);
+    } else RasterEffect::prp_readProperty_impl(src);
 }
 
 QMargins OilEffect::getMargin() const {

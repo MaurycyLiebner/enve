@@ -21,13 +21,13 @@
 eVideoSound::eVideoSound(const qsptr<FixedLenAnimationRect> &durRect) :
     eSoundObjectBase(durRect) {}
 
-void eVideoSound::prp_writeProperty(eWriteStream& dst) const {
-    StaticComplexAnimator::prp_writeProperty(dst);
+void eVideoSound::prp_writeProperty_impl(eWriteStream& dst) const {
+    StaticComplexAnimator::prp_writeProperty_impl(dst);
     dst << isVisible();
 }
 
-void eVideoSound::prp_readProperty(eReadStream& src) {
-    StaticComplexAnimator::prp_readProperty(src);
+void eVideoSound::prp_readProperty_impl(eReadStream& src) {
+    StaticComplexAnimator::prp_readProperty_impl(src);
     bool visible; src >> visible;
     setVisible(visible);
 }

@@ -156,36 +156,6 @@ void SWT_Abstraction::removeAlongWithAllChildren_k() {
     if(mTarget_k) mTarget_k->SWT_removeAbstractionForWidget(mVisiblePartWidgetId);
 }
 
-void SWT_Abstraction::read(eReadStream &src) {
-    src >> mContentVisible;
-}
-
-void SWT_Abstraction::write(eWriteStream &dst) const {
-    dst << mContentVisible;
-}
-
-void SWT_Abstraction::readAll(eReadStream &src) {
-    if(src.evFileVersion() < 11 &&
-       enve_cast<CustomProperties*>(mTarget_k)) {
-        return;
-    }
-    if(src.evFileVersion() < 12 &&
-       enve_cast<BlendEffectCollection*>(mTarget_k)) {
-        return;
-    }
-    if(src.evFileVersion() < 14 &&
-       enve_cast<BlendEffectBoxShadow*>(mTarget_k)) {
-        return;
-    }
-    for(const auto& child : mChildren) child->readAll(src);
-    read(src);
-}
-
-void SWT_Abstraction::writeAll(eWriteStream &dst) const {
-    for(const auto& child : mChildren) child->writeAll(dst);
-    write(dst);
-}
-
 void SWT_Abstraction::setParent(SWT_Abstraction * const parent) {
     mParent = parent;
 }

@@ -328,13 +328,16 @@ void CanvasWindow::readState(eReadStream &src) {
     int sceneReadId; src >> sceneReadId;
     int sceneDocumentId; src >> sceneDocumentId;
 
-    BoundingBox* sceneBox = nullptr;
-    if(sceneReadId != -1)
-        sceneBox = BoundingBox::sGetBoxByReadId(sceneReadId);
-    if(!sceneBox && sceneDocumentId != -1)
-        sceneBox = BoundingBox::sGetBoxByDocumentId(sceneDocumentId);
+    SimpleTask::sScheduleContexted(this, [this, sceneReadId, sceneDocumentId]() {
+        BoundingBox* sceneBox = nullptr;
+        if(sceneReadId != -1)
+            sceneBox = BoundingBox::sGetBoxByReadId(sceneReadId);
+        if(!sceneBox && sceneDocumentId != -1)
+            sceneBox = BoundingBox::sGetBoxByDocumentId(sceneDocumentId);
 
-    setCurrentCanvas(enve_cast<Canvas*>(sceneBox));
+        setCurrentCanvas(enve_cast<Canvas*>(sceneBox));
+    });
+
     src >> mViewTransform;
     mFitToSizeBlocked = true;
 }

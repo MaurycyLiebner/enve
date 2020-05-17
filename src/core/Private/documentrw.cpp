@@ -18,6 +18,7 @@
 
 #include "ReadWrite/basicreadwrite.h"
 #include "ReadWrite/xevformat.h"
+#include "ReadWrite/evformat.h"
 #include "XML/xmlexporthelpers.h"
 #include "Animators/gradient.h"
 #include "Paint/brushescontext.h"
@@ -36,25 +37,16 @@ void Document::writeBookmarked(eWriteStream &dst) const {
     }
 }
 
-void Document::writeScenes(eWriteStream &dst) const {
+void Document::writeScenes(eWriteStream& dst) const {
+    writeBookmarked(dst);
+    dst.writeCheckpoint();
+
     const int nScenes = fScenes.count();
     dst.write(&nScenes, sizeof(int));
     for(const auto &scene : fScenes) {
         scene->writeBoundingBox(dst);
         dst.writeCheckpoint();
     }
-}
-
-void Document::write(eWriteStream& dst) const {
-    writeBookmarked(dst);
-    dst.writeCheckpoint();
-    writeScenes(dst);
-
-//        if(canvas.get() == mCurrentCanvas) {
-//            currentCanvasId = mCurrentCanvas->getWriteId();
-//        }
-//    }
-//    target->write(rcConstChar(&currentCanvasId), sizeof(int));
 }
 
 void Document::readBookmarked(eReadStream &src) {
@@ -79,17 +71,6 @@ void Document::readGradients(eReadStream& src) {
 }
 
 void Document::readScenes(eReadStream& src) {
-    int nScenes;
-    src.read(&nScenes, sizeof(int));
-    for(int i = 0; i < nScenes; i++) {
-        const auto scene = createNewScene();
-        const auto block = scene->blockUndoRedo();
-        scene->readBoundingBox(src);
-        src.readCheckpoint("Error reading scene");
-    }
-}
-
-void Document::read(eReadStream& src) {
     if(src.evFileVersion() > 1) {
         readBookmarked(src);
         src.readCheckpoint("Error reading bookmarks");
@@ -98,7 +79,21 @@ void Document::read(eReadStream& src) {
         readGradients(src);
         src.readCheckpoint("Error reading gradients");
     }
-    readScenes(src);
+
+    int nScenes;
+    src.read(&nScenes, sizeof(int));
+    for(int i = 0; i < nScenes; i++) {
+        Canvas* scene;
+        if(src.evFileVersion() < EvFormat::betterSWTAbsReadWrite) {
+            scene = createNewScene();
+        } else {
+            scene = fScenes.at(fScenes.count() - i - 1).get();
+        }
+        const auto block = scene->blockUndoRedo();
+        scene->readBoundingBox(src);
+        src.readCheckpoint("Error reading scene");
+    }
+
     SimpleTask::sProcessAll();
 }
 

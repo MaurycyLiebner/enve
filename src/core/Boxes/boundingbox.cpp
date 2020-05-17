@@ -93,13 +93,13 @@ BoundingBox::~BoundingBox() {
 
 void BoundingBox::writeBoundingBox(eWriteStream& dst) const {
     if(mWriteId < 0) assignWriteId();
-    eBoxOrSound::prp_writeProperty(dst);
+    eBoxOrSound::prp_writeProperty_impl(dst);
     dst << mWriteId;
     dst.write(&mBlendMode, sizeof(SkBlendMode));
 }
 
 void BoundingBox::readBoundingBox(eReadStream& src) {
-    eBoxOrSound::prp_readProperty(src);
+    eBoxOrSound::prp_readProperty_impl(src);
     if(src.evFileVersion() < 10) {
         QString name; src >> name;
         prp_setName(name);

@@ -11,13 +11,13 @@ class NamedProperty : public T {
 protected:
     using T::T;
 public:
-    void prp_readProperty(eReadStream& src) override {
-        T::prp_readProperty(src);
+    void prp_readProperty_impl(eReadStream& src) override {
+        T::prp_readProperty_impl(src);
         QString name; src >> name;
         this->prp_setName(name);
     }
-    void prp_writeProperty(eWriteStream& dst) const override {
-        T::prp_writeProperty(dst);
+    void prp_writeProperty_impl(eWriteStream& dst) const override {
+        T::prp_writeProperty_impl(dst);
         dst << this->prp_getName();
     }
 

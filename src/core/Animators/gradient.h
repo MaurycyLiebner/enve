@@ -28,8 +28,8 @@ class CORE_EXPORT Gradient : public DynamicComplexAnimator<ColorAnimator> {
 protected:
     Gradient();
 public:
-    void prp_writeProperty(eWriteStream &dst) const;
-    void prp_readProperty(eReadStream &src);
+    void prp_writeProperty_impl(eWriteStream &dst) const;
+    void prp_readProperty_impl(eReadStream &src);
 
     virtual int getReadWriteId() const { return -1; }
     virtual int getDocumentId() const { return -1; }

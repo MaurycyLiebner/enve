@@ -49,15 +49,15 @@ void BoolPropertyContainer::setValue(const bool value) {
 }
 
 
-void BoolPropertyContainer::prp_writeProperty(eWriteStream& dst) const {
+void BoolPropertyContainer::prp_writeProperty_impl(eWriteStream& dst) const {
     dst << mValue;
-    StaticComplexAnimator::prp_writeProperty(dst);
+    StaticComplexAnimator::prp_writeProperty_impl(dst);
 }
 
-void BoolPropertyContainer::prp_readProperty(eReadStream& src) {
+void BoolPropertyContainer::prp_readProperty_impl(eReadStream& src) {
     bool value; src >> value;
     setValue(value);
-    StaticComplexAnimator::prp_readProperty(src);
+    StaticComplexAnimator::prp_readProperty_impl(src);
 }
 
 QDomElement BoolPropertyContainer::prp_writePropertyXEV_impl(

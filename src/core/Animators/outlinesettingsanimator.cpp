@@ -24,19 +24,19 @@ OutlineSettingsAnimator::OutlineSettingsAnimator(BoundingBox * const parent) :
     ca_addChild(mLineWidth);
 }
 
-void OutlineSettingsAnimator::prp_writeProperty(eWriteStream& dst) const {
-    PaintSettingsAnimator::prp_writeProperty(dst);
-    mLineWidth->prp_writeProperty(dst);
-    mBrushSettings->prp_writeProperty(dst);
+void OutlineSettingsAnimator::prp_writeProperty_impl(eWriteStream& dst) const {
+    PaintSettingsAnimator::prp_writeProperty_impl(dst);
+    mLineWidth->prp_writeProperty_impl(dst);
+    mBrushSettings->prp_writeProperty_impl(dst);
     dst.write(&mCapStyle, sizeof(SkPaint::Cap));
     dst.write(&mJoinStyle, sizeof(SkPaint::Join));
     dst.write(&mOutlineCompositionMode, sizeof(QPainter::CompositionMode));
 }
 
-void OutlineSettingsAnimator::prp_readProperty(eReadStream& src) {
-    PaintSettingsAnimator::prp_readProperty(src);
-    mLineWidth->prp_readProperty(src);
-    mBrushSettings->prp_readProperty(src);
+void OutlineSettingsAnimator::prp_readProperty_impl(eReadStream& src) {
+    PaintSettingsAnimator::prp_readProperty_impl(src);
+    mLineWidth->prp_readProperty_impl(src);
+    mBrushSettings->prp_readProperty_impl(src);
     src.read(&mCapStyle, sizeof(SkPaint::Cap));
     src.read(&mJoinStyle, sizeof(SkPaint::Join));
     src.read(&mOutlineCompositionMode, sizeof(QPainter::CompositionMode));

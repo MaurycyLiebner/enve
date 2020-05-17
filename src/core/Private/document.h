@@ -162,8 +162,8 @@ public:
 //
     void clear();
 //
-    void write(eWriteStream &dst) const;
-    void read(eReadStream &src);
+    void writeScenes(eWriteStream &dst) const;
+    void readScenes(eReadStream &src);
 
     void writeXEV(const std::shared_ptr<XevZipFileSaver>& xevFileSaver,
                   const RuntimeIdToWriteId& objListIdConv) const;
@@ -187,12 +187,9 @@ private:
     Clipboard *getClipboard(const ClipboardType type) const;
 
     void writeBookmarked(eWriteStream &dst) const;
-    void writeScenes(eWriteStream &dst) const;
+    void readBookmarked(eReadStream &src);
 
     void readGradients(eReadStream& src);
-
-    void readBookmarked(eReadStream &src);
-    void readScenes(eReadStream &src);
 signals:
     void canvasModeSet(CanvasMode);
 
