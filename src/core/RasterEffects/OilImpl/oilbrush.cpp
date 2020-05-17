@@ -19,16 +19,18 @@ float OilBrush::NOISE_SPEED_FACTOR = 0.04;
 
 unsigned int OilBrush::POSITIONS_FOR_AVERAGE = 4;
 
-OilBrush::OilBrush(const SkPoint& _position, float _size) :
+OilBrush::OilBrush(const SkPoint& _position, float _size,
+                   float _bristlesThickness, float _bristlesDensity) :
 		position(_position), size(_size) {
 	// Calculate some of the bristles properties
     bristlesLength = qMin(size, MAX_BRISTLE_LENGTH);
-    bristlesThickness = qMin(0.8f * bristlesLength, MAX_BRISTLE_THICKNESS);
+    bristlesThickness = qMin(_bristlesThickness * bristlesLength, MAX_BRISTLE_THICKNESS);
     bristlesHorizontalNoise = qMin(0.3f * size, MAX_BRISTLE_HORIZONTAL_NOISE);
     bristlesHorizontalNoiseSeed = gSkRandF(0, 1000);
 
 	// Initialize the bristles offsets and positions containers with default values
-    unsigned int nBristles = floor(size * gSkRandF(1.6, 1.9));
+    unsigned int nBristles = floor(size * gSkRandF(_bristlesDensity*1.6,
+                                                   _bristlesDensity*1.9));
     bOffsets = vector<SkPoint>(nBristles);
     bPositions = vector<SkPoint>(nBristles);
 

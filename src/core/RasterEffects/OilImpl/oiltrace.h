@@ -60,7 +60,8 @@ public:
 	 *
 	 * @param brushSize the brush size
 	 */
-	void setBrushSize(float brushSize);
+    void setBrushSize(float brushSize, float bristleThickness,
+                      float bristleDensity);
 
 	/**
 	 * @brief Sets the trace average color

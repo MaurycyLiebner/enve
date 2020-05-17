@@ -277,7 +277,7 @@ void OilSimulator::getNewTrace() {
 				invalidTrajectoriesCounter = 0;
 
 				// Set the trace brush size
-				trace.setBrushSize(brushSize);
+                trace.setBrushSize(brushSize, BRISTLE_THICKNESS, BRISTLE_DENSITY);
 
 				// Calculate the trace average color and the bristle colors along the trajectory
                 trace.calculateAverageColor(mImg);

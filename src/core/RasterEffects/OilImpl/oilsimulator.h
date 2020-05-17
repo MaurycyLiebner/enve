@@ -10,6 +10,9 @@
 class OilSimulator {
 public:
 
+    float BRISTLE_THICKNESS = 0.8f;
+    float BRISTLE_DENSITY = 1.f;
+
 	/**
 	 * @brief The smaller brush size allowed
 	 */

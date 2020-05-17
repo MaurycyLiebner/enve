@@ -34,6 +34,14 @@ OilEffect::OilEffect() :
 
     mMaxStrokes = enve::make_shared<QrealAnimator>(100, 0, 9999.999, 1, "max strokes");
     ca_addChild(mMaxStrokes);
+
+    mBristleThickness = enve::make_shared<QrealAnimator>(
+                            0.2, 0, 1, 0.01, "bristle thickness");
+    ca_addChild(mBristleThickness);
+
+    mBristleDensity = enve::make_shared<QrealAnimator>(
+                          0.7, 0, 1, 0.01, "bristle density");
+    ca_addChild(mBristleDensity);
 }
 
 void OilEffect::prp_readProperty_impl(eReadStream &src) {
@@ -62,6 +70,8 @@ public:
                     const qreal strokeLength,
                     const qreal resolution,
                     const int maxStrokes,
+                    const qreal bristleThickness,
+                    const qreal bristleDensity,
                     const QMargins& margin,
                     const HardwareSupport hwSupport) :
         RasterEffectCaller(hwSupport, false, margin),
@@ -70,7 +80,9 @@ public:
         mAccuracy(accuracy),
         mStrokeLength(strokeLength),
         mResolution(resolution),
-        mMaxStrokes(maxStrokes) {}
+        mMaxStrokes(maxStrokes),
+        mBristleThickness(bristleThickness),
+        mBristleDensity(bristleDensity) {}
 
     int cpuThreads(const int available, const int area) const {
         Q_UNUSED(available) Q_UNUSED(area)
@@ -84,6 +96,8 @@ public:
         simulator.MAX_COLOR_DIFFERENCE = {accVal, accVal, accVal};
         simulator.RELATIVE_TRACE_LENGTH = mStrokeLength;
         simulator.MIN_TRACE_LENGTH = 16*mResolution;
+        simulator.BRISTLE_THICKNESS = mBristleThickness;
+        simulator.BRISTLE_DENSITY = mBristleDensity;
     }
 
     void processCpu(CpuRenderTools& renderTools,
@@ -155,6 +169,8 @@ private:
     const qreal mStrokeLength;
     const qreal mResolution;
     const int mMaxStrokes;
+    const qreal mBristleThickness;
+    const qreal mBristleDensity;
 };
 
 stdsptr<RasterEffectCaller> OilEffect::getEffectCaller(
@@ -166,8 +182,10 @@ stdsptr<RasterEffectCaller> OilEffect::getEffectCaller(
     const qreal acc = mAccuracy->getEffectiveValue(relFrame);
     const qreal len = mStrokeLength->getEffectiveValue(relFrame);
     const int maxStrokes = qRound(mMaxStrokes->getEffectiveValue(relFrame));
+    const qreal thick = mBristleThickness->getEffectiveValue(relFrame)*resolution;
+    const qreal den = mBristleDensity->getEffectiveValue(relFrame)/resolution;
     const QMargins margin = oilEffectMargin(len, size.y());
     return enve::make_shared<OilEffectCaller>(size, acc, len, resolution,
-                                              maxStrokes, margin,
-                                              instanceHwSupport());
+                                              maxStrokes, thick, den,
+                                              margin, instanceHwSupport());
 }

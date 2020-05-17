@@ -46,7 +46,8 @@ public:
 	 * @param _position the brush central position
 	 * @param _size the brush size
 	 */
-    OilBrush(const SkPoint& _position = SkPoint(), float _size = 5);
+    OilBrush(const SkPoint& _position = SkPoint(), float _size = 5,
+             float _bristlesThickness = 0.8f, float _bristlesDensity = 1);
 
 	/**
 	 * @brief Moves the brush to a new position and resets some internal variables

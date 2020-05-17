@@ -22,6 +22,8 @@ private:
     qsptr<QrealAnimator> mAccuracy;
     qsptr<QrealAnimator> mStrokeLength;
     qsptr<QrealAnimator> mMaxStrokes;
+    qsptr<QrealAnimator> mBristleThickness;
+    qsptr<QrealAnimator> mBristleDensity;
 };
 
 #endif // OILEFFECT_H

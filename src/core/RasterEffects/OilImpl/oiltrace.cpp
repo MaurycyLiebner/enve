@@ -59,9 +59,11 @@ OilTrace::OilTrace(const vector<SkPoint>& _positions, const vector<unsigned char
     averageColor = SK_ColorTRANSPARENT;
 }
 
-void OilTrace::setBrushSize(float brushSize) {
+void OilTrace::setBrushSize(float brushSize, float bristleThickness,
+                            float bristleDensity) {
 	// Initialize the brush
-    brush = OilBrush(positions[0], brushSize);
+    brush = OilBrush(positions[0], brushSize,
+                     bristleThickness, bristleDensity);
 
 	// Reset the average color
     averageColor = SK_ColorTRANSPARENT;
