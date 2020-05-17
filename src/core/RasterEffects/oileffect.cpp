@@ -46,9 +46,13 @@ void OilEffect::prp_readProperty_impl(eReadStream &src) {
     } else RasterEffect::prp_readProperty_impl(src);
 }
 
+QMargins oilEffectMargin(const qreal strokeLength, const qreal brushSize) {
+    return QMargins() + qCeil(strokeLength * brushSize);
+}
+
 QMargins OilEffect::getMargin() const {
-    return QMargins() + qCeil(mStrokeLength->getEffectiveValue()*
-                              mBrushSize->getEffectiveYValue());
+    return oilEffectMargin(mStrokeLength->getEffectiveValue(),
+                           mBrushSize->getEffectiveYValue());
 }
 
 class OilEffectCaller : public RasterEffectCaller {
@@ -58,8 +62,9 @@ public:
                     const qreal strokeLength,
                     const qreal resolution,
                     const int maxStrokes,
+                    const QMargins& margin,
                     const HardwareSupport hwSupport) :
-        RasterEffectCaller(hwSupport),
+        RasterEffectCaller(hwSupport, false, margin),
         mMinBrushSize(brushSize.x()),
         mMaxBrushSize(brushSize.y()),
         mAccuracy(accuracy),
@@ -161,6 +166,8 @@ stdsptr<RasterEffectCaller> OilEffect::getEffectCaller(
     const qreal acc = mAccuracy->getEffectiveValue(relFrame);
     const qreal len = mStrokeLength->getEffectiveValue(relFrame);
     const int maxStrokes = qRound(mMaxStrokes->getEffectiveValue(relFrame));
+    const QMargins margin = oilEffectMargin(len, size.y());
     return enve::make_shared<OilEffectCaller>(size, acc, len, resolution,
-                                              maxStrokes, instanceHwSupport());
+                                              maxStrokes, margin,
+                                              instanceHwSupport());
 }
