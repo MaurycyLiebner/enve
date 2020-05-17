@@ -227,6 +227,7 @@ void Document::readScenesXEV(ZipFileLoader& fileLoader,
                              const RuntimeIdToWriteId& objListIdConv) {
     int id = 0;
     for(const auto& scene : scenes) {
+        const auto block = scene->blockUndoRedo();
         const QString path = "scenes/" + QString::number(id++) + "/";
         scene->readBoxOrSoundXEV(fileLoader, path, objListIdConv);
     }
