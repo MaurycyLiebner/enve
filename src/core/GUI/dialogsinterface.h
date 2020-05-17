@@ -45,6 +45,10 @@ public:
             int& increment) const = 0;
     virtual void showSceneSettingsDialog(
             Canvas* const scene) const = 0;
+    virtual void displayMessageToUser(
+        const QString& message, const int ms) const = 0;
+
+    void displayMessageToUser(const QString& message) const;
 };
 
 #endif // DIALOGSINTERFACE_H

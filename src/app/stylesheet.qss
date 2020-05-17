@@ -203,6 +203,14 @@ QLabel#errorLabel {
     color: red;
 }
 
+QLabel#messageLabel {
+    background: rgb(60, 60, 60);
+    color: white;
+    border: 1px solid black;
+    font-size: 15pt;
+    padding: 1em;
+}
+
 QWidget:disabled {
     color: grey;
 }

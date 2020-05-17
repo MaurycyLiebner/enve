@@ -121,3 +121,12 @@ void DialogsInterfaceImpl::showSceneSettingsDialog(Canvas* const scene) const {
     });
     dialog->show();
 }
+
+void DialogsInterfaceImpl::displayMessageToUser(
+        const QString& message, const int ms) const {
+    const auto parent = MainWindow::sGetInstance();
+    const auto widget = new QLabel(message, parent, Qt::SplashScreen);
+    widget->setObjectName("messageLabel");
+    widget->show();
+    QTimer::singleShot(ms, widget, &QWidget::deleteLater);
+}
