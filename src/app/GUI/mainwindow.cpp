@@ -1329,7 +1329,7 @@ void MainWindow::saveFile(const QString& path, const bool setPath) {
         } else if(suffix == "xev") {
             saveToFileXEV(path);
             const auto& inst = DialogsInterface::instance();
-            inst.displayMessageToUser("Please note that XEV format is still in testing phase.");
+            inst.displayMessageToUser("Please note that the XEV format is still in the testing phase.");
         } else RuntimeThrow("Unrecognized file extension " + suffix);
         if(setPath) mDocument.setPath(path);
         setFileChangedSinceSaving(false);
