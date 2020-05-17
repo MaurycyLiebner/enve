@@ -60,6 +60,7 @@
 #include "centralwidget.h"
 #include "ColorWidgets/bookmarkedcolors.h"
 #include "GUI/edialogs.h"
+#include "GUI/dialogsinterface.h"
 #include "closesignalingdockwidget.h"
 #include "eimporters.h"
 #include "ColorWidgets/paintcolorwidget.h"
@@ -1327,6 +1328,8 @@ void MainWindow::saveFile(const QString& path, const bool setPath) {
             saveToFile(path);
         } else if(suffix == "xev") {
             saveToFileXEV(path);
+            const auto& inst = DialogsInterface::instance();
+            inst.displayMessageToUser("Please note that XEV format is still in testing phase.");
         } else RuntimeThrow("Unrecognized file extension " + suffix);
         if(setPath) mDocument.setPath(path);
         setFileChangedSinceSaving(false);
