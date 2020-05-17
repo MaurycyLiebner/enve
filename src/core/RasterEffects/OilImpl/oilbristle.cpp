@@ -12,6 +12,7 @@ OilBristle::OilBristle(const SkPoint& position, float length) {
     unsigned int nElements = round(sqrt(length / 2)); // round(sqrt(2 * length));
     positions = vector<SkPoint>(nElements + 1, position);
 
+    lengths.reserve(nElements);
 	for (unsigned int i = 0; i < nElements; ++i) {
 		lengths.push_back(nElements - i);
 	}

@@ -28,6 +28,10 @@ OilTrace::OilTrace(const SkPoint& startingPosition, unsigned int nSteps, float s
     float initAng = gSkRandF(0, 2*PI);
     float noiseSeed = gSkRandF(0, 1000);
     float alphaDecrement = qMin(255.0 / nSteps, 25.0);
+
+    positions.reserve(nSteps + 1);
+    alphas.reserve(nSteps + 1);
+
 	positions.push_back(startingPosition);
 	alphas.push_back(255);
 
@@ -72,7 +76,7 @@ void OilTrace::setBrushSize(float brushSize) {
 void OilTrace::calculateBristlePositions() {
 	// Reset the container
 	bPositions.clear();
-
+    bPositions.reserve(positions.size());
 	for (const SkPoint& pos : positions) {
 		// Move the brush
 		brush.updatePosition(pos, false);
@@ -97,10 +101,11 @@ void OilTrace::calculateBristleImageColors(const SkBitmap& img) {
 
 	// Calculate the image colors at the bristles positions
 	bImgColors.clear();
-
+    bImgColors.reserve(bPositions.size());
     for (const vector<SkPoint>& bp : bPositions) {
 		bImgColors.emplace_back();
         vector<SkColor>& bic = bImgColors.back();
+        bic.reserve(bp.size());
 
 		for (const SkPoint& pos : bp) {
 			// Check that the bristle is inside the image
@@ -129,10 +134,12 @@ void OilTrace::calculateBristlePaintedColors(const SkBitmap& paintedPixels,
 
 	// Calculate the painted colors at the bristles positions
 	bPaintedColors.clear();
+    bPaintedColors.reserve(bPositions.size());
 
     for (const vector<SkPoint>& bp : bPositions) {
 		bPaintedColors.emplace_back();
         vector<SkColor>& bpc = bPaintedColors.back();
+        bpc.reserve(bp.size());
 
 		for (const SkPoint& pos : bp) {
 			// Check that the bristle is inside the canvas
@@ -228,8 +235,11 @@ void OilTrace::calculateBristleColors(const SkBitmap& paintedPixels,
 
 	// Mix the previous step colors with the already painted colors
     vector<float> redPrevious;
+    redPrevious.reserve(startingColors.size());
     vector<float> greenPrevious;
+    greenPrevious.reserve(startingColors.size());
     vector<float> bluePrevious;
+    bluePrevious.reserve(startingColors.size());
 
     for (const SkColor& color : startingColors) {
         redPrevious.push_back(SkColorGetR(color));
