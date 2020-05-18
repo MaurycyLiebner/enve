@@ -81,6 +81,7 @@ SOURCES += main.cpp\
     GUI/Settings/settingsdialog.cpp \
     GUI/Settings/settingswidget.cpp \
     GUI/Settings/timelinesettingswidget.cpp \
+    GUI/alignwidget.cpp \
     GUI/audiohandler.cpp \
     GUI/bookmarkedwidget.cpp \
     GUI/buttonbase.cpp \
@@ -209,6 +210,7 @@ HEADERS  += \
     GUI/Settings/settingsdialog.h \
     GUI/Settings/settingswidget.h \
     GUI/Settings/timelinesettingswidget.h \
+    GUI/alignwidget.h \
     GUI/audiohandler.h \
     GUI/bookmarkedwidget.h \
     GUI/buttonbase.h \

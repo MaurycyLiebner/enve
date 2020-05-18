@@ -251,6 +251,8 @@ private:
     CloseSignalingDockWidget *mSelectedObjectDock;
     CloseSignalingDockWidget *mFilesDock;
     CloseSignalingDockWidget *mBrushSettingsDock;
+    CloseSignalingDockWidget *mAlignDock;
+
     TimelineDockWidget *mTimeline = nullptr;
     BrushSelectionWidget *mBrushSelectionWidget = nullptr;
 
@@ -313,6 +315,8 @@ private:
     QAction *mTimelineDockAct;
     QAction *mFillAndStrokeDockAct;
     QAction *mBrushDockAction;
+    QAction *mAlignDockAction;
+
     QAction *mBrushColorBookmarksAction;
 
     FontsWidget *mFontWidget = nullptr;

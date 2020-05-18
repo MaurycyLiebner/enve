@@ -59,6 +59,14 @@ class Document;
 
 enum class CtrlsMode : short;
 
+enum class AlignPivot {
+    geometry, pivot
+};
+
+enum class AlignRelativeTo {
+    scene, lastSelected
+};
+
 class CORE_EXPORT MouseEvent {
 protected:
     MouseEvent(const QPointF& pos,
@@ -300,6 +308,10 @@ public:
     void lowerSelectedBoxesToBottom();
     void raiseSelectedBoxes();
     void lowerSelectedBoxes();
+
+    void alignSelectedBoxes(const Qt::Alignment align,
+                            const AlignPivot pivot,
+                            const AlignRelativeTo relativeTo);
 
     void selectAndAddContainedPointsToSelection(const QRectF &absRect);
 //

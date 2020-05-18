@@ -401,6 +401,7 @@ void Canvas::setCurrentBox(BoundingBox* const box) {
 void Canvas::addBoxToSelection(BoundingBox * const box) {
     if(box->isSelected()) return;
     auto& connCtx = mSelectedBoxes.addObj(box);
+    mLastSelectedBox = box;
     connCtx << connect(box, &BoundingBox::globalPivotInfluenced,
                        this, &Canvas::schedulePivotUpdate);
     connCtx << connect(box, &BoundingBox::fillStrokeSettingsChanged,
@@ -704,6 +705,37 @@ void Canvas::selectedPathsCombine() {
             srcVP->applyTransform(relTransf);
             targetVP->moveAllFrom(srcVP);
             box->removeFromParent_k();
+        }
+    }
+}
+
+void Canvas::alignSelectedBoxes(const Qt::Alignment align,
+                                const AlignPivot pivot,
+                                const AlignRelativeTo relativeTo) {
+    if(mSelectedBoxes.isEmpty()) return;
+    QRectF geometry;
+    BoundingBox* skip = nullptr;
+    switch(relativeTo) {
+    case AlignRelativeTo::scene:
+        geometry = QRectF(0., 0., mWidth, mHeight);
+        break;
+    case AlignRelativeTo::lastSelected:
+        if(!mLastSelectedBox) return;
+        skip = mLastSelectedBox;
+        geometry = mLastSelectedBox->getAbsBoundingRect();
+        break;
+    }
+
+    pushUndoRedoName("align");
+    for(const auto &box : mSelectedBoxes) {
+        if(box == skip) continue;
+        switch(pivot) {
+        case AlignPivot::pivot:
+            box->alignPivot(align, geometry);
+            break;
+        case AlignPivot::geometry:
+            box->alignGeometry(align, geometry);
+            break;
         }
     }
 }

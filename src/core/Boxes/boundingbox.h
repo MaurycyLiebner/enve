@@ -288,6 +288,9 @@ public:
     void finishTransform();
     void cancelTransform();
 
+    void alignGeometry(const Qt::Alignment align, const QRectF& to);
+    void alignPivot(const Qt::Alignment align, const QRectF& to);
+
     QMatrix getTotalTransform() const;
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
@@ -341,6 +344,7 @@ public:
     void applyParentTransform();
     bool isTransformationStatic() const;
     BoxTransformAnimator *getBoxTransformAnimator() const;
+    const QRectF getAbsBoundingRect() const;
     const QRectF& getRelBoundingRect() const
     { return mRelRect; }
     const SkPath &getRelBoundingRectPath() const
@@ -443,6 +447,10 @@ protected:
     const qsptr<BoxTransformAnimator> mTransformAnimator;
     const qsptr<RasterEffectCollection> mRasterEffectsAnimators;
 private:
+    void alignGeometry(const QRectF& geometry,
+                       const Qt::Alignment align,
+                       const QRectF& to);
+
     void setCustomPropertiesVisible(const bool visible);
     void setBlendEffectsVisible(const bool visible);
 

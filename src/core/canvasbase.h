@@ -110,6 +110,7 @@ protected:
     stdptr<MovablePoint> mPressedPoint;
 
     ConnContextObjList<BoundingBox*> mSelectedBoxes;
+    QPointer<BoundingBox> mLastSelectedBox;
 
     ConnContextObjList<Property*> mSelectedProps;
 };

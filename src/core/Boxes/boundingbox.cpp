@@ -548,7 +548,7 @@ stdsptr<BoxRenderData> BoundingBox::getCurrentRenderData(const qreal relFrame) c
 }
 
 bool BoundingBox::isContainedIn(const QRectF &absRect) const {
-    return absRect.contains(getTotalTransform().mapRect(mRelRect));
+    return absRect.contains(getAbsBoundingRect());
 }
 
 BoundingBox *BoundingBox::getBoxAtFromAllDescendents(const QPointF &absPos) {
@@ -729,6 +729,39 @@ void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
                 rasterEffectsMenu, &BoundingBox::addRasterEffect);
 }
 
+void BoundingBox::alignGeometry(const QRectF& geometry,
+                                const Qt::Alignment align,
+                                const QRectF& to) {
+    QPointF moveBy{0., 0.};
+    if(align & Qt::AlignLeft) {
+        moveBy.setX(to.left() - geometry.left());
+    } else if(align & Qt::AlignHCenter) {
+        moveBy.setX(to.center().x() - geometry.center().x());
+    } else if(align & Qt::AlignRight) {
+        moveBy.setX(to.right() - geometry.right());
+    }
+    if(align & Qt::AlignTop) {
+        moveBy.setY(to.top() - geometry.top());
+    } else if(align & Qt::AlignVCenter) {
+        moveBy.setY(to.center().y() - geometry.center().y());
+    } else if(align & Qt::AlignBottom) {
+        moveBy.setY(to.bottom() - geometry.bottom());
+    }
+    if(moveBy.isNull()) return;
+    startPosTransform();
+    moveByAbs(moveBy);
+    finishTransform();
+}
+
+void BoundingBox::alignGeometry(const Qt::Alignment align, const QRectF& to) {
+    alignGeometry(getAbsBoundingRect(), align, to);
+}
+
+void BoundingBox::alignPivot(const Qt::Alignment align, const QRectF& to) {
+    const QPointF pivot = getPivotAbsPos();
+    alignGeometry(QRectF(pivot, pivot), align, to);
+}
+
 void BoundingBox::moveByAbs(const QPointF &trans) {
     mTransformAnimator->moveByAbs(trans);
 }
@@ -887,6 +920,10 @@ BasicTransformAnimator *BoundingBox::getTransformAnimator() const {
 
 BoxTransformAnimator *BoundingBox::getBoxTransformAnimator() const {
     return mTransformAnimator.get();
+}
+
+const QRectF BoundingBox::getAbsBoundingRect() const {
+    return getTotalTransform().mapRect(mRelRect);
 }
 
 bool BoundingBox::isAnimated() const {

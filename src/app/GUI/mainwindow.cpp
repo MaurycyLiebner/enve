@@ -65,6 +65,7 @@
 #include "eimporters.h"
 #include "ColorWidgets/paintcolorwidget.h"
 #include "Dialogs/exportsvgdialog.h"
+#include "alignwidget.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 
@@ -186,6 +187,24 @@ MainWindow::MainWindow(Document& document,
 
     addDockWidget(Qt::LeftDockWidgetArea, mBrushSettingsDock);
     mBrushSettingsDock->hide();
+
+    mAlignDock = new CloseSignalingDockWidget(
+                tr("Align", "Dock"), this);
+
+    const auto alignWidget = new AlignWidget(this);
+    connect(alignWidget, &AlignWidget::alignTriggered,
+            this, [this](const Qt::Alignment align,
+                         const AlignPivot pivot,
+                         const AlignRelativeTo relativeTo) {
+        const auto scene = *mDocument.fActiveScene;
+        if(!scene) return;
+        scene->alignSelectedBoxes(align, pivot, relativeTo);
+        mDocument.actionFinished();
+    });
+    mAlignDock->setWidget(alignWidget);
+
+    addDockWidget(Qt::RightDockWidgetArea, mAlignDock);
+    mAlignDock->hide();
 
     mSelectedObjectDock = new CloseSignalingDockWidget(
                 tr("Selected Objects", "Dock"), this);
@@ -739,6 +758,17 @@ void MainWindow::setupMenuBar() {
             mBrushDockAction, &QAction::setChecked);
     connect(mBrushDockAction, &QAction::toggled,
             mBrushSettingsDock, &QDockWidget::setVisible);
+
+    mAlignDockAction = mPanelsMenu->addAction(
+                tr("Align", "MenuBar_View_Docks"));
+    mAlignDockAction->setCheckable(true);
+    mAlignDockAction->setChecked(false);
+    mAlignDockAction->setShortcut(QKeySequence(Qt::Key_D));
+
+    connect(mAlignDock, &CloseSignalingDockWidget::madeVisible,
+            mAlignDockAction, &QAction::setChecked);
+    connect(mAlignDockAction, &QAction::toggled,
+            mAlignDock, &QDockWidget::setVisible);
 
     mBrushColorBookmarksAction = mPanelsMenu->addAction(
                 tr("Brush/Color Bookmarks", "MenuBar_View_Docks"));
