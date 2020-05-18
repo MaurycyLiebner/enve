@@ -60,11 +60,11 @@ public:
     template <typename T> using Func = std::function<T>;
     template <typename T> using Creator = Func<qsptr<T>()>;
     using CCreator = Creator<RasterEffect>;
-    using CAdder = Func<void(const QString&, const CCreator&)>;
+    using CAdder = Func<void(const QString&, const QString&, const CCreator&)>;
     static void sForEveryEffect(const CAdder& add) {
         for(const auto& creator : sCreators) {
             const auto cCreator = [creator]() { return creator.mCreatorNew(); };
-            add(creator.mName(), cCreator);
+            add(creator.mName(), "", cCreator);
         }
     }
 private:

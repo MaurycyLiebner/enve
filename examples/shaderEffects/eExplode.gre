@@ -14,7 +14,7 @@
 <!-- You should have received a copy of the GNU General Public License -->
 <!-- along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<ShaderEffect name="Explode">
+<ShaderEffect name="Explode" menuPath="Examples">
     <Properties>
         <Property name="displacement" type="vec2" min="0" max="999" step="1" ini="10" resolutionScaled="true"/>
         <Property name="steps"        type="int"  min="1" max="99"  step="1" ini="1"  glValue="true"/>

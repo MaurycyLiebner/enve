@@ -27,17 +27,25 @@ struct CORE_EXPORT RasterEffectMenuCreator {
     template <typename T> using Func = std::function<T>;
     template <typename T> using Creator = Func<qsptr<T>()>;
     using EffectCreator = Creator<RasterEffect>;
-    using EffectAdder = Func<void(const QString&, const EffectCreator&)>;
+    using EffectAdder = Func<void(const QString&, const QString&,
+                                  const EffectCreator&)>;
 
     template <typename Target>
     static void addEffects(PropertyMenu * const menu,
                            void (Target::*addToTarget)(const qsptr<RasterEffect>&)) {
         const auto adder =
-        [menu, addToTarget](const QString& name, const EffectCreator& creator) {
+        [menu, addToTarget](const QString& name, const QString& path,
+                            const EffectCreator& creator) {
             const auto adder = [creator, addToTarget](Target * target) {
                 (target->*addToTarget)(creator());
             };
-            menu->addPlainAction<Target>(name, adder);
+            if(path.isEmpty()) {
+                menu->addPlainAction<Target>(name, adder);
+            } else {
+                auto childMenu = menu->childMenu(path);
+                if(!childMenu) childMenu = menu->addMenu(path);
+                childMenu->addPlainAction<Target>(name, adder);
+            }
         };
         forEveryEffect(adder);
     }

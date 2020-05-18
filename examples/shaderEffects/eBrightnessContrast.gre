@@ -14,7 +14,7 @@
 <!-- You should have received a copy of the GNU General Public License -->
 <!-- along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<ShaderEffect name="Brightness-Contrast">
+<ShaderEffect name="Brightness-Contrast" menuPath="Examples">
     <Properties>
         <Property name="brightness" type="float" min="-1" max="1" step="0.01" ini="0" glValue="true"/>
         <Property name="contrast"   type="float" min="-1" max="1" step="0.01" ini="0" glValue="true"/>

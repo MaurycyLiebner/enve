@@ -25,9 +25,11 @@ struct CORE_EXPORT ShaderEffectCreator : public StdSelfRef {
 public:
     ShaderEffectCreator(const QString& grePath, const QString& name,
                         const QList<stdsptr<ShaderPropertyCreator>>& propCs,
+                        const QString& menuPath,
                         std::unique_ptr<ShaderEffectProgram>&& program) :
         fName(name), fGrePath(grePath),
-        fProperties(propCs), fProgram(std::move(program)) {}
+        fProperties(propCs), fMenuPath(menuPath),
+        fProgram(std::move(program)) {}
 
     struct Identifier {
         Identifier(const QString& grePath, const QString& name,
@@ -42,6 +44,7 @@ public:
     const QString fName;
     const QString fGrePath;
     const QList<stdsptr<ShaderPropertyCreator>> fProperties;
+    const QString fMenuPath;
     std::unique_ptr<ShaderEffectProgram> fProgram;
 
     bool compatible(const QList<ShaderPropertyType> &props) const;
@@ -82,11 +85,11 @@ public:
     template <typename T> using Func = std::function<T>;
     template <typename T> using Creator = Func<qsptr<T>()>;
     using CCreator = Creator<ShaderEffect>;
-    using CAdder = Func<void(const QString&, const CCreator&)>;
+    using CAdder = Func<void(const QString&, const QString&, const CCreator&)>;
     static void sForEveryEffect(const CAdder& add) {
         for(const auto& creator : sEffectCreators) {
             const auto cCreator = [creator]() { return creator->create(); };
-            add(creator->fName, cCreator);
+            add(creator->fName, creator->fMenuPath, cCreator);
         }
     }
 

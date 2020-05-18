@@ -97,6 +97,14 @@ public:
         return child.get();
     }
 
+    TTypeMenu* childMenu(const QString& path) {
+        for(const auto& child : mChildMenus) {
+            if(child->mQMenu->title() == path)
+                return child.get();
+        }
+        return nullptr;
+    }
+
     QAction* addSeparator() {
         return mQMenu->addSeparator();
     }

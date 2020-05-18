@@ -14,7 +14,7 @@
 <!-- You should have received a copy of the GNU General Public License -->
 <!-- along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<ShaderEffect name="Dots">
+<ShaderEffect name="Dots" menuPath="Examples">
     <Properties>
         <Property                       name="translate" type="vec2" min="-999" max="999" step="1"    ini="0"   glValue="true" resolutionScaled="true"/>
         <Property nameUI="dot distance" name="dotDistance" type="float" min="-999" max="999" step="1" ini="8"   glValue="true" resolutionScaled="true"/>

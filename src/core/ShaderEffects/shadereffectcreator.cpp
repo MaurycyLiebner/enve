@@ -460,6 +460,7 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
         RuntimeThrow("Unrecogized root " + root.tagName() +
                      " in ShaderEffect source.");
     const QString effectName = root.attribute("name");
+    const QString menuPath = root.attribute("menuPath");
 
     QList<stdsptr<ShaderPropertyCreator>> propCs;
     UniformSpecifierCreators uniCs;
@@ -483,7 +484,7 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
                      effectName + "'");
     }
     const auto shaderEffectCreator = enve::make_shared<ShaderEffectCreator>(
-                grePath, effectName, propCs, std::move(program));
+                grePath, effectName, propCs, menuPath, std::move(program));
     sEffectCreators << shaderEffectCreator;
 
     return shaderEffectCreator;
