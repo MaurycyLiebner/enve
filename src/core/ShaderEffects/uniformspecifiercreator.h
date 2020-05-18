@@ -39,20 +39,25 @@ typedef QList<UniformSpecifier> UniformSpecifiers;
 struct CORE_EXPORT UniformSpecifierCreator : public StdSelfRef {
     UniformSpecifierCreator(const ShaderPropertyType type,
                             const bool glValue,
-                            const bool resolutionScaled) :
-        mType(type), fGLValue(glValue), mResolutionScaled(resolutionScaled) {}
+                            const bool resolutionScaled,
+                            const bool influenceScaled) :
+        mType(type), fGLValue(glValue),
+        mResolutionScaled(resolutionScaled),
+        mInfluenceScaled(influenceScaled) {}
 
     void create(ShaderEffectJS &engine,
                 const GLint loc,
                 Property * const property,
                 const qreal relFrame,
                 const qreal resolution,
+                const qreal influence,
                 QJSValueList& setterArgs,
                 UniformSpecifiers& uniSpec) const;
 
     const ShaderPropertyType mType;
     const bool fGLValue;
     const bool mResolutionScaled;
+    const bool mInfluenceScaled;
 };
 
 #endif // UNIFORMSPECIFIERCREATOR_H

@@ -24,10 +24,11 @@ void qrealAnimatorCreate(
         Property * const property,
         const qreal relFrame,
         const qreal resolution,
+        const qreal influence,
         QJSValueList& setterArgs,
         UniformSpecifiers& uniSpec) {
     const auto anim = static_cast<QrealAnimator*>(property);
-    const qreal val = anim->getEffectiveValue(relFrame)*resolution;
+    const qreal val = anim->getEffectiveValue(relFrame)*resolution*influence;
     const QString propName = anim->prp_getName();
     const QString valScript = propName + " = " + QString::number(val);
     setterArgs << val;
@@ -45,10 +46,11 @@ void intAnimatorCreate(
         Property * const property,
         const qreal relFrame,
         const qreal resolution,
+        const qreal influence,
         QJSValueList& setterArgs,
         UniformSpecifiers& uniSpec) {
     const auto anim = static_cast<IntAnimator*>(property);
-    const int val = qRound(anim->getEffectiveIntValue(relFrame)*resolution);
+    const int val = qRound(anim->getEffectiveIntValue(relFrame)*resolution*influence);
     const QString valScript = anim->prp_getName() + " = " + QString::number(val);
     setterArgs << val;
 
@@ -71,10 +73,11 @@ void qPointFAnimatorCreate(
         Property * const property,
         const qreal relFrame,
         const qreal resolution,
+        const qreal influence,
         QJSValueList& setterArgs,
         UniformSpecifiers& uniSpec) {
     const auto anim = static_cast<QPointFAnimator*>(property);
-    const QPointF val = anim->getEffectiveValue(relFrame)*resolution;
+    const QPointF val = anim->getEffectiveValue(relFrame)*resolution*influence;
     const QString valScript = vec2ValScript(anim->prp_getName(), val);
     setterArgs << engine.toValue(val);
 
@@ -90,20 +93,24 @@ void UniformSpecifierCreator::create(ShaderEffectJS &engine,
                                      Property * const property,
                                      const qreal relFrame,
                                      const qreal resolution,
+                                     const qreal influence,
                                      QJSValueList& setterArgs,
                                      UniformSpecifiers& uniSpec) const {
     switch(mType) {
     case ShaderPropertyType::floatProperty:
         return qrealAnimatorCreate(fGLValue, loc, property, relFrame,
                                    mResolutionScaled ? resolution : 1,
+                                   mInfluenceScaled ? influence : 1,
                                    setterArgs, uniSpec);
     case ShaderPropertyType::intProperty:
         return intAnimatorCreate(fGLValue, loc, property, relFrame,
                                  mResolutionScaled ? resolution : 1,
+                                 mInfluenceScaled ? influence : 1,
                                  setterArgs, uniSpec);
     case ShaderPropertyType::vec2Property:
         return qPointFAnimatorCreate(engine, fGLValue, loc, property, relFrame,
                                      mResolutionScaled ? resolution : 1,
+                                     mInfluenceScaled ? influence : 1,
                                      setterArgs, uniSpec);
     default: RuntimeThrow("Unsupported type");
     }

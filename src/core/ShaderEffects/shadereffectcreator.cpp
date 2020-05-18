@@ -232,12 +232,14 @@ void parseFloatPropertyCreators(const QString& name,
     const qreal stepVal = qMax(0.1, attrToDouble(elem, name, "step", "1"));
     const bool glValue = attrToBool(elem, name, "glValue", "false");
     const bool resolutionScaled = attrToBool(elem, name, "resolutionScaled", "false");
+    const bool influenceScaled = attrToBool(elem, name, "influenceScaled", "false");
 
     propC = enve::make_shared<QrealAnimatorCreator>(
                 iniVal, minVal, maxVal, stepVal,
                 glValue, name, nameUI);
     uniC = enve::make_shared<UniformSpecifierCreator>(
-                ShaderPropertyType::floatProperty, glValue, resolutionScaled);
+                ShaderPropertyType::floatProperty, glValue,
+                resolutionScaled, influenceScaled);
 }
 
 void parseIntPropertyCreators(const QString& name,
@@ -251,12 +253,14 @@ void parseIntPropertyCreators(const QString& name,
     const int stepVal = attrToInt(elem, name, "step", "1");
     const bool glValue = attrToBool(elem, name, "glValue", "false");
     const bool resolutionScaled = attrToBool(elem, name, "resolutionScaled", "false");
+    const bool influenceScaled = attrToBool(elem, name, "influenceScaled", "false");
 
     propC = enve::make_shared<IntAnimatorCreator>(
                 iniVal, minVal, maxVal, stepVal,
                 glValue, name, nameUI);
     uniC = enve::make_shared<UniformSpecifierCreator>(
-                ShaderPropertyType::intProperty, glValue, resolutionScaled);
+                ShaderPropertyType::intProperty, glValue,
+                resolutionScaled, influenceScaled);
 }
 
 void parseVec2PropertyCreators(const QString& name,
@@ -272,12 +276,14 @@ void parseVec2PropertyCreators(const QString& name,
     const QPointF stepVal = attrToQPointF(elem, name, "step", "1", true);
     const bool glValue = attrToBool(elem, name, "glValue", "false");
     const bool resolutionScaled = attrToBool(elem, name, "resolutionScaled", "false");
+    const bool influenceScaled = attrToBool(elem, name, "influenceScaled", "false");
 
     propC = enve::make_shared<QPointFAnimatorCreator>(
                 iniVal, minVal, maxVal, stepVal, glValue,
                 nameX, nameY, name, nameUI);
     uniC = enve::make_shared<UniformSpecifierCreator>(
-                ShaderPropertyType::vec2Property, glValue, resolutionScaled);
+                ShaderPropertyType::vec2Property, glValue,
+                resolutionScaled, influenceScaled);
 }
 
 void parsePropertyCreators(const QString& type,

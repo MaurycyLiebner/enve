@@ -17,7 +17,7 @@
 <ShaderEffect name="Dots" menuPath="Examples">
     <Properties>
         <Property                       name="translate" type="vec2" min="-999" max="999" step="1"    ini="0"   glValue="true" resolutionScaled="true"/>
-        <Property nameUI="dot distance" name="dotDistance" type="float" min="-999" max="999" step="1" ini="8"   glValue="true" resolutionScaled="true"/>
+        <Property nameUI="dot distance" name="dotDistance" type="float" min="-999" max="999" step="1" ini="8"   glValue="true" resolutionScaled="true"  influenceScaled="true"/>
         <Property nameUI="dot radius"   name="dotRadius"   type="float" min="0" max="999" step="1"    ini="8"   glValue="true" resolutionScaled="true"/>
         <Property                       name="opacity"     type="float" min="0" max="1"   step="0.1"  ini="0.5" glValue="true"/>
     </Properties>

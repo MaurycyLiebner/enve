@@ -42,7 +42,6 @@ void ShaderEffect::writeIdentifierXEV(QDomElement& ele) const {
 stdsptr<RasterEffectCaller> ShaderEffect::getEffectCaller(
         const qreal relFrame, const qreal resolution,
         const qreal influence, BoxRenderData * const data) const {
-    Q_UNUSED(influence)
     Q_UNUSED(data)
     std::unique_ptr<ShaderEffectJS> engineUPtr;
     takeJSEngine(engineUPtr);
@@ -58,7 +57,8 @@ stdsptr<RasterEffectCaller> ShaderEffect::getEffectCaller(
         const auto prop = ca_getChildAt(i);
         const auto& uniformC = mProgram->fPropUniCreators.at(i);
         uniformC->create(engine, loc, prop, relFrame,
-                         resolution, setterArgs, uniSpecs);
+                         resolution, influence,
+                         setterArgs, uniSpecs);
     }
     engine.setValues(setterArgs);
     const int valsCount = mProgram->fValueHandlers.count();
