@@ -74,7 +74,7 @@ TipsWidget::TipsWidget(QWidget* const parent) : QWidget(parent) {
         setFixedWidth(12*size);
         mGif->setFixedWidth(12*size);
         mGif->setFixedHeight(6*size);
-        mDesc->setFixedHeight(5*size);
+        mDesc->setFixedHeight(6*size);
     });
 }
 
