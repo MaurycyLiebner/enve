@@ -117,7 +117,7 @@ void ShadowEffectCaller::setupPaint(SkPaint &paint, const int sign) const {
     const auto filter = SkDropShadowImageFilter::Make(
                 mTranslation.x(), sign*mTranslation.y(),
                 sigma, sigma, toSkColor(mColor),
-                SkDropShadowImageFilter::kDrawShadowAndForeground_ShadowMode,
+                SkDropShadowImageFilter::kDrawShadowOnly_ShadowMode,
                 nullptr);
     paint.setImageFilter(filter);
     const float opacityM[20] = {
@@ -142,6 +142,7 @@ void ShadowEffectCaller::processGpu(QGL33 * const gl,
     SkPaint paint;
     setupPaint(paint, -1);
     canvas->drawImage(srcTex, 0, 0, &paint);
+    canvas->drawImage(srcTex, 0, 0);
     canvas->flush();
 
     renderTools.swapTextures();
@@ -167,10 +168,10 @@ void ShadowEffectCaller::processCpu(CpuRenderTools &renderTools,
         srcBtmp.extractSubset(&tileSrc, srcRect);
         const int drawX = srcRect.left() - texTile.left();
         const int drawY = srcRect.top() - texTile.top();
-        canvas.drawBitmap(tileSrc, drawX, drawY);
 
         SkPaint paint;
         setupPaint(paint, 1);
         canvas.drawBitmap(tileSrc, drawX, drawY, &paint);
+        canvas.drawBitmap(tileSrc, drawX, drawY);
     }
 }
