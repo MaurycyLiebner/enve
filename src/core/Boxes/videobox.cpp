@@ -66,9 +66,9 @@ void VideoBox::fileHandlerConnector(ConnContext &conn, VideoFileHandler *obj) {
         const auto cacheHandler = &newDataHandler->getCacheHandler();
         getAnimationDurationRect()->setRasterCacheHandler(cacheHandler);
         conn << connect(obj, &VideoFileHandler::pathChanged,
-                        this, &VideoBox::animationDataChanged);
-        conn << connect(obj, &VideoFileHandler::pathChanged,
-                        this, &VideoBox::soundDataChanged);
+                        this, [this, obj]() {
+            fileHandlerAfterAssigned(obj);
+        });
         conn << connect(obj, &VideoFileHandler::reloaded,
                         this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
         conn << connect(newDataHandler, &VideoDataHandler::frameCountUpdated,
