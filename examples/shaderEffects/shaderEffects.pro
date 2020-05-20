@@ -23,5 +23,9 @@ DISTFILES += \
     eDots.frag \
     eExplode.gre \
     eExplode.frag \
-    multiplyRed.gre \
-    multiplyRed.frag
+    eMultiplyRed.gre \
+    eMultiplyRed.frag \
+    eWipeLeft.gre \
+    eWipeLeft.frag \
+    eWipeRight.gre \
+    eWipeRight.frag
