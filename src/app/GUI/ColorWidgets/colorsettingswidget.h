@@ -194,6 +194,8 @@ private:
     QrealAnimatorValueSlider *aSpin =
             new QrealAnimatorValueSlider(0., 1., 0.01, this);
 
+    QHBoxLayout *hexLayout;
+
     QHBoxLayout *mColorLabelLayout = new QHBoxLayout();
     ActionButton *mPickingButton;
 
