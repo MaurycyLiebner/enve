@@ -122,7 +122,7 @@ void VideoFrameLoader::readFrame() {
         const int lastFrameTmp = mOpenedVideo->fLastFrame;
         mOpenedVideo->fLastFrame = -qFloor(10*fps); // Just in case error occurs
         const int readRet = av_read_frame(formatContext, packet);
-        if(readRet < 0) RuntimeThrow("Error retrieving AVPacket");
+        if(readRet < 0) NoBreakRuntimeThrow("Error retrieving AVPacket");
         if(packet->stream_index == videoStreamIndex) {
             const int sendRet = avcodec_send_packet(codecContext, packet);
             if(sendRet < 0) RuntimeThrow("Sending packet to the decoder failed");

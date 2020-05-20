@@ -46,15 +46,20 @@
         std::runtime_error(std::string("") + msg) \
     )
 
-#define RuntimeThrow(msg) \
+#define NoBreakRuntimeThrow(msg) \
 { \
-    BREAKPOINT \
     std::throw_with_nested( \
         std::runtime_error( \
             std::to_string(__LINE__) + "  :  " + \
             FILENAME + "  :  " + __func__ + "()\n  " + msg \
         ) \
     ); \
+}
+
+#define RuntimeThrow(msg) \
+{ \
+    BREAKPOINT \
+    NoBreakRuntimeThrow(msg) \
 }
 
 #define CheckInvalidLocation(vLoc, name) \
