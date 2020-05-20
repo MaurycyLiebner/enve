@@ -37,6 +37,7 @@
 #include "Private/document.h"
 #include "Boxes/sculptpathbox.h"
 #include "svgexporter.h"
+#include "ReadWrite/evformat.h"
 
 Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
@@ -959,24 +960,17 @@ SoundComposition *Canvas::getSoundComposition() {
     return mSoundComposition.get();
 }
 
-void Canvas::writeBoundingBox(eWriteStream& dst) const {
-    writeGradients(dst);
-    ContainerBox::writeBoundingBox(dst);
-    const int currFrame = getCurrentFrame();
-    dst << currFrame;
+void Canvas::writeSettings(eWriteStream& dst) const {
+    dst << getCurrentFrame();
     dst << mClipToCanvasSize;
     dst << mWidth;
     dst << mHeight;
     dst << mFps;
-    dst.write(&mRange, sizeof(FrameRange));
-    clearGradientRWIds();
+    dst << mRange;
 }
 
-void Canvas::readBoundingBox(eReadStream& src) {
-    if(src.evFileVersion() > 5) readGradients(src);
-    ContainerBox::readBoundingBox(src);
-    int currFrame;
-    src >> currFrame;
+void Canvas::readSettings(eReadStream& src) {
+    int currFrame; src >> currFrame;
     src >> mClipToCanvasSize;
     src >> mWidth;
     src >> mHeight;
@@ -984,6 +978,20 @@ void Canvas::readBoundingBox(eReadStream& src) {
     FrameRange range; src >> range;
     setFrameRange(range);
     anim_setAbsFrame(currFrame);
+}
+
+void Canvas::writeBoundingBox(eWriteStream& dst) const {
+    writeGradients(dst);
+    ContainerBox::writeBoundingBox(dst);
+    clearGradientRWIds();
+}
+
+void Canvas::readBoundingBox(eReadStream& src) {
+    if(src.evFileVersion() > 5) readGradients(src);
+    ContainerBox::readBoundingBox(src);
+    if(src.evFileVersion() < EvFormat::readSceneSettingsBeforeContent) {
+        readSettings(src);
+    }
     clearGradientRWIds();
 }
 

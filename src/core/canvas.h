@@ -541,6 +541,8 @@ public:
     void renderDataFinished(BoxRenderData *renderData);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
+    void writeSettings(eWriteStream& dst) const;
+    void readSettings(eReadStream& src);
     void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);
 

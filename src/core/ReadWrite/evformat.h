@@ -23,6 +23,7 @@ namespace EvFormat {
         textSkFont = 17,
         oilEffectImprov = 18,
         betterSWTAbsReadWrite = 19,
+        readSceneSettingsBeforeContent = 20,
 
         nextVersion
     };

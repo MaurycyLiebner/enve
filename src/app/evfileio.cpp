@@ -79,7 +79,12 @@ void MainWindow::loadEVFile(const QString &path) {
         readStream.readCheckpoint("File beginning pos mismatch");
         if(evVersion >= EvFormat::betterSWTAbsReadWrite) {
             int nScenes; readStream >> nScenes;
-            for(int i = 0; i < nScenes; i++) mDocument.createNewScene();
+            for(int i = 0; i < nScenes; i++) {
+                const auto scene = mDocument.createNewScene();
+                if(evVersion >= EvFormat::readSceneSettingsBeforeContent) {
+                    scene->readSettings(readStream);
+                }
+            }
             mLayoutHandler->read(readStream);
             readStream.readCheckpoint("Error reading Layout");
         }
@@ -110,7 +115,11 @@ void MainWindow::saveToFile(const QString &path) {
 
     try {
         writeStream.writeCheckpoint();
-        writeStream << mDocument.fScenes.count();
+        const auto& scenes = mDocument.fScenes;
+        writeStream << scenes.count();
+        for(const auto& scene : scenes) {
+            scene->writeSettings(writeStream);
+        }
         mLayoutHandler->write(writeStream);
         writeStream.writeCheckpoint();
         mDocument.writeScenes(writeStream);
