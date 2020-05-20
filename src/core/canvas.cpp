@@ -981,7 +981,8 @@ void Canvas::readBoundingBox(eReadStream& src) {
     src >> mWidth;
     src >> mHeight;
     src >> mFps;
-    src.read(&mRange, sizeof(FrameRange));
+    FrameRange range; src >> range;
+    setFrameRange(range);
     anim_setAbsFrame(currFrame);
     clearGradientRWIds();
 }
