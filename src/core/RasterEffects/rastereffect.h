@@ -26,7 +26,8 @@ enum class RasterEffectType : short {
     CUSTOM, // C++
     CUSTOM_SHADER, // xml, GLSL
     MOTION_BLUR,
-    OIL
+    OIL,
+    WIPE
 };
 
 struct BoxRenderData;

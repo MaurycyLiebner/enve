@@ -141,9 +141,6 @@ qsptr<ShaderEffect> readIdCreateShaderEffectXEV(const QDomElement& ele) {
 
 #include "customidentifier.h"
 #include "RasterEffects/customrastereffectcreator.h"
-#include "RasterEffects/blureffect.h"
-#include "RasterEffects/shadoweffect.h"
-#include "RasterEffects/motionblureffect.h"
 
 qsptr<RasterEffect> createRasterEffectForNonCustomType(const RasterEffectType type) {
     switch(type) {
@@ -155,6 +152,8 @@ qsptr<RasterEffect> createRasterEffectForNonCustomType(const RasterEffectType ty
             return enve::make_shared<MotionBlurEffect>();
         case(RasterEffectType::OIL):
             return enve::make_shared<OilEffect>();
+        case(RasterEffectType::WIPE):
+            return enve::make_shared<WipeEffect>();
         default: return nullptr;
     }
 }

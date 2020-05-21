@@ -218,6 +218,7 @@ SOURCES += \
     RasterEffects/rastereffectcollection.cpp \
     RasterEffects/rastereffectmenucreator.cpp \
     RasterEffects/shadoweffect.cpp \
+    RasterEffects/wipe.cpp \
     ReadWrite/basicreadwrite.cpp \
     ReadWrite/ereadstream.cpp \
     ReadWrite/ewritestream.cpp \
@@ -543,6 +544,7 @@ HEADERS += \
     RasterEffects/rastereffectmenucreator.h \
     RasterEffects/rastereffectsinclude.h \
     RasterEffects/shadoweffect.h \
+    RasterEffects/wipe.h \
     ReadWrite/basicreadwrite.h \
     ReadWrite/efuturepos.h \
     ReadWrite/ereadstream.h \
@@ -707,3 +709,6 @@ unix {
 
 RESOURCES += \
     coreresources.qrc
+
+DISTFILES += \
+    RasterEffects/wipe.frag
