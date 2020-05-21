@@ -69,7 +69,8 @@ enum class AlignRelativeTo {
 
 class CORE_EXPORT MouseEvent {
 protected:
-    MouseEvent(const QPointF& pos,
+    MouseEvent(const bool synth,
+               const QPointF& pos,
                const QPointF& lastPos,
                const QPointF& lastPressPos,
                const bool mouseGrabbing,
@@ -82,6 +83,7 @@ protected:
                std::function<void()> releaseMouse,
                std::function<void()> grabMouse,
                QWidget * const widget) :
+        fSynth(synth),
         fPos(pos), fLastPos(lastPos), fLastPressPos(lastPressPos),
         fMouseGrabbing(mouseGrabbing), fScale(scale),
         fGlobalPos(globalPos), fButton(button), fButtons(buttons),
@@ -98,7 +100,8 @@ public:
                std::function<void()> releaseMouse,
                std::function<void()> grabMouse,
                QWidget * const widget) :
-        MouseEvent(pos, lastPos, lastPressPos, mouseGrabbing,
+        MouseEvent(e->source() == Qt::MouseEventNotSynthesized,
+                   pos, lastPos, lastPressPos, mouseGrabbing,
                    scale, e->globalPos(), e->button(),
                    e->buttons(), e->modifiers(), e->timestamp(),
                    releaseMouse, grabMouse, widget) {}
@@ -111,6 +114,7 @@ public:
         return fModifiers & Qt::CTRL;
     }
 
+    bool fSynth;
     QPointF fPos;
     QPointF fLastPos;
     QPointF fLastPressPos;
@@ -138,7 +142,7 @@ struct CORE_EXPORT KeyEvent : public MouseEvent {
              std::function<void()> releaseMouse,
              std::function<void()> grabMouse,
              QWidget * const widget) :
-      MouseEvent(pos, lastPos, lastPressPos, mouseGrabbing,
+      MouseEvent(false, pos, lastPos, lastPressPos, mouseGrabbing,
                  scale, globalPos, Qt::NoButton,
                  buttons, e->modifiers(), e->timestamp(),
                  releaseMouse, grabMouse, widget),

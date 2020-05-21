@@ -94,6 +94,9 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
     }
 
     if(mCurrentMode == CanvasMode::paint && leftPressed) {
+#ifdef Q_OS_WIN
+        if(e.fSynth) return;
+#endif
         const auto paintMode = mDocument.fPaintMode;
         if(paintMode <= PaintMode::colorize) {
             mPaintTarget.paintMove(e.fPos, e.fTimestamp, 1,
