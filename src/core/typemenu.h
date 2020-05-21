@@ -97,12 +97,31 @@ public:
         return child.get();
     }
 
+    TTypeMenu * addMenu(const QStringList& titles) {
+        TTypeMenu* menu = this;
+        for(const auto& title : titles) {
+            const auto menuT = menu->childMenu(title);
+            if(menuT) menu = menuT;
+            else menu = menu->addMenu(title);
+        }
+        return menu;
+    }
+
     TTypeMenu* childMenu(const QString& path) {
         for(const auto& child : mChildMenus) {
             if(child->mQMenu->title() == path)
                 return child.get();
         }
         return nullptr;
+    }
+
+    TTypeMenu* childMenu(const QStringList& path) {
+        TTypeMenu* menu = this;
+        for(const auto& subPath : path) {
+            menu = menu->childMenu(subPath);
+            if(!menu) return nullptr;
+        }
+        return menu;
     }
 
     QAction* addSeparator() {

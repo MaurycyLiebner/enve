@@ -42,8 +42,9 @@ struct CORE_EXPORT RasterEffectMenuCreator {
             if(path.isEmpty()) {
                 menu->addPlainAction<Target>(name, adder);
             } else {
-                auto childMenu = menu->childMenu(path);
-                if(!childMenu) childMenu = menu->addMenu(path);
+                const auto pathList = path.split('/');
+                auto childMenu = menu->childMenu(pathList);
+                if(!childMenu) childMenu = menu->addMenu(pathList);
                 childMenu->addPlainAction<Target>(name, adder);
             }
         };

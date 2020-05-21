@@ -14,7 +14,7 @@
 <!-- You should have received a copy of the GNU General Public License -->
 <!-- along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<ShaderEffect name="Wipe Left" menuPath="Transitions">
+<ShaderEffect name="Wipe Left" menuPath="Examples/Transitions">
     <Properties>
         <Property name="sharpness" type="float" min="0" max="1" step="0.01" ini="0" glValue="true"/>
         <Property name="time"      type="float" min="0" max="1" step="0.01" ini="0" glValue="true" influenceScaled="true"/>
