@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "wipe.h"
+#include "wipeeffect.h"
 #include "gpurendertools.h"
 
 #include "Animators/qrealanimator.h"
@@ -92,7 +92,7 @@ stdsptr<RasterEffectCaller> WipeEffect::getEffectCaller(
 
 void WipeEffectCaller::sInitialize(QGL33 * const gl) {
     try {
-        iniProgram(gl, sProgramId, GL_TEXTURED_VERT, ":/shaders/wipe.frag");
+        iniProgram(gl, sProgramId, GL_TEXTURED_VERT, ":/shaders/wipeeffect.frag");
     } catch(...) {
         RuntimeThrow("Could not initialize a program for WipeEffectCaller");
     }

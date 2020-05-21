@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DABTEST_H
-#define DABTEST_H
+#ifndef WIPEEFFECT_H
+#define WIPEEFFECT_H
 
 #include "rastereffect.h"
 
@@ -32,4 +32,4 @@ private:
     qsptr<QrealAnimator> mTime;
 };
 
-#endif // DABTEST_H
+#endif // WIPEEFFECT_H
