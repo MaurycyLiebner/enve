@@ -25,35 +25,33 @@ uniform float sharpness;
 uniform float direction;
 uniform float time;
 
+uniform float x0;
+uniform float x1;
+
 const float PI = 3.1415926535;
 const float sqrt2 = 1.41421356237;
 
 void main(void) {
-    float radDir = direction * PI / 180;
     float x = texCoord.x;
     float y = texCoord.y;
 
-    bool i = mod(radDir, PI) > 0.5*PI;
+    bool i = mod(direction, PI) > 0.5*PI;
+    float dir = direction;
     if(i) {
         x = 1 - x;
-        radDir = PI - radDir;
+        dir = PI - dir;
     }
+    bool ii = mod(dir, 2 * PI) > PI;
 
     float a = sqrt(x*x + y*y);
-    float b = radDir - asin(y / a);
-    float c = 0.25*PI - radDir;
+    float b = dir - asin(y / a);
+    float c = 0.25*PI - dir;
 
     float f = a * cos(b) / (cos(c) * sqrt2);
 
-    bool ii = mod(radDir, 2 * PI) > PI;
     if(ii) f = 1 - f;
 
     f += 0.33333 * sqrt2 * (1 - sharpness);
-
-    float width = 2 - sharpness;
-    float margin = 0.5*(width - 1);
-    float x0 = width * time - margin;
-    float x1 = x0 + 1 - sharpness;
 
     float alpha;
     if(f < x0) {
