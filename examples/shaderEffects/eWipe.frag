@@ -26,29 +26,29 @@ uniform float direction;
 uniform float time;
 
 const float PI = 3.1415926535;
+const float sqrt2 = 1.41421356237;
 
 void main(void) {
     float radDir = direction * PI / 180;
     float x = texCoord.x;
     float y = texCoord.y;
 
-    if(mod(radDir, PI) > 0.5*PI) {
+    bool i = mod(radDir, PI) > 0.5*PI;
+    if(i) {
         x = 1 - x;
         radDir = PI - radDir;
-        // y = 1 - y;
     }
 
     float a = sqrt(x*x + y*y);
     float b = radDir - asin(y / a);
     float c = 0.25*PI - radDir;
 
-    float f = a * cos(b) / cos(c) / sqrt(2);
+    float f = a * cos(b) / (cos(c) * sqrt2);
 
-    if(mod(radDir, 2 * PI) > PI) {
-        f = 1 - f;
-    }
+    bool ii = mod(radDir, 2 * PI) > PI;
+    if(ii) f = 1 - f;
 
-    f += 0.333 * sqrt(2) * (1 - sharpness);
+    f += 0.33333 * sqrt2 * (1 - sharpness);
 
     float width = 2 - sharpness;
     float margin = 0.5*(width - 1);
