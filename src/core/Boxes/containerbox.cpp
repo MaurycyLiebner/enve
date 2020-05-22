@@ -31,6 +31,33 @@
 #include "BlendEffects/blendeffectboxshadow.h"
 #include "svgexporter.h"
 #include "Private/Tasks/taskscheduler.h"
+#include "Properties/boolpropertycontainer.h"
+#include "ReadWrite/evformat.h"
+
+class FlipBookProperty : public BoolPropertyContainer {
+    e_OBJECT
+
+    FlipBookProperty(const QString& name) : BoolPropertyContainer(name) {
+        mIndex = enve::make_shared<IntAnimator>(0, -9999, 9999, 1, "index");
+        ca_addChild(mIndex);
+    }
+public:
+    void prp_readProperty(eReadStream &src) override {
+        if(src.evFileVersion() < EvFormat::flipBook) return;
+        BoolPropertyContainer::prp_readProperty(src);
+        SWT_setVisible(getValue());
+    }
+
+    int index() const {
+        return mIndex->getEffectiveIntValue();
+    }
+
+    int index(const qreal relFrame) const {
+        return mIndex->getEffectiveIntValue(relFrame);
+    }
+private:
+    qsptr<IntAnimator> mIndex;
+};
 
 ContainerBox::ContainerBox(const eBoxType type) :
     BoxWithPathEffects(type == eBoxType::group ? "Group" : "Layer",
@@ -40,6 +67,10 @@ ContainerBox::ContainerBox(const eBoxType type) :
             this, &ContainerBox::forcedMarginMeaningfulChange);
     iniPathEffects();
     if(type == eBoxType::layer || type == eBoxType::canvas) promoteToLayer();
+
+    mFlipBook = enve::make_shared<FlipBookProperty>("flip book");
+    ca_addChild(mFlipBook);
+    mFlipBook->SWT_hide();
 }
 
 ContainerBox::ContainerBox(const QString &name, const eBoxType type) :
@@ -394,6 +425,19 @@ void ContainerBox::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
         child->prp_setInheritedFrameShift(thisShift, this);
 }
 
+void ContainerBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
+    const PropertyMenu::CheckSelectedOp<ContainerBox> flipOp =
+    [](ContainerBox* const box, const bool checked) {
+        box->mFlipBook->SWT_setVisible(checked);
+    };
+    menu->addCheckableAction("Flip Book", mFlipBook->SWT_isVisible(), flipOp)
+            ->setDisabled(mFlipBook->getValue());
+
+    menu->addSeparator();
+
+    BoxWithPathEffects::prp_setupTreeViewMenu(menu);
+}
+
 QString ContainerBox::makeNameUniqueForDescendants(
         const QString &name, eBoxOrSound * const skip) {
     return NameFixer::makeNameUnique(
@@ -571,7 +615,9 @@ FrameRange ContainerBox::getMotionBlurIdenticalRange(
 bool ContainerBox::relPointInsidePath(const QPointF &relPos) const {
     if(getRelBoundingRect().contains(relPos)) {
         const QPointF absPos = mapRelPosToAbs(relPos);
-        for(const auto& box : mContainedBoxes) {
+        const auto minMax = getContainedMinMax();
+        for(int i = minMax.fMin; i <= minMax.fMax; i++) {
+            auto& box = mContainedBoxes.at(i);
             if(box->absPointInsidePath(absPos)) {
                 return true;
             }
@@ -598,6 +644,14 @@ bool ContainerBox::isCurrentGroup() const {
     return mIsCurrentGroup;
 }
 
+bool ContainerBox::isFlipBook() const {
+    return mFlipBook->getValue();
+}
+
+FlipBookProperty* ContainerBox::flipBook() const {
+    return mFlipBook.get();
+}
+
 void ContainerBox::updateContainedBoxes() {
     mContainedBoxes.clear();
     for(const auto& child : mContained) {
@@ -622,7 +676,9 @@ void ContainerBox::setDescendantCurrentGroup(const bool bT) {
 BoundingBox *ContainerBox::getBoxAtFromAllDescendents(const QPointF &absPos) {
     if(isLink()) return nullptr;
     BoundingBox* boxAtPos = nullptr;
-    for(const auto& box : mContainedBoxes) {
+    const auto minMax = getContainedMinMax();
+    for(int i = minMax.fMin; i <= minMax.fMax; i++) {
+        const auto& box = mContainedBoxes.at(i);
         if(box->isVisibleAndUnlocked() &&
             box->isVisibleAndInVisibleDurationRect()) {
             boxAtPos = box->getBoxAtFromAllDescendents(absPos);
@@ -720,7 +776,9 @@ void ContainerBox::drawContained(SkCanvas * const canvas,
                                  QList<BlendEffect::Delayed> &delayed) const {
     if(mContainedBoxes.isEmpty()) return;
     handleDelayed(delayed, drawId, nullptr, mContainedBoxes.last());
-    for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
+
+    const auto minMax = getContainedMinMax();
+    for(int i = minMax.fMax; i >= minMax.fMin; i--) {
         const auto& box = mContainedBoxes.at(i);
         const auto& nextBox = i == 0 ? nullptr : mContainedBoxes.at(i - 1);
         if(box->isVisibleAndInVisibleDurationRect()) {
@@ -879,7 +937,8 @@ void processChildData(BoundingBox * const child,
     if(child->isGroup()) {
         const auto childGroup = static_cast<ContainerBox*>(child);
         const auto& descs = childGroup->getContainedBoxes();
-        for(int i = descs.count() - 1; i >= 0; i--) {
+        const auto minMax = childGroup->getContainedMinMax();
+        for(int i = minMax.fMax; i >= minMax.fMin; i--) {
             const auto& desc = descs.at(i);
             const qreal descRelFrame = desc->prp_absFrameToRelFrameF(absFrame);
             processChildData(desc, parentData, descRelFrame, absFrame, delayed);
@@ -911,7 +970,8 @@ void ContainerBox::setupRenderData(const qreal relFrame,
     groupData->fOtherGlobalRects.clear();
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     QList<ChildRenderData> delayed;
-    for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
+    const auto minMax = getContainedMinMax();
+    for(int i = minMax.fMax; i >= minMax.fMin; i--) {
         const auto& box = mContainedBoxes.at(i);
         const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
         processChildData(box, groupData, boxRelFrame, absFrame, delayed);
@@ -985,8 +1045,9 @@ bool ContainerBox::diffsAffectingContainedBoxes(
 
 BoundingBox *ContainerBox::getBoxAt(const QPointF &absPos) {
     BoundingBox* boxAtPos = nullptr;
-
-    for(const auto& box : mContainedBoxes) {
+    const auto minMax = getContainedMinMax();
+    for(int i = minMax.fMin; i <= minMax.fMax; i++) {
+        const auto& box = mContainedBoxes.at(i);
         if(box->isVisibleAndUnlocked() &&
            box->isVisibleAndInVisibleDurationRect()) {
             if(box->absPointInsidePath(absPos)) {
@@ -1010,7 +1071,9 @@ void ContainerBox::anim_setAbsFrame(const int frame) {
 
 void ContainerBox::addContainedBoxesToSelection(const QRectF &rect) {
     const auto pScene = getParentScene();
-    for(const auto& box : mContainedBoxes) {
+    const auto minMax = getContainedMinMax();
+    for(int i = minMax.fMin; i <= minMax.fMax; i++) {
+        const auto& box = mContainedBoxes.at(i);
         if(box->isVisibleAndUnlocked() &&
                 box->isVisibleAndInVisibleDurationRect()) {
             if(box->isContainedIn(rect)) {
@@ -1168,6 +1231,22 @@ void ContainerBox::removeContained(const qsptr<eBoxOrSound>& child) {
     if(index < 0) return;
     removeContainedFromList(index);
     //child->setParent(nullptr);
+}
+
+iValueRange ContainerBox::getContainedMinMax() const {
+    int iMin, iMax;
+    const int count = mContainedBoxes.count();
+    if(isFlipBook()) {
+        const int index = abs(mFlipBook->index() % count);
+        iMin = index;
+        iMax = index;
+        const bool outsideRange = index < 0 || index >= count;
+        if(outsideRange) iMax = iMin - 1;
+    } else {
+        iMin = 0;
+        iMax = count - 1;
+    }
+    return {iMin, iMax};
 }
 
 qsptr<eBoxOrSound> ContainerBox::takeContained_k(const int id) {

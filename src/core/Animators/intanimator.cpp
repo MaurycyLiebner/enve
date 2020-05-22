@@ -37,6 +37,10 @@ int IntAnimator::getBaseIntValue(const qreal relFrame) const {
     return qRound(getBaseValue(relFrame));
 }
 
+int IntAnimator::getEffectiveIntValue() const {
+    return qRound(getEffectiveValue());
+}
+
 int IntAnimator::getEffectiveIntValue(const qreal relFrame) const {
     return qRound(getEffectiveValue(relFrame));
 }

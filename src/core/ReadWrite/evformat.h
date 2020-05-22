@@ -25,6 +25,7 @@ namespace EvFormat {
         betterSWTAbsReadWrite = 19,
         readSceneSettingsBeforeContent = 20,
         relativeFilePathSave = 21,
+        flipBook = 22,
 
         nextVersion
     };

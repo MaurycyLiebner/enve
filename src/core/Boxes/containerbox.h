@@ -18,9 +18,11 @@
 #define CONTAINERBOX_H
 #include "boxwithpatheffects.h"
 #include "conncontextobjlist.h"
+
 class PathBox;
 class PathEffectCollection;
 class BlendEffectBoxShadow;
+class FlipBookProperty;
 
 class CORE_EXPORT ContainerBox : public BoxWithPathEffects {
     Q_OBJECT
@@ -87,6 +89,8 @@ public:
 
     void prp_afterFrameShiftChanged(const FrameRange& oldAbsRange,
                                     const FrameRange& newAbsRange);
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
+
     void shiftAll(const int shift);
 
     void strokeWidthAction(const QrealAction& action);
@@ -160,6 +164,8 @@ public:
     void ungroupAbandomTransform_k();
 
     bool isCurrentGroup() const;
+    bool isFlipBook() const;
+    FlipBookProperty* flipBook() const;
 
     void updateContainedBoxes();
     bool replaceContained(const qsptr<eBoxOrSound>& replaced,
@@ -229,6 +235,8 @@ public:
             QList<BlendEffect::Delayed> &delayed) const;
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
+
+    iValueRange getContainedMinMax() const;
 protected:
     void saveBoxesSVG(SvgExporter& exp,
                       DomEleTask* const eleTask,
@@ -267,6 +275,7 @@ private:
     QList<BoundingBox*> mContainedBoxes;
     QList<qsptr<BlendEffectBoxShadow>> mBlendShadows;
     ConnContextObjList<qsptr<eBoxOrSound>> mContained;
+    qsptr<FlipBookProperty> mFlipBook;
 };
 
 #endif // CONTAINERBOX_H

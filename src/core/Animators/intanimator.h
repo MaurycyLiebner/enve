@@ -33,6 +33,7 @@ public:
     void setIntValueRange(const int minVal, const int maxVal);
 
     int getBaseIntValue(const qreal relFrame) const;
+    int getEffectiveIntValue() const;
     int getEffectiveIntValue(const qreal relFrame) const;
 
     static qsptr<IntAnimator> sCreateSeed() {

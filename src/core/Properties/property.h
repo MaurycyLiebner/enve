@@ -154,7 +154,7 @@ public:
     virtual bool prp_dependsOn(const Property* const prop) const
     { return prop == this; }
 public:
-    void prp_readProperty(eReadStream& src);
+    virtual void prp_readProperty(eReadStream& src);
     void prp_writeProperty(eWriteStream& dst) const;
 
     QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
