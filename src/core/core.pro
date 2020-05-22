@@ -212,6 +212,7 @@ SOURCES += \
     RasterEffects/blureffect.cpp \
     RasterEffects/customrastereffect.cpp \
     RasterEffects/motionblureffect.cpp \
+    RasterEffects/noisefadeeffect.cpp \
     RasterEffects/oileffect.cpp \
     RasterEffects/rastereffect.cpp \
     RasterEffects/rastereffectcaller.cpp \
@@ -536,6 +537,7 @@ HEADERS += \
     RasterEffects/blureffect.h \
     RasterEffects/customrastereffect.h \
     RasterEffects/motionblureffect.h \
+    RasterEffects/noisefadeeffect.h \
     RasterEffects/oileffect.h \
     RasterEffects/rastereffect.h \
     RasterEffects/customrastereffectcreator.h \
@@ -711,4 +713,5 @@ RESOURCES += \
     coreresources.qrc
 
 DISTFILES += \
+    RasterEffects/noisefadeeffect.frag \
     RasterEffects/wipeeffect.frag

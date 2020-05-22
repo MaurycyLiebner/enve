@@ -26,6 +26,7 @@ void RasterEffectMenuCreator::forEveryEffect(const EffectAdder& add) {
     add("Motion Blur", "", []() { return enve::make_shared<MotionBlurEffect>(); });
     add("Oil Painting", "", []() { return enve::make_shared<OilEffect>(); });
     add("Wipe", "Transitions", []() { return enve::make_shared<WipeEffect>(); });
+    add("Noise Fade", "Transitions", []() { return enve::make_shared<NoiseFadeEffect>(); });
 
     CustomRasterEffectCreator::sForEveryEffect(add);
     ShaderEffectCreator::sForEveryEffect(add);

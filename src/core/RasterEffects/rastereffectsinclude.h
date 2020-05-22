@@ -6,5 +6,6 @@
 #include "motionblureffect.h"
 #include "oileffect.h"
 #include "wipeeffect.h"
+#include "noisefadeeffect.h"
 
 #endif // RASTEREFFECTSINCLUDE_H
