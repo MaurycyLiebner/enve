@@ -128,7 +128,7 @@ void KeysClipboard::paste(const int pasteFrame, const bool merge,
         const auto& keys = animatorKeys.at(keysId);
         for(const auto& key : keys) {
             key->setRelFrame(key->getRelFrame() + dFrame);
-            animator->anim_appendKey(key);
+            animator->anim_appendKeyAction(key);
             rKeys.append(key.get());
             if(selectAction) selectAction(key.get());
         }
