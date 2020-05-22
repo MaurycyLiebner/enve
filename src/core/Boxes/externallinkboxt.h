@@ -49,12 +49,12 @@ public:
 
     void writeBoundingBox(eWriteStream& dst) const override {
         BoundingBox::writeBoundingBox(dst);
-        dst << getFilePath();
+        dst.writeFilePath(getFilePath());
     }
 
     void readBoundingBox(eReadStream& src) override {
         BoundingBox::readBoundingBox(src);
-        QString path; src >> path;
+        const QString path = src.readFilePath();
         setFilePath(path);
     }
 

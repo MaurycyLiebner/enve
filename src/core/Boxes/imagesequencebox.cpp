@@ -64,13 +64,13 @@ void ImageSequenceBox::changeSourceFile() {
 
 void ImageSequenceBox::writeBoundingBox(eWriteStream& dst) const {
     AnimationBox::writeBoundingBox(dst);
-    dst << mFileHandler.path();
+    dst.writeFilePath(mFileHandler->path());
 }
 
 void ImageSequenceBox::readBoundingBox(eReadStream& src) {
     AnimationBox::readBoundingBox(src);
-    QString dir; src >> dir;
-    setFolderPath(dir);
+    const QString path = src.readFilePath();
+    setFolderPath(path);
 }
 
 QDomElement ImageSequenceBox::prp_writePropertyXEV_impl(

@@ -6,6 +6,7 @@
 #include "../XML/runtimewriteid.h"
 
 #include <QIODevice>
+#include <QDir>
 
 class SimpleBrushWrapper;
 struct iValueRange;
@@ -34,6 +35,8 @@ class CORE_EXPORT eReadStream {
 public:
     eReadStream(const int evFileVersion, QIODevice* const src);
     eReadStream(QIODevice* const src);
+
+    void setPath(const QString& path);
 
     RuntimeIdToWriteId& objListIdConv() { return mObjectListIdConv; }
 
@@ -65,6 +68,8 @@ public:
     eReadStream& operator>>(QByteArray &val);
     eReadStream& operator>>(SimpleBrushWrapper*& brush);
 
+    QString readFilePath();
+
     template <typename T>
     eReadStream& operator>>(T& value) {
         value.read(*this);
@@ -75,6 +80,7 @@ public:
 private:
     const int mEvFileVersion;
     QIODevice* const mSrc;
+    QDir mDir;
     eReadFutureTable mFutureTable;
     RuntimeIdToWriteId mObjectListIdConv;
 };

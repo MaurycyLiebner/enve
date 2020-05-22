@@ -61,12 +61,12 @@ void ImageBox::fileHandlerAfterAssigned(ImageFileHandler *obj) {
 
 void ImageBox::writeBoundingBox(eWriteStream& dst) const {
     BoundingBox::writeBoundingBox(dst);
-    dst << mFileHandler.path();
+    dst.writeFilePath(mFileHandler->path());
 }
 
 void ImageBox::readBoundingBox(eReadStream& src) {
     BoundingBox::readBoundingBox(src);
-    QString path; src >> path;
+    const QString path = src.readFilePath();
     setFilePath(path);
 }
 

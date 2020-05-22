@@ -69,6 +69,7 @@ void MainWindow::loadEVFile(const QString &path) {
         const int evVersion = FileFooter::sReadEvFileVersion(&file);
         if(evVersion <= 0) RuntimeThrow("Incompatible or incomplete data");
         eReadStream readStream(evVersion, &file);
+        readStream.setPath(path);
 
         const qint64 savedPos = file.pos();
         const qint64 pos = file.size() - FileFooter::sSize(evVersion) -
@@ -112,7 +113,7 @@ void MainWindow::saveToFile(const QString &path) {
     if(!file.open(QIODevice::WriteOnly))
         RuntimeThrow("Could not open file for writing " + path + ".");
     eWriteStream writeStream(&file);
-
+    writeStream.setPath(path);
     try {
         writeStream.writeCheckpoint();
         const auto& scenes = mDocument.fScenes;

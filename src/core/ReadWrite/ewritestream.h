@@ -1,7 +1,8 @@
-#ifndef EWRITESTREAM_H
+﻿#ifndef EWRITESTREAM_H
 #define EWRITESTREAM_H
 
 #include <QFile>
+#include <QDir>
 
 #include "efuturepos.h"
 #include "../XML/runtimewriteid.h"
@@ -43,6 +44,8 @@ public:
 
     eWriteStream(QIODevice* const dst);
 
+    void setPath(const QString& path);
+
     RuntimeIdToWriteId& objListIdConv() { return mObjectListIdConv; }
 
     void writeFutureTable();
@@ -76,6 +79,8 @@ public:
     eWriteStream& operator<<(const QByteArray& val);
     eWriteStream& operator<<(SimpleBrushWrapper* const brush);
 
+    void writeFilePath(const QString& absPath);
+
     template <typename T>
     eWriteStream& operator<<(const T& value) {
         value.write(*this);
@@ -84,6 +89,7 @@ public:
 
 private:
     QIODevice* const mDst;
+    QDir mDir;
     eWriteFutureTable mFutureTable;
     RuntimeIdToWriteId mObjectListIdConv;
 };

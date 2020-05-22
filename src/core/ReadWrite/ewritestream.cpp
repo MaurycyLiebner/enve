@@ -15,6 +15,10 @@ void eWriteFutureTable::write(eWriteStream &dst) {
 
 eWriteStream::eWriteStream(QIODevice * const dst) : mDst(dst), mFutureTable(dst) {}
 
+void eWriteStream::setPath(const QString& path) {
+    mDir.setPath(QFileInfo(path).path());
+}
+
 void eWriteStream::writeFutureTable() {
     mFutureTable.write(*this);
 }
@@ -59,6 +63,12 @@ qint64 eWriteStream::writeCompressed(const void* const data, const qint64 len) {
     const auto compressed = qCompress(ba);
     *this << compressed;
     return compressed.size();
+}
+
+void eWriteStream::writeFilePath(const QString& absPath) {
+    const QString relPath = mDir.relativeFilePath(absPath);
+    *this << absPath;
+    *this << relPath;
 }
 
 eWriteStream& eWriteStream::operator<<(const QByteArray& val) {

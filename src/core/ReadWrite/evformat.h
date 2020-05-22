@@ -24,6 +24,7 @@ namespace EvFormat {
         oilEffectImprov = 18,
         betterSWTAbsReadWrite = 19,
         readSceneSettingsBeforeContent = 20,
+        relativeFilePathSave = 21,
 
         nextVersion
     };

@@ -27,6 +27,10 @@ eReadStream::eReadStream(const int evFileVersion, QIODevice * const src) :
 eReadStream::eReadStream(QIODevice * const src) :
     eReadStream(EvFormat::version, src) {}
 
+void eReadStream::setPath(const QString& path) {
+    mDir.setPath(QFileInfo(path).path());
+}
+
 void eReadStream::readFutureTable() { mFutureTable.read(); }
 
 eFuturePos eReadStream::readFuturePos() { return mFutureTable.readFuturePos(); }
@@ -47,6 +51,18 @@ void eReadStream::readCheckpoint(const QString &errMsg) {
 QByteArray eReadStream::readCompressed() {
     QByteArray compressed; *this >> compressed;
     return qUncompress(compressed);
+}
+
+QString eReadStream::readFilePath() {
+    QString readAbsPath; *this >> readAbsPath;
+    if(mEvFileVersion < EvFormat::relativeFilePathSave) {
+        return readAbsPath;
+    }
+    QString relPath; *this >> relPath;
+    const QString absPath = mDir.absoluteFilePath(relPath);
+    const QFileInfo fi(absPath);
+    if(fi.exists()) return fi.absoluteFilePath();
+    return readAbsPath;
 }
 
 eReadStream& eReadStream::operator>>(QByteArray& val) {

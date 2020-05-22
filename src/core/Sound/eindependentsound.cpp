@@ -117,12 +117,12 @@ void eIndependentSound::updateDurationRectLength() {
 #include "ReadWrite/basicreadwrite.h"
 void eIndependentSound::prp_writeProperty_impl(eWriteStream& dst) const {
     eBoxOrSound::prp_writeProperty_impl(dst);
-    dst << mFileHandler.path();
+    dst.writeFilePath(mFileHandler.path());
 }
 
 void eIndependentSound::prp_readProperty_impl(eReadStream& src) {
     eBoxOrSound::prp_readProperty_impl(src);
-    QString filePath; src >> filePath;
+    const QString filePath = src.readFilePath();
     if(!filePath.isEmpty()) setFilePath(filePath);
 }
 

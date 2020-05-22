@@ -93,12 +93,12 @@ void VideoBox::fileHandlerAfterAssigned(VideoFileHandler *obj) {
 
 void VideoBox::writeBoundingBox(eWriteStream& dst) const {
     AnimationBox::writeBoundingBox(dst);
-    dst << mFileHandler->path();
+    dst.writeFilePath(mFileHandler->path());
 }
 
 void VideoBox::readBoundingBox(eReadStream& src) {
     AnimationBox::readBoundingBox(src);
-    QString path; src >> path;
+    const QString path = src.readFilePath();
     setFilePath(path);
 }
 
