@@ -48,6 +48,12 @@ public:
         SWT_setVisible(getValue());
     }
 
+    void prp_readPropertyXEV_impl(const QDomElement &ele,
+                                  const XevImporter &imp) override {
+        BoolPropertyContainer::prp_readPropertyXEV_impl(ele, imp);
+        SWT_setVisible(getValue());
+    }
+
     int index() const {
         return mIndex->getEffectiveIntValue();
     }
