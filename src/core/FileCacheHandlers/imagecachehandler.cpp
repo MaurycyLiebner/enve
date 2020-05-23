@@ -110,7 +110,7 @@ void ImageFileHandler::replace() {
     const QString filters = FileExtensions::imageFilters() +
                             FileExtensions::layersFilters();
     const auto importPath = eDialogs::openFile(
-                "Change Source", mPath,
+                "Change Source", path(),
                 "Image Files (" + filters + ")");
     if(!importPath.isEmpty()) setPath(importPath);
 }

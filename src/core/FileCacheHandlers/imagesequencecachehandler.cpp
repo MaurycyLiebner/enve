@@ -21,11 +21,6 @@
 #include "filesourcescache.h"
 #include "fileshandler.h"
 
-void ImageSequenceFileHandler::afterPathSet(const QString &folderPath) {
-    Q_UNUSED(folderPath)
-    reload();
-}
-
 ImageCacheContainer* ImageSequenceFileHandler::getFrameAtFrame(const int relFrame) {
     if(mFrameImageHandlers.isEmpty()) return nullptr;
     const auto& cacheHandler = mFrameImageHandlers.at(relFrame);
@@ -52,9 +47,8 @@ eTask *ImageSequenceFileHandler::scheduleFrameLoad(const int frame) {
 
 void ImageSequenceFileHandler::reload() {
     mFrameImageHandlers.clear();
-    QDir dir(mPath);
-    mFileMissing = !dir.exists();
-    if(mFileMissing) return;
+    if(fileMissing()) return;
+    QDir dir(path());
     dir.setFilter(QDir::Files);
     dir.setSorting(QDir::Name);
     const auto files = dir.entryInfoList();
@@ -67,11 +61,11 @@ void ImageSequenceFileHandler::reload() {
         handler->clearCache();
         mFrameImageHandlers << handler;
     }
-    if(mFrameImageHandlers.isEmpty()) mFileMissing = true;
+    if(mFrameImageHandlers.isEmpty()) setMissing(true);
 }
 
 void ImageSequenceFileHandler::replace() {
-    const auto dir = eDialogs::openDir("Import Image Sequence", mPath);
+    const auto dir = eDialogs::openDir("Import Image Sequence", path());
     if(!dir.isEmpty()) setPath(dir);
 }
 

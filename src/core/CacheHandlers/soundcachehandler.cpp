@@ -50,7 +50,7 @@ void SoundDataHandler::afterSourceChanged() {}
 #include "GUI/edialogs.h"
 void SoundFileHandler::replace() {
     const auto importPath = eDialogs::openFile(
-                "Change Source", mPath,
+                "Change Source", path(),
                 "Audio Files (*.wav *.mp3)");
     if(!importPath.isEmpty()) setPath(importPath);
 }

@@ -134,7 +134,7 @@ void VideoDataHandler::clearCache() {
 
 void VideoFileHandler::replace() {
     const QString importPath = eDialogs::openFile(
-                "Replace Video Source " + mPath, mPath,
+                "Replace Video Source " + path(), path(),
                 "Video Files (" + FileExtensions::videoFilters() + ")");
     if(!importPath.isEmpty()) {
         const QFile file(importPath);
@@ -231,13 +231,19 @@ bool hasSound(const char* path) {
     return false;
 }
 
-void VideoFileHandler::afterPathSet(const QString &path) {
-    mDataHandler = VideoDataHandler::sGetCreateDataHandler<VideoDataHandler>(path);
-    if(!hasSound(path.toUtf8().data())) return mSoundHandler.reset();
-    mSoundHandler = SoundDataHandler::sGetCreateDataHandler<SoundDataHandler>(path);
-}
-
 void VideoFileHandler::reload() {
+    if(fileMissing()) {
+        mDataHandler.reset();
+        mSoundHandler.reset();
+        return;
+    }
+    const QString& path = this->path();
+    mDataHandler = VideoDataHandler::sGetCreateDataHandler<VideoDataHandler>(path);
     mDataHandler->reload();
-    if(mSoundHandler) mSoundHandler->reload();
+    if(hasSound(path.toUtf8().data())) {
+        return mSoundHandler.reset();
+    } else {
+        mSoundHandler = SoundDataHandler::sGetCreateDataHandler<SoundDataHandler>(path);
+        mSoundHandler->reload();
+    }
 }

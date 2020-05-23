@@ -23,6 +23,7 @@
 FileCacheHandler::FileCacheHandler() {}
 
 void FileCacheHandler::reloadAction() {
+    updateFileMissing();
     reload();
     emit reloaded();
 }
@@ -43,6 +44,15 @@ bool FileCacheHandler::deleteAction() {
 void FileCacheHandler::setPath(const QString &path) {
     if(mPath == path) return;
     mPath = path;
-    afterPathSet(path);
+    updateFileMissing();
+    reload();
     emit pathChanged(path);
+}
+
+void FileCacheHandler::setMissing(const bool missing) {
+    mFileMissing = missing;
+}
+
+void FileCacheHandler::updateFileMissing() {
+    mFileMissing = !QFileInfo(mPath).exists();
 }

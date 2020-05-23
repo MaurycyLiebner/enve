@@ -28,7 +28,6 @@ class CORE_EXPORT FileCacheHandler : public SelfRef {
 protected:
     FileCacheHandler();
 
-    virtual void afterPathSet(const QString& path) = 0;
     virtual void reload() = 0;
 public:
     virtual void replace() = 0;
@@ -46,6 +45,9 @@ signals:
     void deleteApproved(qsptr<FileCacheHandler>);
 protected:
     void setPath(const QString& path);
+    void setMissing(const bool missing);
+private:
+    void updateFileMissing();
 
     bool mFileMissing = false;
     QString mPath; // filename / dirname

@@ -296,6 +296,7 @@ void AnimationBox::setupRenderData(const qreal relFrame,
                                    BoxRenderData * const data,
                                    Canvas* const scene) {
     BoundingBox::setupRenderData(relFrame, data, scene);
+    if(!mSrcFramesCache) return;
     const auto imgData = static_cast<AnimationBoxRenderData*>(data);
     const int animFrame = getAnimationFrameForRelFrame(relFrame);
     imgData->fAnimFrame = animFrame;

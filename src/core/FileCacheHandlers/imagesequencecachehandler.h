@@ -21,7 +21,6 @@
 
 class CORE_EXPORT ImageSequenceFileHandler : public FileCacheHandler {
 protected:
-    void afterPathSet(const QString& folderPath);
     void reload();
 public:
     void replace();

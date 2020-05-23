@@ -103,14 +103,9 @@ class CORE_EXPORT ImageFileHandler : public FileCacheHandler {
 protected:
     ImageFileHandler() {}
 
-    void afterPathSet(const QString& path) {
-        const QFileInfo info(path);
-        mFileMissing = !info.exists();
-        if(mFileMissing) return mDataHandler.reset();
-        mDataHandler = ImageFileDataHandler::sGetCreateDataHandler<ImageFileDataHandler>(path);
-    }
-
     void reload() {
+        if(fileMissing()) return mDataHandler.reset();
+        mDataHandler = ImageFileDataHandler::sGetCreateDataHandler<ImageFileDataHandler>(path());
         mDataHandler->clearCache();
     }
 public:

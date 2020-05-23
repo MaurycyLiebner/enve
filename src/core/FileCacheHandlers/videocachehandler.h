@@ -90,7 +90,6 @@ class CORE_EXPORT VideoFileHandler : public FileCacheHandler {
     e_OBJECT
 protected:
     VideoFileHandler() {}
-    void afterPathSet(const QString& path);
 
     void reload();
 public:

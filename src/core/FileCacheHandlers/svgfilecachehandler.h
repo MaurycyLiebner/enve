@@ -27,7 +27,6 @@ class CORE_EXPORT SvgFileCacheHandler : public FileCacheHandler {
 protected:
     SvgFileCacheHandler();
 
-    void afterPathSet(const QString& path);
     void reload();
 public:
     void replace();

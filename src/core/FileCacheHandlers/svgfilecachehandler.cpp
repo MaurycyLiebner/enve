@@ -22,16 +22,11 @@
 
 SvgFileCacheHandler::SvgFileCacheHandler() {}
 
-void SvgFileCacheHandler::afterPathSet(const QString &path) {
-    Q_UNUSED(path)
-    reload();
-}
-
 void SvgFileCacheHandler::reload() {}
 
 void SvgFileCacheHandler::replace() {
     const QString importPath = eDialogs::openFile(
-                "Replace SVG Source " + mPath, mPath,
+                "Replace SVG Source " + path(), path(),
                 "Files (*.svg)");
     if(!importPath.isEmpty()) {
         const QFile file(importPath);

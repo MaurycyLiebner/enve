@@ -140,17 +140,10 @@ class CORE_EXPORT SoundFileHandler : public FileCacheHandler {
 protected:
     SoundFileHandler() {}
 
-    void afterPathSet(const QString& path) {
-        mFileMissing = !QFile(path).exists();
-        mDataHandler.reset();
-        if(mFileMissing) return;
-        const auto current = SoundDataHandler::sGetDataHandler<SoundDataHandler>(path);
-        if(current) mDataHandler = current->ref<SoundDataHandler>();
-        else mDataHandler = SoundDataHandler::sCreateDataHandler<SoundDataHandler>(path);
-    }
-
     void reload() {
-        mDataHandler->reload();
+        mDataHandler.reset();
+        if(fileMissing()) return;
+        mDataHandler = SoundDataHandler::sGetCreateDataHandler<SoundDataHandler>(path());
     }
 public:
     void replace();
