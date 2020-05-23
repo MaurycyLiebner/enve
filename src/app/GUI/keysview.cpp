@@ -265,6 +265,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
             mLastPressedKey = getKeyAtPos(posU.x(), posU.y(),
                                           mPixelsPerFrame,
                                           mMinViewedFrame);
+            const bool shiftPressed = e->modifiers() & Qt::SHIFT;
             if(!mLastPressedKey) {
                 mLastPressedMovable = getRectangleMovableAtPos(
                                             posU.x(), posU.y(),
@@ -277,11 +278,10 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                     mSelectionRect.setTopLeft(xFramePos);
                     mSelectionRect.setBottomRight(xFramePos);
                 } else {
-                    mLastPressedMovable->pressed(e->modifiers() & Qt::SHIFT);
+                    mLastPressedMovable->pressed(shiftPressed);
                     mMovingRect = true;
                 }
             } else {
-                const bool shiftPressed = e->modifiers() & Qt::SHIFT;
                 if(!shiftPressed && !mLastPressedKey->isSelected()) {
                     clearKeySelection();
                 }
@@ -757,8 +757,11 @@ void KeysView::handleMouseMove(const QPoint &pos,
         } else if(mMovingRect) {
             if(mFirstMove) {
                 if(mLastPressedMovable) {
-                    const auto childProp = mLastPressedMovable->getParentProperty();
                     const bool shiftPressed = QApplication::keyboardModifiers() & Qt::SHIFT;
+                    if(const auto dur = enve_cast<DurationRectangle*>(mLastPressedMovable)) {
+                        if(!dur->isSelected()) dur->selectionChangeTriggered(shiftPressed);
+                    }
+                    const auto childProp = mLastPressedMovable->getParentProperty();
                     mMoveAllSelected = shiftPressed &&
                             enve_cast<eBoxOrSound*>(childProp);
                     if(mMoveAllSelected) {
@@ -826,8 +829,8 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
         mScrollTimer->disconnect();
         mScrollTimer->stop();
     }
+    const bool shiftPressed = e->modifiers() & Qt::SHIFT;
     if(mGraphViewed && mGPressedPoint) {
-        const bool shiftPressed = e->modifiers() & Qt::SHIFT;
         if(mGPressedPoint->isKeyPt() && mFirstMove && !shiftPressed) {
             clearKeySelection();
             addKeyToSelection(mGPressedPoint->getParentKey());
@@ -855,13 +858,11 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                     mSelectionRect.setTop(bottomT);
                     mSelectionRect.setBottom(topT);
                 }
-                if(!(e->modifiers() & Qt::SHIFT)) {
-                    clearKeySelection();
-                }
+                if(!shiftPressed) clearKeySelection();
                 selectKeysInSelectionRect();
             } else if(mMovingKeys) {
                 if(mFirstMove && mLastPressedKey) {
-                    if(!(QApplication::keyboardModifiers() & Qt::ShiftModifier)) {
+                    if(!shiftPressed) {
                         clearKeySelection();
                         addKeyToSelection(mLastPressedKey);
                     }
@@ -871,6 +872,9 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                 }
             } else if(mMovingRect) {
                 if(mFirstMove) {
+                    if(const auto dur = enve_cast<DurationRectangle*>(mLastPressedMovable)) {
+                        dur->selectionChangeTriggered(shiftPressed);
+                    }
                 } else {
                     const auto childProp = mLastPressedMovable->getParentProperty();
                     if(mMoveAllSelected) {

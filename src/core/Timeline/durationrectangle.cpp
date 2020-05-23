@@ -120,13 +120,10 @@ DurationRectangle::DurationRectangle(Property &parentProp) :
             this, &DurationRectangle::maxRelFrameChanged);
 }
 
-void DurationRectangle::pressed(const bool shiftPressed) {
-    Q_UNUSED(shiftPressed)
-//    if(mParentProperty.SWT_isBoundingBox() ||
-//       mParentProperty.SWT_isSingleSound()) {
-//        const auto cont = static_cast<eBoxOrSound*>(&mParentProperty);
-//        cont->selectionChangeTriggered(shiftPressed);
-//    }
+void DurationRectangle::selectionChangeTriggered(const bool shiftPressed) {
+    if(const auto cont = enve_cast<eBoxOrSound*>(&mParentProperty)) {
+        cont->selectionChangeTriggered(shiftPressed);
+    }
 }
 
 bool DurationRectangle::isSelected() {

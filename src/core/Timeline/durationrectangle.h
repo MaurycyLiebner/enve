@@ -149,11 +149,11 @@ public:
     virtual void writeDurationRectangleXEV(QDomElement& ele) const;
     virtual void readDurationRectangleXEV(const QDomElement& ele);
 
-    void pressed(const bool shiftPressed);
-
     Qt::CursorShape getHoverCursorShape() {
         return Qt::OpenHandCursor;
     }
+
+    void selectionChangeTriggered(const bool shiftPressed);
 
     bool isSelected();
 
