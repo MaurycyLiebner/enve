@@ -156,6 +156,8 @@ qsptr<RasterEffect> createRasterEffectForNonCustomType(const RasterEffectType ty
             return enve::make_shared<WipeEffect>();
         case(RasterEffectType::NOISE_FADE):
             return enve::make_shared<NoiseFadeEffect>();
+        case(RasterEffectType::COLORIZE):
+            return enve::make_shared<ColorizeEffect>();
         default: return nullptr;
     }
 }

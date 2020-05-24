@@ -210,6 +210,7 @@ SOURCES += \
     RasterEffects/OilImpl/oilsimulator.cpp \
     RasterEffects/OilImpl/oiltrace.cpp \
     RasterEffects/blureffect.cpp \
+    RasterEffects/colorizeeffect.cpp \
     RasterEffects/customrastereffect.cpp \
     RasterEffects/motionblureffect.cpp \
     RasterEffects/noisefadeeffect.cpp \
@@ -535,6 +536,7 @@ HEADERS += \
     RasterEffects/OilImpl/oilsimulator.h \
     RasterEffects/OilImpl/oiltrace.h \
     RasterEffects/blureffect.h \
+    RasterEffects/colorizeeffect.h \
     RasterEffects/customrastereffect.h \
     RasterEffects/motionblureffect.h \
     RasterEffects/noisefadeeffect.h \
@@ -713,5 +715,6 @@ RESOURCES += \
     coreresources.qrc
 
 DISTFILES += \
+    RasterEffects/colorizeeffect.frag \
     RasterEffects/noisefadeeffect.frag \
     RasterEffects/wipeeffect.frag
