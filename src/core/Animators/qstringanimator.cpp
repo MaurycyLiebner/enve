@@ -24,9 +24,20 @@ QStringAnimator::QStringAnimator(const QString &name) :
     SteppedAnimator<QString>(name) {}
 
 QDomElement createTextElement(SvgExporter& exp, const QString& text) {
-    auto ele = exp.createElement("text");
-    ele.appendChild(exp.createTextNode(text));
-    return ele;
+    auto textEle = exp.createElement("text");
+
+    const QStringList lines = text.split(QRegExp("\n|\r\n|\r"));
+    for(int i = 0; i < lines.count(); i++) {
+        const auto& line = lines.at(i);
+        auto tspan = exp.createElement("tspan");
+        if(i != 0) tspan.setAttribute("dy", "1.2em");
+        tspan.setAttribute("x", 0);
+        const auto textNode = exp.createTextNode(line);
+        tspan.appendChild(textNode);
+        textEle.appendChild(tspan);
+    }
+
+    return textEle;
 }
 
 void QStringAnimator::saveSVG(SvgExporter& exp, QDomElement& parent,
