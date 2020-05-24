@@ -762,8 +762,8 @@ void KeysView::handleMouseMove(const QPoint &pos,
                         if(!dur->isSelected()) dur->selectionChangeTriggered(shiftPressed);
                     }
                     const auto childProp = mLastPressedMovable->getParentProperty();
-                    mMoveAllSelected = shiftPressed &&
-                            enve_cast<eBoxOrSound*>(childProp);
+                    mMoveAllSelected = true;
+                    // mMoveAllSelected = shiftPressed && enve_cast<eBoxOrSound*>(childProp);
                     if(mMoveAllSelected) {
                         if(mLastPressedMovable->isDurationRect()) {
                             mCurrentScene->startDurationRectPosTransformForAllSelected();
