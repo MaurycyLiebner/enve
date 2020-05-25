@@ -6,5 +6,6 @@
         <file alias="wipeeffect.frag">RasterEffects/wipeeffect.frag</file>
         <file alias="noisefadeeffect.frag">RasterEffects/noisefadeeffect.frag</file>
         <file alias="colorizeeffect.frag">RasterEffects/colorizeeffect.frag</file>
+        <file alias="brightnesscontrasteffect.frag">RasterEffects/brightnesscontrasteffect.frag</file>
     </qresource>
 </RCC>

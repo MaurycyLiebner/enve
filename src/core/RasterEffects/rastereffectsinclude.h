@@ -8,5 +8,6 @@
 #include "wipeeffect.h"
 #include "noisefadeeffect.h"
 #include "colorizeeffect.h"
+#include "brightnesscontrasteffect.h"
 
 #endif // RASTEREFFECTSINCLUDE_H

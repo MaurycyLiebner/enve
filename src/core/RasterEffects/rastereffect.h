@@ -29,7 +29,8 @@ enum class RasterEffectType : short {
     OIL,
     WIPE,
     NOISE_FADE,
-    COLORIZE
+    COLORIZE,
+    BRIGHTNESS_CONTRAST
 };
 
 struct BoxRenderData;

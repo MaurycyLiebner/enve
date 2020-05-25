@@ -220,18 +220,6 @@ public:
     void convertSelectedPathStrokesToPath();
     void convertSelectedBoxesToSculptedPath();
 
-    void applySampledMotionBlurToSelected();
-    void applyLinesEffectToSelected();
-    void applyCirclesEffectToSelected();
-    void applySwirlEffectToSelected();
-    void applyOilEffectToSelected();
-    void applyImplodeEffectToSelected();
-    void applyDesaturateEffectToSelected();
-    void applyColorizeEffectToSelected();
-    void applyReplaceColorEffectToSelected();
-    void applyContrastEffectToSelected();
-    void applyBrightnessEffectToSelected();
-
     void rotateSelectedBy(const qreal rotBy,
                           const QPointF &absOrigin,
                           const bool startTrans);

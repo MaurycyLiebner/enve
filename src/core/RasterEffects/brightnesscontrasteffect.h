@@ -14,16 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#version 330 core
-layout(location = 0) out vec4 fragColor;
+#ifndef BRIGHTNESSCONTRASTEFFECT_H
+#define BRIGHTNESSCONTRASTEFFECT_H
 
-in vec2 texCoord;
+#include "rastereffect.h"
 
-uniform sampler2D texture;
-uniform float brightness;
-uniform float contrast;
+class BrightnessContrastEffect : public RasterEffect {
+public:
+    BrightnessContrastEffect();
 
-void main(void) {
-    vec4 color = texture2D(texture, texCoord);
-    fragColor = vec4((color.rgb - 0.5*color.a) * (contrast + 1) + color.a*(0.5 + brightness), color.a);
-}
+    stdsptr<RasterEffectCaller> getEffectCaller(
+            const qreal relFrame, const qreal resolution,
+            const qreal influence, BoxRenderData * const data) const;
+private:
+    qsptr<QrealAnimator> mBrightness;
+    qsptr<QrealAnimator> mContrast;
+};
+
+#endif // BRIGHTNESSCONTRASTEFFECT_H

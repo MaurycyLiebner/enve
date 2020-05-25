@@ -22,7 +22,7 @@
 #include "Animators/qrealanimator.h"
 
 ColorizeEffect::ColorizeEffect() :
-    RasterEffect("Colorize", HardwareSupport::gpuPreffered,
+    RasterEffect("colorize", HardwareSupport::gpuPreffered,
                  true, RasterEffectType::COLORIZE) {
     mHue = enve::make_shared<QrealAnimator>(180, -9999, 9999, 1, "hue");
     ca_addChild(mHue);
