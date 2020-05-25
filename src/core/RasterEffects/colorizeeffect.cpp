@@ -110,16 +110,25 @@ void ColorizeEffectCaller::processCpu(CpuRenderTools& renderTools,
             qreal h = *src++/255.;
             qreal s = *src++/255.;
             qreal l = *src++/255.;
+            const uchar au = *src++;
+            if(au == 0) {
+                for(int i = 0; i < 4; i++) *dst++ = 0;
+                continue;
+            }
+            qreal a = au/255.;
+            h /= a;
+            s /= a;
+            l /= a;
             qrgb_to_hsl(h, s, l);
             h = mHue / 360.;
             s = mSaturation;
             l = qBound(0., l + mLightness, 1.);
             qhsl_to_rgb(h, s, l);
 
-            *dst++ = 255*h;
-            *dst++ = 255*s;
-            *dst++ = 255*l;
-            *dst++ = *src++;
+            *dst++ = 255*h*a;
+            *dst++ = 255*s*a;
+            *dst++ = 255*l*a;
+            *dst++ = au;
         }
     }
 }

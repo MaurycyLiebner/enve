@@ -58,11 +58,16 @@ vec3 RGBtoHSL(in vec3 RGB) {
 
 void main(void) {
     vec4 color = texture2D(texture, texCoord);
-    float h = mod(hue, 360.)/360.;
-    color.xyz = RGBtoHSL(color.rgb);
-    color.x = h;
-    color.y = saturation;
-    color.z = clamp(color.z + lightness, 0., 1.);
-    color.rgb = HSLtoRGB(color.xyz);
-    fragColor = color;
+    if(color.a < 0.00001f) {
+        fragColor = color;
+    } else {
+        float h = mod(hue, 360.)/360.;
+        color.rgb /= color.a;
+        color.xyz = RGBtoHSL(color.rgb);
+        color.x = h;
+        color.y = saturation;
+        color.z = clamp(color.z + lightness, 0., 1.);
+        color.rgb = HSLtoRGB(color.xyz) * color.a;
+        fragColor = color;
+    }
 }
