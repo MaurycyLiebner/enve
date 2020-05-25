@@ -200,7 +200,7 @@ GLint MotionBlurCaller::sRect2Loc = 0;
 
 void MotionBlurCaller::sInitialize(QGL33 * const gl) {
     try {
-        iniProgram(gl, sProgramId, GL_TEXTURED_VERT,
+        gIniProgram(gl, sProgramId, GL_TEXTURED_VERT,
                    ":/shaders/maxalpha.frag");
     } catch(...) {
         RuntimeThrow("Could not initialize a program for MotionBlurCaller");

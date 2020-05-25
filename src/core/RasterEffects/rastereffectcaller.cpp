@@ -20,10 +20,8 @@
 RasterEffectCaller::RasterEffectCaller(const HardwareSupport hwSupport,
                                        const bool forceMargin,
                                        const QMargins &margin) :
-    fForceMargin(forceMargin), fHwSupport(hwSupport), fMargin(margin) {}
-
-RasterEffectCaller::RasterEffectCaller(const HardwareSupport hwSupport) :
-    RasterEffectCaller(hwSupport, false, QMargins()) {}
+    fForceMargin(forceMargin),
+    fHwSupport(hwSupport), fMargin(margin) {}
 
 int RasterEffectCaller::cpuThreads(const int available,
                                    const int area) const {

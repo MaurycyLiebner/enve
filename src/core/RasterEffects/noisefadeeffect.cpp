@@ -16,6 +16,7 @@
 
 #include "noisefadeeffect.h"
 #include "gpurendertools.h"
+#include "openglrastereffectcaller.h"
 
 #include "Animators/qrealanimator.h"
 
@@ -35,30 +36,41 @@ NoiseFadeEffect::NoiseFadeEffect() :
     ca_addChild(mTime);
 }
 
-class NoiseFadeEffectCaller : public RasterEffectCaller {
+class NoiseFadeEffectCaller : public OpenGLRasterEffectCaller {
 public:
     NoiseFadeEffectCaller(const HardwareSupport hwSupport,
                           const qreal seed,
                           const qreal size,
                           const qreal sharpness,
                           const qreal time) :
-        RasterEffectCaller(hwSupport),
+        OpenGLRasterEffectCaller(sInitialized, sProgramId,
+                                 ":/shaders/noisefadeeffect.frag",
+                                 hwSupport),
         mSeed(seed),
         mSize(size),
         mSharpness(sharpness),
         mTime(time) {}
 
-    void processGpu(QGL33 * const gl,
-                    GpuRenderTools& renderTools);
-
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData& data);
+protected:
+    void iniVars(QGL33 * const gl) const {
+        sSeedU = gl->glGetUniformLocation(sProgramId, "seed");
+        sSizeU = gl->glGetUniformLocation(sProgramId, "size");
+        sSharpnessU = gl->glGetUniformLocation(sProgramId, "sharpness");
+        sTimeU = gl->glGetUniformLocation(sProgramId, "time");
+    }
+
+    void setVars(QGL33 * const gl) const {
+        gl->glUniform1f(sSeedU, mSeed);
+        gl->glUniform1f(sSizeU, mSize);
+        gl->glUniform1f(sSharpnessU, mSharpness);
+        gl->glUniform1f(sTimeU, mTime);
+    }
 private:
     qreal r(const QPointF& p) const;
     qreal n(const QPointF& p) const;
     qreal noise(const QPointF& p) const;
-
-    static void sInitialize(QGL33 * const gl);
 
     static bool sInitialized;
     static GLuint sProgramId;
@@ -95,52 +107,6 @@ stdsptr<RasterEffectCaller> NoiseFadeEffect::getEffectCaller(
 
     return enve::make_shared<NoiseFadeEffectCaller>(instanceHwSupport(),
                                                     seed, size, sharpness, time);
-}
-
-void NoiseFadeEffectCaller::sInitialize(QGL33 * const gl) {
-    try {
-        iniProgram(gl, sProgramId, GL_TEXTURED_VERT, ":/shaders/noisefadeeffect.frag");
-    } catch(...) {
-        RuntimeThrow("Could not initialize a program for NoiseFadeEffectCaller");
-    }
-
-    gl->glUseProgram(sProgramId);
-
-    const auto texLocation = gl->glGetUniformLocation(sProgramId, "texture");
-    gl->glUniform1i(texLocation, 0);
-
-    sSeedU = gl->glGetUniformLocation(sProgramId, "seed");
-    sSizeU = gl->glGetUniformLocation(sProgramId, "size");
-    sSharpnessU = gl->glGetUniformLocation(sProgramId, "sharpness");
-    sTimeU = gl->glGetUniformLocation(sProgramId, "time");
-}
-
-void NoiseFadeEffectCaller::processGpu(QGL33 * const gl,
-                                       GpuRenderTools &renderTools) {
-    renderTools.switchToOpenGL(gl);
-
-    if(!sInitialized) {
-        sInitialize(gl);
-        sInitialized = true;
-    }
-
-    renderTools.requestTargetFbo().bind(gl);
-    gl->glClear(GL_COLOR_BUFFER_BIT);
-
-    gl->glUseProgram(sProgramId);
-
-    gl->glUniform1f(sSeedU, mSeed);
-    gl->glUniform1f(sSizeU, mSize);
-    gl->glUniform1f(sSharpnessU, mSharpness);
-    gl->glUniform1f(sTimeU, mTime);
-
-    gl->glActiveTexture(GL_TEXTURE0);
-    renderTools.getSrcTexture().bind(gl);
-
-    gl->glBindVertexArray(renderTools.getSquareVAO());
-    gl->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    renderTools.swapTextures();
 }
 
 qreal GLSL_smoothstep(const qreal edge0,

@@ -93,7 +93,7 @@ GLuint DabTestCaller000::sProgramId = 0;
 
 void DabTestCaller000::sInitialize(QGL33 * const gl) {
     try {
-        iniProgram(gl, sProgramId, GL_TEXTURED_VERT,
+        gIniProgram(gl, sProgramId, GL_TEXTURED_VERT,
                    ":/shaders/normal.frag");
     } catch(...) {
         RuntimeThrow("Could not initialize a program for DabTestCaller000");

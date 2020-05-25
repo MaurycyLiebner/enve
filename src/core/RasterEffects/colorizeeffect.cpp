@@ -16,6 +16,7 @@
 
 #include "colorizeeffect.h"
 #include "gpurendertools.h"
+#include "openglrastereffectcaller.h"
 
 #include "colorhelpers.h"
 #include "Animators/qrealanimator.h"
@@ -33,25 +34,35 @@ ColorizeEffect::ColorizeEffect() :
     ca_addChild(mLightness);
 }
 
-class ColorizeEffectCaller : public RasterEffectCaller {
+class ColorizeEffectCaller : public OpenGLRasterEffectCaller {
 public:
     ColorizeEffectCaller(const HardwareSupport hwSupport,
                          const qreal hue,
                          const qreal saturation,
                          const qreal lightness) :
-        RasterEffectCaller(hwSupport),
+        OpenGLRasterEffectCaller(sInitialized, sProgramId,
+                                 ":/shaders/colorizeeffect.frag",
+                                 hwSupport),
         mHue(hue),
         mSaturation(saturation),
         mLightness(lightness) {}
 
-    void processGpu(QGL33 * const gl,
-                    GpuRenderTools& renderTools);
-
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData& data);
-private:
-    static void sInitialize(QGL33 * const gl);
+protected:
+    void iniVars(QGL33 * const gl) const {
+        sHueU = gl->glGetUniformLocation(sProgramId, "hue");
+        sSaturationU = gl->glGetUniformLocation(sProgramId, "saturation");
+        sLightnessU = gl->glGetUniformLocation(sProgramId, "lightness");
+    }
 
+    void setVars(QGL33 * const gl) const {
+        gl->glUseProgram(sProgramId);
+        gl->glUniform1f(sHueU, mHue);
+        gl->glUniform1f(sSaturationU, mSaturation);
+        gl->glUniform1f(sLightnessU, mLightness);
+    }
+private:
     static bool sInitialized;
     static GLuint sProgramId;
 
@@ -83,49 +94,6 @@ stdsptr<RasterEffectCaller> ColorizeEffect::getEffectCaller(
 
     return enve::make_shared<ColorizeEffectCaller>(instanceHwSupport(),
                                                    hue, saturation, lightness);
-}
-
-void ColorizeEffectCaller::sInitialize(QGL33 * const gl) {
-    try {
-        iniProgram(gl, sProgramId, GL_TEXTURED_VERT, ":/shaders/colorizeeffect.frag");
-    } catch(...) {
-        RuntimeThrow("Could not initialize a program for ColorizeEffectCaller");
-    }
-
-    gl->glUseProgram(sProgramId);
-
-    const auto texLocation = gl->glGetUniformLocation(sProgramId, "texture");
-    gl->glUniform1i(texLocation, 0);
-
-    sHueU = gl->glGetUniformLocation(sProgramId, "hue");
-    sSaturationU = gl->glGetUniformLocation(sProgramId, "saturation");
-    sLightnessU = gl->glGetUniformLocation(sProgramId, "lightness");
-}
-
-void ColorizeEffectCaller::processGpu(QGL33 * const gl,
-                                  GpuRenderTools &renderTools) {
-    renderTools.switchToOpenGL(gl);
-
-    if(!sInitialized) {
-        sInitialize(gl);
-        sInitialized = true;
-    }
-
-    renderTools.requestTargetFbo().bind(gl);
-    gl->glClear(GL_COLOR_BUFFER_BIT);
-
-    gl->glUseProgram(sProgramId);
-    gl->glUniform1f(sHueU, mHue);
-    gl->glUniform1f(sSaturationU, mSaturation);
-    gl->glUniform1f(sLightnessU, mLightness);
-
-    gl->glActiveTexture(GL_TEXTURE0);
-    renderTools.getSrcTexture().bind(gl);
-
-    gl->glBindVertexArray(renderTools.getSquareVAO());
-    gl->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    renderTools.swapTextures();
 }
 
 void ColorizeEffectCaller::processCpu(CpuRenderTools& renderTools,

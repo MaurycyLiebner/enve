@@ -26,7 +26,7 @@ ShaderEffectProgram::sCreateProgram(
     std::unique_ptr<ShaderEffectProgram> program =
             std::make_unique<ShaderEffectProgram>();
     try {
-        iniProgram(gl, program->fId, GL_TEXTURED_VERT, fragPath);
+        gIniProgram(gl, program->fId, GL_TEXTURED_VERT, fragPath);
     } catch(...) {
         RuntimeThrow("Could not initialize a program for ShaderEffectProgram");
     }

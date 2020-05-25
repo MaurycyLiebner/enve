@@ -27,9 +27,9 @@ enum class HardwareSupport : short;
 class CORE_EXPORT RasterEffectCaller : public StdSelfRef {
     e_OBJECT
 public:
-    RasterEffectCaller(const HardwareSupport hwSupport);
     RasterEffectCaller(const HardwareSupport hwSupport,
-                       const bool forceMargin, const QMargins& margin);
+                       const bool forceMargin = false,
+                       const QMargins& margin = QMargins());
 
     virtual void processGpu(QGL33 * const gl,
                             GpuRenderTools& renderTools) {

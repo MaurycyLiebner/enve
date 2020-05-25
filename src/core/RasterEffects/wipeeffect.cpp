@@ -16,6 +16,7 @@
 
 #include "wipeeffect.h"
 #include "gpurendertools.h"
+#include "openglrastereffectcaller.h"
 
 #include "Animators/qrealanimator.h"
 
@@ -32,25 +33,45 @@ WipeEffect::WipeEffect() :
     ca_addChild(mTime);
 }
 
-class WipeEffectCaller : public RasterEffectCaller {
+class WipeEffectCaller : public OpenGLRasterEffectCaller {
 public:
     WipeEffectCaller(const HardwareSupport hwSupport,
                      const qreal sharpness,
                      const qreal direction,
                      const qreal time) :
-        RasterEffectCaller(hwSupport),
+        OpenGLRasterEffectCaller(sInitialized, sProgramId,
+                                 ":/shaders/wipeeffect.frag",
+                                 hwSupport),
         mSharpness(sharpness),
         mDirection(direction),
         mTime(time) {}
 
-    void processGpu(QGL33 * const gl,
-                    GpuRenderTools& renderTools);
-
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData& data);
-private:
-    static void sInitialize(QGL33 * const gl);
+protected:
+    void iniVars(QGL33 * const gl) const {
+        sSharpnessU = gl->glGetUniformLocation(sProgramId, "sharpness");
+        sDirectionU = gl->glGetUniformLocation(sProgramId, "direction");
+        sTimeU = gl->glGetUniformLocation(sProgramId, "time");
 
+        sX0 = gl->glGetUniformLocation(sProgramId, "x0");
+        sX1 = gl->glGetUniformLocation(sProgramId, "x1");
+    }
+
+    void setVars(QGL33 * const gl) const {
+        gl->glUniform1f(sSharpnessU, mSharpness);
+        gl->glUniform1f(sDirectionU, mDirection * PI / 180.);
+        gl->glUniform1f(sTimeU, mTime);
+
+        const qreal width = 2 - mSharpness;
+        const qreal margin = 0.5*(width - 1);
+        const qreal x0 = width * mTime - margin;
+        const qreal x1 = x0 + 1 - mSharpness;
+
+        gl->glUniform1f(sX0, x0);
+        gl->glUniform1f(sX1, x1);
+    }
+private:
     static bool sInitialized;
     static GLuint sProgramId;
 
@@ -88,60 +109,6 @@ stdsptr<RasterEffectCaller> WipeEffect::getEffectCaller(
 
     return enve::make_shared<WipeEffectCaller>(instanceHwSupport(),
                                                sharpness, direction, time);
-}
-
-void WipeEffectCaller::sInitialize(QGL33 * const gl) {
-    try {
-        iniProgram(gl, sProgramId, GL_TEXTURED_VERT, ":/shaders/wipeeffect.frag");
-    } catch(...) {
-        RuntimeThrow("Could not initialize a program for WipeEffectCaller");
-    }
-
-    gl->glUseProgram(sProgramId);
-
-    const auto texLocation = gl->glGetUniformLocation(sProgramId, "texture");
-    gl->glUniform1i(texLocation, 0);
-
-    sSharpnessU = gl->glGetUniformLocation(sProgramId, "sharpness");
-    sDirectionU = gl->glGetUniformLocation(sProgramId, "direction");
-    sTimeU = gl->glGetUniformLocation(sProgramId, "time");
-
-    sX0 = gl->glGetUniformLocation(sProgramId, "x0");
-    sX1 = gl->glGetUniformLocation(sProgramId, "x1");
-}
-
-void WipeEffectCaller::processGpu(QGL33 * const gl,
-                                  GpuRenderTools &renderTools) {
-    renderTools.switchToOpenGL(gl);
-
-    if(!sInitialized) {
-        sInitialize(gl);
-        sInitialized = true;
-    }
-
-    renderTools.requestTargetFbo().bind(gl);
-    gl->glClear(GL_COLOR_BUFFER_BIT);
-
-    gl->glUseProgram(sProgramId);
-    gl->glUniform1f(sSharpnessU, mSharpness);
-    gl->glUniform1f(sDirectionU, mDirection * PI / 180.);
-    gl->glUniform1f(sTimeU, mTime);
-
-    const qreal width = 2 - mSharpness;
-    const qreal margin = 0.5*(width - 1);
-    const qreal x0 = width * mTime - margin;
-    const qreal x1 = x0 + 1 - mSharpness;
-
-    gl->glUniform1f(sX0, x0);
-    gl->glUniform1f(sX1, x1);
-
-    gl->glActiveTexture(GL_TEXTURE0);
-    renderTools.getSrcTexture().bind(gl);
-
-    gl->glBindVertexArray(renderTools.getSquareVAO());
-    gl->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    renderTools.swapTextures();
 }
 
 qreal GLSL_mod(const qreal x, const qreal y) {

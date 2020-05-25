@@ -42,7 +42,7 @@ void iniColorProgram(QGL33 * const gl,
                      const QString& vShaderPath,
                      const QString& fShaderPath) {
     try {
-        iniProgram(gl, program.fID, vShaderPath, fShaderPath);
+        gIniProgram(gl, program.fID, vShaderPath, fShaderPath);
         program.fHSVColorLoc = gl->glGetUniformLocation(
                     program.fID, "HSVColor"); // optional
         program.fRGBColorLoc = gl->glGetUniformLocation(
@@ -67,7 +67,7 @@ void iniColorProgram(QGL33 * const gl,
 
 void iniPlainColorProgram(QGL33 * const gl, const QString& colorShadersPath) {
     try {
-        iniProgram(gl, PLAIN_PROGRAM.fID, GL_PLAIN_VERT,
+        gIniProgram(gl, PLAIN_PROGRAM.fID, GL_PLAIN_VERT,
                    colorShadersPath + "plain.frag");
         PLAIN_PROGRAM.fRGBAColorLoc = gl->glGetUniformLocation(
                     PLAIN_PROGRAM.fID, "RGBAColor");
@@ -80,7 +80,7 @@ void iniPlainColorProgram(QGL33 * const gl, const QString& colorShadersPath) {
 
 void iniBorderProgram(QGL33 * const gl, const QString& colorShadersPath) {
     try {
-        iniProgram(gl, BORDER_PROGRAM.fID, GL_PLAIN_VERT,
+        gIniProgram(gl, BORDER_PROGRAM.fID, GL_PLAIN_VERT,
                    colorShadersPath + "border.frag");
         BORDER_PROGRAM.fBorderSizeLoc = gl->glGetUniformLocation(
                     BORDER_PROGRAM.fID, "borderSize");
@@ -93,7 +93,7 @@ void iniBorderProgram(QGL33 * const gl, const QString& colorShadersPath) {
 
 void iniDoubleBorderProgram(QGL33 * const gl, const QString& colorShadersPath) {
     try {
-        iniProgram(gl, DOUBLE_BORDER_PROGRAM.fID, GL_PLAIN_VERT,
+        gIniProgram(gl, DOUBLE_BORDER_PROGRAM.fID, GL_PLAIN_VERT,
                    colorShadersPath + "doubleborder.frag");
         DOUBLE_BORDER_PROGRAM.fInnerBorderSizeLoc = gl->glGetUniformLocation(
                     DOUBLE_BORDER_PROGRAM.fID, "innerBorderSize");
@@ -110,7 +110,7 @@ void iniDoubleBorderProgram(QGL33 * const gl, const QString& colorShadersPath) {
 
 void iniGradientProgram(QGL33 * const gl, const QString& colorShadersPath) {
     try {
-        iniProgram(gl, GRADIENT_PROGRAM.fID, GL_PLAIN_VERT,
+        gIniProgram(gl, GRADIENT_PROGRAM.fID, GL_PLAIN_VERT,
                    colorShadersPath + "gradient.frag");
         GRADIENT_PROGRAM.fRGBAColor1Loc = gl->glGetUniformLocation(
                     GRADIENT_PROGRAM.fID, "RGBAColor1");

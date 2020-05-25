@@ -118,9 +118,9 @@ void checkCompileErrors(QGL33 * const gl,
 }
 
 #include <QFile>
-void iniProgram(QGL33 * const gl, GLuint& program,
-                const QString& vShaderPath,
-                const QString& fShaderPath) {
+void gIniProgram(QGL33 * const gl, GLuint& program,
+                 const QString& vShaderPath,
+                 const QString& fShaderPath) {
     Q_INIT_RESOURCE(coreresources);
     std::string vertexCode;
     std::string fragmentCode;

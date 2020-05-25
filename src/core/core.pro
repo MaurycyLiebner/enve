@@ -215,6 +215,7 @@ SOURCES += \
     RasterEffects/motionblureffect.cpp \
     RasterEffects/noisefadeeffect.cpp \
     RasterEffects/oileffect.cpp \
+    RasterEffects/openglrastereffectcaller.cpp \
     RasterEffects/rastereffect.cpp \
     RasterEffects/rastereffectcaller.cpp \
     RasterEffects/rastereffectcollection.cpp \
@@ -541,6 +542,7 @@ HEADERS += \
     RasterEffects/motionblureffect.h \
     RasterEffects/noisefadeeffect.h \
     RasterEffects/oileffect.h \
+    RasterEffects/openglrastereffectcaller.h \
     RasterEffects/rastereffect.h \
     RasterEffects/customrastereffectcreator.h \
     RasterEffects/rastereffectcaller.h \

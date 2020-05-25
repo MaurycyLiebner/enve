@@ -31,10 +31,10 @@ extern void checkGLErrors(QGL33 * const gl, const QString& msg = "");
 
 //! @brief Creates a program, compiles, and attaches associated shaders.
 CORE_EXPORT
-extern void iniProgram(QGL33 * const gl,
-                       GLuint& program,
-                       const QString &vShaderPath,
-                       const QString &fShaderPath);
+extern void gIniProgram(QGL33 * const gl,
+                        GLuint& program,
+                        const QString &vShaderPath,
+                        const QString &fShaderPath);
 
 CORE_EXPORT
 extern void iniTexturedVShaderVBO(QGL33 * const gl);
