@@ -100,7 +100,7 @@ public:
                std::function<void()> releaseMouse,
                std::function<void()> grabMouse,
                QWidget * const widget) :
-        MouseEvent(e->source() == Qt::MouseEventNotSynthesized,
+        MouseEvent(e->source() != Qt::MouseEventNotSynthesized,
                    pos, lastPos, lastPressPos, mouseGrabbing,
                    scale, e->globalPos(), e->button(),
                    e->buttons(), e->modifiers(), e->timestamp(),
