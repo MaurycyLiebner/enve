@@ -36,6 +36,8 @@ public:
 
     using Processor = std::function<void(QIODevice* const dst)>;
     void processAsset(const QString& file, const Processor& func) const;
+
+    QString relPathToAbsPath(const QString& relPath) const;
 private:
     ZipFileLoader& mFileLoader;
     const RuntimeIdToWriteId& mObjectListIdConv;

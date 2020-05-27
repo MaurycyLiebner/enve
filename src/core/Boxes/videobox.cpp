@@ -104,14 +104,16 @@ void VideoBox::readBoundingBox(eReadStream& src) {
 
 QDomElement VideoBox::prp_writePropertyXEV_impl(const XevExporter& exp) const {
     auto result = AnimationBox::prp_writePropertyXEV_impl(exp);
-    result.setAttribute("src", mFileHandler.path());
+    const QString& absSrc = mFileHandler.path();
+    XevExportHelpers::setAbsAndRelFileSrc(absSrc, result, exp);
     return result;
 }
 
-void VideoBox::prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) {
+void VideoBox::prp_readPropertyXEV_impl(const QDomElement& ele,
+                                        const XevImporter& imp) {
     AnimationBox::prp_readPropertyXEV_impl(ele, imp);
-    const auto src = ele.attribute("src");
-    setFilePath(src);
+    const QString absSrc = XevExportHelpers::getAbsAndRelFileSrc(ele, imp);
+    setFilePath(absSrc);
 }
 
 #include "GUI/edialogs.h"

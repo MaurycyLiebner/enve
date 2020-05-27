@@ -76,13 +76,14 @@ void ImageSequenceBox::readBoundingBox(eReadStream& src) {
 QDomElement ImageSequenceBox::prp_writePropertyXEV_impl(
         const XevExporter& exp) const {
     auto result = AnimationBox::prp_writePropertyXEV_impl(exp);
-    result.setAttribute("src", mFileHandler.path());
+    const QString& absSrc = mFileHandler.path();
+    XevExportHelpers::setAbsAndRelFileSrc(absSrc, result, exp);
     return result;
 }
 
 void ImageSequenceBox::prp_readPropertyXEV_impl(
         const QDomElement& ele, const XevImporter& imp) {
     AnimationBox::prp_readPropertyXEV_impl(ele, imp);
-    const auto src = ele.attribute("src");
-    setFolderPath(src);
+    const QString absSrc = XevExportHelpers::getAbsAndRelFileSrc(ele, imp);
+    setFolderPath(absSrc);
 }

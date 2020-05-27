@@ -25,6 +25,8 @@
 #include <QString>
 
 class SimpleBrushWrapper;
+class XevExporter;
+class XevImporter;
 
 namespace XmlExportHelpers {
     CORE_EXPORT
@@ -72,6 +74,14 @@ namespace XevExportHelpers {
                                QDomDocument& doc);
     CORE_EXPORT
     SimpleBrushWrapper* brushFromElement(const QDomElement& ele);
+
+    CORE_EXPORT
+    void setAbsAndRelFileSrc(const QString& absSrc,
+                             QDomElement& ele,
+                             const XevExporter& exp);
+    CORE_EXPORT
+    QString getAbsAndRelFileSrc(const QDomElement& ele,
+                                const XevImporter& imp);
 };
 
 #endif // XMLEXPORTHELPERS_H

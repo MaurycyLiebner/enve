@@ -46,5 +46,9 @@ QDomText XevExporter::createTextNode(const QString& data) const {
 void XevExporter::processAsset(const QString& file, const Processor& func,
                                const bool compress) const {
     auto& fileSaver = mFileSaver->fileSaver();
-    fileSaver.process(mPath + "assets/" + mAssetsPath + file, func, false);
+    fileSaver.process(mPath + "assets/" + mAssetsPath + file, func, compress);
+}
+
+QString XevExporter::absPathToRelPath(const QString& absPath) const {
+    return mFileSaver->absPathToRelPath(absPath);
 }

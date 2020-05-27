@@ -44,6 +44,8 @@ public:
     using Processor = std::function<void(QIODevice* const dst)>;
     void processAsset(const QString& file, const Processor& func,
                       const bool compress = true) const;
+
+    QString absPathToRelPath(const QString& absPath) const;
 private:
     QDomDocument& mDoc;
     const stdsptr<XevZipFileSaver> mFileSaver;

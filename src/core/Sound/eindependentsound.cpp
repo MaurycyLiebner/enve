@@ -128,12 +128,13 @@ void eIndependentSound::prp_readProperty_impl(eReadStream& src) {
 
 QDomElement eIndependentSound::prp_writePropertyXEV_impl(const XevExporter& exp) const {
     auto result = eBoxOrSound::prp_writePropertyXEV_impl(exp);
-    result.setAttribute("src", mFileHandler.path());
+    const QString& absSrc = mFileHandler.path();
+    XevExportHelpers::setAbsAndRelFileSrc(absSrc, result, exp);
     return result;
 }
 
 void eIndependentSound::prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) {
     eBoxOrSound::prp_readPropertyXEV_impl(ele, imp);
-    const auto src = ele.attribute("src");
-    if(!src.isEmpty()) setFilePath(src);
+    const QString absSrc = XevExportHelpers::getAbsAndRelFileSrc(ele, imp);
+    if(!absSrc.isEmpty()) setFilePath(absSrc);
 }

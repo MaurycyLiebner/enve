@@ -34,15 +34,15 @@ protected:
 
     QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const override {
         auto result = T::prp_writePropertyXEV(exp);
-        result.setAttribute("src", getFilePath());
+        XevExportHelpers::setAbsAndRelFileSrc(getFilePath(), result, exp);
         return result;
     }
 
     void prp_readPropertyXEV_impl(const QDomElement& ele,
                              const XevImporter& imp) override {
         T::prp_readPropertyXEV_impl(ele, imp);
-        const auto src = ele.attribute("src");
-        setFilePath(src);
+        const QString absSrc = XevExportHelpers::getAbsAndRelFileSrc(ele, imp);
+        setFilePath(absSrc);
     }
 public:
     virtual void changeSourceFile() = 0;

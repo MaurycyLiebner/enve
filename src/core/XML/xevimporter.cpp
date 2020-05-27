@@ -34,3 +34,7 @@ XevImporter XevImporter::withAssetsPath(const QString& path) const {
 void XevImporter::processAsset(const QString& file, const Processor& func) const {
     mFileLoader.process(mPath + "assets/" + mAssetsPath + file, func);
 }
+
+QString XevImporter::relPathToAbsPath(const QString& relPath) const {
+    return mFileLoader.relPathToAbsPath(relPath);
+}

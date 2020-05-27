@@ -17,6 +17,8 @@
 #ifndef XEVZIPFILESAVER_H
 #define XEVZIPFILESAVER_H
 
+#include <QDir>
+
 #include "zipfilesaver.h"
 
 class CORE_EXPORT XevZipFileSaver {
@@ -26,7 +28,10 @@ public:
     ZipFileSaver& fileSaver() { return mFileSaver; }
 
     void setPath(const QString& path);
+
+    QString absPathToRelPath(const QString& absPath) const;
 private:
+    QDir mDir;
     QFile mFile;
     ZipFileSaver mFileSaver;
 };

@@ -19,9 +19,14 @@
 XevZipFileSaver::XevZipFileSaver() {}
 
 void XevZipFileSaver::setPath(const QString& path) {
+    mDir.setPath(QFileInfo(path).path());
     mFile.setFileName(path);
     if(mFile.exists()) mFile.remove();
     if(!mFile.open(QIODevice::WriteOnly))
         RuntimeThrow("Could not open file for writing '" + path + "'.");
     mFileSaver.setIoDevice(&mFile);
+}
+
+QString XevZipFileSaver::absPathToRelPath(const QString& absPath) const {
+    return mDir.relativeFilePath(absPath);
 }

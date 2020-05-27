@@ -18,6 +18,8 @@
 
 #include "Paint/simplebrushwrapper.h"
 #include "Paint/brushescontext.h"
+#include "xevexporter.h"
+#include "xevimporter.h"
 #include "exceptions.h"
 
 SkBlendMode XmlExportHelpers::stringToBlendMode(const QString& compOpStr) {
@@ -143,4 +145,24 @@ QString XmlExportHelpers::matrixToString(const QMatrix& m) {
     return QString("%1 %2 %3 %4 %5 %6").arg(m.m11()).arg(m.m12()).
                                         arg(m.m21()).arg(m.m22()).
                                         arg(m.dx()).arg(m.dy());
+}
+
+void XevExportHelpers::setAbsAndRelFileSrc(const QString& absSrc,
+                                           QDomElement& ele,
+                                           const XevExporter& exp) {
+    ele.setAttribute("relSrc", exp.absPathToRelPath(absSrc));
+    ele.setAttribute("absSrc", absSrc);
+}
+
+QString XevExportHelpers::getAbsAndRelFileSrc(const QDomElement& ele,
+                                              const XevImporter& imp) {
+    const auto relSrc = ele.attribute("relSrc");
+    const auto absRelSrc = imp.relPathToAbsPath(relSrc);
+    if(QFileInfo(absRelSrc).exists()) {
+        return absRelSrc;
+    } else {
+        const auto absSrc = ele.attribute("absSrc");
+        if(absSrc.isEmpty()) return absRelSrc;
+        else return absSrc;
+    }
 }

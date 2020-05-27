@@ -19,6 +19,7 @@
 ZipFileLoader::ZipFileLoader() {}
 
 void ZipFileLoader::setZipPath(const QString &path) {
+    mDir.setPath(QFileInfo(path).path());
     mZip.setZipName(path);
     if(!mZip.open(QuaZip::mdUnzip))
         RuntimeThrow("Could not open " + path);
@@ -44,4 +45,10 @@ void ZipFileLoader::processText(const QString& file, const TextProcessor& func) 
         QTextStream stream(src);
         func(stream);
     });
+}
+
+QString ZipFileLoader::relPathToAbsPath(const QString& relPath) const {
+    const QString absPath = mDir.absoluteFilePath(relPath);
+    const QFileInfo fi(absPath);
+    return fi.absoluteFilePath();
 }

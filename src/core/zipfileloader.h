@@ -19,6 +19,8 @@
 
 #include <quazip/quazipfile.h>
 
+#include <QDir>
+
 #include "exceptions.h"
 
 class CORE_EXPORT ZipFileLoader {
@@ -31,7 +33,10 @@ public:
     void process(const QString& file, const Processor& func);
     using TextProcessor = std::function<void(QTextStream& stream)>;
     void processText(const QString& file, const TextProcessor& func);
+
+    QString relPathToAbsPath(const QString& relPath) const;
 private:
+    QDir mDir;
     QuaZip mZip;
     QuaZipFile mFile;
 };
