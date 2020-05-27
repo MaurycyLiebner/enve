@@ -31,6 +31,7 @@
 #include "memorychecker.h"
 #include "memoryhandler.h"
 #include "simpletask.h"
+#include "eevent.h"
 
 CanvasWindow::CanvasWindow(Document &document,
                            QWidget * const parent) :
@@ -222,7 +223,7 @@ void CanvasWindow::mousePressEvent(QMouseEvent *event) {
     if(mMouseGrabber && button == Qt::LeftButton) return;
     const auto pos = mapToCanvasCoord(event->pos());
     mCurrentCanvas->mousePressEvent(
-                MouseEvent(pos, pos, pos, mMouseGrabber,
+                eMouseEvent(pos, pos, pos, mMouseGrabber,
                            mViewTransform.m11(), event,
                            [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
@@ -253,7 +254,7 @@ void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
     if(!mCurrentCanvas || mBlockInput) return;
     const auto pos = mapToCanvasCoord(event->pos());
     mCurrentCanvas->mouseReleaseEvent(
-                MouseEvent(pos, mPrevMousePos, mPrevPressPos,
+                eMouseEvent(pos, mPrevMousePos, mPrevPressPos,
                            mMouseGrabber, mViewTransform.m11(),
                            event, [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
@@ -273,7 +274,7 @@ void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
         pos = mPrevMousePos;
     }
     mCurrentCanvas->mouseMoveEvent(
-                MouseEvent(pos, mPrevMousePos, mPrevPressPos,
+                eMouseEvent(pos, mPrevMousePos, mPrevPressPos,
                            mMouseGrabber, mViewTransform.m11(),
                            event, [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
@@ -299,7 +300,7 @@ void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     if(!mCurrentCanvas || mBlockInput) return;
     const auto pos = mapToCanvasCoord(event->pos());
     mCurrentCanvas->mouseDoubleClickEvent(
-                MouseEvent(pos, mPrevMousePos, mPrevPressPos,
+                eMouseEvent(pos, mPrevMousePos, mPrevPressPos,
                            mMouseGrabber, mViewTransform.m11(),
                            event, [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
@@ -466,7 +467,7 @@ bool CanvasWindow::handleRevertPathKeyPress(QKeyEvent *event) {
     return true;
 }
 
-bool CanvasWindow::handleStartTransformKeyPress(const KeyEvent& e) {
+bool CanvasWindow::handleStartTransformKeyPress(const eKeyEvent& e) {
     if(mMouseGrabber) return false;
     if(e.fKey == Qt::Key_R) {
         return mCurrentCanvas->startRotatingAction(e);
@@ -525,7 +526,7 @@ bool CanvasWindow::KFT_keyReleaseEvent(QKeyEvent *event) {
     if(!isMouseGrabber()) return false;
     const QPoint globalPos = QCursor::pos();
     const auto pos = mapToCanvasCoord(mapFromGlobal(globalPos));
-    const KeyEvent e(pos, mPrevMousePos, mPrevPressPos, mMouseGrabber,
+    const eKeyEvent e(pos, mPrevMousePos, mPrevPressPos, mMouseGrabber,
                      mViewTransform.m11(), globalPos,
                      QApplication::mouseButtons(), event,
                      [this]() { releaseMouse(); },
@@ -540,7 +541,7 @@ bool CanvasWindow::KFT_keyPressEvent(QKeyEvent *event) {
     if(mCurrentCanvas->isPreviewingOrRendering()) return false;
     const QPoint globalPos = QCursor::pos();
     const auto pos = mapToCanvasCoord(mapFromGlobal(globalPos));
-    const KeyEvent e(pos, mPrevMousePos, mPrevPressPos, mMouseGrabber,
+    const eKeyEvent e(pos, mPrevMousePos, mPrevPressPos, mMouseGrabber,
                      mViewTransform.m11(), globalPos,
                      QApplication::mouseButtons(), event,
                      [this]() { releaseMouse(); },

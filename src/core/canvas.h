@@ -57,6 +57,9 @@ class VideoBox;
 class ImageBox;
 class Document;
 
+class eMouseEvent;
+class eKeyEvent;
+
 enum class CtrlsMode : short;
 
 enum class AlignPivot {
@@ -65,93 +68,6 @@ enum class AlignPivot {
 
 enum class AlignRelativeTo {
     scene, lastSelected
-};
-
-class CORE_EXPORT MouseEvent {
-protected:
-    MouseEvent(const bool synth,
-               const QPointF& pos,
-               const QPointF& lastPos,
-               const QPointF& lastPressPos,
-               const bool mouseGrabbing,
-               const qreal scale,
-               const QPoint& globalPos,
-               const Qt::MouseButton button,
-               const Qt::MouseButtons buttons,
-               const Qt::KeyboardModifiers modifiers,
-               const ulong& timestamp,
-               std::function<void()> releaseMouse,
-               std::function<void()> grabMouse,
-               QWidget * const widget) :
-        fSynth(synth),
-        fPos(pos), fLastPos(lastPos), fLastPressPos(lastPressPos),
-        fMouseGrabbing(mouseGrabbing), fScale(scale),
-        fGlobalPos(globalPos), fButton(button), fButtons(buttons),
-        fModifiers(modifiers), fTimestamp(timestamp),
-        fReleaseMouse(releaseMouse), fGrabMouse(grabMouse),
-        fWidget(widget) {}
-public:
-    MouseEvent(const QPointF& pos,
-               const QPointF& lastPos,
-               const QPointF& lastPressPos,
-               const bool mouseGrabbing,
-               const qreal scale,
-               const QMouseEvent * const e,
-               std::function<void()> releaseMouse,
-               std::function<void()> grabMouse,
-               QWidget * const widget) :
-        MouseEvent(e->source() != Qt::MouseEventNotSynthesized,
-                   pos, lastPos, lastPressPos, mouseGrabbing,
-                   scale, e->globalPos(), e->button(),
-                   e->buttons(), e->modifiers(), e->timestamp(),
-                   releaseMouse, grabMouse, widget) {}
-
-    bool shiftMod() const {
-        return fModifiers & Qt::SHIFT;
-    }
-
-    bool ctrlMod() const {
-        return fModifiers & Qt::CTRL;
-    }
-
-    bool fSynth;
-    QPointF fPos;
-    QPointF fLastPos;
-    QPointF fLastPressPos;
-    bool fMouseGrabbing;
-    qreal fScale;
-    QPoint fGlobalPos;
-    Qt::MouseButton fButton;
-    Qt::MouseButtons fButtons;
-    Qt::KeyboardModifiers fModifiers;
-    ulong fTimestamp;
-    std::function<void()> fReleaseMouse;
-    std::function<void()> fGrabMouse;
-    QWidget* fWidget;
-};
-
-struct CORE_EXPORT KeyEvent : public MouseEvent {
-    KeyEvent(const QPointF& pos,
-             const QPointF& lastPos,
-             const QPointF& lastPressPos,
-             const bool mouseGrabbing,
-             const qreal scale,
-             const QPoint globalPos,
-             const Qt::MouseButtons buttons,
-             const QKeyEvent * const e,
-             std::function<void()> releaseMouse,
-             std::function<void()> grabMouse,
-             QWidget * const widget) :
-      MouseEvent(false, pos, lastPos, lastPressPos, mouseGrabbing,
-                 scale, globalPos, Qt::NoButton,
-                 buttons, e->modifiers(), e->timestamp(),
-                 releaseMouse, grabMouse, widget),
-                 fAutorepeat(e->isAutoRepeat()),
-                 fType(e->type()), fKey(e->key()) {}
-
-    bool fAutorepeat;
-    QEvent::Type fType;
-    int fKey;
 };
 
 class CORE_EXPORT Canvas : public CanvasBase {
@@ -267,7 +183,7 @@ public:
     int getPointsSelectionCount() const ;
 
     void clearPointsSelectionOrDeselect();
-    NormalSegment getSegment(const MouseEvent &e) const;
+    NormalSegment getSegment(const eMouseEvent &e) const;
 
     void createLinkBoxForSelected();
     void startSelectedPointsTransform();
@@ -310,10 +226,10 @@ public:
     SculptPathBox* newSculptPathBox(const QPointF &pos);
     void newPaintBox(const QPointF &pos);
 
-    void mousePressEvent(const MouseEvent &e);
-    void mouseReleaseEvent(const MouseEvent &e);
-    void mouseMoveEvent(const MouseEvent &e);
-    void mouseDoubleClickEvent(const MouseEvent &e);
+    void mousePressEvent(const eMouseEvent &e);
+    void mouseReleaseEvent(const eMouseEvent &e);
+    void mouseMoveEvent(const eMouseEvent &e);
+    void mouseDoubleClickEvent(const eMouseEvent &e);
 
     struct TabletEvent {
         TabletEvent(const QPointF& pos, QTabletEvent * const e) :
@@ -426,11 +342,11 @@ public:
 protected:
     void setCurrentSmartEndPoint(SmartNodePoint * const point);
 
-    void handleMovePathMouseRelease(const MouseEvent &e);
-    void handleMovePointMouseRelease(const MouseEvent &e);
+    void handleMovePathMouseRelease(const eMouseEvent &e);
+    void handleMovePointMouseRelease(const eMouseEvent &e);
 
-    void handleRightButtonMouseRelease(const MouseEvent &e);
-    void handleLeftButtonMousePress(const MouseEvent &e);
+    void handleRightButtonMouseRelease(const eMouseEvent &e);
+    void handleLeftButtonMousePress(const eMouseEvent &e);
 signals:
     void requestUpdate();
     void newFrameRange(FrameRange);
@@ -466,10 +382,10 @@ public:
 
     SoundComposition *getSoundComposition();
 
-    void updateHoveredBox(const MouseEvent& e);
-    void updateHoveredPoint(const MouseEvent& e);
-    void updateHoveredEdge(const MouseEvent &e);
-    void updateHovered(const MouseEvent &e);
+    void updateHoveredBox(const eMouseEvent& e);
+    void updateHoveredPoint(const eMouseEvent& e);
+    void updateHoveredEdge(const eMouseEvent &e);
+    void updateHovered(const eMouseEvent &e);
     void clearHoveredEdge();
     void clearHovered();
 
@@ -595,16 +511,16 @@ public:
     void setParentToLastSelected();
     void clearParentForSelected();
 
-    bool startRotatingAction(const KeyEvent &e);
-    bool startScalingAction(const KeyEvent &e);
-    bool startMovingAction(const KeyEvent &e);
+    bool startRotatingAction(const eKeyEvent &e);
+    bool startScalingAction(const eKeyEvent &e);
+    bool startMovingAction(const eKeyEvent &e);
 
     void deselectAllBoxesAction();
     void selectAllBoxesAction();
     void selectAllPointsAction();
-    bool handlePaintModeKeyPress(const KeyEvent &e);
-    bool handleModifierChange(const KeyEvent &e);
-    bool handleTransormationInputKeyEvent(const KeyEvent &e);
+    bool handlePaintModeKeyPress(const eKeyEvent &e);
+    bool handleModifierChange(const eKeyEvent &e);
+    bool handleTransormationInputKeyEvent(const eKeyEvent &e);
 
     void setCurrentGroupParentAsCurrentGroup();
 
@@ -664,8 +580,8 @@ private:
     QList<SmartNodePoint*> getSortedSelectedNodes();
     void openTextEditorForTextBox(TextBox *textBox);
 
-    void scaleSelected(const MouseEvent &e);
-    void rotateSelected(const MouseEvent &e);
+    void scaleSelected(const eMouseEvent &e);
+    void rotateSelected(const eMouseEvent &e);
 
     void sculptPress(const QPointF& pos, const qreal pressure);
     void sculptMove(const QPointF& pos, const qreal pressure);
@@ -764,20 +680,20 @@ protected:
 
     std::map<int, stdsptr<ConnContextObjList<GraphAnimator*>>> mSelectedForGraph;
 
-    void handleMovePointMousePressEvent(const MouseEvent& e);
-    void handleMovePointMouseMove(const MouseEvent& e);
+    void handleMovePointMousePressEvent(const eMouseEvent& e);
+    void handleMovePointMouseMove(const eMouseEvent& e);
 
-    void handleMovePathMousePressEvent(const MouseEvent &e);
-    void handleMovePathMouseMove(const MouseEvent &e);
+    void handleMovePathMousePressEvent(const eMouseEvent &e);
+    void handleMovePathMouseMove(const eMouseEvent &e);
 
-    void handleLeftMouseRelease(const MouseEvent &e);
+    void handleLeftMouseRelease(const eMouseEvent &e);
 
-    void handleAddSmartPointMousePress(const MouseEvent &e);
-    void handleAddSmartPointMouseMove(const MouseEvent &e);
-    void handleAddSmartPointMouseRelease(const MouseEvent &e);
+    void handleAddSmartPointMousePress(const eMouseEvent &e);
+    void handleAddSmartPointMouseMove(const eMouseEvent &e);
+    void handleAddSmartPointMouseRelease(const eMouseEvent &e);
 
-    void updateTransformation(const KeyEvent &e);
-    QPointF getMoveByValueForEvent(const MouseEvent &e);
+    void updateTransformation(const eKeyEvent &e);
+    QPointF getMoveByValueForEvent(const eMouseEvent &e);
     void cancelCurrentTransform();
 };
 

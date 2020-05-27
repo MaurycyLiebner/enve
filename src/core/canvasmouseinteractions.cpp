@@ -16,6 +16,8 @@
 
 #include "canvas.h"
 
+#include "eevent.h"
+
 #include "Private/document.h"
 #include "GUI/dialogsinterface.h"
 
@@ -43,7 +45,7 @@
 #include <QMenu>
 #include <QInputDialog>
 
-void Canvas::handleMovePathMousePressEvent(const MouseEvent& e) {
+void Canvas::handleMovePathMousePressEvent(const eMouseEvent& e) {
     mPressedBox = mCurrentContainer->getBoxAt(e.fPos);
     if(e.shiftMod()) return;
     if(mPressedBox ? !mPressedBox->isSelected() : true) {
@@ -95,7 +97,7 @@ void Canvas::addActionsToMenu(QMenu *const menu) {
     });
 }
 
-void Canvas::handleRightButtonMouseRelease(const MouseEvent& e) {
+void Canvas::handleRightButtonMouseRelease(const eMouseEvent& e) {
     if(e.fMouseGrabbing) {
         cancelCurrentTransform();
         e.fReleaseMouse();
@@ -145,7 +147,7 @@ void Canvas::clearHoveredEdge() {
     mHoveredNormalSegment.reset();
 }
 
-void Canvas::handleMovePointMousePressEvent(const MouseEvent& e) {
+void Canvas::handleMovePointMousePressEvent(const eMouseEvent& e) {
     if(mHoveredNormalSegment.isValid()) {
         if(e.ctrlMod()) {
             clearPointsSelection();
@@ -170,7 +172,7 @@ void Canvas::handleMovePointMousePressEvent(const MouseEvent& e) {
 }
 
 
-void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
+void Canvas::handleLeftButtonMousePress(const eMouseEvent& e) {
     if(e.fMouseGrabbing) {
         //handleMouseRelease(event->pos());
         //releaseMouseAndDontTrack();
@@ -279,7 +281,7 @@ void Canvas::cancelCurrentTransform() {
     mTransMode = TransformMode::none;
 }
 
-void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
+void Canvas::handleMovePointMouseRelease(const eMouseEvent &e) {
     if(mRotPivot->isSelected()) {
         mRotPivot->setSelected(false);
     } else if(mTransMode == TransformMode::rotate ||
@@ -346,7 +348,7 @@ void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
     }
 }
 
-void Canvas::handleMovePathMouseRelease(const MouseEvent &e) {
+void Canvas::handleMovePathMouseRelease(const eMouseEvent &e) {
     if(mRotPivot->isSelected()) {
         if(!mStartTransform) mRotPivot->finishTransform();
         mRotPivot->setSelected(false);
@@ -478,7 +480,7 @@ void Canvas::drawPathFinish(const qreal invScale) {
     drawPathClear();
 }
 
-void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
+void Canvas::handleLeftMouseRelease(const eMouseEvent &e) {
     if(e.fMouseGrabbing) e.fReleaseMouse();
     if(mCurrentNormalSegment.isValid()) {
         if(!mStartTransform) mCurrentNormalSegment.finishPassThroughTransform();
@@ -541,7 +543,7 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
     mTransMode = TransformMode::none;
 }
 
-QPointF Canvas::getMoveByValueForEvent(const MouseEvent &e) {
+QPointF Canvas::getMoveByValueForEvent(const eMouseEvent &e) {
     if(mValueInput.inputEnabled())
         return mValueInput.getPtValue();
     const QPointF moveByPoint = e.fPos - e.fLastPressPos;
@@ -555,7 +557,7 @@ QPointF Canvas::getMoveByValueForEvent(const MouseEvent &e) {
 #include "MovablePoints/smartctrlpoint.h"
 #include "MovablePoints/pathpointshandler.h"
 #include "Boxes/smartvectorpath.h"
-void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
+void Canvas::handleMovePointMouseMove(const eMouseEvent &e) {
     if(mRotPivot->isSelected()) {
         if(mStartTransform) mRotPivot->startTransform();
         mRotPivot->moveByAbs(getMoveByValueForEvent(e));
@@ -637,7 +639,7 @@ void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
     }
 }
 
-void Canvas::scaleSelected(const MouseEvent& e) {
+void Canvas::scaleSelected(const eMouseEvent& e) {
     const QPointF absPos = mRotPivot->getAbsolutePos();
     const QPointF distMoved = e.fPos - e.fLastPressPos;
 
@@ -671,7 +673,7 @@ void Canvas::scaleSelected(const MouseEvent& e) {
     mRotPivot->setMousePos(e.fPos);
 }
 
-void Canvas::rotateSelected(const MouseEvent& e) {
+void Canvas::rotateSelected(const eMouseEvent& e) {
     const QPointF absPos = mRotPivot->getAbsolutePos();
     qreal rot;
     if(mValueInput.inputEnabled()) {
@@ -702,7 +704,7 @@ void Canvas::rotateSelected(const MouseEvent& e) {
     mRotPivot->setMousePos(e.fPos);
 }
 
-void Canvas::handleMovePathMouseMove(const MouseEvent& e) {
+void Canvas::handleMovePathMouseMove(const eMouseEvent& e) {
     if(mRotPivot->isSelected()) {
         if(mStartTransform) mRotPivot->startTransform();
         mRotPivot->moveByAbs(getMoveByValueForEvent(e));
@@ -721,7 +723,7 @@ void Canvas::handleMovePathMouseMove(const MouseEvent& e) {
     }
 }
 
-void Canvas::updateTransformation(const KeyEvent &e) {
+void Canvas::updateTransformation(const eKeyEvent &e) {
     if(mSelecting) {
         moveSecondSelectionPoint(e.fPos);
     } else if(mCurrentMode == CanvasMode::pointTransform) {

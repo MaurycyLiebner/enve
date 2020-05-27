@@ -142,7 +142,7 @@ private:
     bool handleGroupChangeKeyPress(QKeyEvent *event);
     bool handleResetTransformKeyPress(QKeyEvent *event);
     bool handleRevertPathKeyPress(QKeyEvent *event);
-    bool handleStartTransformKeyPress(const KeyEvent &e);
+    bool handleStartTransformKeyPress(const eKeyEvent &e);
     bool handleSelectAllKeyPress(QKeyEvent *event);
     bool handleShiftKeysKeyPress(QKeyEvent *event);    
 signals:

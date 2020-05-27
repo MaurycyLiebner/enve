@@ -270,6 +270,7 @@ SOURCES += \
     cpurendertools.cpp \
     customidentifier.cpp \
     drawpath.cpp \
+    eevent.cpp \
     efiltersettings.cpp \
     etexture.cpp \
     etextureframebuffer.cpp \
@@ -608,6 +609,7 @@ HEADERS += \
     customhandler.h \
     customidentifier.h \
     drawpath.h \
+    eevent.h \
     efiltersettings.h \
     etexture.h \
     etextureframebuffer.h \

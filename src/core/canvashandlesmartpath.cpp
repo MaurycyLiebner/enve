@@ -17,6 +17,7 @@
 #include "canvas.h"
 #include "MovablePoints/smartnodepoint.h"
 #include "Boxes/smartvectorpath.h"
+#include "eevent.h"
 
 void Canvas::clearCurrentSmartEndPoint() {
     setCurrentSmartEndPoint(nullptr);
@@ -31,7 +32,7 @@ void Canvas::setCurrentSmartEndPoint(SmartNodePoint * const point) {
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "Animators/transformanimator.h"
 
-void Canvas::handleAddSmartPointMousePress(const MouseEvent &e) {
+void Canvas::handleAddSmartPointMousePress(const eMouseEvent &e) {
     if(mLastEndPoint ? mLastEndPoint->isHidden(mCurrentMode) : false) {
         clearCurrentSmartEndPoint();
     }
@@ -77,7 +78,7 @@ void Canvas::handleAddSmartPointMousePress(const MouseEvent &e) {
 }
 
 
-void Canvas::handleAddSmartPointMouseMove(const MouseEvent &e) {
+void Canvas::handleAddSmartPointMouseMove(const eMouseEvent &e) {
     if(!mLastEndPoint) return;
     if(mStartTransform) mLastEndPoint->startTransform();
     if(mLastEndPoint->hasNextNormalPoint() &&
@@ -101,7 +102,7 @@ void Canvas::handleAddSmartPointMouseMove(const MouseEvent &e) {
     }
 }
 
-void Canvas::handleAddSmartPointMouseRelease(const MouseEvent &e) {
+void Canvas::handleAddSmartPointMouseRelease(const eMouseEvent &e) {
     Q_UNUSED(e)
     if(mLastEndPoint) {
         if(!mStartTransform) mLastEndPoint->finishTransform();

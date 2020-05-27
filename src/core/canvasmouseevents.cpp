@@ -24,6 +24,7 @@
 #include "Boxes/smartvectorpath.h"
 #include "Private/document.h"
 #include "MovablePoints/pathpivot.h"
+#include "eevent.h"
 
 SculptPathBox* Canvas::newSculptPathBox(const QPointF &pos) {
     const auto sculptBox = enve::make_shared<SculptPathBox>();
@@ -46,7 +47,7 @@ void Canvas::newPaintBox(const QPointF &pos) {
     addBoxToSelection(paintBox.get());
 }
 
-void Canvas::mousePressEvent(const MouseEvent &e) {
+void Canvas::mousePressEvent(const eMouseEvent &e) {
     if(mStylusDrawing) return;
     if(isPreviewingOrRendering()) return;
     if(e.fMouseGrabbing && e.fButton == Qt::LeftButton) return;
@@ -78,7 +79,7 @@ void Canvas::mousePressEvent(const MouseEvent &e) {
     }
 }
 
-void Canvas::mouseMoveEvent(const MouseEvent &e) {
+void Canvas::mouseMoveEvent(const eMouseEvent &e) {
     if(mStylusDrawing) return;
     if(isPreviewingOrRendering()) return;
 
@@ -163,7 +164,7 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
         e.fGrabMouse();
 }
 
-void Canvas::mouseReleaseEvent(const MouseEvent &e) {
+void Canvas::mouseReleaseEvent(const eMouseEvent &e) {
     if(isPreviewingOrRendering()) return;
     if(e.fButton == Qt::RightButton) {
         if(mCurrentMode == CanvasMode::paint) {
@@ -200,7 +201,7 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
 #include "MovablePoints/smartnodepoint.h"
 #include "MovablePoints/pathpointshandler.h"
 #include "Private/document.h"
-void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
+void Canvas::mouseDoubleClickEvent(const eMouseEvent &e) {
     if(e.fModifiers & Qt::ShiftModifier) return;
     mDoubleClick = true;
 

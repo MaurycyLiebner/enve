@@ -20,6 +20,7 @@
 #include "Boxes/smartvectorpath.h"
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "Private/document.h"
+#include "eevent.h"
 
 void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.isEmpty()) return;
@@ -262,7 +263,7 @@ void Canvas::startSelectedFillColorTransform() {
 }
 
 #include "Boxes/smartvectorpath.h"
-NormalSegment Canvas::getSegment(const MouseEvent& e) const {
+NormalSegment Canvas::getSegment(const eMouseEvent& e) const {
     const qreal zoomInv = 1/e.fScale;
     for(const auto &box : mSelectedBoxes) {
         const auto pathEdge = box->getNormalSegment(e.fPos, zoomInv);
