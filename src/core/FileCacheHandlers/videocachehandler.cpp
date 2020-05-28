@@ -241,9 +241,9 @@ void VideoFileHandler::reload() {
     mDataHandler = VideoDataHandler::sGetCreateDataHandler<VideoDataHandler>(path);
     mDataHandler->reload();
     if(hasSound(path.toUtf8().data())) {
-        return mSoundHandler.reset();
-    } else {
         mSoundHandler = SoundDataHandler::sGetCreateDataHandler<SoundDataHandler>(path);
         mSoundHandler->reload();
+    } else {
+        return mSoundHandler.reset();
     }
 }
