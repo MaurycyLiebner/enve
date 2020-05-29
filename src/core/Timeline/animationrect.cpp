@@ -16,6 +16,7 @@
 
 #include "animationrect.h"
 #include "Properties/property.h"
+#include "Private/esettings.h"
 
 int AnimationRect::getMaxAnimAbsFrame() const {
     return mParentProperty.prp_relFrameToAbsFrame(getMaxAnimRelFrame());
@@ -47,7 +48,8 @@ void AnimationRect::draw(QPainter * const p,
         QRect animDurRect(qFloor(firstRelDrawFrame*pixelsPerFrame), drawRect.y(),
                           qCeil(drawFrameSpan*pixelsPerFrame), drawRect.height());
 
-        p->fillRect(animDurRect.adjusted(0, 1, 0, -1), QColor(125, 125, 255, 180));
+        const auto& sett = eSettings::instance();
+        p->fillRect(animDurRect.adjusted(0, 1, 0, -1), sett.fAnimationRangeColor);
     }
     DurationRectangle::draw(p, drawRect, fps, pixelsPerFrame, absFrameRange);
 }

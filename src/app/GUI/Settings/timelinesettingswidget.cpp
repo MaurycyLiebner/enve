@@ -52,6 +52,22 @@ TimelineSettingsWidget::TimelineSettingsWidget(QWidget *parent) :
                  mPropertyKeyframeColor);
     add2HWidgets(new QLabel("Selected keyframe color"),
                  mSelectedKeyframeColor);
+
+    addSeparator();
+
+    mVisibilityRangeColor = new ColorAnimatorButton(
+                               mSett.fVisibilityRangeColor);
+    mSelectedVisibilityRangeColor = new ColorAnimatorButton(
+                               mSett.fSelectedVisibilityRangeColor);
+    mAnimationRangeColor = new ColorAnimatorButton(
+                               mSett.fAnimationRangeColor);
+
+    add2HWidgets(new QLabel("Visibility range color"),
+                 mVisibilityRangeColor);
+    add2HWidgets(new QLabel("Selected visibility range color"),
+                 mSelectedVisibilityRangeColor);
+    add2HWidgets(new QLabel("Animation range color"),
+                 mAnimationRangeColor);
 }
 
 void TimelineSettingsWidget::applySettings() {
@@ -65,6 +81,10 @@ void TimelineSettingsWidget::applySettings() {
     mSett.fPropertyGroupKeyframeColor = mPropertyGroupKeyframeColor->color();
     mSett.fPropertyKeyframeColor = mPropertyKeyframeColor->color();
     mSett.fSelectedKeyframeColor = mSelectedKeyframeColor->color();
+
+    mSett.fVisibilityRangeColor = mVisibilityRangeColor->color();
+    mSett.fSelectedVisibilityRangeColor = mSelectedVisibilityRangeColor->color();
+    mSett.fAnimationRangeColor = mAnimationRangeColor->color();
 }
 
 void TimelineSettingsWidget::updateSettings() {
@@ -78,4 +98,8 @@ void TimelineSettingsWidget::updateSettings() {
     mPropertyGroupKeyframeColor->setColor(mSett.fPropertyGroupKeyframeColor);
     mPropertyKeyframeColor->setColor(mSett.fPropertyKeyframeColor);
     mSelectedKeyframeColor->setColor(mSett.fSelectedKeyframeColor);
+
+    mVisibilityRangeColor->setColor(mSett.fVisibilityRangeColor);
+    mSelectedVisibilityRangeColor->setColor(mSett.fSelectedVisibilityRangeColor);
+    mAnimationRangeColor->setColor(mSett.fAnimationRangeColor);
 }

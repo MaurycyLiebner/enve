@@ -121,6 +121,10 @@ public:
     QColor fPropertyKeyframeColor;
     QColor fSelectedKeyframeColor;
 
+    QColor fVisibilityRangeColor;
+    QColor fSelectedVisibilityRangeColor;
+    QColor fAnimationRangeColor;
+
     // external applications
     QString fGimp = "gimp";
     QString fMyPaint = "mypaint";

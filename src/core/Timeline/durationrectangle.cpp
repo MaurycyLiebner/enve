@@ -18,6 +18,7 @@
 #include "CacheHandlers/hddcachablecachehandler.h"
 #include "GUI/global.h"
 #include "Boxes/boundingbox.h"
+#include "Private/esettings.h"
 
 TimelineMovable::TimelineMovable(const Type type, Property &parentProp) :
     mType(type), mParentProperty(parentProp) {}
@@ -226,8 +227,9 @@ void DurationRectangle::draw(QPainter * const p,
     }
 
     QColor fillColor;
-    if(isSelected()) fillColor = QColor(50, 50, 255, 120);
-    else fillColor = QColor(0, 0, 255, 120);
+    const auto& sett = eSettings::instance();
+    if(isSelected()) fillColor = sett.fSelectedVisibilityRangeColor;
+    else fillColor = sett.fVisibilityRangeColor;
 
     p->fillRect(durRect.adjusted(0, 1, 0, -1), fillColor);
     if(mHovered) {

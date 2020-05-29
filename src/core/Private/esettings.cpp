@@ -246,6 +246,19 @@ eSettings::eSettings(const int cpuThreads, const intKB ramKB,
                      "selectedKeyframeColor",
                      QColor(255, 255, 0));
 
+    gSettings << std::make_shared<eColorSetting>(
+                     fVisibilityRangeColor,
+                     "visibilityRangeColor",
+                     QColor(0, 0, 255, 120));
+    gSettings << std::make_shared<eColorSetting>(
+                     fSelectedVisibilityRangeColor,
+                     "selectedVisibilityRangeColor",
+                     QColor(255, 0, 255, 120));
+    gSettings << std::make_shared<eColorSetting>(
+                     fAnimationRangeColor,
+                     "animationRangeColor",
+                     QColor(255, 255, 255, 180));
+
     gSettings << std::make_shared<eStringSetting>(fGimp, "gimp", "gimp");
     gSettings << std::make_shared<eStringSetting>(fMyPaint, "mypaint", "mypaint");
     gSettings << std::make_shared<eStringSetting>(fKrita, "krita", "krita");
