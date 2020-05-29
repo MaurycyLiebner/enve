@@ -66,10 +66,11 @@ public:
 
     Property* getParentProperty() const { return &mParentProperty; }
 
-    void setClamp(const int min, const int max) {
-        setClampMin(min);
-        setClampMax(max);
-    }
+    void selectionChangeTriggered(const bool shiftPressed);
+
+    bool isSelected();
+
+    void setClamp(const int min, const int max);
 
     void setClampMin(const int min);
     void setClampMax(const int max);
@@ -152,10 +153,6 @@ public:
     Qt::CursorShape getHoverCursorShape() {
         return Qt::OpenHandCursor;
     }
-
-    void selectionChangeTriggered(const bool shiftPressed);
-
-    bool isSelected();
 
     void setFramesDuration(const int duration);
     int getFrameDuration() const;

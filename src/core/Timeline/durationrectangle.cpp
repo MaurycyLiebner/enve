@@ -86,6 +86,24 @@ void TimelineMovable::finishPosTransform() {
     mParentProperty.prp_addUndoRedo(ur);
 }
 
+void TimelineMovable::selectionChangeTriggered(const bool shiftPressed) {
+    if(const auto cont = enve_cast<eBoxOrSound*>(&mParentProperty)) {
+        cont->selectionChangeTriggered(shiftPressed);
+    }
+}
+
+bool TimelineMovable::isSelected() {
+    if(const auto cont = enve_cast<eBoxOrSound*>(&mParentProperty)) {
+        return cont->isSelected();
+    }
+    return false;
+}
+
+void TimelineMovable::setClamp(const int min, const int max) {
+    setClampMin(min);
+    setClampMax(max);
+}
+
 void TimelineMovable::setClampMax(const int max) {
     mClampMax = max;
 }
@@ -118,19 +136,6 @@ DurationRectangle::DurationRectangle(Property &parentProp) :
             this, &DurationRectangle::minRelFrameChanged);
     connect(&mMaxFrame, &TimelineMovable::valueChanged,
             this, &DurationRectangle::maxRelFrameChanged);
-}
-
-void DurationRectangle::selectionChangeTriggered(const bool shiftPressed) {
-    if(const auto cont = enve_cast<eBoxOrSound*>(&mParentProperty)) {
-        cont->selectionChangeTriggered(shiftPressed);
-    }
-}
-
-bool DurationRectangle::isSelected() {
-    if(const auto cont = enve_cast<eBoxOrSound*>(&mParentProperty)) {
-        return cont->isSelected();
-    }
-    return false;
 }
 
 void DurationRectangle::setFramesDuration(const int duration) {

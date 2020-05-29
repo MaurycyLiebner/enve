@@ -758,8 +758,8 @@ void KeysView::handleMouseMove(const QPoint &pos,
             if(mFirstMove) {
                 if(mLastPressedMovable) {
                     const bool shiftPressed = QApplication::keyboardModifiers() & Qt::SHIFT;
-                    if(const auto dur = enve_cast<DurationRectangle*>(mLastPressedMovable)) {
-                        if(!dur->isSelected()) dur->selectionChangeTriggered(shiftPressed);
+                    if(!mLastPressedMovable->isSelected()) {
+                        mLastPressedMovable->selectionChangeTriggered(shiftPressed);
                     }
                     const auto childProp = mLastPressedMovable->getParentProperty();
                     mMoveAllSelected = true;
@@ -872,8 +872,8 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                 }
             } else if(mMovingRect) {
                 if(mFirstMove) {
-                    if(const auto dur = enve_cast<DurationRectangle*>(mLastPressedMovable)) {
-                        dur->selectionChangeTriggered(shiftPressed);
+                    if(mLastPressedMovable) {
+                        mLastPressedMovable->selectionChangeTriggered(shiftPressed);
                     }
                 } else {
                     const auto childProp = mLastPressedMovable->getParentProperty();
