@@ -113,6 +113,8 @@ protected:
     qsptr<QPointFAnimator> mPosAnimator;
     qsptr<QPointFAnimator> mScaleAnimator;
     qsptr<QrealAnimator> mRotAnimator;
+private:
+    bool rotationFlipped() const;
 signals:
     void totalTransformChanged(const UpdateReason);
 };

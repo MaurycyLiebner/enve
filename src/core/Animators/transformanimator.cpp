@@ -92,7 +92,8 @@ void BasicTransformAnimator::startScaleTransform() {
 }
 
 void BasicTransformAnimator::rotateRelativeToSavedValue(const qreal rotRel) {
-    mRotAnimator->incSavedValueToCurrentValue(rotRel);
+    const bool flip = rotationFlipped();
+    mRotAnimator->incSavedValueToCurrentValue(flip ? -rotRel : rotRel);
 }
 
 void BasicTransformAnimator::moveRelativeToSavedValue(const qreal dX, const qreal dY) {
@@ -206,7 +207,8 @@ void BasicTransformAnimator::rotateRelativeToSavedValue(const qreal rotRel,
     matrix.rotate(rotRel);
     matrix.translate(-pivot.x() + mPosAnimator->getSavedXValue(),
                      -pivot.y() + mPosAnimator->getSavedYValue());
-    rotateRelativeToSavedValue(rotRel);
+    const bool flip = rotationFlipped();
+    rotateRelativeToSavedValue(flip ? -rotRel : rotRel);
     mPosAnimator->setBaseValue(QPointF(matrix.dx(), matrix.dy()));
 }
 
@@ -231,6 +233,10 @@ void BasicTransformAnimator::updateTotalTransform(const UpdateReason reason) {
         mTotalTransform = mRelTransform;
     }
     emit totalTransformChanged(reason);
+}
+
+bool BasicTransformAnimator::rotationFlipped() const {
+    return mInheritedTransform.m11() * mInheritedTransform.m22() < 0.;
 }
 
 const QMatrix &BasicTransformAnimator::getInheritedTransform() const {
