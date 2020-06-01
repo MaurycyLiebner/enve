@@ -24,7 +24,8 @@ class ColorSettingsWidget;
 class ColorPickingWidget : public QWidget {
     Q_OBJECT
 public:
-    explicit ColorPickingWidget(QWidget * const parent = nullptr);
+    explicit ColorPickingWidget(QScreen* const screen,
+                                QWidget * const parent = nullptr);
 
 protected:
     void mouseReleaseEvent(QMouseEvent *e);

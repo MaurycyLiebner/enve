@@ -26,14 +26,9 @@
 #include "GUI/global.h"
 #include <QWindow>
 
-ColorPickingWidget::ColorPickingWidget(QWidget * const parent)
+ColorPickingWidget::ColorPickingWidget(QScreen* const screen,
+                                       QWidget * const parent)
     : QWidget(parent) {
-    QScreen * screen = nullptr;
-    if(const auto window = windowHandle())
-        screen = window->screen();
-    else screen = QGuiApplication::primaryScreen();
-    if(!screen) return;
-
     mScreenshot = screen->grabWindow(0).toImage();
 
     QPixmap picker(":/cursors/cursor_color_picker.png");

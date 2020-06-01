@@ -17,6 +17,7 @@
 #include "colorsettingswidget.h"
 #include "GUI/mainwindow.h"
 #include <QResizeEvent>
+#include <QWindow>
 #include <QMenu>
 #include "GUI/ColorWidgets/colorpickingwidget.h"
 #include "colorhelpers.h"
@@ -241,7 +242,9 @@ void ColorSettingsWidget::moveAlphaWidgetToTab(const int tabId) {
 }
 
 void ColorSettingsWidget::startColorPicking() {
-    const auto wid = new ColorPickingWidget(MainWindow::sGetInstance());
+    const auto parent = MainWindow::sGetInstance();
+    const auto screen = parent->windowHandle()->screen();
+    const auto wid = new ColorPickingWidget(screen, parent);
     connect(wid, &ColorPickingWidget::colorSelected,
             [this](const QColor & color) {
         emitStartFullColorChangedSignal();
