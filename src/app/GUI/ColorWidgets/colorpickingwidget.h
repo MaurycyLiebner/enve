@@ -26,15 +26,16 @@ class ColorPickingWidget : public QWidget {
 public:
     explicit ColorPickingWidget(QWidget * const parent = nullptr);
 
+protected:
     void mouseReleaseEvent(QMouseEvent *e);
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
+    void focusOutEvent(QFocusEvent*);
 signals:
     void colorSelected(QColor);
 private:
     QColor colorFromPoint(const int x, const int y);
-    void endThis();
     void updateBox(const QPoint &pos);
 
     QImage mScreenshot;
