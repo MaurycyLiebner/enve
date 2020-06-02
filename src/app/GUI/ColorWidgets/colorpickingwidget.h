@@ -28,7 +28,7 @@ public:
                                 QWidget * const parent = nullptr);
 
 protected:
-    void mouseReleaseEvent(QMouseEvent *e);
+    void mousePressEvent(QMouseEvent *e);
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
     void mouseMoveEvent(QMouseEvent *e);

@@ -40,11 +40,11 @@ ColorPickingWidget::ColorPickingWidget(QScreen* const screen,
     setAttribute(Qt::WA_DeleteOnClose);
 
     showFullScreen();
-    updateBox(QCursor::pos());
+    updateBox(mapFromGlobal(QCursor::pos()));
     setFocus();
 }
 
-void ColorPickingWidget::mouseReleaseEvent(QMouseEvent *e) {
+void ColorPickingWidget::mousePressEvent(QMouseEvent *e) {
     if(e->button() == Qt::RightButton) {
         close();
     } else if(e->button() == Qt::LeftButton) {
@@ -96,4 +96,3 @@ void ColorPickingWidget::updateBox(const QPoint& pos) {
     mCurrentColor = colorFromPoint(pos.x(), pos.y());
     update();
 }
-
