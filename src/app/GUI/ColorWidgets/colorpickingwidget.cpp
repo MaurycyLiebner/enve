@@ -78,7 +78,7 @@ void ColorPickingWidget::keyPressEvent(QKeyEvent *e) {
 }
 
 void ColorPickingWidget::mouseMoveEvent(QMouseEvent *e) {
-    updateBox(e->globalPos());
+    updateBox(e->pos());
 }
 
 void ColorPickingWidget::focusOutEvent(QFocusEvent*) {
@@ -90,10 +90,10 @@ QColor ColorPickingWidget::colorFromPoint(const int x, const int y) {
     return QColor::fromRgb(rgb);
 }
 
-void ColorPickingWidget::updateBox(const QPoint& globalPos) {
-    mCursorX = globalPos.x();
-    mCursorY = globalPos.y();
-    mCurrentColor = colorFromPoint(globalPos.x(), globalPos.y());
+void ColorPickingWidget::updateBox(const QPoint& pos) {
+    mCursorX = pos.x();
+    mCursorY = pos.y();
+    mCurrentColor = colorFromPoint(pos.x(), pos.y());
     update();
 }
 
