@@ -36,11 +36,10 @@ ColorPickingWidget::ColorPickingWidget(QScreen* const screen,
 
     setMouseTracking(true);
 
-    setWindowFlag(Qt::SplashScreen);
+    setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_DeleteOnClose);
 
     showFullScreen();
-    updateBox(mapFromGlobal(QCursor::pos()));
     setFocus();
 }
 
@@ -82,7 +81,7 @@ void ColorPickingWidget::mouseMoveEvent(QMouseEvent *e) {
 }
 
 void ColorPickingWidget::focusOutEvent(QFocusEvent*) {
-    QTimer::singleShot(1000, this, &QWidget::close);
+    close();
 }
 
 QColor ColorPickingWidget::colorFromPoint(const int x, const int y) {
