@@ -38,7 +38,6 @@ signals:
 private:
     QColor colorFromPoint(const int x, const int y);
     void updateBox(const QPoint &pos);
-    void finish();
 
     QImage mScreenshot;
     QColor mCurrentColor;

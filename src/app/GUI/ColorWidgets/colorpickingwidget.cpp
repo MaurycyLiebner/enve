@@ -45,14 +45,12 @@ ColorPickingWidget::ColorPickingWidget(QScreen* const screen,
 }
 
 void ColorPickingWidget::mousePressEvent(QMouseEvent *e) {
-    qDebug() << "mouse press" << e->button();
     if(e->button() == Qt::RightButton) {
-        finish();
+        close();
     } else if(e->button() == Qt::LeftButton) {
-        qDebug() << "emit" << mCurrentColor;
         emit colorSelected(mCurrentColor);
         Document::sInstance->actionFinished();
-        finish();
+        close();
     }
 }
 
@@ -76,16 +74,15 @@ void ColorPickingWidget::paintEvent(QPaintEvent *) {
 
 void ColorPickingWidget::keyPressEvent(QKeyEvent *e) {
     if(e->isAutoRepeat()) return;
-    finish();
+    close();
 }
 
 void ColorPickingWidget::mouseMoveEvent(QMouseEvent *e) {
     updateBox(e->pos());
 }
 
-void ColorPickingWidget::focusOutEvent(QFocusEvent* e) {
-    qDebug() << "focus out" << e->reason();
-    finish();
+void ColorPickingWidget::focusOutEvent(QFocusEvent*) {
+    QTimer::singleShot(1000, this, &QWidget::close);
 }
 
 QColor ColorPickingWidget::colorFromPoint(const int x, const int y) {
@@ -98,9 +95,4 @@ void ColorPickingWidget::updateBox(const QPoint& pos) {
     mCursorY = pos.y();
     mCurrentColor = colorFromPoint(pos.x(), pos.y());
     update();
-}
-
-void ColorPickingWidget::finish() {
-    qDebug() << "finish";
-    close();
 }
