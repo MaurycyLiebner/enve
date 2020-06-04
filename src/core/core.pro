@@ -532,6 +532,7 @@ HEADERS += \
     Properties/boxtargetproperty.h \
     Properties/emimedata.h \
     Properties/namedproperty.h \
+    Properties/newproperty.h \
     RasterEffects/OilImpl/oilPaint.h \
     RasterEffects/OilImpl/oilbristle.h \
     RasterEffects/OilImpl/oilbrush.h \

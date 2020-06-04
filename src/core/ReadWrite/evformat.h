@@ -26,6 +26,7 @@ namespace EvFormat {
         readSceneSettingsBeforeContent = 20,
         relativeFilePathSave = 21,
         flipBook = 22,
+        colorizeInfluence = 23,
 
         nextVersion
     };

@@ -20,10 +20,16 @@
 
 #include "colorhelpers.h"
 #include "Animators/qrealanimator.h"
+#include "ReadWrite/evformat.h"
+#include "Properties/newproperty.h"
 
 ColorizeEffect::ColorizeEffect() :
     RasterEffect("colorize", HardwareSupport::gpuPreffered,
                  true, RasterEffectType::COLORIZE) {
+    using InfluenceType = NewProperty<QrealAnimator, EvFormat::colorizeInfluence>;
+    mInfluence = enve::make_shared<InfluenceType>(1, 0, 1, 0.01, "influence");
+    ca_addChild(mInfluence);
+
     mHue = enve::make_shared<QrealAnimator>(180, -9999, 9999, 1, "hue");
     ca_addChild(mHue);
 
@@ -37,12 +43,14 @@ ColorizeEffect::ColorizeEffect() :
 class ColorizeEffectCaller : public OpenGLRasterEffectCaller {
 public:
     ColorizeEffectCaller(const HardwareSupport hwSupport,
+                         const qreal influence,
                          const qreal hue,
                          const qreal saturation,
                          const qreal lightness) :
         OpenGLRasterEffectCaller(sInitialized, sProgramId,
                                  ":/shaders/colorizeeffect.frag",
                                  hwSupport),
+        mInfluence(influence),
         mHue(hue),
         mSaturation(saturation),
         mLightness(lightness) {}
@@ -51,6 +59,7 @@ public:
                     const CpuRenderData& data);
 protected:
     void iniVars(QGL33 * const gl) const {
+        sInfluenceU = gl->glGetUniformLocation(sProgramId, "influence");
         sHueU = gl->glGetUniformLocation(sProgramId, "hue");
         sSaturationU = gl->glGetUniformLocation(sProgramId, "saturation");
         sLightnessU = gl->glGetUniformLocation(sProgramId, "lightness");
@@ -58,6 +67,7 @@ protected:
 
     void setVars(QGL33 * const gl) const {
         gl->glUseProgram(sProgramId);
+        gl->glUniform1f(sInfluenceU, mInfluence);
         gl->glUniform1f(sHueU, mHue);
         gl->glUniform1f(sSaturationU, mSaturation);
         gl->glUniform1f(sLightnessU, mLightness);
@@ -66,10 +76,12 @@ private:
     static bool sInitialized;
     static GLuint sProgramId;
 
+    static GLint sInfluenceU;
     static GLint sHueU;
     static GLint sSaturationU;
     static GLint sLightnessU;
 
+    const qreal mInfluence;
     const qreal mHue;
     const qreal mSaturation;
     const qreal mLightness;
@@ -78,6 +90,7 @@ private:
 bool ColorizeEffectCaller::sInitialized = false;
 GLuint ColorizeEffectCaller::sProgramId = 0;
 
+GLint ColorizeEffectCaller::sInfluenceU = -1;
 GLint ColorizeEffectCaller::sHueU = -1;
 GLint ColorizeEffectCaller::sSaturationU = -1;
 GLint ColorizeEffectCaller::sLightnessU = -1;
@@ -88,11 +101,12 @@ stdsptr<RasterEffectCaller> ColorizeEffect::getEffectCaller(
     Q_UNUSED(resolution)
     Q_UNUSED(data)
 
+    const qreal infl = mInfluence->getEffectiveValue(relFrame) * influence;
     const qreal hue = mHue->getEffectiveValue(relFrame);
     const qreal saturation = mSaturation->getEffectiveValue(relFrame) * influence;
     const qreal lightness = mLightness->getEffectiveValue(relFrame);
 
-    return enve::make_shared<ColorizeEffectCaller>(instanceHwSupport(),
+    return enve::make_shared<ColorizeEffectCaller>(instanceHwSupport(), infl,
                                                    hue, saturation, lightness);
 }
 
@@ -107,28 +121,33 @@ void ColorizeEffectCaller::processCpu(CpuRenderTools& renderTools,
         auto dst = static_cast<uchar*>(renderTools.fDstBtmp.getAddr(0, yi - yMin));
         auto src = static_cast<uchar*>(renderTools.fSrcBtmp.getAddr(xMin, yi));
         for(int xi = xMin; xi <= xMax; xi++) {
-            qreal h = *src++/255.;
-            qreal s = *src++/255.;
-            qreal l = *src++/255.;
-            const uchar au = *src++;
-            if(au == 0) {
+            const uchar texR = *src++;
+            const uchar texG = *src++;
+            const uchar texB = *src++;
+            const uchar texA = *src++;
+
+            const qreal texRF = texR/255.;
+            const qreal texGF = texG/255.;
+            const qreal texBF = texB/255.;
+            const qreal texAF = texA/255.;
+
+            if(texA == 0) {
                 for(int i = 0; i < 4; i++) *dst++ = 0;
                 continue;
             }
-            qreal a = au/255.;
-            h /= a;
-            s /= a;
-            l /= a;
+            qreal h = texRF/texAF;
+            qreal s = texGF/texAF;
+            qreal l = texBF/texAF;
             qrgb_to_hsl(h, s, l);
             h = mHue / 360.;
             s = mSaturation;
             l = qBound(0., l + mLightness, 1.);
             qhsl_to_rgb(h, s, l);
 
-            *dst++ = 255*h*a;
-            *dst++ = 255*s*a;
-            *dst++ = 255*l*a;
-            *dst++ = au;
+            *dst++ = 255*(h*texAF*mInfluence + texRF*(1 - mInfluence));
+            *dst++ = 255*(s*texAF*mInfluence + texGF*(1 - mInfluence));
+            *dst++ = 255*(l*texAF*mInfluence + texBF*(1 - mInfluence));
+            *dst++ = texA;
         }
     }
 }

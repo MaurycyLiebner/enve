@@ -21,6 +21,7 @@ in vec2 texCoord;
 
 uniform sampler2D texture;
 
+uniform float influence;
 uniform float hue;
 uniform float saturation;
 uniform float lightness;
@@ -57,17 +58,18 @@ vec3 RGBtoHSL(in vec3 RGB) {
 }
 
 void main(void) {
-    vec4 color = texture2D(texture, texCoord);
-    if(color.a < 0.00001f) {
-        fragColor = color;
+    vec4 texColor = texture2D(texture, texCoord);
+    if(texColor.a < 0.00001f) {
+        fragColor = texColor;
     } else {
         float h = mod(hue, 360.)/360.;
+        vec4 color = texColor;
         color.rgb /= color.a;
         color.xyz = RGBtoHSL(color.rgb);
         color.x = h;
         color.y = saturation;
         color.z = clamp(color.z + lightness, 0., 1.);
         color.rgb = HSLtoRGB(color.xyz) * color.a;
-        fragColor = color;
+        fragColor = mix(texColor, color, influence);
     }
 }

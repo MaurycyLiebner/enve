@@ -27,6 +27,7 @@ public:
             const qreal relFrame, const qreal resolution,
             const qreal influence, BoxRenderData * const data) const;
 private:
+    qsptr<QrealAnimator> mInfluence;
     qsptr<QrealAnimator> mHue;
     qsptr<QrealAnimator> mSaturation;
     qsptr<QrealAnimator> mLightness;
