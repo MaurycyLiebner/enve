@@ -28,8 +28,6 @@ protected:
 public:
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
-    QString prp_tagNameXEV() const { return "TextEffects"; }
-
     bool hasEffects()
     { return ca_hasChildren(); }
 

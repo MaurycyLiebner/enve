@@ -46,8 +46,6 @@ public:
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
     void prp_readProperty_impl(eReadStream& src);
 
-    QString prp_tagNameXEV() const { return "BlendEffect"; }
-
     void writeIdentifier(eWriteStream &dst) const;
     void writeIdentifierXEV(QDomElement& ele) const;
 

@@ -55,7 +55,6 @@ public:
     void writeIdentifierXEV(QDomElement& ele) const;
 
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
-    QString prp_tagNameXEV() const { return "PathEffect"; }
 
     void apply(const qreal relFrame,
                const qreal influence,

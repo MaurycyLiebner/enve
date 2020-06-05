@@ -135,8 +135,6 @@ public:
     virtual void prp_startTransform() {}
     virtual void prp_finishTransform() {}
 
-    virtual QString prp_tagNameXEV() const { return "Property"; }
-
     virtual int prp_getTotalFrameShift() const;
     virtual int prp_getInheritedFrameShift() const;
 
@@ -156,6 +154,7 @@ public:
 public:
     virtual void prp_readProperty(eReadStream& src);
     void prp_writeProperty(eWriteStream& dst) const;
+    QString prp_tagNameXEV() const;
 
     QDomElement prp_writePropertyXEV(const XevExporter& exp) const;
     void prp_readPropertyXEV(const QDomElement& ele, const XevImporter& imp);

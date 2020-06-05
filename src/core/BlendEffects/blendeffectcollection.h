@@ -33,8 +33,6 @@ public:
     void prp_writeProperty_impl(eWriteStream &dst) const;
     void prp_readProperty_impl(eReadStream &src);
 
-    QString prp_tagNameXEV() const { return "BlendEffects"; }
-
     void blendSetup(ChildRenderData &data,
                     const int index, const qreal relFrame,
                     QList<ChildRenderData> &delayed) const;

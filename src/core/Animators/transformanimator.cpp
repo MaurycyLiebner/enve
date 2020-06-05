@@ -25,14 +25,14 @@
 
 BasicTransformAnimator::BasicTransformAnimator() :
     StaticComplexAnimator("transform") {
-    mPosAnimator = enve::make_shared<QPointFAnimator>("pos");
+    mPosAnimator = enve::make_shared<QPointFAnimator>("translation");
     mPosAnimator->setBaseValue(QPointF(0, 0));
 
     mScaleAnimator = enve::make_shared<QPointFAnimator>("scale");
     mScaleAnimator->setBaseValue(QPointF(1, 1));
     mScaleAnimator->setPrefferedValueStep(0.05);
 
-    mRotAnimator = enve::make_shared<QrealAnimator>("rot");
+    mRotAnimator = enve::make_shared<QrealAnimator>("rotation");
     mRotAnimator->setCurrentBaseValue(0);
 
     ca_addChild(mPosAnimator);
@@ -543,30 +543,6 @@ QMatrix AdvancedTransformAnimator::getRelativeTransformAtFrame(const qreal relFr
 
     matrix.translate(-pivotX, -pivotY);
     return matrix;
-}
-
-QDomElement AdvancedTransformAnimator::prp_writePropertyXEV_impl(
-        const XevExporter& exp) const {
-    auto result = exp.createElement("Transform");
-
-    XevExportHelpers::writeProperty(result, exp, "Translation", mPosAnimator.get());
-    XevExportHelpers::writeProperty(result, exp, "Scale", mScaleAnimator.get());
-    XevExportHelpers::writeProperty(result, exp, "Rotation", mRotAnimator.get());
-    XevExportHelpers::writeProperty(result, exp, "Pivot", mPivotAnimator.get());
-    XevExportHelpers::writeProperty(result, exp, "Shear", mShearAnimator.get());
-    XevExportHelpers::writeProperty(result, exp, "Opacity", mOpacityAnimator.get());
-
-    return result;
-}
-
-void AdvancedTransformAnimator::prp_readPropertyXEV_impl(
-        const QDomElement& ele, const XevImporter& imp) {
-    XevExportHelpers::readProperty(ele, imp, "Translation", mPosAnimator.get());
-    XevExportHelpers::readProperty(ele, imp, "Scale", mScaleAnimator.get());
-    XevExportHelpers::readProperty(ele, imp, "Rotation", mRotAnimator.get());
-    XevExportHelpers::readProperty(ele, imp, "Pivot", mPivotAnimator.get());
-    XevExportHelpers::readProperty(ele, imp, "Shear", mShearAnimator.get());
-    XevExportHelpers::readProperty(ele, imp, "Opacity", mOpacityAnimator.get());
 }
 
 BoxTransformAnimator::BoxTransformAnimator() {

@@ -45,7 +45,6 @@ protected:
     PathEffectCollection();
 public:
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
-    QString prp_tagNameXEV() const { return "PathEffects"; }
 
     bool hasEffects();
     void readPathEffect(eReadStream &target);

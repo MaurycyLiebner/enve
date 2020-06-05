@@ -51,8 +51,6 @@ public:
     void saveSVG(SvgExporter& exp) const;
 signals:
     void removed();
-protected:
-    QString prp_tagNameXEV() const { return "Gradient"; }
 private:
     QGradientStops mQGradientStops;
 };

@@ -31,29 +31,25 @@ void StaticComplexAnimator::prp_readProperty_impl(eReadStream &src) {
         prop->prp_readProperty(src);
 }
 
-void StaticComplexAnimator::prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) {
+void StaticComplexAnimator::prp_readPropertyXEV_impl(
+        const QDomElement& ele, const XevImporter& imp) {
     const auto& children = ca_getChildren();
-    const auto childNodes = ele.childNodes();
-    const int count = qMin(childNodes.count(), children.count());
-    for(int i = 0; i < count; i++) {
-        const auto node = childNodes.at(i);
-        if(!node.isElement()) continue;
-        const auto element = node.toElement();
-        const auto& prop = children.at(i);
-        const auto path = QString::number(i) + "/";
-        prop->prp_readPropertyXEV(element, imp.withAssetsPath(path));
+    for(const auto& c : children) {
+        const QString tagName = c->prp_tagNameXEV();
+        const auto path = tagName + "/";
+        const auto impc = imp.withAssetsPath(path);
+        XevExportHelpers::readProperty(ele, impc, tagName, c.get());
     }
 }
 
 void StaticComplexAnimator::writeChildPropertiesXEV(
         QDomElement& prop, const XevExporter& exp) const {
     const auto& children = ca_getChildren();
-    int id = 0;
     for(const auto& c : children) {
-        const auto path = QString::number(id++) + "/";
+        const QString tagName = c->prp_tagNameXEV();
+        const auto path = tagName + "/";
         const auto expc = exp.withAssetsPath(path);
-        auto child = c->prp_writePropertyXEV(*expc);
-        prop.appendChild(child);
+        XevExportHelpers::writeProperty(prop, *expc, tagName, c.get());
     }
 }
 

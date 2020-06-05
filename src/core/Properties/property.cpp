@@ -80,6 +80,27 @@ void Property::prp_writeProperty(eWriteStream& dst) const {
     SWT_writeAbstraction(dst);
 }
 
+QString Property::prp_tagNameXEV() const {
+    const QString& name = prp_getName();
+    QString result;
+    result.reserve(name.length());
+    bool upper = true;
+    for(int i = 0; i < name.length(); i++) {
+        auto c = name[i];
+        if(c == ' ') {
+            upper = true;
+            continue;
+        }
+        if(upper) {
+            result.append(c.toUpper());
+            upper = false;
+        } else {
+            result.append(c);
+        }
+    }
+    return result;
+}
+
 QDomElement Property::prp_writePropertyXEV(const XevExporter& exp) const {
     auto result = prp_writePropertyXEV_impl(exp);
     SWT_writeAbstractionXEV(result, exp);

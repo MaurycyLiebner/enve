@@ -56,7 +56,6 @@ public:
     QMimeData *SWT_createMimeData() final;
 
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
-    QString prp_tagNameXEV() const { return "RasterEffect"; }
 
     void writeIdentifier(eWriteStream& dst) const;
     void writeIdentifierXEV(QDomElement& ele) const;

@@ -288,28 +288,20 @@ void ColorAnimator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     colorModeMenu->addCheckableAction("HSL", mColorMode == ColorMode::hsl, hslOp);
 }
 
-QDomElement ColorAnimator::prp_writePropertyXEV_impl(const XevExporter& exp) const {
+QDomElement ColorAnimator::prp_writePropertyXEV_impl(
+        const XevExporter& exp) const {
     auto result = exp.createElement("Color");
     result.setAttribute("mode", static_cast<int>(mColorMode));
 
-    auto v1 = mVal1Animator->prp_writeNamedPropertyXEV("V1", exp);
-    result.appendChild(v1);
-
-    auto v2 = mVal2Animator->prp_writeNamedPropertyXEV("V2", exp);
-    result.appendChild(v2);
-
-    auto v3 = mVal3Animator->prp_writeNamedPropertyXEV("V3", exp);
-    result.appendChild(v3);
-
-    auto a = mAlphaAnimator->prp_writeNamedPropertyXEV("A", exp);
-    result.appendChild(a);
+    writeChildPropertiesXEV(result, exp);
 
     return result;
 }
 
-void ColorAnimator::prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) {
+void ColorAnimator::prp_readPropertyXEV_impl(
+        const QDomElement& ele, const XevImporter& imp) {
     const auto modeStr = ele.attribute("mode", "0");
     const int modeInt = XmlExportHelpers::stringToInt(modeStr);
-    mColorMode = static_cast<ColorMode>(modeInt);
+    setColorMode(static_cast<ColorMode>(modeInt));
     StaticComplexAnimator::prp_readPropertyXEV_impl(ele, imp);
 }

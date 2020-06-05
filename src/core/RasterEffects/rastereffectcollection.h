@@ -48,7 +48,6 @@ protected:
     RasterEffectCollection();
 public:
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
-    QString prp_tagNameXEV() const { return "RasterEffects"; }
 
     bool hasEffects();
 

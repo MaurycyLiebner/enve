@@ -106,8 +106,6 @@ class CORE_EXPORT FillSettingsAnimator : public PaintSettingsAnimator {
 protected:
     FillSettingsAnimator(BoundingBox * const parent) :
         PaintSettingsAnimator("fill", parent) {}
-
-    QString prp_tagNameXEV() const override { return "Fill"; }
 public:
     void saveSVG(SvgExporter& exp, QDomElement& parent,
                  const FrameRange& visRange) const {

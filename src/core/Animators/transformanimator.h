@@ -123,9 +123,6 @@ class CORE_EXPORT AdvancedTransformAnimator : public BasicTransformAnimator {
     e_OBJECT
 protected:
     AdvancedTransformAnimator();
-
-    QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
-    void prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp);
 public:
     void reset();
     QMatrix getRelativeTransformAtFrame(const qreal relFrame);

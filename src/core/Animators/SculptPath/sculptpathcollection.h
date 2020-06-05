@@ -31,8 +31,6 @@ public:
     void prp_writeProperty_impl(eWriteStream& dst) const;
     void prp_readProperty_impl(eReadStream& src);
 
-    QString prp_tagNameXEV() const { return "SculptPaths"; }
-
     void sculpt(const SculptTarget target,
                 const SculptMode mode,
                 const SculptBrush &brush);

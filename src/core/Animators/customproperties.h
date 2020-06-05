@@ -48,8 +48,6 @@ public:
     void prp_writeProperty_impl(eWriteStream& dst) const override;
     void prp_readProperty_impl(eReadStream& src) override;
 
-    QString prp_tagNameXEV() const override { return "CustomProperties"; }
-
     void addProperty(const qsptr<Animator>& prop);
 
     template <typename T>
