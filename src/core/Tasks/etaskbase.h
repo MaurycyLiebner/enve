@@ -36,7 +36,7 @@ public:
 protected:
     virtual void afterProcessing() {}
     virtual void afterCanceled() {}
-    virtual void handleException() {}
+    virtual bool handleException() { return false; }
 public:
     struct Dependent {
         using Func = std::function<void()>;
@@ -67,6 +67,8 @@ public:
     void cancel();
 protected:
     eTaskState mState = eTaskState::created;
+
+    void moveDependent(eTaskBase* const to);
 private:
     void decDependencies() { mNDependancies--; }
     void incDependencies() { mNDependancies++; }

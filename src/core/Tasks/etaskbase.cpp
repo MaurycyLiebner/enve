@@ -26,8 +26,8 @@ void eTaskBase::finishedProcessing() {
         mCancel = false;
         cancel();
     } else if(unhandledException()) {
-        handleException();
-        if(unhandledException()) {
+        const bool handled = handleException();
+        if(!handled) {
             const auto ePtr = takeException();
 //            try {
 //                if(ePtr) std::rethrow_exception(ePtr);
@@ -45,6 +45,7 @@ void eTaskBase::finishedProcessing() {
 }
 
 void eTaskBase::addDependent(eTask * const task) {
+    Q_ASSERT(task != this);
     if(!task) return;
     if(mState == eTaskState::finished) {
         return;
@@ -73,6 +74,17 @@ void eTaskBase::cancel() {
     mState = eTaskState::canceled;
     cancelDependent();
     afterCanceled();
+}
+
+void eTaskBase::moveDependent(eTaskBase* const to) {
+    for(const auto& dependent : mDependent) {
+        to->mDependent << dependent;
+    }
+    mDependent.clear();
+    for(const auto& dependent : mDependentF) {
+        to->mDependentF << dependent;
+    }
+    mDependentF.clear();
 }
 
 void eTaskBase::setException(const std::exception_ptr& exception) {

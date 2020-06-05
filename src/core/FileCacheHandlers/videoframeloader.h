@@ -46,7 +46,7 @@ public:
 protected:
     void afterProcessing();
     void afterCanceled();
-    void handleException();
+    bool handleException();
 
     void queTaskNow();
 private:

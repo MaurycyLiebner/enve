@@ -215,14 +215,18 @@ void VideoFrameLoader::afterCanceled() {
     mCacheHandler->frameLoaderCanceled(mFrameId);
 }
 
-void VideoFrameLoader::handleException() {
-    if(!mCacheHandler) return;
+bool VideoFrameLoader::handleException() {
+    if(!mCacheHandler) return false;
     takeException();
-    int& frame = const_cast<int&>(mFrameId);
-    if(frame <= 0) return finishedProcessing();
-    frame--;
-    mCacheHandler->mDataHandler->setFrameCount(frame);
-    queTaskNow();
+    if(mFrameId <= 0) {
+        finishedProcessing();
+        return false;
+    }
+    const auto moved = mCacheHandler->addFrameLoader(mFrameId - 1);
+    moveDependent(moved);
+    mCacheHandler->frameLoaderFailed(mFrameId);
+    moved->queTask();
+    return true;
 }
 
 void VideoFrameLoader::queTaskNow() {
