@@ -32,6 +32,7 @@ public:
                               int& increment) const;
     void showSceneSettingsDialog(Canvas* const scene) const;
     void displayMessageToUser(const QString& message, const int ms) const;
+    void showStatusMessage(const QString& message, const int ms) const;
 };
 
 #endif // DIALOGSINTERFACEIMPL_H

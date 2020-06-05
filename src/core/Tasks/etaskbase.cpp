@@ -18,6 +18,8 @@
 
 #include "etask.h"
 
+#include "GUI/dialogsinterface.h"
+
 void eTaskBase::finishedProcessing() {
     mState = eTaskState::finished;
     if(mCancel) {
@@ -26,7 +28,14 @@ void eTaskBase::finishedProcessing() {
     } else if(unhandledException()) {
         handleException();
         if(unhandledException()) {
-            gPrintExceptionCritical(takeException());
+            const auto ePtr = takeException();
+//            try {
+//                if(ePtr) std::rethrow_exception(ePtr);
+//            } catch(const std::exception& e) {
+//                const auto& inst = DialogsInterface::instance();
+//                inst.showStatusMessage(e.what());
+//            }
+            gPrintExceptionCritical(ePtr);
             cancel();
         }
     } else {

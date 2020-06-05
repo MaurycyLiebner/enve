@@ -47,8 +47,11 @@ public:
             Canvas* const scene) const = 0;
     virtual void displayMessageToUser(
         const QString& message, const int ms) const = 0;
+    virtual void showStatusMessage(
+        const QString& message, const int ms) const = 0;
 
     void displayMessageToUser(const QString& message) const;
+    void showStatusMessage(const QString& message) const;
 };
 
 #endif // DIALOGSINTERFACE_H

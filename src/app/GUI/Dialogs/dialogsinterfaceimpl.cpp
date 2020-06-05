@@ -20,6 +20,7 @@
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QStatusBar>
 
 #include "../buttonslist.h"
 #include "GUI/global.h"
@@ -129,4 +130,10 @@ void DialogsInterfaceImpl::displayMessageToUser(
     widget->setObjectName("messageLabel");
     widget->show();
     QTimer::singleShot(ms, widget, &QWidget::deleteLater);
+}
+
+void DialogsInterfaceImpl::showStatusMessage(
+        const QString& message, const int ms) const {
+    const auto win = MainWindow::sGetInstance();
+    win->statusBar()->showMessage(message, ms);
 }

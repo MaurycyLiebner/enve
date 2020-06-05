@@ -26,5 +26,9 @@ DialogsInterface::DialogsInterface() {
 const DialogsInterface& DialogsInterface::instance() { return *sInstance; }
 
 void DialogsInterface::displayMessageToUser(const QString& message) const {
-    displayMessageToUser(message, message.length()*150);
+    displayMessageToUser(message, message.length()*100);
+}
+
+void DialogsInterface::showStatusMessage(const QString& message) const {
+    showStatusMessage(message, message.length()*100);
 }
