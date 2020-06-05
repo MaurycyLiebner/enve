@@ -16,6 +16,7 @@
 
 #include "xmlexporthelpers.h"
 
+#include "Properties/property.h"
 #include "Paint/simplebrushwrapper.h"
 #include "Paint/brushescontext.h"
 #include "xevexporter.h"
@@ -165,4 +166,22 @@ QString XevExportHelpers::getAbsAndRelFileSrc(const QDomElement& ele,
         if(absSrc.isEmpty()) return absRelSrc;
         else return absSrc;
     }
+}
+
+bool XevExportHelpers::writeProperty(
+        QDomElement& ele, const XevExporter& exp,
+        const QString& name, Property* const prop) {
+    const auto childEle = prop->prp_writeNamedPropertyXEV(name, exp);
+    if(childEle.isNull()) return false;
+    ele.appendChild(childEle);
+    return true;
+}
+
+bool XevExportHelpers::readProperty(
+        const QDomElement& ele, const XevImporter& imp,
+        const QString& name, Property* const prop) {
+    const auto childEle = ele.firstChildElement(name);
+    if(childEle.isNull()) return false;
+    prop->prp_readPropertyXEV(childEle, imp);
+    return true;
 }

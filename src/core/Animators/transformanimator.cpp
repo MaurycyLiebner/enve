@@ -545,49 +545,28 @@ QMatrix AdvancedTransformAnimator::getRelativeTransformAtFrame(const qreal relFr
     return matrix;
 }
 
-QDomElement AdvancedTransformAnimator::prp_writePropertyXEV_impl(const XevExporter& exp) const {
+QDomElement AdvancedTransformAnimator::prp_writePropertyXEV_impl(
+        const XevExporter& exp) const {
     auto result = exp.createElement("Transform");
 
-    auto translation = mPosAnimator->prp_writeNamedPropertyXEV("Translation", exp);
-    result.appendChild(translation);
-
-    auto scale = mScaleAnimator->prp_writeNamedPropertyXEV("Scale", exp);
-    result.appendChild(scale);
-
-    auto rotation = mRotAnimator->prp_writeNamedPropertyXEV("Rotation", exp);
-    result.appendChild(rotation);
-
-    auto pivot = mPivotAnimator->prp_writeNamedPropertyXEV("Pivot", exp);
-    result.appendChild(pivot);
-
-    auto shear = mShearAnimator->prp_writeNamedPropertyXEV("Shear", exp);
-    result.appendChild(shear);
-
-    auto opacity = mOpacityAnimator->prp_writeNamedPropertyXEV("Opacity", exp);
-    result.appendChild(opacity);
+    XevExportHelpers::writeProperty(result, exp, "Translation", mPosAnimator.get());
+    XevExportHelpers::writeProperty(result, exp, "Scale", mScaleAnimator.get());
+    XevExportHelpers::writeProperty(result, exp, "Rotation", mRotAnimator.get());
+    XevExportHelpers::writeProperty(result, exp, "Pivot", mPivotAnimator.get());
+    XevExportHelpers::writeProperty(result, exp, "Shear", mShearAnimator.get());
+    XevExportHelpers::writeProperty(result, exp, "Opacity", mOpacityAnimator.get());
 
     return result;
 }
 
 void AdvancedTransformAnimator::prp_readPropertyXEV_impl(
         const QDomElement& ele, const XevImporter& imp) {
-    const auto translation = ele.firstChildElement("Translation");
-    mPosAnimator->prp_readPropertyXEV(translation, imp);
-
-    const auto scale = ele.firstChildElement("Scale");
-    mScaleAnimator->prp_readPropertyXEV(scale, imp);
-
-    const auto rotation = ele.firstChildElement("Rotation");
-    mRotAnimator->prp_readPropertyXEV(rotation, imp);
-
-    const auto pivot = ele.firstChildElement("Pivot");
-    mPivotAnimator->prp_readPropertyXEV(pivot, imp);
-
-    const auto shear = ele.firstChildElement("Shear");
-    mShearAnimator->prp_readPropertyXEV(shear, imp);
-
-    const auto opacity = ele.firstChildElement("Opacity");
-    mOpacityAnimator->prp_readPropertyXEV(opacity, imp);
+    XevExportHelpers::readProperty(ele, imp, "Translation", mPosAnimator.get());
+    XevExportHelpers::readProperty(ele, imp, "Scale", mScaleAnimator.get());
+    XevExportHelpers::readProperty(ele, imp, "Rotation", mRotAnimator.get());
+    XevExportHelpers::readProperty(ele, imp, "Pivot", mPivotAnimator.get());
+    XevExportHelpers::readProperty(ele, imp, "Shear", mShearAnimator.get());
+    XevExportHelpers::readProperty(ele, imp, "Opacity", mOpacityAnimator.get());
 }
 
 BoxTransformAnimator::BoxTransformAnimator() {

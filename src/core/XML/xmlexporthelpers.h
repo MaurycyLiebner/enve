@@ -27,6 +27,7 @@
 class SimpleBrushWrapper;
 class XevExporter;
 class XevImporter;
+class Property;
 
 namespace XmlExportHelpers {
     CORE_EXPORT
@@ -82,6 +83,12 @@ namespace XevExportHelpers {
     CORE_EXPORT
     QString getAbsAndRelFileSrc(const QDomElement& ele,
                                 const XevImporter& imp);
+    CORE_EXPORT
+    bool writeProperty(QDomElement& ele, const XevExporter& exp,
+                       const QString& name, Property* const prop);
+    CORE_EXPORT
+    bool readProperty(const QDomElement& ele, const XevImporter& imp,
+                      const QString& name, Property* const prop);
 };
 
 #endif // XMLEXPORTHELPERS_H
