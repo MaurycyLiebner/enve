@@ -23,7 +23,7 @@ public:
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData &data);
 private:
-    void setupPaint(SkPaint& paint, const int sign) const;
+    void setupPaint(SkPaint& paint) const;
 
     const float mRadius;
     const SkColor mColor;
@@ -35,7 +35,7 @@ ShadowEffect::ShadowEffect() :
     RasterEffect("shadow", HardwareSupport::gpuPreffered,
                  false, RasterEffectType::SHADOW) {
     mBlurRadius = enve::make_shared<QrealAnimator>("blur radius");
-    mOpacity = enve::make_shared<QrealAnimator>("opacity");
+    mOpacity = enve::make_shared<QrealAnimator>(1, 0, 1, 0.01, "opacity");
     mColor = enve::make_shared<ColorAnimator>();
     mTranslation = enve::make_shared<QPointFAnimator>("translation");
 
@@ -50,8 +50,6 @@ ShadowEffect::ShadowEffect() :
     mColor->setColor(Qt::black);
     ca_addChild(mColor);
 
-    mOpacity->setValueRange(0, 9);
-    mOpacity->setCurrentBaseValue(1);
     ca_addChild(mOpacity);
 
     ca_setGUIProperty(mColor.data());
@@ -112,19 +110,20 @@ ShadowEffect::getEffectCaller(
                 QMargins(iL, iT, iR, iB));
 }
 
-void ShadowEffectCaller::setupPaint(SkPaint &paint, const int sign) const {
+void ShadowEffectCaller::setupPaint(SkPaint &paint) const {
     const float sigma = mRadius*0.3333333f;
-    const auto filter = SkDropShadowImageFilter::Make(
-                mTranslation.x(), sign*mTranslation.y(),
-                sigma, sigma, toSkColor(mColor),
-                SkDropShadowImageFilter::kDrawShadowOnly_ShadowMode,
-                nullptr);
+    const auto filter = SkImageFilters::Blur(sigma, sigma, nullptr);
     paint.setImageFilter(filter);
+    const float r = SkColorGetR(mColor)/255.f;
+    const float g = SkColorGetG(mColor)/255.f;
+    const float b = SkColorGetB(mColor)/255.f;
+    const float a = SkColorGetA(mColor)/255.f;
     const float opacityM[20] = {
-        1, 0, 0, 0, 0,
-        0, 1, 0, 0, 0,
-        0, 0, 1, 0, 0,
-        0, 0, 0, mOpacity, 0};
+        0, 0, 0, r, 0,
+        0, 0, 0, g, 0,
+        0, 0, 0, b, 0,
+        0, 0, 0, mOpacity*a, 0
+    };
     paint.setColorFilter(SkColorFilters::Matrix(opacityM));
 }
 
@@ -139,8 +138,8 @@ void ShadowEffectCaller::processGpu(QGL33 * const gl,
     const auto srcTex = renderTools.requestSrcTextureImageWrapper();
 
     SkPaint paint;
-    setupPaint(paint, -1);
-    canvas->drawImage(srcTex, 0, 0, &paint);
+    setupPaint(paint);
+    canvas->drawImage(srcTex, mTranslation.x(), -mTranslation.y(), &paint);
     canvas->drawImage(srcTex, 0, 0);
     canvas->flush();
 
@@ -169,8 +168,9 @@ void ShadowEffectCaller::processCpu(CpuRenderTools &renderTools,
         const int drawY = srcRect.top() - texTile.top();
 
         SkPaint paint;
-        setupPaint(paint, 1);
-        canvas.drawBitmap(tileSrc, drawX, drawY, &paint);
+        setupPaint(paint);
+        canvas.drawBitmap(tileSrc, mTranslation.x() + drawX,
+                          mTranslation.y() + drawY, &paint);
         canvas.drawBitmap(tileSrc, drawX, drawY);
     }
 }
