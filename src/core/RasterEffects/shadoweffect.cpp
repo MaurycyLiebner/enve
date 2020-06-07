@@ -137,7 +137,6 @@ void ShadowEffectCaller::processGpu(QGL33 * const gl,
     canvas->clear(SK_ColorTRANSPARENT);
 
     const auto srcTex = renderTools.requestSrcTextureImageWrapper();
-    canvas->drawImage(srcTex, 0, 0);
 
     SkPaint paint;
     setupPaint(paint, -1);
