@@ -120,46 +120,17 @@ struct CORE_EXPORT qCubicSegment2D {
 
     void reverse();
 
-    qCubicSegment2D rotated(const qreal deg) const {
-        qCubicSegment2D result(*this);
-        result.rotate(deg);
-        return result;
-    }
+    qCubicSegment2D rotated(const qreal deg) const;
 
     void transform(const QMatrix& transform);
 
-    void rotate(const qreal deg) {
-        if(isZero6Dec(deg)) return;
-        mP0 = gRotPt(p0(), deg);
-        mC1 = gRotPt(c1(), deg);
-        mC2 = gRotPt(c2(), deg);
-        mP3 = gRotPt(p3(), deg);
-        mLengthUpToDate = false;
-    }
+    void rotate(const qreal deg);
 
-    void makePassThroughRel(const QPointF &relPos, const qreal t) {
-        const qreal oneMinusT = 1 - t;
-        QPointF dPos = relPos - posAtT(t);
-        while(pointToLen(dPos) > 1) {
-            setC1(c1() + oneMinusT*dPos);
-            setC2(c2() + t*dPos);
-            dPos = relPos - posAtT(t);
-        }
-    }
+    void makePassThroughRel(const QPointF &relPos, const qreal t);
 
-    qCubicSegment2D randomDisplaced(const qreal displ) {
-        qCubicSegment2D result(*this);
-        result.randomDisplace(displ);
-        return result;
-    }
+    qCubicSegment2D randomDisplaced(const qreal displ);
 
-    void randomDisplace(const qreal displ) {
-        setP0(gQPointFDisplace(p0(), displ));
-        setC1(gQPointFDisplace(c1(), displ));
-        setC2(gQPointFDisplace(c2(), displ));
-        setP3(gQPointFDisplace(p3(), displ));
-        mLengthUpToDate = false;
-    }
+    void randomDisplace(const qreal displ);
 
     //! @brief -90 is y direction 0 is x direction
     qreal tFurthestInDirection(const qreal deg) const;
@@ -169,24 +140,9 @@ struct CORE_EXPORT qCubicSegment2D {
     qCubicSegment2D lenFracFragment(const qreal minLenFrac,
                                     const qreal maxLenFrac) const;
 
-    bool isLine() const {
-        const qreal arr1 = mP0.x()*(mC1.y() - mC2.y()) +
-                           mC1.x()*(mC2.y() - mP0.y()) +
-                           mC2.x()*(mP0.y() - mC1.y());
-        if(!isZero2Dec(arr1)) return false;
-        const qreal arr2 = mP3.x()*(mC1.y() - mC2.y()) +
-                           mC1.x()*(mC2.y() - mP3.y()) +
-                           mC2.x()*(mP3.y() - mC1.y());
-        if(!isZero2Dec(arr2)) return false;
-        return true;
-    }
+    bool isLine() const;
 
-    bool isNull() const {
-        if(!isZero2Dec(pointToLen(mP0 - mP3))) return false;
-        if(!isZero2Dec(pointToLen(mP0 - mC1))) return false;
-        if(!isZero2Dec(pointToLen(mP0 - mC2))) return false;
-        return true;
-    }
+    bool isNull() const;
 private:
     qreal tAtLength(const qreal length, const qreal maxLenErr,
                     const qreal minT, const qreal maxT) const;

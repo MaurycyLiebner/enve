@@ -189,8 +189,8 @@ void NodeList::approximateBeforeDemoteOrRemoval(
         Node * const prevNormalV,
         Node * const nextNormalV) {
     if(!node || !prevNormalV || !nextNormalV) return;
-    if(!prevNormalV->getC0Enabled()) prevNormalV->setC0Enabled(true);
-    if(!nextNormalV->getC2Enabled()) nextNormalV->setC2Enabled(true);
+    if(!prevNormalV->getC2Enabled()) prevNormalV->setC2Enabled(true);
+    if(!nextNormalV->getC0Enabled()) nextNormalV->setC0Enabled(true);
 
     const auto prevSeg = gSegmentFromNodes(*prevNormalV, *node);
     const QPointF midPrevPt = prevSeg.posAtT(0.5);
@@ -276,7 +276,7 @@ void NodeList::demoteNormalNodeToDissolved(const int nodeId,
     if(!prevNormalV || !nextNormalV) return;
 
     if(approx) {
-        approximateBeforeDemoteOrRemoval(node->t(), node,
+        approximateBeforeDemoteOrRemoval(0.5, node,
                                          prevNormalV, nextNormalV);
     }
 

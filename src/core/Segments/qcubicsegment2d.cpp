@@ -262,11 +262,52 @@ void qCubicSegment2D::reverse() {
     std::swap(mC1, mC2);
 }
 
+qCubicSegment2D qCubicSegment2D::rotated(const qreal deg) const {
+    qCubicSegment2D result(*this);
+    result.rotate(deg);
+    return result;
+}
+
 void qCubicSegment2D::transform(const QMatrix& transform) {
     mP0 = transform.map(p0());
     mC1 = transform.map(c1());
     mC2 = transform.map(c2());
     mP3 = transform.map(p3());
+    mLengthUpToDate = false;
+}
+
+void qCubicSegment2D::rotate(const qreal deg) {
+    if(isZero6Dec(deg)) return;
+    mP0 = gRotPt(p0(), deg);
+    mC1 = gRotPt(c1(), deg);
+    mC2 = gRotPt(c2(), deg);
+    mP3 = gRotPt(p3(), deg);
+    mLengthUpToDate = false;
+}
+
+void qCubicSegment2D::makePassThroughRel(const QPointF& relPos, const qreal t) {
+    if(t < 0.001 || t > 0.999) return;
+    const qreal oneMinusT = 1 - t;
+    QPointF dPos = relPos - posAtT(t);
+    for(int i = 0; i < 100; i++) {
+        setC1(c1() + oneMinusT*dPos);
+        setC2(c2() + t*dPos);
+        dPos = relPos - posAtT(t);
+        if(pointToLen(dPos) < 1) break;
+    }
+}
+
+qCubicSegment2D qCubicSegment2D::randomDisplaced(const qreal displ) {
+    qCubicSegment2D result(*this);
+    result.randomDisplace(displ);
+    return result;
+}
+
+void qCubicSegment2D::randomDisplace(const qreal displ) {
+    setP0(gQPointFDisplace(p0(), displ));
+    setC1(gQPointFDisplace(c1(), displ));
+    setC2(gQPointFDisplace(c2(), displ));
+    setP3(gQPointFDisplace(p3(), displ));
     mLengthUpToDate = false;
 }
 
@@ -296,6 +337,25 @@ qCubicSegment2D qCubicSegment2D::lenFragment(const qreal minLen,
 qCubicSegment2D qCubicSegment2D::lenFracFragment(
         const qreal minLenFrac, const qreal maxLenFrac) const {
     return lenFragment(minLenFrac*length(), maxLenFrac*length());
+}
+
+bool qCubicSegment2D::isLine() const {
+    const qreal arr1 = mP0.x()*(mC1.y() - mC2.y()) +
+                       mC1.x()*(mC2.y() - mP0.y()) +
+                       mC2.x()*(mP0.y() - mC1.y());
+    if(!isZero2Dec(arr1)) return false;
+    const qreal arr2 = mP3.x()*(mC1.y() - mC2.y()) +
+                       mC1.x()*(mC2.y() - mP3.y()) +
+                       mC2.x()*(mP3.y() - mC1.y());
+    if(!isZero2Dec(arr2)) return false;
+    return true;
+}
+
+bool qCubicSegment2D::isNull() const {
+    if(!isZero2Dec(pointToLen(mP0 - mP3))) return false;
+    if(!isZero2Dec(pointToLen(mP0 - mC1))) return false;
+    if(!isZero2Dec(pointToLen(mP0 - mC2))) return false;
+    return true;
 }
 
 qreal qCubicSegment2D::tAtLength(const qreal length,
