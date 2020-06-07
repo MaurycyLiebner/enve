@@ -308,6 +308,7 @@ public:
     }
 protected:
     QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const override {
+        if(!this->ca_hasChildren()) return QDomElement();
         auto result = exp.createElement(this->prp_tagNameXEV());
         const auto& children = this->ca_getChildren();
         int id = 0;
