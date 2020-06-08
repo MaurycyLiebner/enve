@@ -191,6 +191,8 @@ void NodeList::approximateBeforeDemoteOrRemoval(
     if(!node || !prevNormalV || !nextNormalV) return;
     if(!prevNormalV->getC2Enabled()) prevNormalV->setC2Enabled(true);
     if(!nextNormalV->getC0Enabled()) nextNormalV->setC0Enabled(true);
+    prevNormalV->assignCtrlsMode(CtrlsMode::corner);
+    nextNormalV->assignCtrlsMode(CtrlsMode::corner);
 
     const auto prevSeg = gSegmentFromNodes(*prevNormalV, *node);
     const QPointF midPrevPt = prevSeg.posAtT(0.5);
