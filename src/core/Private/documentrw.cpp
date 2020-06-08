@@ -87,7 +87,7 @@ void Document::readScenes(eReadStream& src) {
         if(src.evFileVersion() < EvFormat::betterSWTAbsReadWrite) {
             scene = createNewScene();
         } else {
-            scene = fScenes.at(fScenes.count() - i - 1).get();
+            scene = fScenes.at(fScenes.count() - nScenes + i).get();
         }
         const auto block = scene->blockUndoRedo();
         scene->readBoundingBox(src);
