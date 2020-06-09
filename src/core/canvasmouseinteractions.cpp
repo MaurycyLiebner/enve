@@ -436,7 +436,7 @@ void Canvas::drawPathFinish(const qreal invScale) {
 
             if(sampeParent) {
                 const auto transform = beginNode->getTransform();
-                const auto matrix = transform->getCurrentTransform();
+                const auto matrix = transform->getTotalTransform();
                 const auto invMatrix = matrix.inverted();
                 std::for_each(fitted.begin(), fitted.end(),
                               [&invMatrix](qCubicSegment2D& seg) {
@@ -470,6 +470,12 @@ void Canvas::drawPathFinish(const qreal invScale) {
             drawPathAppend(fitted, endNode);
         } else createNew = true;
         if(createNew) {
+            const auto matrix = mCurrentContainer->getTotalTransform();
+            const auto invMatrix = matrix.inverted();
+            std::for_each(fitted.begin(), fitted.end(),
+                          [&invMatrix](qCubicSegment2D& seg) {
+                seg.transform(invMatrix);
+            });
             const auto newPath = drawPathNew(fitted);
             mCurrentContainer->addContained(newPath);
             clearBoxesSelection();
