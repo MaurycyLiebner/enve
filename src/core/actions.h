@@ -103,7 +103,6 @@ public:
     void setCircleMode();
     void setTextMode();
 
-    void setSculptMode();
     void setPickPaintSettingsMode();
 //
     bool smoothChange() const { return mSmoothChange; }
@@ -120,7 +119,6 @@ public:
 
     UndoableAction* objectsToPathAction;
     UndoableAction* strokeToPathAction;
-    UndoableAction* objectsToSculptedPathAction;
 
     UndoableAction* groupAction;
     UndoableAction* ungroupAction;

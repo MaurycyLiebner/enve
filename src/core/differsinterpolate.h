@@ -39,11 +39,4 @@ extern void gInterpolate(const SmartPath& path1,
                          const qreal path2Weight,
                          SmartPath& target);
 
-class SculptPath;
-extern bool gDiffers(const SculptPath& path1, const SculptPath& path2);
-extern void gInterpolate(const SculptPath& path1,
-                         const SculptPath& path2,
-                         const qreal path2Weight,
-                         SculptPath& target);
-
 #endif // DIFFERSINTERPOLATE_H

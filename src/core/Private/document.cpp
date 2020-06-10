@@ -224,7 +224,6 @@ void Document::setBrush(BrushContexedWrapper * const brush) {
 void Document::setBrushColor(const QColor &color) {
     fBrushColor = color;
     if(fBrush) fBrush->setColor(fBrushColor);
-    fSculptBrush.setColor(color);
     emit brushColorChanged(color);
 }
 
@@ -258,55 +257,6 @@ void Document::setPaintMode(const PaintMode mode) {
         }
     }
     emit paintModeChanged(mode);
-}
-
-void Document::setSculptNodesHidden(const bool hidden) {
-    fSculptNodesVisible = !hidden;
-    actionFinished();
-}
-
-void Document::incSculptBrushRadius() {
-    fSculptBrush.incExpRadius(0.3);
-    emit sculptBrushSizeChanged(fSculptBrush.radius());
-}
-
-void Document::decSculptBrushRadius() {
-    fSculptBrush.decExpRadius(0.3);
-    emit sculptBrushSizeChanged(fSculptBrush.radius());
-}
-
-void Document::incSculptHardness() {
-    const qreal oldHardness = fSculptBrush.hardness();
-    fSculptBrush.setHardness(oldHardness + 0.1);
-    emit sculptHardnessChanged(fSculptBrush.hardness());
-}
-
-void Document::decSculptHardness() {
-    const qreal oldHardness = fSculptBrush.hardness();
-    fSculptBrush.setHardness(oldHardness - 0.1);
-    emit sculptHardnessChanged(fSculptBrush.hardness());
-}
-
-void Document::incSculptOpacity() {
-    const qreal oldOpacity = fSculptBrush.opacity();
-    fSculptBrush.setOpacity(oldOpacity + 0.1);
-    emit sculptOpacityChanged(fSculptBrush.opacity());
-}
-
-void Document::decSculptOpacity() {
-    const qreal oldOpacity = fSculptBrush.opacity();
-    fSculptBrush.setOpacity(oldOpacity - 0.1);
-    emit sculptOpacityChanged(fSculptBrush.opacity());
-}
-
-void Document::setSculptTarget(const SculptTarget target) {
-    fSculptTarget = target;
-    emit sculptTargetChanged(target);
-}
-
-void Document::setSculptMode(const SculptMode mode) {
-    fSculptMode = mode;
-    emit sculptModeChanged(mode);
 }
 
 void Document::clear() {

@@ -134,7 +134,6 @@ public:
     void resetSelectedRotation();
     void convertSelectedBoxesToPath();
     void convertSelectedPathStrokesToPath();
-    void convertSelectedBoxesToSculptedPath();
 
     void rotateSelectedBy(const qreal rotBy,
                           const QPointF &absOrigin,
@@ -223,7 +222,6 @@ public:
 
     void selectAndAddContainedPointsToSelection(const QRectF &absRect);
 //
-    SculptPathBox* newSculptPathBox(const QPointF &pos);
     void newPaintBox(const QPointF &pos);
 
     void mousePressEvent(const eMouseEvent &e);
@@ -528,8 +526,6 @@ public:
         return mPaintTarget.isValid();
     }
 
-    bool hasValidSculptTarget() const;
-
     void queTasks();
 
     void setMinFrameUseRange(const int min) {
@@ -582,11 +578,6 @@ private:
 
     void scaleSelected(const eMouseEvent &e);
     void rotateSelected(const eMouseEvent &e);
-
-    void sculptPress(const QPointF& pos, const qreal pressure);
-    void sculptMove(const QPointF& pos, const qreal pressure);
-    void sculptRelease(const QPointF& pos, const qreal pressure);
-    void sculptCancel();
 
     void drawPathClear();
     void drawPathFinish(const qreal invScale);

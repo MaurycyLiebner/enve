@@ -46,7 +46,6 @@ enum class CanvasMode : short {
     rectCreate,
     textCreate,
 
-    sculptPath,
     pickFillStroke
 };
 

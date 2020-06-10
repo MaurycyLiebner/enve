@@ -30,7 +30,6 @@
 #include "Animators/gradient.h"
 #include "Private/esettings.h"
 #include "Private/document.h"
-#include "Boxes/sculptpathbox.h"
 #include "BrushWidgets/brushlabel.h"
 #include "GUI/global.h"
 
@@ -528,12 +527,6 @@ void FillStrokeSettingsWidget::setCurrentBox(BoundingBox* const box) {
     if(box) {
         conn << connect(box, &BoundingBox::brushChanged,
                         this, &FillStrokeSettingsWidget::setDisplayedBrush);
-        if(const auto sculptBox = enve_cast<SculptPathBox*>(box)) {
-            setDisplayedBrush(sculptBox->brush());
-            if(mTarget == PaintSetting::OUTLINE)
-                setBrushPaintType();
-            else mCurrentStrokePaintType = BRUSHPAINT;
-        }
     }
 }
 

@@ -27,7 +27,6 @@
 #include "actions.h"
 #include "Tasks/taskscheduler.h"
 #include "clipboardcontainer.h"
-#include "Animators/SculptPath/sculptpath.h"
 #include "conncontextptr.h"
 #include "zipfilesaver.h"
 #include "zipfileloader.h"
@@ -79,11 +78,6 @@ public:
     StrokeSettings fStroke;
 
     SimpleBrushWrapper* fOutlineBrush = nullptr;
-
-    bool fSculptNodesVisible = true;
-    SculptBrush fSculptBrush = SculptBrush(3, 0.5, 0.8, 1);
-    SculptTarget fSculptTarget = SculptTarget::position;
-    SculptMode fSculptMode = SculptMode::drag;
 
     bool fDrawPathManual = false;
     int fDrawPathSmooth = 25;
@@ -146,20 +140,6 @@ public:
     void setOnionDisabled(const bool disabled);
     void setPaintMode(const PaintMode mode);
 //
-    void setSculptNodesHidden(const bool hidden);
-
-    void incSculptBrushRadius();
-    void decSculptBrushRadius();
-
-    void incSculptHardness();
-    void decSculptHardness();
-
-    void incSculptOpacity();
-    void decSculptOpacity();
-
-    void setSculptTarget(const SculptTarget target);
-    void setSculptMode(const SculptMode mode);
-//
     void clear();
 //
     void writeScenes(eWriteStream &dst) const;
@@ -218,13 +198,6 @@ signals:
 //
     void evFilePathChanged(QString);
     void documentChanged();
-//
-    void sculptBrushSizeChanged(const qreal size);
-    void sculptHardnessChanged(const qreal hardness);
-    void sculptOpacityChanged(const qreal opacity);
-
-    void sculptTargetChanged(const SculptTarget target);
-    void sculptModeChanged(const SculptMode mode);
 };
 
 #endif // DOCUMENT_H

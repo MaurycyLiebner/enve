@@ -23,7 +23,7 @@
 #include "keyfocustarget.h"
 #include "smartPointers/ememory.h"
 #include "canvas.h"
-#include "Animators/SculptPath/sculptbrush.h"
+
 class Brush;
 class WindowSingleWidgetTarget;
 enum class ColorMode : short;
@@ -108,7 +108,6 @@ protected:
 private:
     void setCanvasMode(const CanvasMode mode);
     void updatePaintModeCursor();
-    void updateSculptModeCursor();
 
     Document& mDocument;
     Actions& mActions;
@@ -118,8 +117,6 @@ private:
     QPointF mPrevMousePos;
     QPointF mPrevPressPos;
     bool mValidPaintTarget = false;
-
-    bool mValidSculptTarget = false;
 
     bool mBlockInput = false;
     bool mMouseGrabber = false;

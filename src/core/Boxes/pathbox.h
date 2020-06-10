@@ -49,7 +49,6 @@ public:
 
     SmartVectorPath *objectToVectorPathBox();
     SmartVectorPath *strokeToVectorPathBox();
-    SculptPathBox* objectToSculptPathBox();
 
     bool relPointInsidePath(const QPointF &relPos) const;
 

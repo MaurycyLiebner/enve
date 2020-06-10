@@ -515,14 +515,6 @@ void MainWindow::setupMenuBar() {
 
     {
         const auto qAct = mPathMenu->addAction(
-                    tr("Object to Sculpted Path", "MenuBar_Path"));
-        mActions.objectsToSculptedPathAction->connect(qAct);
-    }
-
-    mPathMenu->addSeparator();
-
-    {
-        const auto qAct = mPathMenu->addAction(
                     tr("Union", "MenuBar_Path"));
         qAct->setShortcut(Qt::CTRL + Qt::Key_Plus);
         mActions.pathsUnionAction->connect(qAct);
@@ -911,16 +903,10 @@ void MainWindow::setupToolBar() {
 
     mToolBar->addSeparator();
 
-    mSculptMode = SwitchButton::sCreate2Switch(
-                "toolbarButtons/sculptUnchecked.png",
-                "toolbarButtons/sculptChecked.png",
-                gSingleLineTooltip(tr("Sculpt Path Mode", "ToolBar"), "F9"), this);
-    mToolBar->addWidget(mSculptMode);
-
     mPickPaintSettingsMode = SwitchButton::sCreate2Switch(
                 "toolbarButtons/pickUnchecked.png",
                 "toolbarButtons/pickChecked.png",
-                gSingleLineTooltip(tr("Pick Mode", "ToolBar"), "F10"), this);
+                gSingleLineTooltip(tr("Pick Mode", "ToolBar"), "F9"), this);
     mToolBar->addWidget(mPickPaintSettingsMode);
 
     mToolBar->widgetForAction(mToolBar->addAction("     "))->
@@ -1006,8 +992,6 @@ void MainWindow::connectToolBarActions() {
     connect(mTextMode, &ActionButton::pressed,
             &mActions, &Actions::setTextMode);
 
-    connect(mSculptMode, &ActionButton::pressed,
-            &mActions, &Actions::setSculptMode);
     connect(mPickPaintSettingsMode, &ActionButton::pressed,
             &mActions, &Actions::setPickPaintSettingsMode);
 
@@ -1063,7 +1047,6 @@ void MainWindow::updateCanvasModeButtonsChecked() {
     mRectangleMode->setState(mode == CanvasMode::rectCreate);
     mTextMode->setState(mode == CanvasMode::textCreate);
 
-    mSculptMode->setState(mode == CanvasMode::sculptPath);
     mPickPaintSettingsMode->setState(mode == CanvasMode::pickFillStroke);
 
     const bool boxMode = mode == CanvasMode::boxTransform;
@@ -1211,8 +1194,6 @@ bool handleCanvasModeKeyPress(Document& document, const int key) {
     } else if(key == Qt::Key_F8) {
         document.setCanvasMode(CanvasMode::textCreate);
     } else if(key == Qt::Key_F9) {
-        document.setCanvasMode(CanvasMode::sculptPath);
-    } else if(key == Qt::Key_F10) {
         document.setCanvasMode(CanvasMode::pickFillStroke);
     } else return false;
     KeyFocusTarget::KFT_sSetRandomTarget();

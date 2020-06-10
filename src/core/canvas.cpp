@@ -35,7 +35,6 @@
 #include "Animators/transformanimator.h"
 #include "glhelpers.h"
 #include "Private/document.h"
-#include "Boxes/sculptpathbox.h"
 #include "svgexporter.h"
 #include "ReadWrite/evformat.h"
 #include "eevent.h"
@@ -97,13 +96,6 @@ void Canvas::setResolution(const qreal percent) {
 
 void Canvas::setCurrentGroupParentAsCurrentGroup() {
     setCurrentBoxesGroup(mCurrentContainer->getParentGroup());
-}
-
-bool Canvas::hasValidSculptTarget() const {
-    for(const auto& box : mSelectedBoxes) {
-        if(enve_cast<SculptPathBox*>(box)) return true;
-    }
-    return false;
 }
 
 void Canvas::queTasks() {

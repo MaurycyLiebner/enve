@@ -93,17 +93,6 @@ private:
     void setBrushColor(const QColor& color);
     void setBrush(BrushContexedWrapper* const brush);
 
-    void setSculptBrushColor(const QColor& color);
-    void setupSculptBrushSizeButtons();
-    void setupSculptBrushColorLabel();
-    void setupSculptModeButtons();
-    void setupSculptTargetButtons();
-    void setupSculptValueSpins();
-    void sculptModeChanged();
-    void sculptTargetChanged();
-
-    void updateSculptPositionEnabled();
-
     Document& mDocument;
     MainWindow* const mMainWindow;
     QStackedWidget* const mTimelineLayout;
@@ -152,60 +141,6 @@ private:
     SwitchButton *mPaintMoveMode;
     QAction* mPaintCropModeAct;
     SwitchButton *mPaintCropMode;
-
-    //
-    QAction* mDecSculptBrushSizeAct;
-    ActionButton* mDecSculptBrushSize;
-    QAction* mSculptBrushSizeLabelAct;
-    QLabel* mSculptBrushSizeLabel;
-    QAction* mIncSculptBrushSizeAct;
-    ActionButton* mIncSculptBrushSize;
-
-    TriggerLabel* mSculptColorLabel;
-    QAction* mSculptColorLabelAct;
-
-    QAction* mSculptNodeVisibilityAct;
-    SwitchButton *mSculptNodeVisibility;
-    QAction* mSculptModeNodeVisibilitySpace;
-
-    QAction* mDragModeAct;
-    SwitchButton* mDragMode;
-    QAction* mAddModeAct;
-    SwitchButton* mAddMode;
-    QAction* mReplaceModeAct;
-    SwitchButton* mReplaceMode;
-    QAction* mSubtractModeAct;
-    SwitchButton* mSubtractMode;
-
-    QAction* mSculptModeTargetSeperator;
-
-    QAction* mPositionTargetAct;
-    SwitchButton* mPositionTarget;
-    QAction* mWidthTargetAct;
-    SwitchButton* mWidthTarget;
-    QAction* mPressureTargetAct;
-    SwitchButton* mPressureTarget;
-    QAction* mSpacingTargetAct;
-    SwitchButton* mSpacingTarget;
-    QAction* mTimeTargetAct;
-    SwitchButton* mTimeTarget;
-    QAction* mColorTargetAct;
-    SwitchButton* mColorTarget;
-
-    QAction* mSculptSpace0;
-
-    QDoubleSlider* mValue;
-    QAction* mValueAct;
-
-    QAction* mSculptSpace1;
-
-    QDoubleSlider* mHardness;
-    QAction* mHardnessAct;
-
-    QAction* mSculptSpace2;
-
-    QDoubleSlider* mOpacity;
-    QAction* mOpacityAct;
     //
     SwitchButton* mDrawPathAuto;
     QAction* mDrawPathAutoAct;

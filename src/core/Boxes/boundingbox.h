@@ -47,7 +47,6 @@ class BlendEffectCollection;
 
 class ContainerBox;
 class SmartVectorPath;
-class SculptPathBox;
 class DurationRectangle;
 struct ContainerBoxRenderData;
 class ShaderEffect;
@@ -74,7 +73,7 @@ enum class eBoxType {
     paint,
     group,
     custom,
-    sculptPath,
+    deprecated0, // sculptPath,
 
     count
 };
@@ -128,8 +127,6 @@ public:
     virtual SmartVectorPath *objectToVectorPathBox()
     { return nullptr; }
     virtual SmartVectorPath *strokeToVectorPathBox()
-    { return nullptr;}
-    virtual SculptPathBox *objectToSculptPathBox()
     { return nullptr; }
 
     void centerPivotPositionAction();

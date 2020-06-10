@@ -355,18 +355,7 @@ tips.files = $$files(tips/*)
 RESOURCES += tips
 
 DISTFILES += \
-    icons/promoteToLayer \
-    icons/toolbarButtons/checkable/color \
-    icons/toolbarButtons/checkable/position \
-    icons/toolbarButtons/checkable/pressure \
-    icons/toolbarButtons/checkable/sculpt+ \
-    icons/toolbarButtons/checkable/sculpt- \
-    icons/toolbarButtons/checkable/sculptx- \
-    icons/toolbarButtons/checkable/sculpt= \
-    icons/toolbarButtons/checkable/sculptUnchecked \
-    icons/toolbarButtons/checkable/spacing \
-    icons/toolbarButtons/checkable/time \
-    icons/toolbarButtons/checkable/width
+    icons/promoteToLayer
 
 macx {
     MAC_APP_FOLDER = $$sprintf("%1/%2/%3.app", $$OUT_PWD, $$DESTDIR, $$TARGET)

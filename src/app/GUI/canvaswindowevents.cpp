@@ -35,8 +35,6 @@ void CanvasWindow::zoomView(const qreal scaleBy, const QPointF &absOrigin) {
     mViewTransform.translate(-transPoint.x(), -transPoint.y());
     mViewTransform.scale(scaleBy, scaleBy);
     mViewTransform.translate(transPoint.x(), transPoint.y());
-    if(mDocument.fCanvasMode == CanvasMode::sculptPath)
-        updateSculptModeCursor();
 }
 
 #include <QResizeEvent>
@@ -47,8 +45,6 @@ void CanvasWindow::resizeEvent(QResizeEvent *e) {
             const qreal div = 2*mViewTransform.m11();
             const QPointF trans{dSize.width()/div, dSize.height()/div};
             translateView(trans);
-            if(mDocument.fCanvasMode == CanvasMode::sculptPath)
-                updateSculptModeCursor();
         }
         // e->oldSize() returns {-1, -1} after chaning parent
         mOldSize = e->size();
@@ -72,8 +68,6 @@ void CanvasWindow::fitCanvasToSize() {
     translateView({(widWidth - canvasSize.width()*minScale)*0.5,
                    (widHeight - canvasSize.height()*minScale)*0.5});
     mViewTransform.scale(minScale, minScale);
-    if(mDocument.fCanvasMode == CanvasMode::sculptPath)
-        updateSculptModeCursor();
 }
 
 #include <QEvent>
@@ -101,6 +95,4 @@ void CanvasWindow::resetTransormation() {
     mViewTransform.reset();
     translateView({(width() - mCurrentCanvas->getCanvasWidth())*0.5,
                    (height() - mCurrentCanvas->getCanvasHeight())*0.5});
-    if(mDocument.fCanvasMode == CanvasMode::sculptPath)
-        updateSculptModeCursor();
 }

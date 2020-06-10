@@ -201,22 +201,6 @@ Actions::Actions(Document &document) : mDocument(document) {
                                                 this);
     }
 
-    { // objectsToSculptedPathAction
-        const auto objectsToSculptedPathActionCan = [this]() {
-            if(!mActiveScene) return false;
-            return !mActiveScene->isBoxSelectionEmpty();
-        };
-        const auto objectsToSculptedPathActionExec = [this]() {
-            mActiveScene->convertSelectedBoxesToSculptedPath();
-            afterAction();
-        };
-        objectsToSculptedPathAction = new UndoableAction(
-                    objectsToSculptedPathActionCan,
-                    objectsToSculptedPathActionExec,
-                    "Object to Sculpted Path",
-                    pushName, this);
-    }
-
     { // groupAction
         const auto groupActionCan = [this]() {
             if(!mActiveScene) return false;
@@ -799,10 +783,6 @@ void Actions::setPaintMode() {
     mDocument.setCanvasMode(CanvasMode::paint);
 }
 
-void Actions::setSculptMode() {
-    mDocument.setCanvasMode(CanvasMode::sculptPath);
-}
-
 void Actions::finishSmoothChange() {
     mSmoothChange = false;
     //    mDocument.actionFinished();
@@ -853,14 +833,11 @@ void Actions::connectToActiveScene(Canvas* const scene) {
 
     objectsToPathAction->raiseCanExecuteChanged();
     strokeToPathAction->raiseCanExecuteChanged();
-    objectsToSculptedPathAction->raiseCanExecuteChanged();
     if(mActiveScene) {
         conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
                         objectsToPathAction, &Action::raiseCanExecuteChanged);
         conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
                         strokeToPathAction, &Action::raiseCanExecuteChanged);
-        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
-                        objectsToSculptedPathAction, &Action::raiseCanExecuteChanged);
     }
 
     groupAction->raiseCanExecuteChanged();

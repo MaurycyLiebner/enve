@@ -44,7 +44,6 @@ class Canvas;
 class PathBox;
 class PaintBox;
 class SmartVectorPath;
-class SculptPathBox;
 class BlendEffectBoxShadow;
 // Sound
 class eSound;
@@ -114,7 +113,6 @@ public:
     e_DECLARE_TYPE_FUNCTION(PathBox)
     e_DECLARE_TYPE_FUNCTION(PaintBox)
     e_DECLARE_TYPE_FUNCTION(SmartVectorPath)
-    e_DECLARE_TYPE_FUNCTION(SculptPathBox)
     e_DECLARE_TYPE_FUNCTION(BlendEffectBoxShadow)
     // Sound
     e_DECLARE_TYPE_FUNCTION(eSound)

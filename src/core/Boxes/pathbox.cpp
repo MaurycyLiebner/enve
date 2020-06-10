@@ -16,7 +16,6 @@
 
 #include "Boxes/pathbox.h"
 
-#include "Boxes/sculptpathbox.h"
 #include "MovablePoints/gradientpoint.h"
 #include "Animators/gradientpoints.h"
 #include "skia/skiaincludes.h"
@@ -329,16 +328,6 @@ SmartVectorPath *PathBox::strokeToVectorPathBox() {
     const auto newPath = enve::make_shared<SmartVectorPath>();
     newPath->loadSkPath(mOutlinePathSk);
     copyPathBoxDataTo(newPath.get());
-    getParentGroup()->addContained(newPath);
-    return newPath.get();
-}
-
-SculptPathBox *PathBox::objectToSculptPathBox() {
-    const auto newPath = enve::make_shared<SculptPathBox>();
-    newPath->setPath(mEditPathSk);
-    PropertyClipboard::sCopyAndPaste(mFillSettings.get(),
-                                     newPath->getFillSettings());
-    copyBoundingBoxDataTo(newPath.get());
     getParentGroup()->addContained(newPath);
     return newPath.get();
 }

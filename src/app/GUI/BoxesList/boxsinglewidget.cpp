@@ -41,7 +41,6 @@
 #include "Sound/eindependentsound.h"
 
 #include "Animators/SmartPath/smartpathcollection.h"
-#include "Animators/SculptPath/sculptpathcollection.h"
 
 #include "typemenu.h"
 
@@ -341,8 +340,6 @@ void BoxSingleWidget::setFillType(const int id) {
 
     if(const auto pAnim = enve_cast<SmartPathCollection*>(target)) {
         pAnim->setFillType(static_cast<SkPathFillType>(id));
-    } else if(const auto pAnim = enve_cast<SculptPathCollection*>(target)) {
-        pAnim->setFillType(static_cast<SkPathFillType>(id));
     }
     Document::sInstance->actionFinished();
 }
@@ -481,13 +478,6 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
             mFillTypeVisible = true;
             mFillTypeCombo->setCurrentIndex(static_cast<int>(coll->getFillType()));
             mTargetConn << connect(coll, &SmartPathCollection::fillTypeChanged,
-                                   this, [this](const SkPathFillType type) {
-                mFillTypeCombo->setCurrentIndex(static_cast<int>(type));
-            });
-        } else if(const auto coll = enve_cast<SculptPathCollection*>(prop)) {
-            mFillTypeVisible = true;
-            mFillTypeCombo->setCurrentIndex(static_cast<int>(coll->getFillType()));
-            mTargetConn << connect(coll, &SculptPathCollection::fillTypeChanged,
                                    this, [this](const SkPathFillType type) {
                 mFillTypeCombo->setCurrentIndex(static_cast<int>(type));
             });
