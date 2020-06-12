@@ -179,8 +179,8 @@ private:
         auto& layout = mLayouts[uint(id)];
         const auto scene = layout->fScene;
         if(scene) {
-            const bool valid = Property::prp_sValidateName(newName);
-            if(!valid) return;
+            //const bool valid = Property::prp_sValidateName(newName);
+            //if(!valid) return;
             scene->prp_setNameAction(newName);
         }
         layout->fName = newName;
