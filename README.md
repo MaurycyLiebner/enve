@@ -32,12 +32,12 @@ Enve was created with flexibility and expandability in mind.
 
 <img src="https://user-images.githubusercontent.com/16670651/70745938-36e20900-1d25-11ea-9bdf-78d3fe402291.png"/>
 
+## Download
+You can download the latest enve release for <a href="https://github.com/MaurycyLiebner/enve/releases/continuous-linux/" target="_blank">Linux</a> and <a href="https://github.com/MaurycyLiebner/enve/releases/continuous-windows/" target="_blank">Windows</a>.
+
 ## Source and building instructions
 
 See [Source and Building info.md](/Source%20and%20building%20info.md) for in-detail instructions for getting the source, and building for Linux, Windows, and macOS.
-
-## Download
-You can download the latest enve release for <a href="https://github.com/MaurycyLiebner/enve/releases/continuous-linux/" target="_blank">Linux</a> and <a href="https://github.com/MaurycyLiebner/enve/releases/continuous-windows/" target="_blank">Windows</a>.
 
 ## Authors
 
