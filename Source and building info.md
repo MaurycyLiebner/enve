@@ -1,6 +1,8 @@
 - [Get Enve Source](#get-enve-source)
-- Index table
+- [Table of Contents (TOC)](#toc)
 - [License](#license)
+
+#### TOC
 
 | [Linux][A0]              | [Windows][B0]            | [macOS][C0]       |
 | ---------------------- | -------------------------- | -------------------- |
