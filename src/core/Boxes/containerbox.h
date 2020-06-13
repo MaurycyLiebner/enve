@@ -253,15 +253,19 @@ private:
             int& drawId, QList<BlendEffect::UIDelayed> &delayed);
     void updateUIElementsForBlendEffects(
             int& drawId, QList<BlendEffect::UIDelayed> &delayed);
+    using PathUpdater = void (PathBox::*)(const UpdateReason);
 signals:
     void switchedGroupLayer(const eBoxType type);
     void insertedObject(const int id, eBoxOrSound* const obj);
     void removedObject(const int id, eBoxOrSound* const obj);
     void movedObject(const int from, const int to,
                      eBoxOrSound* const obj);
-private:
+    void childPathsUpdated(const UpdateReason reason,
+                           const PathUpdater func);
+protected:
     void updateAllChildPaths(const UpdateReason reason,
-                             void (PathBox::*func)(const UpdateReason));
+                             const PathUpdater func);
+private:
     void iniPathEffects();
     void updateRelBoundingRect();
     void removeContained(const qsptr<eBoxOrSound> &child);

@@ -297,6 +297,21 @@ bool PathBox::differenceInOutlinePathBetweenFrames(const int frame1, const int f
     return BoxWithPathEffects::differenceInOutlinePathBetweenFrames(frame1, frame2);
 }
 
+void PathBox::setPathsOutdated(const UpdateReason reason) {
+    mCurrentPathsOutdated = true;
+    planUpdate(reason);
+}
+
+void PathBox::setOutlinePathOutdated(const UpdateReason reason) {
+    mCurrentOutlinePathOutdated = true;
+    planUpdate(reason);
+}
+
+void PathBox::setFillPathOutdated(const UpdateReason reason) {
+    mCurrentFillPathOutdated = true;
+    planUpdate(reason);
+}
+
 void PathBox::saveFillSettingsSVG(SvgExporter& exp, QDomElement& ele,
                                   const FrameRange& visRange) const {
     mFillSettings->saveSVG(exp, ele, visRange);

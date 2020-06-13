@@ -34,6 +34,20 @@ public:
     void addOutlineBasePathEffect(const qsptr<PathEffect> &effect);
     void addOutlinePathEffect(const qsptr<PathEffect> &effect);
 
+    virtual bool localDifferenceInPathBetweenFrames(
+            const int frame1, const int frame2) const;
+    virtual bool localDifferenceInOutlinePathBetweenFrames(
+            const int frame1, const int frame2) const;
+    virtual bool localDifferenceInFillPathBetweenFrames(
+            const int frame1, const int frame2) const;
+
+    bool differenceInPathBetweenFrames(
+            const int frame1, const int frame2) const;
+    bool differenceInOutlinePathBetweenFrames(
+            const int frame1, const int frame2) const;
+    bool differenceInFillPathBetweenFrames(
+            const int frame1, const int frame2) const;
+
     void setPathEffectsEnabled(const bool enable);
     bool getPathEffectsVisible() const;
 
@@ -48,15 +62,8 @@ public:
 
     PathEffectCollection *getPathEffectsAnimators();
     PathEffectCollection *getFillPathEffectsAnimators();
-    PathEffectCollection *getOutlineBasrPathEffectsAnimators();
+    PathEffectCollection *getOutlineBasePathEffectsAnimators();
     PathEffectCollection *getOutlinePathEffectsAnimators();
-
-    bool differenceInPathBetweenFrames(
-            const int frame1, const int frame2) const;
-    virtual bool differenceInOutlinePathBetweenFrames(
-            const int frame1, const int frame2) const;
-    bool differenceInFillPathBetweenFrames(
-            const int frame1, const int frame2) const;
 
     bool hasBasePathEffects() const;
     bool hasFillEffects() const;

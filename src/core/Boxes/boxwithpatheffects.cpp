@@ -146,7 +146,7 @@ PathEffectCollection *BoxWithPathEffects::getFillPathEffectsAnimators() {
     return mFillPathEffectsAnimators.data();
 }
 
-PathEffectCollection *BoxWithPathEffects::getOutlineBasrPathEffectsAnimators() {
+PathEffectCollection *BoxWithPathEffects::getOutlineBasePathEffectsAnimators() {
     return mOutlineBasePathEffectsAnimators.data();
 }
 
@@ -155,7 +155,7 @@ PathEffectCollection *BoxWithPathEffects::getOutlinePathEffectsAnimators() {
 }
 
 bool BoxWithPathEffects::differenceInPathBetweenFrames(const int frame1, const int frame2) const {
-    if(mPathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
+    if(localDifferenceInPathBetweenFrames(frame1, frame2))
         return true;
     const auto parent = getParentGroup();
     if(!parent) return false;
@@ -167,9 +167,7 @@ bool BoxWithPathEffects::differenceInPathBetweenFrames(const int frame1, const i
 }
 
 bool BoxWithPathEffects::differenceInOutlinePathBetweenFrames(const int frame1, const int frame2) const {
-    if(mOutlineBasePathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
-        return true;
-    if(mOutlinePathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
+    if(localDifferenceInOutlinePathBetweenFrames(frame1, frame2))
         return true;
     const auto parent = getParentGroup();
     if(!parent) return false;
@@ -181,7 +179,7 @@ bool BoxWithPathEffects::differenceInOutlinePathBetweenFrames(const int frame1, 
 }
 
 bool BoxWithPathEffects::differenceInFillPathBetweenFrames(const int frame1, const int frame2) const {
-    if(mFillPathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
+    if(localDifferenceInFillPathBetweenFrames(frame1, frame2))
         return true;
     const auto parent = getParentGroup();
     if(!parent) return false;
@@ -190,6 +188,29 @@ bool BoxWithPathEffects::differenceInFillPathBetweenFrames(const int frame1, con
     const int pFrame1 = parent->prp_absFrameToRelFrame(absFrame1);
     const int pFrame2 = parent->prp_absFrameToRelFrame(absFrame2);
     return parent->differenceInFillPathBetweenFrames(pFrame1, pFrame2);
+}
+
+
+bool BoxWithPathEffects::localDifferenceInPathBetweenFrames(
+        const int frame1, const int frame2) const {
+    return mPathEffectsAnimators->
+            prp_differencesBetweenRelFrames(frame1, frame2);
+}
+
+bool BoxWithPathEffects::localDifferenceInOutlinePathBetweenFrames(
+        const int frame1, const int frame2) const {
+    const bool diff1 = mOutlineBasePathEffectsAnimators->
+                 prp_differencesBetweenRelFrames(frame1, frame2);
+    if(diff1) return true;
+    const bool diff2 = mOutlinePathEffectsAnimators->
+                 prp_differencesBetweenRelFrames(frame1, frame2);
+    return diff1 || diff2;
+}
+
+bool BoxWithPathEffects::localDifferenceInFillPathBetweenFrames(
+        const int frame1, const int frame2) const {
+    return mFillPathEffectsAnimators->
+            prp_differencesBetweenRelFrames(frame1, frame2);
 }
 
 bool BoxWithPathEffects::hasBasePathEffects() const {

@@ -42,6 +42,36 @@ void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
     ContainerBox::setupRenderData(relFrame, data, scene);
 }
 
+bool InternalLinkGroupBox::localDifferenceInPathBetweenFrames(
+        const int frame1, const int frame2) const {
+    const bool diff1 = ContainerBox::localDifferenceInPathBetweenFrames(frame1, frame2);
+    if(diff1) return true;
+    if(const auto linkTarget = getLinkTarget()) {
+        const bool diff2 = linkTarget->localDifferenceInPathBetweenFrames(frame1, frame2);
+        return diff1 || diff2;
+    } else return false;
+}
+
+bool InternalLinkGroupBox::localDifferenceInOutlinePathBetweenFrames(
+        const int frame1, const int frame2) const {
+    const bool diff1 = ContainerBox::localDifferenceInOutlinePathBetweenFrames(frame1, frame2);
+    if(diff1) return true;
+    if(const auto linkTarget = getLinkTarget()) {
+        const bool diff2 = linkTarget->localDifferenceInOutlinePathBetweenFrames(frame1, frame2);
+        return diff1 || diff2;
+    } else return false;
+}
+
+bool InternalLinkGroupBox::localDifferenceInFillPathBetweenFrames(
+        const int frame1, const int frame2) const {
+    const bool diff1 = ContainerBox::localDifferenceInFillPathBetweenFrames(frame1, frame2);
+    if(diff1) return true;
+    if(const auto linkTarget = getLinkTarget()) {
+        const bool diff2 = linkTarget->localDifferenceInFillPathBetweenFrames(frame1, frame2);
+        return diff1 || diff2;
+    } else return false;
+}
+
 #include "Sound/eindependentsound.h"
 #include "Sound/esoundlink.h"
 
@@ -88,6 +118,8 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
                         this, &ContainerBox::removeContainedFromList);
         conn << connect(linkTarget, &ContainerBox::movedObject,
                         this, qOverload<int, int>(&ContainerBox::moveContainedInList));
+        conn << connect(linkTarget, &ContainerBox::childPathsUpdated,
+                        this, &InternalLinkGroupBox::updateAllChildPaths);
 
         const auto &boxesList = linkTarget->getContained();
         const int iMax = boxesList.count();

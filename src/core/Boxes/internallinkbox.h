@@ -24,6 +24,7 @@ class eSound;
 
 class CORE_EXPORT InternalLinkBox : public InternalLinkBoxBase<BoundingBox> {
     e_OBJECT
+    e_DECLARE_TYPE(InternalLinkBox)
 protected:
     InternalLinkBox(BoundingBox * const linkTarget,
                     const bool innerLink);

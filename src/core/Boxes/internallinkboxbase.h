@@ -64,11 +64,12 @@ public:
             QList<BlendEffect::Delayed> &delayed) const override;
 
     void saveSVG(SvgExporter& exp, DomEleTask* const task) const override;
+
+    BoxT *getFinalTarget() const;
 protected:
     ConnContext& assignLinkTarget(BoxT * const linkTarget);
     BoxT *getLinkTarget() const
     { return mLinkTarget; }
-    BoxT *getFinalTarget() const;
 
     const qsptr<BoxTargetProperty> mBoxTarget =
             enve::make_shared<BoxTargetProperty>("link target");

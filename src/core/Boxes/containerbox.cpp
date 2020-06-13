@@ -33,6 +33,7 @@
 #include "Private/Tasks/taskscheduler.h"
 #include "Properties/boolpropertycontainer.h"
 #include "ReadWrite/evformat.h"
+#include "internallinkbox.h"
 
 class FlipBookProperty : public BoolPropertyContainer {
     e_OBJECT
@@ -306,14 +307,20 @@ void ContainerBox::anim_scaleTime(const int pivotAbsFrame, const qreal scale) {
 }
 
 void ContainerBox::updateAllChildPaths(const UpdateReason reason,
-                                       void (PathBox::*func)(const UpdateReason)) {
+                                       const PathUpdater func) {
     for(const auto& box : mContainedBoxes) {
-        if(enve_cast<PathBox*>(box)) {
-            (static_cast<PathBox*>(box)->*func)(reason);
-        } else if(enve_cast<ContainerBox*>(box)) {
-            static_cast<ContainerBox*>(box)->updateAllChildPaths(reason, func);
+        if(const auto path = enve_cast<PathBox*>(box)) {
+            (path->*func)(reason);
+        } else if(const auto cont = enve_cast<ContainerBox*>(box)) {
+            cont->updateAllChildPaths(reason, func);
+        } else if(const auto link = enve_cast<InternalLinkBox*>(box)) {
+            const auto target = link->getFinalTarget();
+            if(const auto path = enve_cast<PathBox*>(target)) {
+                link->planUpdate(reason);
+            }
         }
     }
+    emit childPathsUpdated(reason, func);
 }
 
 void ContainerBox::forcedMarginMeaningfulChange() {
@@ -325,8 +332,7 @@ void ContainerBox::forcedMarginMeaningfulChange() {
     mForcedMargin.setBottom(qMax(inheritedMargin.bottom(), thisMargin.bottom()));
     mForcedMargin.setRight(qMax(inheritedMargin.right(), thisMargin.right()));
     for(const auto& box : mContainedBoxes) {
-        if(enve_cast<ContainerBox*>(box)) {
-            const auto cont = static_cast<ContainerBox*>(box);
+        if(const auto cont = enve_cast<ContainerBox*>(box)) {
             cont->forcedMarginMeaningfulChange();
         } else box->planUpdate(UpdateReason::userChange);
     }
