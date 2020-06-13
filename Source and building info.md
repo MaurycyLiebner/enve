@@ -26,21 +26,21 @@
 [A10]: #deploying-for-linux
 [B0]: #building-for-windows
 [B1]: #visual-studio-community-2017
-[B2]: #qt
+[B2]: #qt-1
 [B3]: #llvm
 [B4]: #environment
 [B5]: #ffmpeg-and-libmypaint
-[B6]: #qscintilla
-[B7]: #quazip
-[B8]: #skia
-[B9]: #enve
+[B6]: #qscintilla-1
+[B7]: #quazip-1
+[B8]: #skia-1
+[B9]: #enve-1
 [C0]: #building-for-macos
-[C1]: #skia
-[C2]: #libmypaint
-[C3]: #quazip
-[C4]: #gperftools
-[C5]: #qscintilla
-[C6]: #enve
+[C1]: #skia-2
+[C2]: #libmypaint-1
+[C3]: #quazip-2
+[C4]: #gperftools-1
+[C5]: #qscintilla-2
+[C6]: #enve-2
 
 
 ## Get Enve Source
@@ -209,7 +209,7 @@ Otherwise it will not execute properly.
 sudo apt-get install libxkbcommon-x11-dev
 ```
 
-### enve itself
+### enve
 
 You can either build enve through QtCreator (open enve.pro and setup Relase/Debug Kits),
 or by running qmake and make directly.
