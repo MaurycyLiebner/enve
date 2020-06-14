@@ -52,18 +52,19 @@ void PathBoxRenderData::drawOnParentLayer(SkCanvas * const canvas,
     if(!mDirectDraw) return BoxRenderData::drawOnParentLayer(canvas, paint);
     if(isZero4Dec(fOpacity)) return;
     canvas->concat(toSkMatrix(fScaledTransform));
-    paint.setAlpha(static_cast<U8CPU>(qRound(fOpacity*2.55)));
     paint.setBlendMode(fBlendMode);
     paint.setAntiAlias(true);
     paint.setStyle(SkPaint::kFill_Style);
 
     if(!fFillPath.isEmpty()) {
-        fPaintSettings.applyPainterSettingsSk(&paint);
+        fPaintSettings.applyPainterSettingsSk(paint);
+        paint.setAlphaf(fOpacity*0.01);
         canvas->drawPath(fFillPath, paint);
     }
     if(!fOutlinePath.isEmpty()) {
         paint.setShader(nullptr);
-        fStrokeSettings.applyPainterSettingsSk(&paint);
+        fStrokeSettings.applyPainterSettingsSk(paint);
+        paint.setAlphaf(fOpacity*0.01);
         canvas->drawPath(fOutlinePath, paint);
     }
 }
@@ -85,7 +86,7 @@ void PathBoxRenderData::drawSk(SkCanvas * const canvas) {
     paint.setStyle(SkPaint::kFill_Style);
 
     if(!fFillPath.isEmpty()) {
-        fPaintSettings.applyPainterSettingsSk(&paint);
+        fPaintSettings.applyPainterSettingsSk(paint);
         canvas->drawPath(fFillPath, paint);
     }
     if(!fOutlinePath.isEmpty()) {
@@ -142,7 +143,7 @@ void PathBoxRenderData::drawSk(SkCanvas * const canvas) {
                                     fGlobalRect.bottom() - baseRect.bottom());
             mBitmap = surf.toBitmap(iMargins);
         } else {
-            fStrokeSettings.applyPainterSettingsSk(&paint);
+            fStrokeSettings.applyPainterSettingsSk(paint);
             canvas->drawPath(fOutlinePath, paint);
         }
     }

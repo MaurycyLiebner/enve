@@ -424,15 +424,13 @@ UpdatePaintSettings::UpdatePaintSettings() {}
 
 UpdatePaintSettings::~UpdatePaintSettings() {}
 
-void UpdatePaintSettings::applyPainterSettingsSk(SkPaint *paint) {
+void UpdatePaintSettings::applyPainterSettingsSk(SkPaint& paint) {
     if(fPaintType == GRADIENTPAINT) {
-        //p->setBrush(gradient);
-        paint->setShader(fGradient);
-        paint->setAlpha(255);
+        paint.setShader(fGradient);
     } else if(fPaintType == FLATPAINT) {
-        paint->setColor(toSkColor(fPaintColor));
+        paint.setColor(toSkColor(fPaintColor));
     } else {
-        paint->setColor(SkColorSetARGB(0, 0, 0, 0));
+        paint.setColor(SkColorSetARGB(0, 0, 0, 0));
     }
 }
 
@@ -495,7 +493,3 @@ UpdateStrokeSettings::UpdateStrokeSettings(const qreal width,
 }
 
 UpdateStrokeSettings::UpdateStrokeSettings() {}
-
-void UpdateStrokeSettings::applyPainterSettingsSk(SkPaint *paint) {
-    UpdatePaintSettings::applyPainterSettingsSk(paint);
-}
