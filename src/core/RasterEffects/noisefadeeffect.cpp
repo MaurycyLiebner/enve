@@ -21,7 +21,7 @@
 #include "Animators/qrealanimator.h"
 
 NoiseFadeEffect::NoiseFadeEffect() :
-    RasterEffect("noide fade", HardwareSupport::gpuPreffered,
+    RasterEffect("noise fade", HardwareSupport::gpuPreffered,
                  false, RasterEffectType::NOISE_FADE) {
     mSeed = enve::make_shared<QrealAnimator>(0, -999.99, 999.99, 0.01, "seed");
     ca_addChild(mSeed);
