@@ -10,6 +10,7 @@
 
 class SimpleBrushWrapper;
 struct iValueRange;
+class BoundingBox;
 
 class CORE_EXPORT eReadFutureTable {
     friend class eReadStream;
@@ -35,6 +36,13 @@ class CORE_EXPORT eReadStream {
 public:
     eReadStream(const int evFileVersion, QIODevice* const src);
     eReadStream(QIODevice* const src);
+
+    ~eReadStream();
+
+    void addReadBox(const int readId, BoundingBox * const box);
+    BoundingBox *getBoxByReadId(const int readId) const;
+    using ReadStreamDoneTask = std::function<void(eReadStream&)>;
+    void addReadStreamDoneTask(const ReadStreamDoneTask& task);
 
     void setPath(const QString& path);
 
@@ -78,6 +86,9 @@ public:
 
     int evFileVersion() const;
 private:
+    std::map<int, BoundingBox*> mReadBoxes;
+    QList<ReadStreamDoneTask> mDoneTasks;
+
     const int mEvFileVersion;
     QIODevice* const mSrc;
     QDir mDir;

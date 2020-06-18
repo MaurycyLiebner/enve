@@ -186,18 +186,17 @@ void RenderInstanceSettings::read(eReadStream &src) {
     int targetDocumentId;
     src >> targetDocumentId;
     if(targetReadId != -1 && targetDocumentId != -1) {
-        const auto canvasSetter = [this, targetReadId, targetDocumentId]() {
+        mTargetCanvas.assign(nullptr);
+        src.addReadStreamDoneTask([this, targetReadId, targetDocumentId]
+                                  (eReadStream& src) {
             BoundingBox* box = nullptr;
             if(targetReadId != -1)
-                box = BoundingBox::sGetBoxByReadId(targetReadId);
+                box = src.getBoxByReadId(targetReadId);
              if(!box && targetDocumentId != -1)
                  box = BoundingBox::sGetBoxByDocumentId(targetDocumentId);
              if(const auto scene = enve_cast<Canvas*>(box))
                  setTargetCanvas(scene, false);
-        };
-        mTargetCanvas.assign(nullptr);
-        canvasSetter();
-        if(!mTargetCanvas) SimpleTask::sScheduleContexted(this, canvasSetter);
+        });
     }
 
     emit stateChanged(mState);

@@ -4,6 +4,7 @@
 #include "filefooter.h"
 #include "framerange.h"
 #include "evformat.h"
+#include "Boxes/boundingbox.h"
 
 eReadFutureTable::eReadFutureTable(QIODevice * const main) : mMain(main) {}
 
@@ -26,6 +27,24 @@ eReadStream::eReadStream(const int evFileVersion, QIODevice * const src) :
 
 eReadStream::eReadStream(QIODevice * const src) :
     eReadStream(EvFormat::version, src) {}
+
+eReadStream::~eReadStream() {
+    for(const auto& task : mDoneTasks) task(*this);
+}
+
+void eReadStream::addReadBox(const int readId, BoundingBox* const box) {
+    mReadBoxes[readId] = box;
+}
+
+BoundingBox *eReadStream::getBoxByReadId(const int readId) const {
+    const auto it = mReadBoxes.find(readId);
+    if(it == mReadBoxes.end()) return nullptr;
+    else return it->second;
+}
+
+void eReadStream::addReadStreamDoneTask(const ReadStreamDoneTask& task) {
+    mDoneTasks << task;
+}
 
 void eReadStream::setPath(const QString& path) {
     mDir.setPath(QFileInfo(path).path());

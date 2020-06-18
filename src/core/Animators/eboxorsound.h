@@ -55,7 +55,8 @@ public:
     virtual void writeBoxOrSoundXEV(const std::shared_ptr<XevZipFileSaver>& xevFileSaver,
                                     const RuntimeIdToWriteId& objListIdConv,
                                     const QString& path) const;
-    virtual void readBoxOrSoundXEV(ZipFileLoader& fileLoader, const QString& path,
+    virtual void readBoxOrSoundXEV(XevReadBoxesHandler& boxReadHandler,
+                                   ZipFileLoader& fileLoader, const QString& path,
                                    const RuntimeIdToWriteId& objListIdConv);
 
     TimelineMovable *anim_getTimelineMovable(

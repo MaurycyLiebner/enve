@@ -27,7 +27,8 @@ protected:
     void readData(eReadStream& src);
     void writeData(eWriteStream& dst);
 
-    void readDataXEV(const QDomElement& ele,
+    void readDataXEV(XevReadBoxesHandler& boxReadHandler,
+                     const QDomElement& ele,
                      RuntimeIdToWriteId& objListIdConv);
     void writeDataXEV(QDomElement& ele, QDomDocument& doc,
                       RuntimeIdToWriteId& objListIdConv);

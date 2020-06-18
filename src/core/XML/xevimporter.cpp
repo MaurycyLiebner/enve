@@ -18,16 +18,37 @@
 
 #include "../zipfileloader.h"
 
-XevImporter::XevImporter(ZipFileLoader& fileLoader,
+XevReadBoxesHandler::~XevReadBoxesHandler() {
+    for(const auto& task : mDoneTasks) task(*this);
+}
+
+void XevReadBoxesHandler::addReadBox(const int readId, BoundingBox* const box) {
+    mReadBoxes[readId] = box;
+}
+
+BoundingBox *XevReadBoxesHandler::getBoxByReadId(const int readId) const {
+    const auto it = mReadBoxes.find(readId);
+    if(it == mReadBoxes.end()) return nullptr;
+    else return it->second;
+}
+
+void XevReadBoxesHandler::addXevImporterDoneTask(const XevImporterDoneTask& task) {
+    mDoneTasks << task;
+}
+
+XevImporter::XevImporter(XevReadBoxesHandler& xevReadBoxesHandler,
+                         ZipFileLoader& fileLoader,
                          const RuntimeIdToWriteId& objListIdConv,
                          const QString& path,
                          const QString& assetsPath) :
+    mXevReadBoxesHandler(xevReadBoxesHandler),
     mFileLoader(fileLoader),
     mObjectListIdConv(objListIdConv),
     mPath(path), mAssetsPath(assetsPath) {}
 
 XevImporter XevImporter::withAssetsPath(const QString& path) const {
-    return XevImporter(mFileLoader, mObjectListIdConv,
+    return XevImporter(mXevReadBoxesHandler,
+                       mFileLoader, mObjectListIdConv,
                        mPath, mAssetsPath + path);
 }
 

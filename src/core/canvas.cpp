@@ -1011,9 +1011,10 @@ void Canvas::writeBoxOrSoundXEV(const stdsptr<XevZipFileSaver>& xevFileSaver,
     });
 }
 
-void Canvas::readBoxOrSoundXEV(ZipFileLoader &fileLoader, const QString &path,
+void Canvas::readBoxOrSoundXEV(XevReadBoxesHandler& boxReadHandler,
+                               ZipFileLoader &fileLoader, const QString &path,
                                const RuntimeIdToWriteId& objListIdConv) {
-    ContainerBox::readBoxOrSoundXEV(fileLoader, path, objListIdConv);
+    ContainerBox::readBoxOrSoundXEV(boxReadHandler, fileLoader, path, objListIdConv);
     fileLoader.process(path + "gradients.xml",
                        [&](QIODevice* const src) {
         QDomDocument doc;
@@ -1023,7 +1024,7 @@ void Canvas::readBoxOrSoundXEV(ZipFileLoader &fileLoader, const QString &path,
         for(int i = 0; i < gradients.count(); i++) {
             const auto node = gradients.at(i);
             const auto ele = node.toElement();
-            const XevImporter imp(fileLoader, objListIdConv, path);
+            const XevImporter imp(boxReadHandler, fileLoader, objListIdConv, path);
             createNewGradient()->prp_readPropertyXEV(ele, imp);
         }
     });

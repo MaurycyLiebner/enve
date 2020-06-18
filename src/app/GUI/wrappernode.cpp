@@ -44,7 +44,8 @@ WrapperNode* WrapperNode::sRead(eReadStream &src,
     return wid;
 }
 
-WrapperNode* WrapperNode::sReadXEV(const QDomElement& ele,
+WrapperNode* WrapperNode::sReadXEV(XevReadBoxesHandler& boxReadHandler,
+                                   const QDomElement& ele,
                                    const WidgetCreator& creator,
                                    RuntimeIdToWriteId& objListIdConv) {
     WrapperNodeType type;
@@ -53,7 +54,7 @@ WrapperNode* WrapperNode::sReadXEV(const QDomElement& ele,
     else if(tag == "VSplit") type = WrapperNodeType::splitV;
     else type = WrapperNodeType::widget;
     const auto wid = createForType(type, creator);
-    wid->readDataXEV(ele, objListIdConv);
+    wid->readDataXEV(boxReadHandler, ele, objListIdConv);
     return wid;
 }
 

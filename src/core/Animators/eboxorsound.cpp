@@ -156,7 +156,8 @@ void eBoxOrSound::writeBoxOrSoundXEV(const std::shared_ptr<XevZipFileSaver>& xev
     });
 }
 
-void eBoxOrSound::readBoxOrSoundXEV(ZipFileLoader& fileLoader, const QString& path,
+void eBoxOrSound::readBoxOrSoundXEV(XevReadBoxesHandler& boxReadHandler,
+                                    ZipFileLoader& fileLoader, const QString& path,
                                     const RuntimeIdToWriteId& objListIdConv) {
     QDomDocument doc;
     fileLoader.process(path + "properties.xml",
@@ -169,7 +170,7 @@ void eBoxOrSound::readBoxOrSoundXEV(ZipFileLoader& fileLoader, const QString& pa
         if(!mDurationRectangle) createDurationRectangle();
         mDurationRectangle->readDurationRectangleXEV(obj);
     }
-    const XevImporter imp(fileLoader, objListIdConv, path);
+    const XevImporter imp(boxReadHandler, fileLoader, objListIdConv, path);
     prp_readPropertyXEV(obj, imp);
 }
 

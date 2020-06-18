@@ -64,13 +64,14 @@ struct LayoutData {
         ele.appendChild(timelineLayout);
     }
 
-    void readXEV(const QDomElement& ele,
+    void readXEV(XevReadBoxesHandler& boxReadHandler,
+                 const QDomElement& ele,
                  RuntimeIdToWriteId& objListIdConv) {
         fName = ele.attribute("name");
         const auto canvasLayout = ele.firstChildElement("CanvasLayout");
         const auto timelineLayout = ele.firstChildElement("TimelineLayout");
-        fSceneLayout->readDataXEV(canvasLayout, objListIdConv);
-        fTimelineLayout->readDataXEV(timelineLayout, objListIdConv);
+        fSceneLayout->readDataXEV(boxReadHandler, canvasLayout, objListIdConv);
+        fTimelineLayout->readDataXEV(boxReadHandler, timelineLayout, objListIdConv);
     }
 
     QString fName;
@@ -147,7 +148,8 @@ public:
         ele.setAttribute("currentId", mCurrentId);
     }
 
-    void readXEV(const QDomElement& ele,
+    void readXEV(XevReadBoxesHandler& boxReadHandler,
+                 const QDomElement& ele,
                  RuntimeIdToWriteId& objListIdConv) {
         setCurrent(-1);
 
@@ -156,7 +158,7 @@ public:
         for(int i = 0; i < nCLays; i++) {
             const auto layNode = cLays.at(i);
             const auto layEle = layNode.toElement();
-            newLayout()->readXEV(layEle, objListIdConv);
+            newLayout()->readXEV(boxReadHandler, layEle, objListIdConv);
         }
 
         const auto sLays = ele.elementsByTagName("SceneLayout");
@@ -164,7 +166,8 @@ public:
         for(int i = 0; i < nSLays; i++) {
             const auto layNode = sLays.at(i);
             const auto layEle = layNode.toElement();
-            mLayouts.at(uint(i + mNumberLayouts))->readXEV(layEle, objListIdConv);
+            const auto layout = mLayouts.at(uint(i + mNumberLayouts));
+            layout->readXEV(boxReadHandler, layEle, objListIdConv);
         }
 
         const auto currentIdStr = ele.attribute("currentId");

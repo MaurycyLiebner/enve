@@ -50,7 +50,7 @@ public:
     }
 
     void prp_readPropertyXEV_impl(const QDomElement &ele,
-                                  const XevImporter &imp) override {
+                                  const XevImporter& imp) override {
         BoolPropertyContainer::prp_readPropertyXEV_impl(ele, imp);
         SWT_setVisible(getValue());
     }
@@ -1506,6 +1506,7 @@ qsptr<BoundingBox> createBoxOfNonCustomType(const eBoxType type) {
 }
 
 void ContainerBox::readAllContainedXEV(
+        XevReadBoxesHandler& boxReadHandler,
         ZipFileLoader& fileLoader, const QString& path,
         const RuntimeIdToWriteId& objListIdConv) {
     fileLoader.process(path + "stack.xml", [&](QIODevice* const src) {
@@ -1566,15 +1567,17 @@ void ContainerBox::readAllContainedXEV(
     const QString childPath = path + "objects/%1/";
     int id = 0;
     for(const auto& cont : mContained) {
-        cont->readBoxOrSoundXEV(fileLoader, childPath.arg(id++), objListIdConv);
+        cont->readBoxOrSoundXEV(boxReadHandler, fileLoader,
+                                childPath.arg(id++), objListIdConv);
     }
 }
 
 void ContainerBox::readBoxOrSoundXEV(
+        XevReadBoxesHandler& boxReadHandler,
         ZipFileLoader& fileLoader, const QString& path,
         const RuntimeIdToWriteId& objListIdConv) {
-    BoundingBox::readBoxOrSoundXEV(fileLoader, path, objListIdConv);
-    readAllContainedXEV(fileLoader, path, objListIdConv);
+    BoundingBox::readBoxOrSoundXEV(boxReadHandler, fileLoader, path, objListIdConv);
+    readAllContainedXEV(boxReadHandler, fileLoader, path, objListIdConv);
 }
 
 void ContainerBox::writeBoundingBox(eWriteStream& dst) const {

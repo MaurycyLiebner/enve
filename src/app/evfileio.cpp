@@ -102,8 +102,6 @@ void MainWindow::loadEVFile(const QString &path) {
     }
     file.close();
     addRecentFile(path);
-
-    BoundingBox::sClearReadBoxes();
 }
 
 void MainWindow::saveToFile(const QString &path) {
@@ -191,20 +189,20 @@ void MainWindow::loadXevFile(const QString &path) {
         QList<Canvas*> scenes;
         mDocument.readDocumentXEV(fileLoader, scenes);
 
+        XevReadBoxesHandler boxReadHandler;
         RuntimeIdToWriteId objListIdConv;
         objListIdConv.assign(mObjectSettingsWidget->getId());
         fileLoader.process("UI/layouts.xml", [&](QIODevice* const src) {
             QDomDocument doc;
             doc.setContent(src);
             const auto ele = doc.firstChildElement("Layouts");
-            mLayoutHandler->readXEV(ele, objListIdConv);
+            mLayoutHandler->readXEV(boxReadHandler, ele, objListIdConv);
         });
 
-        mDocument.readScenesXEV(fileLoader, scenes, objListIdConv);
+        mDocument.readScenesXEV(boxReadHandler, fileLoader, scenes, objListIdConv);
     } catch(...) {
         RuntimeThrow("Error while reading from file " + path);
     }
 
-    BoundingBox::sClearReadBoxes();
     addRecentFile(path);
 }

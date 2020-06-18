@@ -398,10 +398,11 @@ void TimelineWidget::readState(eReadStream &src) {
         setTarget(target);
     }
 
-    SimpleTask::sScheduleContexted(this, [this, sceneReadId, sceneDocumentId]() {
-        BoundingBox* sceneBox = nullptr;;
+    src.addReadStreamDoneTask([this, sceneReadId, sceneDocumentId]
+                              (eReadStream& src) {
+        BoundingBox* sceneBox = nullptr;
         if(sceneReadId != -1)
-            sceneBox = BoundingBox::sGetBoxByReadId(sceneReadId);
+            sceneBox = src.getBoxByReadId(sceneReadId);
         if(!sceneBox && sceneDocumentId != -1)
             sceneBox = BoundingBox::sGetBoxByDocumentId(sceneDocumentId);
 
@@ -417,7 +418,8 @@ void TimelineWidget::readState(eReadStream &src) {
     setViewedFrameRange({minViewedFrame, maxViewedFrame});
 }
 
-void TimelineWidget::readStateXEV(const QDomElement& ele,
+void TimelineWidget::readStateXEV(XevReadBoxesHandler& boxReadHandler,
+                                  const QDomElement& ele,
                                   RuntimeIdToWriteId& objListIdConv) {
     objListIdConv.assign(mBoxesListWidget->getId());
 
@@ -441,8 +443,9 @@ void TimelineWidget::readStateXEV(const QDomElement& ele,
     const auto sceneIdStr = ele.attribute("sceneId");
     const int sceneId = XmlExportHelpers::stringToInt(sceneIdStr);
 
-    SimpleTask::sScheduleContexted(this, [this, sceneId]() {
-        const auto sceneBox = BoundingBox::sGetBoxByReadId(sceneId);
+    boxReadHandler.addXevImporterDoneTask(
+                [this, sceneId](const XevReadBoxesHandler& imp) {
+        const auto sceneBox = imp.getBoxByReadId(sceneId);
         const auto scene = enve_cast<Canvas*>(sceneBox);
         setCurrentScene(scene);
     });

@@ -96,11 +96,6 @@ public:
 
     static BoundingBox *sGetBoxByDocumentId(const int documentId);
 
-    static void sAddReadBox(BoundingBox * const box);
-    static BoundingBox *sGetBoxByReadId(const int readId);
-    static void sClearReadBoxes();
-    static void sForEveryReadBox(const std::function<void(BoundingBox*)>& func);
-
     static void sClearWriteBoxes();
 
     template <typename B, typename T>
@@ -108,8 +103,6 @@ public:
 private:
     static int sNextDocumentId;
     static QList<BoundingBox*> sDocumentBoxes;
-
-    static QList<BoundingBox*> sReadBoxes;
 
     static int sNextWriteId;
     static QList<const BoundingBox*> sBoxesWithWriteIds;
@@ -307,9 +300,6 @@ public:
     void clearWriteId() const;
     int getWriteId() const;
 
-    int getReadId() const;
-    void clearReadId() const;
-
     void clearParent();
     void setParentTransform(BasicTransformAnimator *parent);
 
@@ -453,7 +443,6 @@ private:
 
     SkBlendMode mBlendMode = SkBlendMode::kSrcOver;
 
-    mutable int mReadId = -1;
     mutable int mWriteId = -1;
 
     bool mVisibleInScene = true;

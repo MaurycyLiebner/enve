@@ -22,13 +22,33 @@
 #include "runtimewriteid.h"
 
 class ZipFileLoader;
+class BoundingBox;
+
+class XevReadBoxesHandler {
+public:
+    ~XevReadBoxesHandler();
+
+    void addReadBox(const int readId, BoundingBox * const box);
+    BoundingBox *getBoxByReadId(const int readId) const;
+    using XevImporterDoneTask = std::function<void(const XevReadBoxesHandler&)>;
+    void addXevImporterDoneTask(const XevImporterDoneTask& task);
+private:
+    std::map<int, BoundingBox*> mReadBoxes;
+    QList<XevImporterDoneTask> mDoneTasks;
+
+};
 
 class XevImporter {
 public:
-    XevImporter(ZipFileLoader& fileLoader,
+    XevImporter(XevReadBoxesHandler& xevReadBoxesHandler,
+                ZipFileLoader& fileLoader,
                 const RuntimeIdToWriteId& objListIdConv,
                 const QString& path,
                 const QString& assetsPath = "");
+
+    XevReadBoxesHandler& getXevReadBoxesHandler() const {
+        return mXevReadBoxesHandler;
+    }
 
     const RuntimeIdToWriteId& objListIdConv() const { return mObjectListIdConv; }
 
@@ -39,6 +59,7 @@ public:
 
     QString relPathToAbsPath(const QString& relPath) const;
 private:
+    XevReadBoxesHandler& mXevReadBoxesHandler;
     ZipFileLoader& mFileLoader;
     const RuntimeIdToWriteId& mObjectListIdConv;
     const QString mPath;

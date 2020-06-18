@@ -35,9 +35,10 @@ void TimelineWrapperNode::writeData(eWriteStream &dst) {
     mTimelineWidget->writeState(dst);
 }
 
-void TimelineWrapperNode::readDataXEV(const QDomElement& ele,
+void TimelineWrapperNode::readDataXEV(XevReadBoxesHandler& boxReadHandler,
+                                      const QDomElement& ele,
                                       RuntimeIdToWriteId& objListIdConv) {
-    mTimelineWidget->readStateXEV(ele, objListIdConv);
+    mTimelineWidget->readStateXEV(boxReadHandler, ele, objListIdConv);
 }
 
 void TimelineWrapperNode::writeDataXEV(QDomElement& ele, QDomDocument& doc,

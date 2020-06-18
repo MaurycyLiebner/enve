@@ -153,7 +153,8 @@ public:
 
     void readDocumentXEV(ZipFileLoader& fileLoader,
                          QList<Canvas*>& scenes);
-    void readScenesXEV(ZipFileLoader& fileLoader,
+    void readScenesXEV(XevReadBoxesHandler& boxReadHandler,
+                       ZipFileLoader& fileLoader,
                        const QList<Canvas*>& scenes,
                        const RuntimeIdToWriteId& objListIdConv);
 

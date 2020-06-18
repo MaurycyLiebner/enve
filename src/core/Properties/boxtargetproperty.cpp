@@ -96,11 +96,12 @@ void BoxTargetProperty::prp_readProperty_impl(eReadStream& src) {
     src >> targetReadId;
     int targetDocumentId;
     src >> targetDocumentId;
-    if(targetReadId == -1 || targetDocumentId == -1) return;
-    SimpleTask::sScheduleContexted(this, [this, targetReadId, targetDocumentId]() {
+    if(targetReadId == -1 && targetDocumentId == -1) return;
+    src.addReadStreamDoneTask([this, targetReadId, targetDocumentId]
+                              (eReadStream& src) {
         BoundingBox* targetBox = nullptr;
         if(targetReadId != -1)
-            targetBox = BoundingBox::sGetBoxByReadId(targetReadId);
+            targetBox = src.getBoxByReadId(targetReadId);
          if(!targetBox && targetDocumentId != -1)
              targetBox = BoundingBox::sGetBoxByDocumentId(targetDocumentId);
          setTarget(targetBox);
@@ -119,11 +120,11 @@ QDomElement BoxTargetProperty::prp_writePropertyXEV_impl(const XevExporter& exp)
 
 void BoxTargetProperty::prp_readPropertyXEV_impl(
         const QDomElement& ele, const XevImporter& imp) {
-    Q_UNUSED(imp)
     const int targetId = XmlExportHelpers::stringToInt(ele.attribute("targetId"));
     if(targetId == -1) return;
-    SimpleTask::sScheduleContexted(this, [this, targetId]() {
-        const auto targetObj = BoundingBox::sGetBoxByReadId(targetId);
+    auto& handler = imp.getXevReadBoxesHandler();
+    handler.addXevImporterDoneTask([this, targetId](const XevReadBoxesHandler& imp) {
+        const auto targetObj = imp.getBoxByReadId(targetId);
         if(targetObj) setTarget(targetObj);
     });
 }

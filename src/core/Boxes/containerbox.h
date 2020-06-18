@@ -123,9 +123,11 @@ public:
     void writeBoxOrSoundXEV(const stdsptr<XevZipFileSaver>& xevFileSaver,
                             const RuntimeIdToWriteId& objListIdConv,
                             const QString& path) const;
-    void readBoxOrSoundXEV(ZipFileLoader& fileLoader, const QString& path,
+    void readBoxOrSoundXEV(XevReadBoxesHandler& boxReadHandler,
+                           ZipFileLoader& fileLoader, const QString& path,
                            const RuntimeIdToWriteId& objListIdConv);
-    void readAllContainedXEV(ZipFileLoader& fileLoader, const QString& path,
+    void readAllContainedXEV(XevReadBoxesHandler& boxReadHandler,
+                             ZipFileLoader& fileLoader, const QString& path,
                              const RuntimeIdToWriteId& objListIdConv);
 
     void queChildrenTasks();

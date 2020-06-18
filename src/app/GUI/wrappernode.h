@@ -1,4 +1,4 @@
-// enve - 2D animations software
+﻿// enve - 2D animations software
 // Copyright (C) 2016-2020 Maurycy Liebner
 
 // This program is free software: you can redistribute it and/or modify
@@ -36,6 +36,7 @@ class SplitWrapperNode;
 class ParentWrapperNode;
 class WidgetWrapperNode;
 class Canvas;
+class XevReadBoxesHandler;
 
 class WrapperNode {
 public:
@@ -60,7 +61,8 @@ public:
 
     static WrapperNode *sRead(eReadStream& src,
                               const WidgetCreator& creator);
-    static WrapperNode *sReadXEV(const QDomElement& ele,
+    static WrapperNode *sReadXEV(XevReadBoxesHandler& boxReadHandler,
+                                 const QDomElement& ele,
                                  const WidgetCreator& creator,
                                  RuntimeIdToWriteId& objListIdConv);
 protected:
@@ -68,7 +70,8 @@ protected:
     virtual void writeData(eWriteStream& dst) = 0;
     virtual void writeDataXEV(QDomElement& ele, QDomDocument& doc,
                               RuntimeIdToWriteId& objListIdConv) = 0;
-    virtual void readDataXEV(const QDomElement& ele,
+    virtual void readDataXEV(XevReadBoxesHandler& boxReadHandler,
+                             const QDomElement& ele,
                              RuntimeIdToWriteId& objListIdConv) = 0;
     virtual QString tagNameXEV() const = 0;
 };
@@ -129,11 +132,12 @@ public:
         ele.appendChild(child);
     }
 
-    void readDataXEV(const QDomElement& ele,
+    void readDataXEV(XevReadBoxesHandler& boxReadHandler,
+                     const QDomElement& ele,
                      RuntimeIdToWriteId& objListIdConv) {
         const auto child = ele.firstChildElement();
         const auto childTag = child.tagName();
-        const auto newChild = sReadXEV(child, fCreator, objListIdConv);
+        const auto newChild = sReadXEV(boxReadHandler, child, fCreator, objListIdConv);
         replaceAndDeleteChild(newChild);
     }
 
@@ -199,13 +203,14 @@ protected:
         ele.appendChild(child2);
     }
 
-    void readDataXEV(const QDomElement& ele,
+    void readDataXEV(XevReadBoxesHandler& boxReadHandler,
+                     const QDomElement& ele,
                      RuntimeIdToWriteId& objListIdConv) {
         const auto child1 = ele.firstChildElement();
         const auto child2 = ele.lastChildElement();
 
-        fChild1 = sReadXEV(child1, fCreator, objListIdConv);
-        fChild2 = sReadXEV(child2, fCreator, objListIdConv);
+        fChild1 = sReadXEV(boxReadHandler, child1, fCreator, objListIdConv);
+        fChild2 = sReadXEV(boxReadHandler, child2, fCreator, objListIdConv);
 
         fChild1->fParent = this;
         fChild2->fParent = this;
@@ -247,9 +252,10 @@ protected:
         ele.setAttribute("proportions", percentAt(1));
     }
 
-    void readDataXEV(const QDomElement& ele,
+    void readDataXEV(XevReadBoxesHandler& boxReadHandler,
+                     const QDomElement& ele,
                      RuntimeIdToWriteId& objListIdConv) {
-        SplitWrapperNode::readDataXEV(ele, objListIdConv);
+        SplitWrapperNode::readDataXEV(boxReadHandler, ele, objListIdConv);
         const QString child2fracStr = ele.attribute("proportions");
         const qreal child2frac = XmlExportHelpers::stringToDouble(child2fracStr);
         appendWidget(fChild1->widget());
@@ -294,9 +300,10 @@ protected:
         ele.setAttribute("proportions", percentAt(1));
     }
 
-    void readDataXEV(const QDomElement& ele,
+    void readDataXEV(XevReadBoxesHandler& boxReadHandler,
+                     const QDomElement& ele,
                      RuntimeIdToWriteId& objListIdConv) {
-        SplitWrapperNode::readDataXEV(ele, objListIdConv);
+        SplitWrapperNode::readDataXEV(boxReadHandler, ele, objListIdConv);
         const QString child2fracStr = ele.attribute("proportions");
         const qreal child2frac = XmlExportHelpers::stringToDouble(child2fracStr);
         appendWidget(fChild1->widget());

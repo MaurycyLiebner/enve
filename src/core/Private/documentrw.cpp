@@ -222,13 +222,15 @@ void Document::readDocumentXEV(const QDomDocument& doc,
     }
 }
 
-void Document::readScenesXEV(ZipFileLoader& fileLoader,
+void Document::readScenesXEV(XevReadBoxesHandler& boxReadHandler,
+                             ZipFileLoader& fileLoader,
                              const QList<Canvas*>& scenes,
                              const RuntimeIdToWriteId& objListIdConv) {
     int id = 0;
     for(const auto& scene : scenes) {
         const auto block = scene->blockUndoRedo();
         const QString path = "scenes/" + QString::number(id++) + "/";
-        scene->readBoxOrSoundXEV(fileLoader, path, objListIdConv);
+        scene->readBoxOrSoundXEV(boxReadHandler, fileLoader,
+                                 path, objListIdConv);
     }
 }

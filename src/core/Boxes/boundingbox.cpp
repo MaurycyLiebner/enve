@@ -46,7 +46,6 @@
 
 int BoundingBox::sNextDocumentId = 0;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
-QList<BoundingBox*> BoundingBox::sReadBoxes;
 int BoundingBox::sNextWriteId;
 QList<const BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 
@@ -104,16 +103,18 @@ void BoundingBox::readBoundingBox(eReadStream& src) {
         QString name; src >> name;
         prp_setName(name);
     }
-    src >> mReadId;
+    int readId; src >> readId;
     src.read(&mBlendMode, sizeof(SkBlendMode));
 
-    BoundingBox::sAddReadBox(this);
+    src.addReadBox(readId, this);
 }
 
-void BoundingBox::prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) {
+void BoundingBox::prp_readPropertyXEV_impl(const QDomElement& ele,
+                                           const XevImporter& imp) {
     const auto readIdStr = ele.attribute("id");
-    mReadId = XmlExportHelpers::stringToInt(readIdStr);
-    BoundingBox::sAddReadBox(this);
+    const int readId = XmlExportHelpers::stringToInt(readIdStr);
+    auto& handler = imp.getXevReadBoxesHandler();
+    handler.addReadBox(readId, this);
 
     eBoxOrSound::prp_readPropertyXEV_impl(ele, imp);
 }
@@ -1107,10 +1108,6 @@ void BoundingBox::writeIdentifier(eWriteStream &dst) const {
     dst.write(&mType, sizeof(eBoxType));
 }
 
-int BoundingBox::getReadId() const {
-    return mReadId;
-}
-
 int BoundingBox::getWriteId() const {
     if(mWriteId < 0) assignWriteId();
     return mWriteId;
@@ -1122,23 +1119,8 @@ int BoundingBox::assignWriteId() const {
     return mWriteId;
 }
 
-void BoundingBox::clearReadId() const {
-    mReadId = -1;
-}
-
 void BoundingBox::clearWriteId() const {
     mWriteId = -1;
-}
-
-BoundingBox *BoundingBox::sGetBoxByReadId(const int readId) {
-    for(const auto& box : sReadBoxes) {
-        if(box->getReadId() == readId) return box;
-    }
-    return nullptr;
-}
-
-void BoundingBox::sAddReadBox(BoundingBox * const box) {
-    sReadBoxes << box;
 }
 
 void BoundingBox::sClearWriteBoxes() {
@@ -1150,18 +1132,6 @@ void BoundingBox::sClearWriteBoxes() {
 }
 
 #include "simpletask.h"
-void BoundingBox::sClearReadBoxes() {
-    SimpleTask::sSchedule([]() {
-        for(const auto& box : sReadBoxes) {
-            box->clearReadId();
-        }
-        sReadBoxes.clear();
-    });
-}
-
-void BoundingBox::sForEveryReadBox(const std::function<void(BoundingBox*)> &func) {
-    for(const auto& box : sReadBoxes) func(box);
-}
 
 void BoundingBox::selectAndAddContainedPointsToList(
         const QRectF &absRect,

@@ -290,10 +290,11 @@ void CanvasWindow::readState(eReadStream &src) {
     int sceneReadId; src >> sceneReadId;
     int sceneDocumentId; src >> sceneDocumentId;
 
-    SimpleTask::sScheduleContexted(this, [this, sceneReadId, sceneDocumentId]() {
+    src.addReadStreamDoneTask([this, sceneReadId, sceneDocumentId]
+                              (eReadStream& src) {
         BoundingBox* sceneBox = nullptr;
         if(sceneReadId != -1)
-            sceneBox = BoundingBox::sGetBoxByReadId(sceneReadId);
+            sceneBox = src.getBoxByReadId(sceneReadId);
         if(!sceneBox && sceneDocumentId != -1)
             sceneBox = BoundingBox::sGetBoxByDocumentId(sceneDocumentId);
 
@@ -304,12 +305,14 @@ void CanvasWindow::readState(eReadStream &src) {
     mFitToSizeBlocked = true;
 }
 
-void CanvasWindow::readStateXEV(const QDomElement& ele) {
+void CanvasWindow::readStateXEV(XevReadBoxesHandler& boxReadHandler,
+                                const QDomElement& ele) {
     const auto sceneIdStr = ele.attribute("sceneId");
     const int sceneId = XmlExportHelpers::stringToInt(sceneIdStr);
 
-    SimpleTask::sScheduleContexted(this, [this, sceneId]() {
-        const auto sceneBox = BoundingBox::sGetBoxByReadId(sceneId);
+    boxReadHandler.addXevImporterDoneTask(
+                [this, sceneId](const XevReadBoxesHandler& imp) {
+        const auto sceneBox = imp.getBoxByReadId(sceneId);
         const auto scene = enve_cast<Canvas*>(sceneBox);
         setCurrentCanvas(scene);
     });

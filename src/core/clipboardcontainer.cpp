@@ -88,7 +88,6 @@ void BoxesClipboard::pasteTo(ContainerBox* const parent) {
             parentScene->addBoxToSelection(box);
         }
     }
-    BoundingBox::sClearReadBoxes();
 }
 
 KeysClipboard::KeysClipboard() : Clipboard(ClipboardType::keys) {}
