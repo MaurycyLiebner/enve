@@ -57,14 +57,12 @@ void PathBoxRenderData::drawOnParentLayer(SkCanvas * const canvas,
     paint.setStyle(SkPaint::kFill_Style);
 
     if(!fFillPath.isEmpty()) {
-        fPaintSettings.applyPainterSettingsSk(paint);
-        paint.setAlphaf(fOpacity*0.01);
+        fPaintSettings.applyPainterSettingsSk(paint, fOpacity*0.01f);
         canvas->drawPath(fFillPath, paint);
     }
     if(!fOutlinePath.isEmpty()) {
         paint.setShader(nullptr);
-        fStrokeSettings.applyPainterSettingsSk(paint);
-        paint.setAlphaf(fOpacity*0.01);
+        fStrokeSettings.applyPainterSettingsSk(paint, fOpacity*0.01f);
         canvas->drawPath(fOutlinePath, paint);
     }
 }

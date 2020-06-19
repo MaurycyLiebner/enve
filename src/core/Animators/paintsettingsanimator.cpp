@@ -424,11 +424,14 @@ UpdatePaintSettings::UpdatePaintSettings() {}
 
 UpdatePaintSettings::~UpdatePaintSettings() {}
 
-void UpdatePaintSettings::applyPainterSettingsSk(SkPaint& paint) {
+void UpdatePaintSettings::applyPainterSettingsSk(
+        SkPaint& paint, const float opactiy) {
     if(fPaintType == GRADIENTPAINT) {
         paint.setShader(fGradient);
+        paint.setAlphaf(opactiy);
     } else if(fPaintType == FLATPAINT) {
         paint.setColor(toSkColor(fPaintColor));
+        paint.setAlphaf(paint.getAlphaf()*opactiy);
     } else {
         paint.setColor(SkColorSetARGB(0, 0, 0, 0));
     }
