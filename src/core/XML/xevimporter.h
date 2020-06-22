@@ -24,7 +24,7 @@
 class ZipFileLoader;
 class BoundingBox;
 
-class XevReadBoxesHandler {
+class CORE_EXPORT XevReadBoxesHandler {
 public:
     ~XevReadBoxesHandler();
 
