@@ -32,7 +32,8 @@ public:
 
     QIcon icon(const QFileInfo & info) const {
         const QString name = info.fileName();
-        if(name.endsWith(".ev")) return mEvIcon;
+        if(name.endsWith(".ev") ||
+           name.endsWith(".xev")) return mEvIcon;
         return QFileIconProvider::icon(info);
     }
 private:
