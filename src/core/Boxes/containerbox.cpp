@@ -125,8 +125,8 @@ bool ContainerBox::SWT_dropInto(const int index, const QMimeData * const data) {
         const auto urls = data->urls();
         int dropId = index;
         for(const auto& url : urls) {
-            Actions::sInstance->importFile(url.path(), this,
-                                           (dropId++) - ca_getNumberOfChildren());
+            const int insertId = (dropId++) - ca_getNumberOfChildren();
+            Actions::sInstance->importFile(url.toLocalFile(), this, insertId);
         }
         return true;
     }

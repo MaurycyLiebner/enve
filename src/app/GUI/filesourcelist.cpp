@@ -54,8 +54,9 @@ void FileSourceWidget::mouseMoveEvent(QMouseEvent *event) {
     QDrag *drag = new QDrag(this);
 
     QMimeData *mimeData = new QMimeData();
-    mimeData->setUrls(QList<QUrl>() <<
-                      QUrl::fromLocalFile(mTargetCache->getName()));
+    const QString path = mTargetCache->getName();
+    const QUrl url = QUrl::fromLocalFile(path);
+    mimeData->setUrls(QList<QUrl>() << url);
     drag->setMimeData(mimeData);
 
     drag->installEventFilter(MainWindow::sGetInstance());
