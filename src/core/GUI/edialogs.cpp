@@ -105,8 +105,8 @@ QString eDialogs::openDir(const QString &title, const QString &path) {
 QString eDialogs::saveFile(const QString &title,
                            const QString &path,
                            const QString &filter) {
-
     QFileDialog dialog(nullptr, title, path);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setOption(QFileDialog::DontUseNativeDialog);
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setNameFilter(filter);
