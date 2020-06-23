@@ -53,6 +53,8 @@ public:
     void renderPreview();
     void renderFromSettings(RenderInstanceSettings * const settings);
 
+    void setLoop(const bool loop);
+
     PreviewSate currentPreviewState() const
     { return mPreviewSate; }
 
@@ -84,6 +86,8 @@ private:
 
     Document& mDocument;
 
+    bool mLoop = false;
+
     // AUDIO
     AudioHandler& mAudioHandler;
     VideoEncoder& mVideoEncoder;
@@ -96,6 +100,7 @@ private:
 
     int mCurrentPreviewFrame;
     int mMaxPreviewFrame;
+    int mMinPreviewFrame;
 
     PreviewSate mPreviewSate = PreviewSate::stopped;
     //! @brief true if preview is currently playing

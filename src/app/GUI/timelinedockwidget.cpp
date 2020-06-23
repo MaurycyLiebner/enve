@@ -92,13 +92,21 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
         renderPreview();
     });
 
-    mPlayButton = SwitchButton::sCreate2Switch("toolbarButtons/play.png",
-                                               "toolbarButtons/pause.png",
-                                               gSingleLineTooltip("Render Preview", "Space"), this);
+    mPlayButton = SwitchButton::sCreate2Switch(
+                      "toolbarButtons/play.png",
+                      "toolbarButtons/pause.png",
+                      gSingleLineTooltip("Render Preview", "Space"), this);
     mStopButton = new ActionButton("toolbarButtons/stop.png",
                                    gSingleLineTooltip("Stop Preview", "Esc"), this);
     connect(mStopButton, &ActionButton::pressed,
             this, &TimelineDockWidget::interruptPreview);
+
+    mLoopButton = SwitchButton::sCreate2Switch(
+                      "toolbarButtons/loopUnchecked.png",
+                      "toolbarButtons/loopChecked.png",
+                      gSingleLineTooltip("Loop"), this);
+    connect(mLoopButton, &SwitchButton::toggled,
+            this, &TimelineDockWidget::setLoop);
 
     mLocalPivot = SwitchButton::sCreate2Switch(
                 "toolbarButtons/pivotGlobal.png", "toolbarButtons/pivotLocal.png",
@@ -279,6 +287,8 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mToolBar->addWidget(mPlayFromBeginningButton);
     mToolBar->addWidget(mPlayButton);
     mToolBar->addWidget(mStopButton);
+    mToolBar->addSeparator();
+    mToolBar->addWidget(mLoopButton);
 
     addSpaceToToolbar()->setText("     ");
 
@@ -426,6 +436,10 @@ void TimelineDockWidget::setResolutionText(QString text) {
     text = text.remove(" %");
     const qreal res = clamp(text.toDouble(), 1, 200)/100;
     mMainWindow->setResolutionValue(res);
+}
+
+void TimelineDockWidget::setLoop(const bool loop) {
+    RenderHandler::sInstance->setLoop(loop);
 }
 
 void TimelineDockWidget::clearAll() {

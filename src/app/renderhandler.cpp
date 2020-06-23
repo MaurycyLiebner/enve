@@ -110,6 +110,10 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
     }
 }
 
+void RenderHandler::setLoop(const bool loop) {
+    mLoop = loop;
+}
+
 void RenderHandler::setFrameAction(const int frame) {
     if(mCurrentScene) mCurrentScene->anim_setAbsFrame(frame);
     mDocument.actionFinished();
@@ -162,12 +166,14 @@ void RenderHandler::renderPreview() {
     TaskScheduler::sSetAllTasksFinishedFunc(nextFrameFunc);
 
     mSavedCurrentFrame = mCurrentScene->getCurrentFrame();
-    mCurrentRenderFrame = mSavedCurrentFrame;
+
+    mMinRenderFrame = mLoop ? mCurrentScene->getMinFrame() : mSavedCurrentFrame;
+    mMaxRenderFrame = mCurrentScene->getMaxFrame();
+
+    mCurrentRenderFrame = mMinRenderFrame;
     mCurrRenderRange = {mCurrentRenderFrame, mCurrentRenderFrame};
     mCurrentScene->setMinFrameUseRange(mCurrentRenderFrame);
     mCurrentSoundComposition->setMinFrameUseRange(mCurrentRenderFrame);
-
-    mMaxRenderFrame = mCurrentScene->getMaxFrame();
 
     setPreviewState(PreviewSate::rendering);
 
@@ -267,6 +273,7 @@ void RenderHandler::playPreview() {
     const int minPreviewFrame = mSavedCurrentFrame;
     const int maxPreviewFrame = qMin(mMaxRenderFrame, mCurrentRenderFrame);
     if(minPreviewFrame >= maxPreviewFrame) return;
+    mMinPreviewFrame = mLoop ? mCurrentScene->getMinFrame() : minPreviewFrame;
     mMaxPreviewFrame = maxPreviewFrame;
     mCurrentPreviewFrame = minPreviewFrame;
     mCurrentScene->setSceneFrame(mCurrentPreviewFrame);
@@ -298,10 +305,13 @@ void RenderHandler::nextPreviewFrame() {
     if(!mCurrentScene) return;
     mCurrentPreviewFrame++;
     if(mCurrentPreviewFrame > mMaxPreviewFrame) {
-        stopPreview();
+        if(mLoop) {
+            mCurrentPreviewFrame = mMinPreviewFrame - 1;
+            nextPreviewFrame();
+        } else stopPreview();
     } else {
         mCurrentScene->setSceneFrame(mCurrentPreviewFrame);
-        mCurrentScene->setMinFrameUseRange(mCurrentPreviewFrame);
+        if(!mLoop) mCurrentScene->setMinFrameUseRange(mCurrentPreviewFrame);
         emit mCurrentScene->currentFrameChanged(mCurrentPreviewFrame);
     }
     emit mCurrentScene->requestUpdate();

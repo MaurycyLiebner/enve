@@ -73,6 +73,7 @@ public:
 private:
     void setResolutionText(QString text);
 
+    void setLoop(const bool loop);
     void interruptPreview();
 
     void setLocalPivot(const bool local);
@@ -105,6 +106,7 @@ private:
     ActionButton *mPlayFromBeginningButton;
     SwitchButton *mPlayButton;
     ActionButton *mStopButton;
+    SwitchButton *mLoopButton;
 
     QAction* mLocalPivotAct;
     SwitchButton *mLocalPivot;
