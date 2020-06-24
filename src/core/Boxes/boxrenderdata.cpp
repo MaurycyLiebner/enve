@@ -75,7 +75,7 @@ void BoxRenderData::drawOnParentLayer(SkCanvas * const canvas) {
 
 void BoxRenderData::drawOnParentLayer(SkCanvas * const canvas,
                                       SkPaint& paint) {
-    if(isZero4Dec(fOpacity)) return;
+    if(isZero4Dec(fOpacity) || !fRenderedImage) return;
     if(fUseRenderTransform) canvas->concat(toSkMatrix(fRenderTransform));
     if(fBlendMode == SkBlendMode::kDstIn ||
        fBlendMode == SkBlendMode::kSrcIn ||
