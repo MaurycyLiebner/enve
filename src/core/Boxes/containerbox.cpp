@@ -576,7 +576,9 @@ void ContainerBox::shiftAll(const int shift) {
 
 void ContainerBox::updateRelBoundingRect() {
     SkPath boundingPaths;
-    for(const auto &child : mContainedBoxes) {
+    const auto minMax = getContainedMinMax();
+    for(int i = minMax.fMin; i <= minMax.fMax; i++) {
+        const auto& child = mContainedBoxes.at(i);
         if(child->isVisibleAndInVisibleDurationRect()) {
             SkPath childPath;
             const auto childRel = child->getRelBoundingRect();
@@ -595,7 +597,9 @@ void ContainerBox::updateRelBoundingRect() {
 FrameRange ContainerBox::prp_getIdenticalRelRange(const int relFrame) const {
     auto range = BoundingBox::prp_getIdenticalRelRange(relFrame);
     const int absFrame = prp_relFrameToAbsFrame(relFrame);
-    for(const auto &child : mContainedBoxes) {
+    const auto minMax = getContainedMinMax();
+    for(int i = minMax.fMin; i <= minMax.fMax; i++) {
+        const auto& child = mContainedBoxes.at(i);
         if(range.isUnary()) return range;
         auto childRange = child->prp_getIdenticalRelRange(
                     child->prp_absFrameToRelFrame(absFrame));
