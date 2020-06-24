@@ -126,6 +126,10 @@ public:
     void readBoxOrSoundXEV(XevReadBoxesHandler& boxReadHandler,
                            ZipFileLoader& fileLoader, const QString& path,
                            const RuntimeIdToWriteId& objListIdConv);
+
+    virtual bool isFlipBook() const;
+    virtual iValueRange getContainedMinMax() const;
+
     void readAllContainedXEV(XevReadBoxesHandler& boxReadHandler,
                              ZipFileLoader& fileLoader, const QString& path,
                              const RuntimeIdToWriteId& objListIdConv);
@@ -166,8 +170,6 @@ public:
     void ungroupAbandomTransform_k();
 
     bool isCurrentGroup() const;
-    bool isFlipBook() const;
-    FlipBookProperty* flipBook() const;
 
     void updateContainedBoxes();
     bool replaceContained(const qsptr<eBoxOrSound>& replaced,
@@ -237,8 +239,6 @@ public:
             QList<BlendEffect::Delayed> &delayed) const;
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
-
-    iValueRange getContainedMinMax() const;
 protected:
     void saveBoxesSVG(SvgExporter& exp,
                       DomEleTask* const eleTask,

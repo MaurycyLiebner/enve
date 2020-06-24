@@ -54,6 +54,9 @@ public:
     bool localDifferenceInFillPathBetweenFrames(
             const int frame1, const int frame2) const;
 
+    bool isFlipBook() const;
+    iValueRange getContainedMinMax() const;
+
     void setLinkTarget(ContainerBox * const linkTarget);
 protected:
     const qsptr<BoxTargetProperty> mBoxTarget =

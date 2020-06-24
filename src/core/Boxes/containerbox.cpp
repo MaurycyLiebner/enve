@@ -664,10 +664,6 @@ bool ContainerBox::isFlipBook() const {
     return mFlipBook->getValue();
 }
 
-FlipBookProperty* ContainerBox::flipBook() const {
-    return mFlipBook.get();
-}
-
 void ContainerBox::updateContainedBoxes() {
     mContainedBoxes.clear();
     for(const auto& child : mContained) {

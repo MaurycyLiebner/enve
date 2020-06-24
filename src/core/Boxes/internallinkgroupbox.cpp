@@ -72,6 +72,18 @@ bool InternalLinkGroupBox::localDifferenceInFillPathBetweenFrames(
     } else return false;
 }
 
+bool InternalLinkGroupBox::isFlipBook() const {
+    const auto linkTarget = getLinkTarget();
+    if(linkTarget) return linkTarget->isFlipBook();
+    else return false;
+}
+
+iValueRange InternalLinkGroupBox::getContainedMinMax() const {
+    const auto linkTarget = getLinkTarget();
+    if(linkTarget) return linkTarget->getContainedMinMax();
+    else return ContainerBox::getContainedMinMax();
+}
+
 #include "Sound/eindependentsound.h"
 #include "Sound/esoundlink.h"
 
