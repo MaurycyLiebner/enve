@@ -44,6 +44,7 @@ void eSoundObjectBase::prp_setupTreeViewMenu(PropertyMenu * const menu) {
 }
 
 SoundReaderForMerger *eSoundObjectBase::getSecondReader(const int relSecondId) {
+    if(!mCacheHandler) return nullptr;
     const int maxSec = mCacheHandler->durationSecCeil() - 1;
     if(relSecondId < 0 || relSecondId > maxSec) return nullptr;
     const auto reader = mCacheHandler->getSecondReader(relSecondId);
@@ -52,6 +53,7 @@ SoundReaderForMerger *eSoundObjectBase::getSecondReader(const int relSecondId) {
 }
 
 stdsptr<Samples> eSoundObjectBase::getSamplesForSecond(const int relSecondId) {
+    if(!mCacheHandler) return nullptr;
     return mCacheHandler->getSamplesForSecond(relSecondId);
 }
 
