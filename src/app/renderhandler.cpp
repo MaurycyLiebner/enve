@@ -40,6 +40,7 @@ RenderHandler::RenderHandler(Document &document,
             this, &RenderHandler::outOfMemory);
 
     mPreviewFPSTimer = new QTimer(this);
+    mPreviewFPSTimer->setTimerType(Qt::PreciseTimer);
     connect(mPreviewFPSTimer, &QTimer::timeout,
             this, &RenderHandler::nextPreviewFrame);
     connect(mPreviewFPSTimer, &QTimer::timeout,
