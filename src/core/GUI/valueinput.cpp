@@ -44,7 +44,8 @@ void ValueInput::draw(SkCanvas *canvas, const int y) {
     paint.setStyle(SkPaint::kStrokeAndFill_Style);
     paint.setStrokeWidth(.1f);
 
-    canvas->drawString(transStr.toStdString().c_str(),
+    const auto stdStr = transStr.toStdString();
+    canvas->drawString(stdStr.c_str(),
            inputRect.x() + eSizesUI::widget*0.5f,
            inputRect.y() + inputRect.height()*0.5f + eSizesUI::font*0.2f,
            mFont, paint);
