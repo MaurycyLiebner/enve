@@ -105,10 +105,10 @@ void ExpressionEditor::setFillerText() {
     if(mFillerText) return;
     mFillerText = true;
     setText("// Here you can bind property values, e.g.:\n"
-            "// varName = transform.rot\n"
+            "// varName = transform.rotation\n"
             "// Where 'varName' is the name of the variable you can use\n"
             "// from the 'Calculate' portion of the script,\n"
-            "// and 'transform.rot' is the property\n"
+            "// and 'transform.rotation' is the property\n"
             "// the variable will get its value from.");
 }
 
