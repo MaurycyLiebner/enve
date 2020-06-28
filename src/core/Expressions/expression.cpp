@@ -115,7 +115,8 @@ qsptr<Expression> Expression::sCreate(const QString& definitionsStr,
 bool Expression::setAbsFrame(const int absFrame) {
     bool changed = false;
     for(const auto& binding : mBindings) {
-        changed = changed || binding.second->setAbsFrame(absFrame);
+        const bool c = binding.second->setAbsFrame(absFrame);
+        changed = changed || c;
     }
     return changed;
 }
