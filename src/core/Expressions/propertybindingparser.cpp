@@ -42,9 +42,10 @@ bool parseBindingName(const QString& exp, int& pos, QString& name) {
     int newPos = pos;
     name.clear();
     while(newPos < exp.count()) {
-        const auto& character = exp.at(newPos++);
+        const auto& character = exp.at(newPos);
         if(!character.isLetter() && !character.isDigit()
            && character != '_') break;
+        newPos++;
         name.append(character);
     }
     if(name.isEmpty()) return false;
