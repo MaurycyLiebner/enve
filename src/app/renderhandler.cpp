@@ -168,7 +168,8 @@ void RenderHandler::renderPreview() {
 
     mSavedCurrentFrame = mCurrentScene->getCurrentFrame();
 
-    mMinRenderFrame = mLoop ? mCurrentScene->getMinFrame() : mSavedCurrentFrame;
+    mMinRenderFrame = mLoop ? mCurrentScene->getMinFrame() - 1:
+                              mSavedCurrentFrame;
     mMaxRenderFrame = mCurrentScene->getMaxFrame();
 
     mCurrentRenderFrame = mMinRenderFrame;
