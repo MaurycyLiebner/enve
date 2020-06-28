@@ -309,6 +309,8 @@ void RenderHandler::nextPreviewFrame() {
         if(mLoop) {
             mCurrentPreviewFrame = mMinPreviewFrame - 1;
             nextPreviewFrame();
+            stopAudio();
+            startAudio();
         } else stopPreview();
     } else {
         mCurrentScene->setSceneFrame(mCurrentPreviewFrame);
