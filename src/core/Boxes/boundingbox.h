@@ -217,6 +217,8 @@ public:
     virtual SkBlendMode getBlendMode() const
     { return mBlendMode; }
 
+    virtual qreal getOpacity(const qreal relFrame) const;
+
     virtual void saveSVG(SvgExporter& exp, DomEleTask* const task) const {
         Q_UNUSED(exp)
         Q_UNUSED(task)

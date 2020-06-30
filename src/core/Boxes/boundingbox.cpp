@@ -109,6 +109,10 @@ void BoundingBox::readBoundingBox(eReadStream& src) {
     src.addReadBox(readId, this);
 }
 
+qreal BoundingBox::getOpacity(const qreal relFrame) const {
+    return mTransformAnimator->getOpacity(relFrame);
+}
+
 void BoundingBox::prp_readPropertyXEV_impl(const QDomElement& ele,
                                            const XevImporter& imp) {
     const auto readIdStr = ele.attribute("id");
@@ -283,7 +287,7 @@ NormalSegment BoundingBox::getNormalSegment(const QPointF &absPos,
 
 void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
                                const SkFilterQuality filter) const {
-    const qreal opacity = mTransformAnimator->getOpacity();
+    const qreal opacity = getOpacity(anim_getCurrentRelFrame());
     if(isZero4Dec(opacity) || !mVisibleInScene) return;
     mDrawRenderContainer.drawSk(canvas, filter);
 }
@@ -830,7 +834,7 @@ void BoundingBox::setupWithoutRasterEffects(const qreal relFrame,
     data->fResolution = scene->getResolution();
     data->fResolutionScale.reset();
     data->fResolutionScale.scale(data->fResolution, data->fResolution);
-    data->fOpacity = mTransformAnimator->getOpacity(relFrame);
+    data->fOpacity = getOpacity(relFrame);
     data->fBaseMargin = QMargins() + 2;
     data->fBlendMode = getBlendMode();
 

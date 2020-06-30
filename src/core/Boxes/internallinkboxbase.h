@@ -65,6 +65,8 @@ public:
 
     void saveSVG(SvgExporter& exp, DomEleTask* const task) const override;
 
+    qreal getOpacity(const qreal relFrame) const override;
+
     BoxT *getFinalTarget() const;
 protected:
     ConnContext& assignLinkTarget(BoxT * const linkTarget);
@@ -79,6 +81,16 @@ private:
 };
 
 #define ILBB InternalLinkBoxBase<BoxT>
+
+template <typename BoxT>
+qreal ILBB::getOpacity(const qreal relFrame) const {
+    const auto linkTarget = getLinkTarget();
+    if(mInnerLink && linkTarget) {
+        return linkTarget->getOpacity(relFrame);
+    } else {
+        return BoundingBox::getOpacity(relFrame);
+    }
+}
 
 template <typename BoxT>
 bool ILBB::relPointInsidePath(const QPointF &relPos) const {
