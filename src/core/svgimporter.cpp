@@ -1170,6 +1170,7 @@ void StrokeSvgAttributes::apply(BoundingBox *box, const qreal scale) const {
 }
 
 void BoxSvgAttributes::apply(BoundingBox *box) const {
+    if(!mId.isEmpty()) box->prp_setName(mId);
     if(const auto path = enve_cast<PathBox*>(box)) {
         const qreal m11 = mRelTransform.m11();
         const qreal m12 = mRelTransform.m12();
