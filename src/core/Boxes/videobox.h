@@ -43,6 +43,8 @@ public:
     void setFilePath(const QString& path);
     QString getFilePath();
 private:
+    void setFilePathNoRename(const QString &path);
+
     void soundDataChanged();
     void fileHandlerConnector(ConnContext& conn, VideoFileHandler* obj);
     void fileHandlerAfterAssigned(VideoFileHandler* obj);

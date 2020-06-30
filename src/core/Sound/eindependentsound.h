@@ -42,6 +42,8 @@ public:
     void setFilePath(const QString &path);
 
 private:
+    void setFilePathNoRename(const QString &path);
+
     void fileHandlerConnector(ConnContext &conn, SoundFileHandler *obj);
     void fileHandlerAfterAssigned(SoundFileHandler *obj);
 

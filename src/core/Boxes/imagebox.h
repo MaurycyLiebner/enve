@@ -59,6 +59,8 @@ public:
 
     void reload();
 private:
+    void setFilePathNoRename(const QString &path);
+
     void fileHandlerConnector(ConnContext& conn, ImageFileHandler* obj);
     void fileHandlerAfterAssigned(ImageFileHandler* obj);
 

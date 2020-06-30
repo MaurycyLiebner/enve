@@ -67,7 +67,7 @@ void ImageBox::writeBoundingBox(eWriteStream& dst) const {
 void ImageBox::readBoundingBox(eReadStream& src) {
     BoundingBox::readBoundingBox(src);
     const QString path = src.readFilePath();
-    setFilePath(path);
+    setFilePathNoRename(path);
 }
 
 QDomElement ImageBox::prp_writePropertyXEV_impl(const XevExporter& exp) const {
@@ -80,14 +80,17 @@ QDomElement ImageBox::prp_writePropertyXEV_impl(const XevExporter& exp) const {
 void ImageBox::prp_readPropertyXEV_impl(const QDomElement& ele, const XevImporter& imp) {
     BoundingBox::prp_readPropertyXEV_impl(ele, imp);
     const QString absSrc = XevExportHelpers::getAbsAndRelFileSrc(ele, imp);
-    setFilePath(absSrc);
+    setFilePathNoRename(absSrc);
+}
+
+void ImageBox::setFilePathNoRename(const QString &path) {
+    mFileHandler.assign(path);
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void ImageBox::setFilePath(const QString &path) {
-    mFileHandler.assign(path);
-
-    rename(path.split("/").last());
-    prp_afterWholeInfluenceRangeChanged();
+    setFilePathNoRename(path);
+    rename(QFileInfo(path).completeBaseName());
 }
 
 void ImageBox::reload() {
