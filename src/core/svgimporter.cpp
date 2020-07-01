@@ -660,20 +660,32 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
                 if(!iNode.isElement()) continue;
                 const QDomElement elem = iNode.toElement();
                 if(elem.tagName() != "stop") continue;
-                QColor stopColor;
+                QString stopColorS;
+                QString stopOpacityS;
                 const QString stopStyle = elem.attribute("style");
                 QList<SvgAttribute> attributesList;
                 extractSvgAttributes(stopStyle, &attributesList);
                 for(const auto& attr : attributesList) {
                     if(attr.fName == "stop-color") {
-                        const qreal alpha = stopColor.alphaF();
-                        toColor(attr.fValue, stopColor);
-                        stopColor.setAlphaF(alpha);
+                        stopColorS = attr.fValue;
 
                     } else if(attr.fName == "stop-opacity") {
-                        stopColor.setAlphaF(toDouble(attr.fValue));
+                        stopOpacityS = attr.fValue;
                     }
                 }
+                if(stopColorS.isEmpty()) {
+                    stopColorS = elem.attribute("stop-color");
+                }
+                if(stopOpacityS.isEmpty()) {
+                    stopOpacityS = elem.attribute("stop-opacity");
+                }
+
+                QColor stopColor;
+                toColor(stopColorS, stopColor);
+                if(!stopOpacityS.isEmpty()) {
+                    stopColor.setAlphaF(toDouble(stopOpacityS));
+                }
+
                 gradient->addColor(stopColor);
             }
         } else {
