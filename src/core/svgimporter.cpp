@@ -35,6 +35,8 @@
 #include "transformvalues.h"
 #include "regexhelpers.h"
 
+#define RGXS REGEX_SPACES
+
 class TextSvgAttributes {
 public:
     TextSvgAttributes() {}
@@ -207,9 +209,9 @@ void extractSvgAttributes(const QString &string,
 
 
 bool toColor(const QString &colorStr, QColor &color) {
-    QRegExp rx = QRegExp("rgb\\(.*\\)", Qt::CaseInsensitive);
+    QRegExp rx = QRegExp(RGXS "rgb\\(.*\\)" RGXS, Qt::CaseInsensitive);
     if(rx.exactMatch(colorStr)) {
-        rx = QRegExp("rgb\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)", Qt::CaseInsensitive);
+        rx = QRegExp(RGXS "rgb\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)" RGXS, Qt::CaseInsensitive);
         if(rx.exactMatch(colorStr)) {
             rx.indexIn(colorStr);
             QStringList intRGB = rx.capturedTexts();
@@ -217,7 +219,7 @@ bool toColor(const QString &colorStr, QColor &color) {
                          intRGB.at(2).toInt(),
                          intRGB.at(3).toInt());
         } else {
-            rx = QRegExp("rgb\\(\\s*(\\d+)\\s*%\\s*,\\s*(\\d+)\\s*%\\s*,\\s*(\\d+)\\s*%\\s*\\)", Qt::CaseInsensitive);
+            rx = QRegExp(RGXS "rgb\\(\\s*(\\d+)\\s*%\\s*,\\s*(\\d+)\\s*%\\s*,\\s*(\\d+)\\s*%\\s*\\)" RGXS, Qt::CaseInsensitive);
             rx.indexIn(colorStr);
             QStringList intRGB = rx.capturedTexts();
             color.setRgbF(intRGB.at(1).toInt()/100.,
@@ -226,7 +228,7 @@ bool toColor(const QString &colorStr, QColor &color) {
 
         }
     } else {
-        rx = QRegExp("#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})", Qt::CaseInsensitive);
+        rx = QRegExp(RGXS "#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})" RGXS, Qt::CaseInsensitive);
         if(rx.exactMatch(colorStr)) {
             color = QColor(colorStr);
         } else {
@@ -531,7 +533,7 @@ void loadText(const QDomElement &pathElement,
 }
 
 bool extractTranslation(const QString& str, QMatrix& target) {
-    const QRegExp rx1("translate\\(" REGEX_SINGLE_FLOAT "\\)",
+    const QRegExp rx1(RGXS "translate\\(" REGEX_SINGLE_FLOAT "\\)" RGXS,
                       Qt::CaseInsensitive);
     if(rx1.exactMatch(str)) {
         rx1.indexIn(str);
@@ -540,7 +542,7 @@ bool extractTranslation(const QString& str, QMatrix& target) {
         return true;
     }
 
-    const QRegExp rx2("translate\\(" REGEX_TWO_FLOATS "\\)",
+    const QRegExp rx2(RGXS "translate\\(" REGEX_TWO_FLOATS "\\)" RGXS,
                       Qt::CaseInsensitive);
     if(rx2.exactMatch(str)) {
         rx2.indexIn(str);
@@ -555,7 +557,7 @@ bool extractTranslation(const QString& str, QMatrix& target) {
 
 
 bool extractScale(const QString& str, QMatrix& target) {
-    const QRegExp rx1("scale\\(" REGEX_SINGLE_FLOAT "\\)",
+    const QRegExp rx1(RGXS "scale\\(" REGEX_SINGLE_FLOAT "\\)" RGXS,
                       Qt::CaseInsensitive);
     if(rx1.exactMatch(str)) {
         rx1.indexIn(str);
@@ -565,7 +567,7 @@ bool extractScale(const QString& str, QMatrix& target) {
         return true;
     }
 
-    const QRegExp rx2("scale\\(" REGEX_TWO_FLOATS "\\)",
+    const QRegExp rx2(RGXS "scale\\(" REGEX_TWO_FLOATS "\\)" RGXS,
                       Qt::CaseInsensitive);
     if(rx2.exactMatch(str)) {
         rx2.indexIn(str);
@@ -579,7 +581,7 @@ bool extractScale(const QString& str, QMatrix& target) {
 }
 
 bool extractRotate(const QString& str, QMatrix& target) {
-    const QRegExp rx5("rotate\\(" REGEX_SINGLE_FLOAT "\\)",
+    const QRegExp rx5(RGXS "rotate\\(" REGEX_SINGLE_FLOAT "\\)" RGXS,
                       Qt::CaseInsensitive);
     if(rx5.exactMatch(str)) {
         rx5.indexIn(str);
@@ -591,14 +593,14 @@ bool extractRotate(const QString& str, QMatrix& target) {
 }
 
 bool extractWholeMatrix(const QString& str, QMatrix& target) {
-    const QRegExp rx("matrix\\("
+    const QRegExp rx(RGXS "matrix\\("
                          REGEX_FIRST_FLOAT
                          REGEX_INNER_FLOAT
                          REGEX_INNER_FLOAT
                          REGEX_INNER_FLOAT
                          REGEX_INNER_FLOAT
                          REGEX_LAST_FLOAT
-                     "\\)", Qt::CaseInsensitive);
+                     "\\)" RGXS, Qt::CaseInsensitive);
     if(rx.exactMatch(str)) {
         rx.indexIn(str);
         const QStringList capturedTxt = rx.capturedTexts();
@@ -734,7 +736,7 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
 }
 
 bool getUrlId(const QString &urlStr, QString *id) {
-    const QRegExp rx = QRegExp("url\\(\\s*#(.*)\\)", Qt::CaseInsensitive);
+    const QRegExp rx = QRegExp(RGXS "url\\(\\s*#(.*)\\)" RGXS, Qt::CaseInsensitive);
     if(rx.exactMatch(urlStr)) {
         rx.indexIn(urlStr);
         const QStringList capturedTxt = rx.capturedTexts();
@@ -747,7 +749,7 @@ bool getUrlId(const QString &urlStr, QString *id) {
 
 bool getGradientFromString(const QString &colorStr,
                            FillSvgAttributes * const target) {
-    const QRegExp rx = QRegExp("url\\(\\s*(.*)\\s*\\)", Qt::CaseInsensitive);
+    const QRegExp rx = QRegExp(RGXS "url\\(\\s*(.*)\\s*\\)" RGXS, Qt::CaseInsensitive);
     if(rx.exactMatch(colorStr)) {
         const QStringList capturedTxt = rx.capturedTexts();
         QString id = capturedTxt.at(1);
