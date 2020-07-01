@@ -352,7 +352,8 @@ static void parseNumbersArray(const QChar *&str,
 }
 
 bool parsePolylineData(const QString &dataStr,
-                       VectorPathSvgAttributes &attributes) {
+                       VectorPathSvgAttributes &attributes,
+                       const bool isPolygon) {
     float x0 = 0, y0 = 0;              // starting point
     float x = 0, y = 0;                // current point
     const QChar *str = dataStr.constData();
@@ -391,6 +392,7 @@ bool parsePolylineData(const QString &dataStr,
                 path.lineTo({x, y});
             }
         }
+        if(isPolygon) path.close();
     }
     return true;
 }
@@ -439,9 +441,10 @@ void loadVectorPath(const QDomElement &pathElement,
 
 void loadPolyline(const QDomElement &pathElement,
                   ContainerBox *parentGroup,
-                  VectorPathSvgAttributes &attributes) {
+                  VectorPathSvgAttributes &attributes,
+                  const bool isPolygon) {
     const QString pathStr = pathElement.attribute("points");
-    parsePolylineData(pathStr, attributes);
+    parsePolylineData(pathStr, attributes, isPolygon);
     if(attributes.isEmpty()) return;
     const auto vectorPath = enve::make_shared<SmartVectorPath>();
     vectorPath->planCenterPivotPosition();
@@ -705,14 +708,16 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
                                toDouble(x2), toDouble(y2),
                                trans});
     }
-    if(tagName == "path" || tagName == "polyline") {
+    if(tagName == "path" || tagName == "polyline" || tagName == "polygon") {
         VectorPathSvgAttributes attributes;
         attributes.setParent(parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
         if(tagName == "path") {
             loadVectorPath(element, parentGroup, attributes);
-        } else { // if(tagName == "polyline") {
-            loadPolyline(element, parentGroup, attributes);
+        } else if(tagName == "polyline") {
+            loadPolyline(element, parentGroup, attributes, false);
+        } else if(tagName == "polygon") {
+            loadPolyline(element, parentGroup, attributes, true);
         }
     } else if(tagName == "g" || tagName == "text" ||
               tagName == "circle" || tagName == "ellipse" ||
@@ -732,7 +737,7 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
         } else if(tagName == "tspan") {
             loadText(element, parentGroup, attributes);
         }
-    }
+    } else qDebug() << "Unrecognized tagName \"" + tagName + "\"";
 }
 
 bool getUrlId(const QString &urlStr, QString *id) {
