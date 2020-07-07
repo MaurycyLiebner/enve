@@ -976,7 +976,6 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
         case 'i':
             if(name == "id") mId = value;
             break;
-
         case 'o':
             if(name == "opacity") {
                 mOpacity = toDouble(value)*100.;
@@ -1061,6 +1060,8 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
             break;
         }
     }
+
+    mId = element.attribute("id", mId);
 
     const QString fillAttributesStr = element.attribute("fill");
     if(!fillAttributesStr.isEmpty()) setFillAttribute(fillAttributesStr);
