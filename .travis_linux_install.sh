@@ -53,4 +53,12 @@ cd qscintilla/Qt4Qt5
 qmake
 make -j 2
 sudo make install
-cd ../../../
+cd ../../
+
+# build qtstyleplugins
+git clone https://github.com/qt/qtstyleplugins
+cd qtstyleplugins
+qmake
+make -j 2
+make install
+cd ../../

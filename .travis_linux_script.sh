@@ -20,4 +20,4 @@ cp exec.so AppDir/usr/optional
 mkdir AppDir/usr/optional/libstdc++
 cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 AppDir/usr/optional/libstdc++/
 cp -av ../third_party/gperftools/.libs/libtcmalloc.so* AppDir/usr/lib/
-./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/io.github.maurycyliebner.enve.desktop -appimage
+./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/io.github.maurycyliebner.enve.desktop -appimage -extra-plugins=platformthemes/libqgtk2.so,styles/libqgtk2style.so
