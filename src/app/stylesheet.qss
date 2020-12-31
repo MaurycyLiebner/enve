@@ -299,6 +299,50 @@ QTabWidget::pane {
     margin: 0px;
 }
 
+QSpinBox, QDoubleSpinBox, QLineEdit {
+    background: qlineargradient(x1:0, y1:0,
+                                x2:0, y2:1,
+        stop:0 rgb(200, 200, 200),
+        stop:0.5 rgb(188, 188, 188));
+    border: 1px solid black;
+    border-radius: 5px;
+    color: black;
+    outline: none;
+    padding: 2px 2px 2px 2px
+}
+
+QComboBox > QLineEdit {
+    border: 0;
+}
+
+QAbstractSpinBox:up-button,
+QSpinBox:up-button,
+QDoubleSpinBox:up-button,
+QTimeEdit:up-button,
+QDateEdit:up-button,
+QDateTimeEdit:up-button {
+    subcontrol-position: top right;
+    border-top-right-radius: 5px;
+}
+
+QAbstractSpinBox:down-button,
+QSpinBox:down-button,
+QDoubleSpinBox:down-button,
+QTimeEdit:down-button,
+QDateEdit:down-button,
+QDateTimeEdit:down-button {
+    subcontrol-position: bottom right;
+    border-bottom-right-radius: 5px;
+}
+
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
+    image: url(:/arrows/up-arrow.png);
+}
+
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
+    image: url(:/arrows/down-arrow.png);
+}
+
 QPushButton {
     qproperty-iconSize: 17px;
     background: qlineargradient(x1:0, y1:0,

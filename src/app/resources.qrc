@@ -56,4 +56,8 @@
         <file alias="Checkbox_checked_normal.png">pixmaps/Checkbox_checked_normal.png</file>
         <file alias="Checkbox_checked_disabled.png">pixmaps/Checkbox_checked_disabled.png</file>
     </qresource>
+    <qresource prefix="/arrows">
+        <file alias="up-arrow.png">pixmaps/up-arrow.png</file>
+        <file alias="down-arrow.png">pixmaps/down-arrow.png</file>
+    </qresource>
 </RCC>
