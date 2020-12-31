@@ -89,6 +89,11 @@ int main(int argc, char *argv[]) {
 #ifdef Q_OS_WIN
     SetProcessDPIAware(); // call before the main event loop
 #endif // Q_OS_WIN
+
+#ifdef Q_OS_LINUX
+    qputenv("QT_QPA_PLATFORMTHEME", "gtk2");
+#endif
+
     QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
