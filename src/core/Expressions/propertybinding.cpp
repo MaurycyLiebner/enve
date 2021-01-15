@@ -146,6 +146,9 @@ bool PropertyBinding::bindProperty(const QString& path, Property * const newBind
             if(relRange.inRange(relFrame())) emit currentValueChanged();
             emit relRangeChanged(relRange);
         });
+        connect(newBinding, &Property::prp_currentFrameChanged,
+                this, &PropertyBinding::currentValueChanged);
+
         conn << connect(newBinding, &Property::prp_pathChanged,
                         this, [this]() { pathChanged(); });
     }
