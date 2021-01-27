@@ -88,6 +88,34 @@ void qPointFAnimatorCreate(
     };
 }
 
+QString colorValScript(const QString& name, const QColor& value) {
+    return name + " = [" + QString::number(value.redF()) + "," +
+                           QString::number(value.greenF()) + "," +
+                           QString::number(value.blueF()) + "," +
+                           QString::number(value.alphaF()) + "]";
+}
+
+void colorAnimatorCreate(
+        ShaderEffectJS &engine,
+        const bool glValue,
+        const GLint loc,
+        Property * const property,
+        const qreal relFrame,
+        QJSValueList& setterArgs,
+        UniformSpecifiers& uniSpec) {
+    const auto anim = static_cast<ColorAnimator*>(property);
+    const QColor val = anim->getColor(relFrame);
+    const QString valScript = colorValScript(anim->prp_getName(), val);
+    setterArgs << engine.toValue(val);
+
+    if(!glValue) return;
+    Q_ASSERT(loc >= 0);
+    uniSpec << [loc, val, valScript](QGL33 * const gl) {
+        gl->glUniform4f(loc, val.redF(), val.greenF(), val.blueF(),
+                        val.alphaF());
+    };
+}
+
 void UniformSpecifierCreator::create(ShaderEffectJS &engine,
                                      const GLint loc,
                                      Property * const property,
@@ -112,6 +140,9 @@ void UniformSpecifierCreator::create(ShaderEffectJS &engine,
                                      mResolutionScaled ? resolution : 1,
                                      mInfluenceScaled ? influence : 1,
                                      setterArgs, uniSpec);
+    case ShaderPropertyType::colorProperty:
+        return colorAnimatorCreate(engine, fGLValue, loc, property, relFrame,
+                                   setterArgs, uniSpec);
     default: RuntimeThrow("Unsupported type");
     }
 }

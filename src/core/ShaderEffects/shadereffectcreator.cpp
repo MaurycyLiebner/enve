@@ -42,6 +42,10 @@ bool ShaderEffectCreator::compatible(const QList<ShaderPropertyType> &props) con
             const bool iCompatible = enve_cast<QPointFAnimatorCreator*>(prop);
             if(!iCompatible) return false;
         } break;
+        case ShaderPropertyType::colorProperty: {
+            const bool iCompatible = enve_cast<ColorAnimatorCreator*>(prop);
+            if(!iCompatible) return false;
+        } break;
         default: return false;
         };
     }
@@ -77,6 +81,8 @@ ShaderPropertyType creatorPropertyType(ShaderPropertyCreator* const prop) {
         return ShaderPropertyType::intProperty;
     } else if(enve_cast<QPointFAnimatorCreator*>(prop)) {
         return ShaderPropertyType::vec2Property;
+    } else if(enve_cast<ColorAnimatorCreator*>(prop)) {
+        return ShaderPropertyType::colorProperty;
     } else RuntimeThrow("Unsupported type");
 }
 
@@ -207,8 +213,8 @@ QPointF attrToQPointF(const QDomElement &elem,
                       const bool allowSingleValue) {
     const QString valS = elem.attribute(attr, def);
     const QRegExp rx("\\[" REGEX_TWO_FLOATS "\\]");
-    if(rx.exactMatch(attr)) {
-        rx.indexIn(attr);
+    if(rx.exactMatch(valS)) {
+        rx.indexIn(valS);
         const QStringList xy = rx.capturedTexts();
         return {xy.at(1).toDouble(), xy.at(2).toDouble()};
     } else if(allowSingleValue) {
@@ -219,6 +225,34 @@ QPointF attrToQPointF(const QDomElement &elem,
         return {value, value};
     } else RuntimeThrow("Invalid '" + attr + "' value \"" + valS + "\" for '" +
                          elemName + "'.\nExpected \"[x, y]\".");
+}
+
+QColor attrToQColor(const QDomElement &elem,
+                    const QString& elemName,
+                    const QString& attr,
+                    const QString& def) {
+    const QString valS = elem.attribute(attr, def);
+    const QRegExp rxRGBA("\\[" REGEX_FOUR_FLOATS "\\]");
+    if(rxRGBA.exactMatch(valS)) {
+        rxRGBA.indexIn(valS);
+        const QStringList rgba = rxRGBA.capturedTexts();
+        return QColor::fromRgbF(rgba.at(1).toDouble(),
+                                rgba.at(2).toDouble(),
+                                rgba.at(3).toDouble(),
+                                rgba.at(4).toDouble());
+    } else {
+        const QRegExp rxRGB("\\[" REGEX_THREE_FLOATS "\\]");
+        if(rxRGB.exactMatch(valS)) {
+            rxRGB.indexIn(valS);
+            const QStringList rgb = rxRGB.capturedTexts();
+            return QColor::fromRgbF(rgb.at(1).toDouble(),
+                                    rgb.at(2).toDouble(),
+                                    rgb.at(3).toDouble());
+        } else {
+            RuntimeThrow("Invalid '" + attr + "' value \"" + valS + "\" for '" +
+                         elemName + "'.\nExpected \"[r, g, b, a]\".");
+        }
+    }
 }
 
 void parseFloatPropertyCreators(const QString& name,
@@ -286,6 +320,21 @@ void parseVec2PropertyCreators(const QString& name,
                 resolutionScaled, influenceScaled);
 }
 
+void parseColorPropertyCreators(const QString& name,
+                                const QString& nameUI,
+                                const QDomElement &elem,
+                                stdsptr<ShaderPropertyCreator>& propC,
+                                stdsptr<UniformSpecifierCreator>& uniC) {
+    const QColor iniVal = attrToQColor(elem, name, "ini", "[0, 0, 0]");
+    const bool glValue = attrToBool(elem, name, "glValue", "false");
+
+    propC = enve::make_shared<ColorAnimatorCreator>(
+                iniVal, glValue, name, nameUI);
+    uniC = enve::make_shared<UniformSpecifierCreator>(
+                ShaderPropertyType::colorProperty, glValue,
+                false, false);
+}
+
 void parsePropertyCreators(const QString& type,
                            const QString& name,
                            const QString& nameUI,
@@ -298,6 +347,8 @@ void parsePropertyCreators(const QString& type,
         parseIntPropertyCreators(name, nameUI, elem, propC, uniC);
     } else if(type == "vec2") {
         parseVec2PropertyCreators(name, nameUI, elem, propC, uniC);
+    } else if(type == "color") {
+        parseColorPropertyCreators(name, nameUI, elem, propC, uniC);
     } else {
         RuntimeThrow("Invalid Property type '" + type + "' for " + name + ".");
     }

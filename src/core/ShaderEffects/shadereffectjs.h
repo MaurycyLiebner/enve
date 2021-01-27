@@ -61,6 +61,7 @@ public:
     void setSceneRect(const SkIRect& rect);
 
     QJSValue toValue(const QPointF& val);
+    QJSValue toValue(const QColor& val);
 private:
     QJSEngine mEngine;
     QJSValue m_eSetSceneRect;

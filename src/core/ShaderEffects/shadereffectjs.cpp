@@ -17,6 +17,7 @@
 #include "shadereffectjs.h"
 
 #include <QPointF>
+#include <QColor>
 
 #include "exceptions.h"
 
@@ -96,6 +97,15 @@ QJSValue ShaderEffectJS::toValue(const QPointF& val) {
     QJSValue arr = mEngine.newArray(2);
     arr.setProperty(0, val.x());
     arr.setProperty(1, val.y());
+    return arr;
+}
+
+QJSValue ShaderEffectJS::toValue(const QColor& val) {
+    QJSValue arr = mEngine.newArray(4);
+    arr.setProperty(0, val.redF());
+    arr.setProperty(1, val.greenF());
+    arr.setProperty(2, val.blueF());
+    arr.setProperty(3, val.alphaF());
     return arr;
 }
 

@@ -22,6 +22,7 @@
 #include "PropertyCreators/qrealanimatorcreator.h"
 #include "PropertyCreators/intanimatorcreator.h"
 #include "PropertyCreators/qpointfanimatorcreator.h"
+#include "PropertyCreators/coloranimatorcreator.h"
 #include "glhelpers.h"
 
 class ShaderEffectJS;
