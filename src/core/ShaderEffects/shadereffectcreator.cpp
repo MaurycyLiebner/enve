@@ -53,19 +53,11 @@ bool ShaderEffectCreator::compatible(const QList<ShaderPropertyType> &props) con
 }
 
 void ShaderEffectCreator::reloadProgram(QGL33 * const gl, const QString &fragPath) {
-    if(!QFile(fragPath).exists())
-        RuntimeThrow("Failed to open '" + fragPath + "'");
-    const auto oldProgram = fProgram->fId;
     try {
-        fProgram = ShaderEffectProgram::sCreateProgram(
-                    gl, fragPath, fProperties,
-                    fProgram->fJSBlueprint,
-                    fProgram->fPropUniCreators,
-                    fProgram->fValueHandlers);
+        fProgram->reloadFragmentShader(gl, fragPath);
     } catch(...) {
         RuntimeThrow("Failed to load a new version of '" + fragPath + "'");
     }
-    gl->glDeleteProgram(oldProgram);
 }
 
 qsptr<ShaderEffect> ShaderEffectCreator::create() const {

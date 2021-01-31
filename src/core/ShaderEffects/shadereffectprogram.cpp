@@ -16,6 +16,60 @@
 
 #include "shadereffectprogram.h"
 
+ShaderEffectProgram::ShaderEffectProgram(
+        const QList<stdsptr<ShaderPropertyCreator> >& propCs) :
+    fProperties(propCs) {}
+
+void ShaderEffectProgram::reloadFragmentShader(
+        QGL33 * const gl, const QString &fragPath) {
+    GLuint newProgram;
+    if(!QFile(fragPath).exists())
+        RuntimeThrow("Failed to open '" + fragPath + "'");
+
+    try {
+        gIniProgram(gl, newProgram, GL_TEXTURED_VERT, fragPath);
+    } catch(...) {
+        RuntimeThrow("Could not initialize a program for ShaderEffectProgram");
+    }
+
+    QList<GLint> propUniLocs;
+    for(const auto& propC : fProperties) {
+        if(propC->fGLValue) {
+            const GLint loc = gl->glGetUniformLocation(newProgram, propC->fName.toLatin1());
+            if(loc < 0) {
+                gl->glDeleteProgram(newProgram);
+                RuntimeThrow("'" + propC->fName +
+                             "' does not correspond to an active uniform variable.");
+            }
+            propUniLocs.append(loc);
+        } else propUniLocs.append(-1);
+    }
+    QList<GLint> valueLocs;
+    for(const auto& value : fValueHandlers) {
+        const GLint loc = gl->glGetUniformLocation(newProgram, value->fName.toLatin1());
+        if(loc < 0) {
+            gl->glDeleteProgram(newProgram);
+            RuntimeThrow("'" + value->fName +
+                         "' does not correspond to an active uniform variable.");
+        }
+        valueLocs.append(loc);
+    }
+
+    GLint texLocation = gl->glGetUniformLocation(newProgram, "texture");
+    if(texLocation < 0) {
+        gl->glDeleteProgram(newProgram);
+        RuntimeThrow("Invalid location received for 'texture'.");
+    }
+    gl->glUniform1i(texLocation, 0);
+
+    if(fId != 0) gl->glDeleteProgram(fId);
+
+    fId = newProgram;
+    fPropUniLocs = propUniLocs;
+    fValueLocs = valueLocs;
+    fTexLocation = texLocation;
+}
+
 std::unique_ptr<ShaderEffectProgram>
 ShaderEffectProgram::sCreateProgram(
         QGL33 * const gl, const QString &fragPath,
@@ -24,46 +78,13 @@ ShaderEffectProgram::sCreateProgram(
         const UniformSpecifierCreators& uniCs,
         const QList<stdsptr<ShaderValueHandler>>& values) {
     std::unique_ptr<ShaderEffectProgram> program =
-            std::make_unique<ShaderEffectProgram>();
-    try {
-        gIniProgram(gl, program->fId, GL_TEXTURED_VERT, fragPath);
-    } catch(...) {
-        RuntimeThrow("Could not initialize a program for ShaderEffectProgram");
-    }
-
+            std::make_unique<ShaderEffectProgram>(propCs);
     program->fJSBlueprint = jsBlueprint;
-
-    for(const auto& propC : propCs) {
-        if(propC->fGLValue) {
-            const GLint loc = gl->glGetUniformLocation(program->fId,
-                                                       propC->fName.toLatin1());
-            if(loc < 0) {
-                gl->glDeleteProgram(program->fId);
-                RuntimeThrow("'" + propC->fName +
-                             "' does not correspond to an active uniform variable.");
-            }
-            program->fPropUniLocs.append(loc);
-        } else program->fPropUniLocs.append(-1);
-    }
-    program->fPropUniCreators = uniCs;
-    for(const auto& value : values) {
-        const GLint loc = gl->glGetUniformLocation(program->fId,
-                                                   value->fName.toLatin1());
-        if(loc < 0) {
-            gl->glDeleteProgram(program->fId);
-            RuntimeThrow("'" + value->fName +
-                         "' does not correspond to an active uniform variable.");
-        }
-        program->fValueLocs.append(loc);
-    }
     program->fValueHandlers = values;
+    program->fPropUniCreators = uniCs;
 
-    program->fTexLocation = gl->glGetUniformLocation(program->fId, "texture");
-    if(program->fTexLocation < 0) {
-        gl->glDeleteProgram(program->fId);
-        RuntimeThrow("Invalid location received for 'texture'.");
-    }
-    gl->glUniform1i(program->fTexLocation, 0);
+    program->reloadFragmentShader(gl, fragPath);
 
     return program;
 }
+

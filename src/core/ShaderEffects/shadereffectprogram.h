@@ -22,7 +22,7 @@
 
 typedef QList<stdsptr<UniformSpecifierCreator>> UniformSpecifierCreators;
 struct CORE_EXPORT ShaderEffectProgram {
-    ShaderEffectProgram() {}
+    ShaderEffectProgram(const QList<stdsptr<ShaderPropertyCreator>>& propCs);
     ShaderEffectProgram(const ShaderEffectProgram& s) = delete;
     ShaderEffectProgram& operator=(const ShaderEffectProgram& s) = delete;
 
@@ -35,6 +35,9 @@ struct CORE_EXPORT ShaderEffectProgram {
     QList<GLint> fValueLocs;
     std::shared_ptr<ShaderEffectJS::Blueprint> fJSBlueprint;
     mutable std::vector<std::unique_ptr<ShaderEffectJS>> fEngines;
+    const QList<stdsptr<ShaderPropertyCreator>> fProperties;
+
+    void reloadFragmentShader(QGL33 * const gl, const QString &fragPath);
 
     static std::unique_ptr<ShaderEffectProgram> sCreateProgram(
             QGL33 * const gl, const QString &fragPath,
