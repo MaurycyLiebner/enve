@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 #endif // Q_OS_WIN
 
 #ifdef Q_OS_LINUX
-    qputenv("QT_QPA_PLATFORMTHEME", "gtk2");
+    // qputenv("QT_QPA_PLATFORMTHEME", "gtk2");
 #endif
 
     QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
