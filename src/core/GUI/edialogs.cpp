@@ -45,7 +45,7 @@ QString eDialogs::openFile(const QString &title,
                            const QString &filter) {
 
     QFileDialog dialog(nullptr, title, path);
-    dialog.setOption(QFileDialog::DontUseNativeDialog);
+    // dialog.setOption(QFileDialog::DontUseNativeDialog);
     dialog.setNameFilter(filter);
     auto iconProvider = new evIconProvider;
     dialog.setIconProvider(iconProvider);
@@ -61,7 +61,7 @@ QStringList eDialogs::openFiles(const QString &title,
                                 const QString &path,
                                 const QString &filter) {
     QFileDialog dialog(nullptr, title, path);
-    dialog.setOption(QFileDialog::DontUseNativeDialog);
+    // dialog.setOption(QFileDialog::DontUseNativeDialog);
     dialog.setFileMode(QFileDialog::ExistingFiles);
     dialog.setNameFilter(filter);
     auto iconProvider = new evIconProvider;
@@ -72,7 +72,7 @@ QStringList eDialogs::openFiles(const QString &title,
 
 QString eDialogs::openDir(const QString &title, const QString &path) {
     QFileDialog dialog(nullptr, title, path);
-    dialog.setOption(QFileDialog::DontUseNativeDialog);
+    // dialog.setOption(QFileDialog::DontUseNativeDialog);
     dialog.setFileMode(QFileDialog::Directory);
     dialog.setOption(QFileDialog::ShowDirsOnly);
     auto iconProvider = new evIconProvider;
@@ -90,7 +90,7 @@ QString eDialogs::saveFile(const QString &title,
                            const QString &filter) {
     QFileDialog dialog(nullptr, title, path);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
-    dialog.setOption(QFileDialog::DontUseNativeDialog);
+    // dialog.setOption(QFileDialog::DontUseNativeDialog);
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setNameFilter(filter);
     auto iconProvider = new evIconProvider;
