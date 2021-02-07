@@ -413,10 +413,7 @@ public:
                                qreal& scaleX, qreal& scaleY,
                                qreal& shearX, qreal& shearY);
 
-    bool transformEffectsEnabled() const;
     bool hasTransformEffects() const;
-    bool hasEnabledTransformEffects() const
-    { return transformEffectsEnabled() && hasTransformEffects(); }
 
     ContainerBox* getFirstParentLayer() const;
 
