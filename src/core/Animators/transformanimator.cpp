@@ -488,20 +488,42 @@ void AdvancedTransformAnimator::startTransformSkipOpacity() {
     startShearTransform();
 }
 
-QMatrix AdvancedTransformAnimator::getCurrentTransform() {
-    const qreal pivotX = mPivotAnimator->getEffectiveXValue();
-    const qreal pivotY = mPivotAnimator->getEffectiveYValue();
+QMatrix valuesToMatrix(const qreal pivotX, const qreal pivotY,
+                       const qreal posX, const qreal posY,
+                       const qreal rot,
+                       const qreal scaleX, const qreal scaleY,
+                       const qreal shearX, const qreal shearY) {
     QMatrix matrix;
-    matrix.translate(pivotX + mPosAnimator->getEffectiveXValue(),
-                     pivotY + mPosAnimator->getEffectiveYValue());
-
-    matrix.rotate(mRotAnimator->getEffectiveValue());
-    matrix.scale(mScaleAnimator->getEffectiveXValue(),
-                 mScaleAnimator->getEffectiveYValue());
-    matrix.shear(mShearAnimator->getEffectiveXValue(),
-                 mShearAnimator->getEffectiveYValue());
-
+    matrix.translate(pivotX + posX, pivotY + posY);
+    matrix.rotate(rot);
+    matrix.scale(scaleX, scaleY);
+    matrix.shear(shearX, shearY);
     matrix.translate(-pivotX, -pivotY);
+
+    return matrix;
+}
+
+QMatrix AdvancedTransformAnimator::getCurrentTransform() {
+    qreal pivotX = mPivotAnimator->getEffectiveXValue();
+    qreal pivotY = mPivotAnimator->getEffectiveYValue();
+
+    qreal posX = mPosAnimator->getEffectiveXValue();
+    qreal posY = mPosAnimator->getEffectiveYValue();
+
+    qreal rot = mRotAnimator->getEffectiveValue();
+
+    qreal scaleX = mScaleAnimator->getEffectiveXValue();
+    qreal scaleY = mScaleAnimator->getEffectiveYValue();
+
+    qreal shearX = mShearAnimator->getEffectiveXValue();
+    qreal shearY = mShearAnimator->getEffectiveYValue();
+
+    QMatrix matrix = valuesToMatrix(pivotX, pivotY,
+                                    posX, posY,
+                                    rot,
+                                    scaleX, scaleY,
+                                    shearX, shearY);
+
     return matrix;
 }
 
@@ -514,34 +536,46 @@ void AdvancedTransformAnimator::setValues(const TransformValues &values) {
 }
 
 QMatrix AdvancedTransformAnimator::getRotScaleShearTransform() {
-    const qreal pivotX = mPivotAnimator->getEffectiveXValue();
-    const qreal pivotY = mPivotAnimator->getEffectiveYValue();
+    qreal pivotX = mPivotAnimator->getEffectiveXValue();
+    qreal pivotY = mPivotAnimator->getEffectiveYValue();
 
-    QMatrix matrix;
-    matrix.translate(pivotX, pivotY);
-    matrix.rotate(mRotAnimator->getEffectiveValue());
-    matrix.scale(mScaleAnimator->getEffectiveXValue(),
-                 mScaleAnimator->getEffectiveYValue());
-    matrix.shear(mShearAnimator->getEffectiveXValue(),
-                 mShearAnimator->getEffectiveYValue());
-    matrix.translate(-pivotX, -pivotY);
+    qreal rot = mRotAnimator->getEffectiveValue();
+
+    qreal scaleX = mScaleAnimator->getEffectiveXValue();
+    qreal scaleY = mScaleAnimator->getEffectiveYValue();
+
+    qreal shearX = mShearAnimator->getEffectiveXValue();
+    qreal shearY = mShearAnimator->getEffectiveYValue();
+
+    QMatrix matrix = valuesToMatrix(pivotX, pivotY,
+                                    0, 0,
+                                    rot,
+                                    scaleX, scaleY,
+                                    shearX, shearY);
     return matrix;
 }
 
 QMatrix AdvancedTransformAnimator::getRelativeTransformAtFrame(const qreal relFrame) {
-    const qreal pivotX = mPivotAnimator->getEffectiveXValue(relFrame);
-    const qreal pivotY = mPivotAnimator->getEffectiveYValue(relFrame);
-    QMatrix matrix;
-    matrix.translate(pivotX + mPosAnimator->getEffectiveXValue(relFrame),
-                     pivotY + mPosAnimator->getEffectiveYValue(relFrame));
+    qreal pivotX = mPivotAnimator->getEffectiveXValue(relFrame);
+    qreal pivotY = mPivotAnimator->getEffectiveYValue(relFrame);
 
-    matrix.rotate(mRotAnimator->getEffectiveValue(relFrame));
-    matrix.scale(mScaleAnimator->getEffectiveXValue(relFrame),
-                 mScaleAnimator->getEffectiveYValue(relFrame));
-    matrix.shear(mShearAnimator->getEffectiveXValue(relFrame),
-                 mShearAnimator->getEffectiveYValue(relFrame));
+    qreal posX = mPosAnimator->getEffectiveXValue(relFrame);
+    qreal posY = mPosAnimator->getEffectiveYValue(relFrame);
 
-    matrix.translate(-pivotX, -pivotY);
+    qreal rot = mRotAnimator->getEffectiveValue(relFrame);
+
+    qreal scaleX = mScaleAnimator->getEffectiveXValue(relFrame);
+    qreal scaleY = mScaleAnimator->getEffectiveYValue(relFrame);
+
+    qreal shearX = mShearAnimator->getEffectiveXValue(relFrame);
+    qreal shearY = mShearAnimator->getEffectiveYValue(relFrame);
+
+    QMatrix matrix = valuesToMatrix(pivotX, pivotY,
+                                    posX, posY,
+                                    rot,
+                                    scaleX, scaleY,
+                                    shearX, shearY);
+
     return matrix;
 }
 
