@@ -84,7 +84,7 @@ qsptr<TransformEffect> createTransformEffectForType(
         case(TransformEffectType::track):
             return enve::make_shared<TrackTransformEffect>();
         case(TransformEffectType::followPath):
-            return enve::make_shared<TrackTransformEffect>();
+            return enve::make_shared<FollowPathTransformEffect>();
         default: RuntimeThrow("Invalid transform effect type '" +
                               QString::number(int(type)) + "'");
     }
