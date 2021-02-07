@@ -18,6 +18,7 @@
 #include "ReadWrite/evformat.h"
 
 #include "tracktransformeffect.h"
+#include "followpathtransformeffect.h"
 
 TransformEffectCollection::TransformEffectCollection() :
     TransformEffectCollectionBase("transform effects") {}
@@ -31,6 +32,13 @@ void TransformEffectCollection::prp_setupTreeViewMenu(PropertyMenu * const menu)
             coll->addChild(enve::make_shared<TrackTransformEffect>());
         };
         menu->addPlainAction("Track Effect", aOp);
+    }
+    {
+        const PropertyMenu::PlainSelectedOp<TransformEffectCollection> aOp =
+        [](TransformEffectCollection * coll) {
+            coll->addChild(enve::make_shared<FollowPathTransformEffect>());
+        };
+        menu->addPlainAction("Follow Path Effect", aOp);
     }
     menu->addSeparator();
     TransformEffectCollection::prp_setupTreeViewMenu(menu);
@@ -74,6 +82,8 @@ qsptr<TransformEffect> createTransformEffectForType(
         const TransformEffectType type) {
     switch(type) {
         case(TransformEffectType::track):
+            return enve::make_shared<TrackTransformEffect>();
+        case(TransformEffectType::followPath):
             return enve::make_shared<TrackTransformEffect>();
         default: RuntimeThrow("Invalid transform effect type '" +
                               QString::number(int(type)) + "'");
