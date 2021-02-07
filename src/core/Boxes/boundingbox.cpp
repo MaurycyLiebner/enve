@@ -40,6 +40,7 @@
 #include "Animators/customproperties.h"
 #include "GUI/propertynamedialog.h"
 #include "BlendEffects/blendeffectcollection.h"
+#include "TransformEffects/transformeffectcollection.h"
 #include "GUI/dialogsinterface.h"
 #include "svgexporter.h"
 #include "svgexporthelpers.h"
@@ -54,12 +55,15 @@ BoundingBox::BoundingBox(const QString& name, const eBoxType type) :
     mDocumentId(sNextDocumentId++), mType(type),
     mCustomProperties(enve::make_shared<CustomProperties>()),
     mBlendEffectCollection(enve::make_shared<BlendEffectCollection>()),
+    mTransformEffectCollection(enve::make_shared<TransformEffectCollection>()),
     mTransformAnimator(enve::make_shared<BoxTransformAnimator>()),
     mRasterEffectsAnimators(enve::make_shared<RasterEffectCollection>()) {
     sDocumentBoxes << this;
 
     ca_addChild(mCustomProperties);
     mCustomProperties->SWT_setVisible(false);
+
+    mTransformAnimator->ca_addChild(mTransformEffectCollection);
 
     ca_addChild(mBlendEffectCollection);
     mBlendEffectCollection->SWT_hide();
@@ -300,6 +304,26 @@ bool BoundingBox::hasBlendEffects() const {
     return mBlendEffectCollection->ca_hasChildren();
 }
 
+void BoundingBox::applyTransformEffects(
+        const qreal relFrame,
+        qreal& pivotX, qreal& pivotY,
+        qreal& posX, qreal& posY,
+        qreal& rot,
+        qreal& scaleX, qreal& scaleY,
+        qreal& shearX, qreal& shearY) {
+    mTransformEffectCollection->applyEffects(relFrame,
+                                             pivotX, pivotY,
+                                             posX, posY,
+                                             rot,
+                                             scaleX, scaleY,
+                                             shearX, shearY,
+                                             this);
+}
+
+bool BoundingBox::hasTransformEffects() const {
+    return mTransformEffectCollection->ca_hasChildren();
+}
+
 ContainerBox *BoundingBox::getFirstParentLayer() const {
     const auto parent = getParentGroup();
     if(!parent) return nullptr;
@@ -436,6 +460,10 @@ void BoundingBox::setPivotAbsPos(const QPointF &absPos) {
 
 QPointF BoundingBox::getPivotAbsPos() {
     return mTransformAnimator->getPivotAbs();
+}
+
+QPointF BoundingBox::getPivotAbsPos(const qreal relFrame) {
+    return mTransformAnimator->getPivotAbs(relFrame);
 }
 
 void BoundingBox::setRelBoundingRect(const QRectF& relRect) {

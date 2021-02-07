@@ -22,6 +22,7 @@
 #include "skia/skqtconversions.h"
 #include "matrixdecomposition.h"
 #include "svgexporter.h"
+#include "Boxes/boundingbox.h"
 
 BasicTransformAnimator::BasicTransformAnimator() :
     StaticComplexAnimator("transform") {
@@ -224,6 +225,7 @@ void BasicTransformAnimator::updateInheritedTransform(const UpdateReason reason)
         mInheritedTransform.reset();
     }
     updateTotalTransform(reason);
+    emit inheritedTransformChanged(reason);
 }
 
 void BasicTransformAnimator::updateTotalTransform(const UpdateReason reason) {
@@ -435,6 +437,10 @@ QPointF AdvancedTransformAnimator::getPivot() {
     return mPivotAnimator->getEffectiveValue();
 }
 
+QPointF AdvancedTransformAnimator::getPivotAbs(const qreal relFrame) {
+    return mapRelPosToAbs(mPivotAnimator->getEffectiveValue(relFrame));
+}
+
 QPointF AdvancedTransformAnimator::getPivotAbs() {
     return mapRelPosToAbs(mPivotAnimator->getEffectiveValue());
 }
@@ -518,6 +524,14 @@ QMatrix AdvancedTransformAnimator::getCurrentTransform() {
     qreal shearX = mShearAnimator->getEffectiveXValue();
     qreal shearY = mShearAnimator->getEffectiveYValue();
 
+
+    applyTransformEffects(anim_getCurrentRelFrame(),
+                          pivotX, pivotY,
+                          posX, posY,
+                          rot,
+                          scaleX, scaleY,
+                          shearX, shearY);
+
     QMatrix matrix = valuesToMatrix(pivotX, pivotY,
                                     posX, posY,
                                     rot,
@@ -525,6 +539,23 @@ QMatrix AdvancedTransformAnimator::getCurrentTransform() {
                                     shearX, shearY);
 
     return matrix;
+}
+
+void AdvancedTransformAnimator::applyTransformEffects(
+        const qreal relFrame,
+        qreal& pivotX, qreal& pivotY,
+        qreal& posX, qreal& posY,
+        qreal& rot,
+        qreal& scaleX, qreal& scaleY,
+        qreal& shearX, qreal& shearY) {
+    const auto parent = getFirstAncestor<BoundingBox>();
+    if(!parent) return;
+    parent->applyTransformEffects(relFrame,
+                                  pivotX, pivotY,
+                                  posX, posY,
+                                  rot,
+                                  scaleX, scaleY,
+                                  shearX, shearY);
 }
 
 void AdvancedTransformAnimator::setValues(const TransformValues &values) {
@@ -539,6 +570,9 @@ QMatrix AdvancedTransformAnimator::getRotScaleShearTransform() {
     qreal pivotX = mPivotAnimator->getEffectiveXValue();
     qreal pivotY = mPivotAnimator->getEffectiveYValue();
 
+    qreal posX = 0.;
+    qreal posY = 0.;
+
     qreal rot = mRotAnimator->getEffectiveValue();
 
     qreal scaleX = mScaleAnimator->getEffectiveXValue();
@@ -547,11 +581,19 @@ QMatrix AdvancedTransformAnimator::getRotScaleShearTransform() {
     qreal shearX = mShearAnimator->getEffectiveXValue();
     qreal shearY = mShearAnimator->getEffectiveYValue();
 
+    applyTransformEffects(anim_getCurrentRelFrame(),
+                          pivotX, pivotY,
+                          posX, posY,
+                          rot,
+                          scaleX, scaleY,
+                          shearX, shearY);
+
     QMatrix matrix = valuesToMatrix(pivotX, pivotY,
-                                    0, 0,
+                                    posX, posY,
                                     rot,
                                     scaleX, scaleY,
                                     shearX, shearY);
+
     return matrix;
 }
 
@@ -569,6 +611,13 @@ QMatrix AdvancedTransformAnimator::getRelativeTransformAtFrame(const qreal relFr
 
     qreal shearX = mShearAnimator->getEffectiveXValue(relFrame);
     qreal shearY = mShearAnimator->getEffectiveYValue(relFrame);
+
+    applyTransformEffects(anim_getCurrentRelFrame(),
+                          pivotX, pivotY,
+                          posX, posY,
+                          rot,
+                          scaleX, scaleY,
+                          shearX, shearY);
 
     QMatrix matrix = valuesToMatrix(pivotX, pivotY,
                                     posX, posY,

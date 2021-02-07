@@ -117,6 +117,7 @@ private:
     bool rotationFlipped() const;
 signals:
     void totalTransformChanged(const UpdateReason);
+    void inheritedTransformChanged(const UpdateReason);
 };
 
 class CORE_EXPORT AdvancedTransformAnimator : public BasicTransformAnimator {
@@ -127,6 +128,13 @@ public:
     void reset();
     QMatrix getRelativeTransformAtFrame(const qreal relFrame);
     QMatrix getCurrentTransform();
+
+    void applyTransformEffects(const qreal relFrame,
+                               qreal& pivotX, qreal& pivotY,
+                               qreal& posX, qreal& posY,
+                               qreal& rot,
+                               qreal& scaleX, qreal& scaleY,
+                               qreal& shearX, qreal& shearY);
 
     void setValues(const TransformValues& values);
 
@@ -156,6 +164,7 @@ public:
 
     void finishPivotTransform();
     QPointF getPivotAbs();
+    QPointF getPivotAbs(const qreal relFrame);
 
     qreal getOpacity(const qreal relFrame);
 

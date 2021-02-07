@@ -243,6 +243,9 @@ SOURCES += \
     Timeline/animationrect.cpp \
     Timeline/durationrectangle.cpp \
     Timeline/fixedlenanimationrect.cpp \
+    TransformEffects/tracktransformeffect.cpp \
+    TransformEffects/transformeffect.cpp \
+    TransformEffects/transformeffectcollection.cpp \
     XML/xevexporter.cpp \
     XML/xevimporter.cpp \
     XML/xevzipfilesaver.cpp \
@@ -575,6 +578,9 @@ HEADERS += \
     Timeline/animationrect.h \
     Timeline/durationrectangle.h \
     Timeline/fixedlenanimationrect.h \
+    TransformEffects/tracktransformeffect.h \
+    TransformEffects/transformeffect.h \
+    TransformEffects/transformeffectcollection.h \
     XML/runtimewriteid.h \
     XML/xevexporter.h \
     XML/xevimporter.h \

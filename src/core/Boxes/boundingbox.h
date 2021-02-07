@@ -26,6 +26,7 @@
 #include "MovablePoints/segment.h"
 #include "Animators/qcubicsegment1danimator.h"
 #include "BlendEffects/blendeffect.h"
+#include "TransformEffects/transformeffect.h"
 #include "Tasks/domeletask.h"
 
 class Canvas;
@@ -44,6 +45,7 @@ class BoxTransformAnimator;
 class BasicTransformAnimator;
 class CustomProperties;
 class BlendEffectCollection;
+class TransformEffectCollection;
 
 class ContainerBox;
 class SmartVectorPath;
@@ -308,6 +310,8 @@ public:
     bool isContainedIn(const QRectF &absRect) const;
 
     QPointF getPivotAbsPos();
+    QPointF getPivotAbsPos(const qreal relFrame);
+
     QPointF getAbsolutePos() const;
     bool absPointInsidePath(const QPointF &absPos);
 
@@ -402,6 +406,18 @@ public:
     bool hasEnabledBlendEffects() const
     { return blendEffectsEnabled() && hasBlendEffects(); }
 
+    void applyTransformEffects(const qreal relFrame,
+                               qreal& pivotX, qreal& pivotY,
+                               qreal& posX, qreal& posY,
+                               qreal& rot,
+                               qreal& scaleX, qreal& scaleY,
+                               qreal& shearX, qreal& shearY);
+
+    bool transformEffectsEnabled() const;
+    bool hasTransformEffects() const;
+    bool hasEnabledTransformEffects() const
+    { return transformEffectsEnabled() && hasTransformEffects(); }
+
     ContainerBox* getFirstParentLayer() const;
 
     eTask* saveSVGWithTransform(SvgExporter& exp, QDomElement& parent,
@@ -433,6 +449,7 @@ protected:
 
     const qsptr<CustomProperties> mCustomProperties;
     const qsptr<BlendEffectCollection> mBlendEffectCollection;
+    const qsptr<TransformEffectCollection> mTransformEffectCollection;
     const qsptr<BoxTransformAnimator> mTransformAnimator;
     const qsptr<RasterEffectCollection> mRasterEffectsAnimators;
 private:
@@ -442,6 +459,7 @@ private:
 
     void setCustomPropertiesVisible(const bool visible);
     void setBlendEffectsVisible(const bool visible);
+    void setTransformEffectsVisible(const bool visible);
 
     SkBlendMode mBlendMode = SkBlendMode::kSrcOver;
 
