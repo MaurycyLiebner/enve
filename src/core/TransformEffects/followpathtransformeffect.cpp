@@ -36,19 +36,13 @@ FollowPathTransformEffect::FollowPathTransformEffect() :
         if(newTarget) {
             const auto parent = getFirstAncestor<BoundingBox>();
             const auto parentTransform = parent->getTransformAnimator();
-            const auto targetTransform = newTarget->getTransformAnimator();
             conn << connect(newTarget, &Property::prp_absFrameRangeChanged,
                             this, [parentTransform](const FrameRange& range,
                             const bool clip) {
                 parentTransform->prp_afterChangedAbsRange(range, clip);
             });
-            conn << connect(targetTransform,
-                            &AdvancedTransformAnimator::totalTransformChanged,
-                            this, [parentTransform](const UpdateReason reason) {
-                parentTransform->prp_afterChangedCurrent(reason);
-            });
-            conn << connect(parentTransform,
-                            &AdvancedTransformAnimator::inheritedTransformChanged,
+            conn << connect(newTarget,
+                            &AdvancedTransformAnimator::prp_currentFrameChanged,
                             this, [parentTransform](const UpdateReason reason) {
                 parentTransform->prp_afterChangedCurrent(reason);
             });
