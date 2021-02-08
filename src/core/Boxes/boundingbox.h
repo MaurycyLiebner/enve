@@ -176,9 +176,9 @@ public:
 
     virtual void updateAllBoxes(const UpdateReason reason);
 
-    virtual QMatrix getRelativeTransformAtCurrentFrame();
-    virtual QMatrix getRelativeTransformAtFrame(const qreal relFrame);
-    virtual QMatrix getInheritedTransformAtFrame(const qreal relFrame);
+    virtual QMatrix getRelativeTransformAtCurrentFrame() const;
+    virtual QMatrix getRelativeTransformAtFrame(const qreal relFrame) const;
+    virtual QMatrix getInheritedTransformAtFrame(const qreal relFrame) const;
     virtual QMatrix getTotalTransformAtFrame(const qreal relFrame) const;
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
 

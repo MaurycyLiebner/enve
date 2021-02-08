@@ -87,6 +87,7 @@ public:
     void duplicatePaintSettingsFrom(FillSettingsAnimator * const fillSettings,
                                     OutlineSettingsAnimator * const strokeSettings);
 
+    SkPath getParentCoordinatesPath(const qreal relFrame) const;
     SkPath getAbsolutePath(const qreal relFrame) const;
     SkPath getAbsolutePath() const;
     const SkPath &getRelativePath() const;

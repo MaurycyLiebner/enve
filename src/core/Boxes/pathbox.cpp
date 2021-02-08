@@ -347,6 +347,14 @@ SmartVectorPath *PathBox::strokeToVectorPathBox() {
     return newPath.get();
 }
 
+
+SkPath PathBox::getParentCoordinatesPath(const qreal relFrame) const {
+    SkPath result;
+    const auto transform = toSkMatrix(getRelativeTransformAtFrame(relFrame));
+    getRelativePath(relFrame).transform(transform, &result);
+    return result;
+}
+
 SkPath PathBox::getAbsolutePath(const qreal relFrame) const {
     SkPath result;
     const auto transform = toSkMatrix(getTotalTransformAtFrame(relFrame));

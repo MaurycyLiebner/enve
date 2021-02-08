@@ -681,7 +681,7 @@ QMatrix BoundingBox::getTotalTransform() const {
     return mTransformAnimator->getTotalTransform();
 }
 
-QMatrix BoundingBox::getRelativeTransformAtCurrentFrame() {
+QMatrix BoundingBox::getRelativeTransformAtCurrentFrame() const {
     return getRelativeTransformAtFrame(anim_getCurrentRelFrame());
 }
 
@@ -979,13 +979,13 @@ void BoundingBox::removeRasterEffect(const qsptr<RasterEffect> &effect) {
 //    }
 //}
 
-QMatrix BoundingBox::getRelativeTransformAtFrame(const qreal relFrame) {
+QMatrix BoundingBox::getRelativeTransformAtFrame(const qreal relFrame) const {
     if(isZero6Dec(relFrame - anim_getCurrentRelFrame()))
         return mTransformAnimator->getRelativeTransform();
     return mTransformAnimator->getRelativeTransformAtFrame(relFrame);
 }
 
-QMatrix BoundingBox::getInheritedTransformAtFrame(const qreal relFrame) {
+QMatrix BoundingBox::getInheritedTransformAtFrame(const qreal relFrame) const {
     if(isZero6Dec(relFrame - anim_getCurrentRelFrame()))
         return mTransformAnimator->getInheritedTransform();
     return mTransformAnimator->getInheritedTransformAtFrame(relFrame);

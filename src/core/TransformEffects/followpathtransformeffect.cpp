@@ -76,7 +76,7 @@ void FollowPathTransformEffect::applyEffect(
     if(!target) return;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     const qreal targetRelFrame = target->prp_absFrameToRelFrameF(absFrame);
-    const auto path = target->getRelativePath(targetRelFrame);
+    const auto path = target->getParentCoordinatesPath(targetRelFrame);
     QPainterPath qpath = toQPainterPath(path);
 
     const qreal infl = mInfluence->getEffectiveValue(relFrame);

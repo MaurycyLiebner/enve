@@ -1,4 +1,4 @@
-// enve - 2D animations software
+﻿// enve - 2D animations software
 // Copyright (C) 2016-2020 Maurycy Liebner
 
 // This program is free software: you can redistribute it and/or modify
@@ -34,10 +34,10 @@ protected:
     BasicTransformAnimator();
 public:
     virtual void reset();
-    virtual QMatrix getCurrentTransform();
-    virtual QMatrix getRelativeTransformAtFrame(const qreal relFrame);
-    virtual QMatrix getInheritedTransformAtFrame(const qreal relFrame);
-    virtual QMatrix getTotalTransformAtFrame(const qreal relFrame);
+    virtual QMatrix getCurrentTransform() const;
+    virtual QMatrix getRelativeTransformAtFrame(const qreal relFrame) const;
+    virtual QMatrix getInheritedTransformAtFrame(const qreal relFrame) const;
+    virtual QMatrix getTotalTransformAtFrame(const qreal relFrame) const;
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
@@ -126,15 +126,15 @@ protected:
     AdvancedTransformAnimator();
 public:
     void reset();
-    QMatrix getRelativeTransformAtFrame(const qreal relFrame);
-    QMatrix getCurrentTransform();
+    QMatrix getRelativeTransformAtFrame(const qreal relFrame) const;
+    QMatrix getCurrentTransform() const;
 
     void applyTransformEffects(const qreal relFrame,
                                qreal& pivotX, qreal& pivotY,
                                qreal& posX, qreal& posY,
                                qreal& rot,
                                qreal& scaleX, qreal& scaleY,
-                               qreal& shearX, qreal& shearY);
+                               qreal& shearX, qreal& shearY) const;
 
     void setValues(const TransformValues& values);
 

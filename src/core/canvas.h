@@ -269,7 +269,7 @@ public:
         return QMatrix();
     }
 
-    QMatrix getRelativeTransformAtCurrentFrame() {
+    QMatrix getRelativeTransformAtCurrentFrame() const {
         return QMatrix();
     }
 

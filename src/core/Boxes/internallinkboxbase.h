@@ -47,8 +47,8 @@ public:
 
     SkBlendMode getBlendMode() const override;
 
-    QMatrix getRelativeTransformAtFrame(const qreal relFrame) override;
-    QMatrix getTotalTransformAtFrame(const qreal relFrame) override;
+    QMatrix getRelativeTransformAtFrame(const qreal relFrame) const override;
+    QMatrix getTotalTransformAtFrame(const qreal relFrame) const override;
 
     bool isFrameInDurationRect(const int relFrame) const override;
     bool isFrameFInDurationRect(const qreal relFrame) const override;
@@ -161,7 +161,7 @@ bool ILBB::isFrameFInDurationRect(const qreal relFrame) const {
 }
 
 template <typename BoxT>
-QMatrix ILBB::getRelativeTransformAtFrame(const qreal relFrame) {
+QMatrix ILBB::getRelativeTransformAtFrame(const qreal relFrame) const {
     if(mInnerLink) {
         const auto linkTarget = getLinkTarget();
         if(!linkTarget) return QMatrix();
@@ -172,7 +172,7 @@ QMatrix ILBB::getRelativeTransformAtFrame(const qreal relFrame) {
 }
 
 template <typename BoxT>
-QMatrix ILBB::getTotalTransformAtFrame(const qreal relFrame) {
+QMatrix ILBB::getTotalTransformAtFrame(const qreal relFrame) const {
     if(mInnerLink) {
         const auto parentGroup = this->getParentGroup();
         const auto linkTarget = getLinkTarget();
