@@ -161,6 +161,7 @@ public:
             const QString& name, const XevExporter& exp) const;
 
     QMatrix getTransform() const;
+    QMatrix getTransform(const qreal relFrame) const;
 
     void prp_setSelected(const bool selected);
     void prp_afterWholeInfluenceRangeChanged();

@@ -76,8 +76,16 @@ void FollowPathTransformEffect::applyEffect(
     if(!target) return;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     const qreal targetRelFrame = target->prp_absFrameToRelFrameF(absFrame);
-    const auto path = target->getParentCoordinatesPath(targetRelFrame);
-    QPainterPath qpath = toQPainterPath(path);
+
+    const auto parentTransform = parent->getInheritedTransformAtFrame(relFrame);
+    const auto targetTransform = target->getTotalTransformAtFrame(targetRelFrame);
+
+    const auto transform = targetTransform*parentTransform.inverted();
+
+    SkPath path;
+    const auto relPath = target->getRelativePath(targetRelFrame);
+    relPath.transform(toSkMatrix(transform), &path);
+    const QPainterPath qpath = toQPainterPath(path);
 
     const qreal infl = mInfluence->getEffectiveValue(relFrame);
     qreal per = mComplete->getEffectiveValue(relFrame);

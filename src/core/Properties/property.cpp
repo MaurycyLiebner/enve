@@ -172,6 +172,12 @@ QMatrix Property::getTransform() const {
     const auto trans = getTransformAnimator();
     if(trans) return trans->getTotalTransform();
     return QMatrix();
+
+}
+QMatrix Property::getTransform(const qreal relFrame) const {
+    const auto trans = getTransformAnimator();
+    if(trans) return trans->getTotalTransformAtFrame(relFrame);
+    return QMatrix();
 }
 
 void Property::prp_setSelected(const bool selected) {
