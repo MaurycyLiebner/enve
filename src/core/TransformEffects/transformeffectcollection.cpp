@@ -49,6 +49,15 @@ void TransformEffectCollection::prp_readProperty(eReadStream &src) {
     TransformEffectCollectionBase::prp_readProperty(src);
 }
 
+void TransformEffectCollection::prp_readProperty_impl(eReadStream &src) {
+    if(src.evFileVersion() == EvFormat::transformEffects) {
+        TransformEffectCollectionBase::prp_readProperty_impl(src);
+        bool visible; src >> visible;
+    } else {
+        TransformEffectCollectionBase::prp_readProperty_impl(src);
+    }
+}
+
 void TransformEffectCollection::applyEffects(
         const qreal relFrame,
         qreal& pivotX, qreal& pivotY,
