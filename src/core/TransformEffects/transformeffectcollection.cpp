@@ -44,16 +44,9 @@ void TransformEffectCollection::prp_setupTreeViewMenu(PropertyMenu * const menu)
     TransformEffectCollection::prp_setupTreeViewMenu(menu);
 }
 
-void TransformEffectCollection::prp_writeProperty_impl(eWriteStream &dst) const {
-    TransformEffectCollectionBase::prp_writeProperty_impl(dst);
-    dst << SWT_isVisible();
-}
-
-void TransformEffectCollection::prp_readProperty_impl(eReadStream &src) {
+void TransformEffectCollection::prp_readProperty(eReadStream &src) {
     if(src.evFileVersion() < EvFormat::transformEffects) return;
-    TransformEffectCollectionBase::prp_readProperty_impl(src);
-    bool visible; src >> visible;
-    SWT_setVisible(visible);
+    TransformEffectCollectionBase::prp_readProperty(src);
 }
 
 void TransformEffectCollection::applyEffects(

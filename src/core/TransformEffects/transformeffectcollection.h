@@ -46,8 +46,7 @@ protected:
 public:
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
-    void prp_writeProperty_impl(eWriteStream &dst) const;
-    void prp_readProperty_impl(eReadStream &src);
+    void prp_readProperty(eReadStream &src);
 
     bool hasEffects();
     void readTransformEffect(eReadStream &target);
