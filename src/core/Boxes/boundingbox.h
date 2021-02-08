@@ -179,7 +179,7 @@ public:
     virtual QMatrix getRelativeTransformAtCurrentFrame();
     virtual QMatrix getRelativeTransformAtFrame(const qreal relFrame);
     virtual QMatrix getInheritedTransformAtFrame(const qreal relFrame);
-    virtual QMatrix getTotalTransformAtFrame(const qreal relFrame);
+    virtual QMatrix getTotalTransformAtFrame(const qreal relFrame) const;
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
 
     virtual void applyPaintSetting(const PaintSettingsApplier &setting);

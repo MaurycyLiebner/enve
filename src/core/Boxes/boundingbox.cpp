@@ -991,7 +991,7 @@ QMatrix BoundingBox::getInheritedTransformAtFrame(const qreal relFrame) {
     return mTransformAnimator->getInheritedTransformAtFrame(relFrame);
 }
 
-QMatrix BoundingBox::getTotalTransformAtFrame(const qreal relFrame) {
+QMatrix BoundingBox::getTotalTransformAtFrame(const qreal relFrame) const {
     if(isZero6Dec(relFrame - anim_getCurrentRelFrame()))
         return mTransformAnimator->getTotalTransform();
     return mTransformAnimator->getTotalTransformAtFrame(relFrame);
