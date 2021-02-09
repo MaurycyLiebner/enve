@@ -19,6 +19,7 @@
 
 #include "tracktransformeffect.h"
 #include "followpathtransformeffect.h"
+#include "followobjecttransformeffect.h"
 
 TransformEffectCollection::TransformEffectCollection() :
     TransformEffectCollectionBase("transform effects") {}
@@ -31,14 +32,21 @@ void TransformEffectCollection::prp_setupTreeViewMenu(PropertyMenu * const menu)
         [](TransformEffectCollection * coll) {
             coll->addChild(enve::make_shared<TrackTransformEffect>());
         };
-        menu->addPlainAction("Track Effect", aOp);
+        menu->addPlainAction("Add Track Effect", aOp);
     }
     {
         const PropertyMenu::PlainSelectedOp<TransformEffectCollection> aOp =
         [](TransformEffectCollection * coll) {
             coll->addChild(enve::make_shared<FollowPathTransformEffect>());
         };
-        menu->addPlainAction("Follow Path Effect", aOp);
+        menu->addPlainAction("Add Follow Path Effect", aOp);
+    }
+    {
+        const PropertyMenu::PlainSelectedOp<TransformEffectCollection> aOp =
+        [](TransformEffectCollection * coll) {
+            coll->addChild(enve::make_shared<FollowObjectTransformEffect>());
+        };
+        menu->addPlainAction("Add Follow Object Effect", aOp);
     }
     menu->addSeparator();
     TransformEffectCollection::prp_setupTreeViewMenu(menu);
@@ -87,6 +95,8 @@ qsptr<TransformEffect> createTransformEffectForType(
             return enve::make_shared<TrackTransformEffect>();
         case(TransformEffectType::followPath):
             return enve::make_shared<FollowPathTransformEffect>();
+        case(TransformEffectType::followObject):
+            return enve::make_shared<FollowObjectTransformEffect>();
         default: RuntimeThrow("Invalid transform effect type '" +
                               QString::number(int(type)) + "'");
     }

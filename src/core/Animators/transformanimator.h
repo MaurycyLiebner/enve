@@ -146,6 +146,7 @@ public:
     void resetPivot();
     void setPivotFixedTransform(const QPointF &newPivot);
 
+    QPointF getPivot(const qreal relFrame);
     QPointF getPivot();
     qreal getPivotX();
     qreal getPivotY();

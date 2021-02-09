@@ -434,6 +434,10 @@ void AdvancedTransformAnimator::setPivotFixedTransform(
     }
 }
 
+QPointF AdvancedTransformAnimator::getPivot(const qreal relFrame) {
+    return mPivotAnimator->getEffectiveValue(relFrame);
+}
+
 QPointF AdvancedTransformAnimator::getPivot() {
     return mPivotAnimator->getEffectiveValue();
 }

@@ -462,6 +462,10 @@ QPointF BoundingBox::getPivotAbsPos() {
     return mTransformAnimator->getPivotAbs();
 }
 
+QPointF BoundingBox::getPivotRelPos(const qreal relFrame) {
+    return mTransformAnimator->getPivot(relFrame);
+}
+
 QPointF BoundingBox::getPivotAbsPos(const qreal relFrame) {
     return mTransformAnimator->getPivotAbs(relFrame);
 }

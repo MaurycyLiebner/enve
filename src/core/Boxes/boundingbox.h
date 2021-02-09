@@ -309,6 +309,7 @@ public:
 
     bool isContainedIn(const QRectF &absRect) const;
 
+    QPointF getPivotRelPos(const qreal relFrame);
     QPointF getPivotAbsPos();
     QPointF getPivotAbsPos(const qreal relFrame);
 
