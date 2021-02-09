@@ -712,13 +712,17 @@ void QrealAnimator::prp_cancelTransform() {
 
 FrameRange QrealAnimator::prp_getIdenticalRelRange(const int relFrame) const {
     const auto base = Animator::prp_getIdenticalRelRange(relFrame);
-    if(mExpression) return base * mExpression->identicalRelRange(relFrame);
+    if(mExpression) {
+        const int absFrame = prp_relFrameToAbsFrame(relFrame);
+        return base * mExpression->identicalRelRange(absFrame);
+    }
     else return base;
 }
 
 FrameRange QrealAnimator::prp_nextNonUnaryIdenticalRelRange(const int relFrame) const {
     if(hasExpression()) {
-        for(int i = relFrame; i < FrameRange::EMAX; i++) {
+        const int absFrame = prp_relFrameToAbsFrame(relFrame);
+        for(int i = relFrame, j = absFrame; i < FrameRange::EMAX; i++, j++) {
             FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
             int lowestMax = INT_MAX;
 
@@ -728,13 +732,15 @@ FrameRange QrealAnimator::prp_nextNonUnaryIdenticalRelRange(const int relFrame) 
                 range *= childRange;
             }
             {
-                const auto childRange = mExpression->nextNonUnaryIdenticalRelRange(i);
+                const auto childRange = mExpression->nextNonUnaryIdenticalRelRange(j);
                 lowestMax = qMin(lowestMax, childRange.fMax);
                 range *= childRange;
             }
 
             if(!range.isUnary()) return range;
-            i = lowestMax;
+            const int di = lowestMax - i;
+            i += di;
+            j += di;
         }
 
         return FrameRange::EMINMAX;
