@@ -26,8 +26,9 @@ public:
     TargetTransformEffect(const QString& name,
                           const TransformEffectType type);
 
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 protected:
-    BoxTargetProperty* targetProperty();
+    BoxTargetProperty* targetProperty() const;
 private:
     ConnContextQPtr<BoundingBox> mTargetConn;
     qsptr<BoxTargetProperty> mTarget;

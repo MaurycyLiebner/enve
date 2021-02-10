@@ -53,6 +53,19 @@ TargetTransformEffect::TargetTransformEffect(
     ca_addChild(mTarget);
 }
 
-BoxTargetProperty* TargetTransformEffect::targetProperty() {
+FrameRange TargetTransformEffect::prp_getIdenticalRelRange(
+        const int relFrame) const {
+    const auto thisIdent = ComplexAnimator::prp_getIdenticalRelRange(relFrame);
+    const auto target = mTarget->getTarget();
+    if(!target) return thisIdent;
+    const auto targetTransform = target->getTransformAnimator();
+    const int absFrame = prp_relFrameToAbsFrame(relFrame);
+    const int tRelFrame = targetTransform->prp_absFrameToRelFrame(absFrame);
+    const auto parentIdent = targetTransform->prp_getIdenticalRelRange(tRelFrame);
+    const auto absParentIdent = targetTransform->prp_relRangeToAbsRange(parentIdent);
+    return thisIdent*prp_absRangeToRelRange(absParentIdent);
+}
+
+BoxTargetProperty* TargetTransformEffect::targetProperty() const {
     return mTarget.get();
 }
