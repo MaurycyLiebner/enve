@@ -52,6 +52,8 @@ void FollowObjectTransformEffect::applyEffect(
     Q_UNUSED(shearX);
     Q_UNUSED(shearY);
 
+    if(!isVisible()) return;
+
     if(!parent) return;
     const auto target = targetProperty()->getTarget();
     if(!target) return;

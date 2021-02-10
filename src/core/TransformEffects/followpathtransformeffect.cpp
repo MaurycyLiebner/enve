@@ -50,6 +50,8 @@ void FollowPathTransformEffect::applyEffect(
     Q_UNUSED(shearX);
     Q_UNUSED(shearY);
 
+    if(!isVisible()) return;
+
     if(!parent) return;
     const auto target = static_cast<PathBox*>(targetProperty()->getTarget());
     if(!target) return;
