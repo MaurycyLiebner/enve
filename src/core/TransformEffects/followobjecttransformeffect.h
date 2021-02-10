@@ -17,12 +17,11 @@
 #ifndef FOLLOWOBJECTTRANSFORMEFFECT_H
 #define FOLLOWOBJECTTRANSFORMEFFECT_H
 
-#include "transformeffect.h"
+#include "targettransformeffect.h"
 
-#include "Properties/boxtargetproperty.h"
 #include "Animators/qpointfanimator.h"
 
-class FollowObjectTransformEffect : public TransformEffect {
+class FollowObjectTransformEffect : public TargetTransformEffect {
 public:
     FollowObjectTransformEffect();
 
@@ -34,9 +33,6 @@ public:
                      qreal &shearX, qreal &shearY,
                      BoundingBox* const parent) override;
 private:
-    ConnContextQPtr<BoundingBox> mTargetConn;
-
-    qsptr<BoxTargetProperty> mTarget;
     qsptr<QPointFAnimator> mPosInfluence;
     qsptr<QPointFAnimator> mScaleInfluence;
     qsptr<QrealAnimator> mRotInfluence;

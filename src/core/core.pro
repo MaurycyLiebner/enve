@@ -245,6 +245,7 @@ SOURCES += \
     Timeline/fixedlenanimationrect.cpp \
     TransformEffects/followobjecttransformeffect.cpp \
     TransformEffects/followpathtransformeffect.cpp \
+    TransformEffects/targettransformeffect.cpp \
     TransformEffects/tracktransformeffect.cpp \
     TransformEffects/transformeffect.cpp \
     TransformEffects/transformeffectcollection.cpp \
@@ -582,6 +583,7 @@ HEADERS += \
     Timeline/fixedlenanimationrect.h \
     TransformEffects/followobjecttransformeffect.h \
     TransformEffects/followpathtransformeffect.h \
+    TransformEffects/targettransformeffect.h \
     TransformEffects/tracktransformeffect.h \
     TransformEffects/transformeffect.h \
     TransformEffects/transformeffectcollection.h \

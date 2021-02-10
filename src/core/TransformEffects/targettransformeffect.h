@@ -14,24 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef TRACKTRANSFORMEFFECT_H
-#define TRACKTRANSFORMEFFECT_H
+#ifndef TARGETTRANSFORMEFFECT_H
+#define TARGETTRANSFORMEFFECT_H
 
-#include "targettransformeffect.h"
+#include "transformeffect.h"
 
-class TrackTransformEffect : public TargetTransformEffect {
+#include "Properties/boxtargetproperty.h"
+
+class TargetTransformEffect : public TransformEffect {
 public:
-    TrackTransformEffect();
+    TargetTransformEffect(const QString& name,
+                          const TransformEffectType type);
 
-    void applyEffect(const qreal relFrame,
-                     qreal &pivotX, qreal &pivotY,
-                     qreal &posX, qreal &posY,
-                     qreal &rot,
-                     qreal &scaleX, qreal &scaleY,
-                     qreal &shearX, qreal &shearY,
-                     BoundingBox* const parent) override;
+protected:
+    BoxTargetProperty* targetProperty();
 private:
-    qsptr<QrealAnimator> mInfluence;
+    ConnContextQPtr<BoundingBox> mTargetConn;
+    qsptr<BoxTargetProperty> mTarget;
 };
 
-#endif // TRACKTRANSFORMEFFECT_H
+#endif // TARGETTRANSFORMEFFECT_H

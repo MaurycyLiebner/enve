@@ -21,35 +21,14 @@
 #include "Animators/transformanimator.h"
 
 FollowPathTransformEffect::FollowPathTransformEffect() :
-    TransformEffect("follow path", TransformEffectType::followPath) {
-    mTarget = enve::make_shared<BoxTargetProperty>("path");
-    mTarget->setValidator<PathBox>();
+    TargetTransformEffect("follow path", TransformEffectType::followPath) {
+    targetProperty()->setValidator<PathBox>();
 
     mRotate = enve::make_shared<BoolProperty>("rotate");
     mLengthBased = enve::make_shared<BoolProperty>("length based");
     mComplete = enve::make_shared<QrealAnimator>(0, 0, 1, 0.01, "complete");
     mInfluence = enve::make_shared<QrealAnimator>(1, -1, 1, 0.01, "influence");
 
-    connect(mTarget.get(), &BoxTargetProperty::targetSet,
-            this, [this](BoundingBox* const newTarget) {
-        auto& conn = mTargetConn.assign(newTarget);
-        if(newTarget) {
-            const auto parent = getFirstAncestor<BoundingBox>();
-            const auto parentTransform = parent->getTransformAnimator();
-            conn << connect(newTarget, &Property::prp_absFrameRangeChanged,
-                            this, [parentTransform](const FrameRange& range,
-                            const bool clip) {
-                parentTransform->prp_afterChangedAbsRange(range, clip);
-            });
-            conn << connect(newTarget,
-                            &AdvancedTransformAnimator::prp_currentFrameChanged,
-                            this, [parentTransform](const UpdateReason reason) {
-                parentTransform->prp_afterChangedCurrent(reason);
-            });
-        }
-    });
-
-    ca_addChild(mTarget);
     ca_addChild(mRotate);
     ca_addChild(mLengthBased);
     ca_addChild(mComplete);
@@ -72,7 +51,7 @@ void FollowPathTransformEffect::applyEffect(
     Q_UNUSED(shearY);
 
     if(!parent) return;
-    const auto target = static_cast<PathBox*>(mTarget->getTarget());
+    const auto target = static_cast<PathBox*>(targetProperty()->getTarget());
     if(!target) return;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     const qreal targetRelFrame = target->prp_absFrameToRelFrameF(absFrame);

@@ -17,12 +17,11 @@
 #ifndef FOLLOWPATHTRANSFORMEFFECT_H
 #define FOLLOWPATHTRANSFORMEFFECT_H
 
-#include "transformeffect.h"
+#include "targettransformeffect.h"
 
-#include "Properties/boxtargetproperty.h"
 #include "Properties/boolproperty.h"
 
-class FollowPathTransformEffect : public TransformEffect {
+class FollowPathTransformEffect : public TargetTransformEffect {
 public:
     FollowPathTransformEffect();
 
@@ -34,9 +33,6 @@ public:
                      qreal &shearX, qreal &shearY,
                      BoundingBox* const parent) override;
 private:
-    ConnContextQPtr<BoundingBox> mTargetConn;
-
-    qsptr<BoxTargetProperty> mTarget;
     qsptr<BoolProperty> mRotate;
     qsptr<BoolProperty> mLengthBased;
     qsptr<QrealAnimator> mComplete;

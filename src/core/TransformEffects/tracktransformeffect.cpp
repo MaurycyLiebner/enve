@@ -21,37 +21,10 @@
 #include "Animators/transformanimator.h"
 
 TrackTransformEffect::TrackTransformEffect() :
-    TransformEffect("track", TransformEffectType::track) {
+    TargetTransformEffect("track", TransformEffectType::track) {
     mInfluence = enve::make_shared<QrealAnimator>(1, -1, 1, 0.01, "influence");
-    mTarget = enve::make_shared<BoxTargetProperty>("target");
 
-    connect(mTarget.get(), &BoxTargetProperty::targetSet,
-            this, [this](BoundingBox* const newTarget) {
-        auto& conn = mTargetConn.assign(newTarget);
-        if(newTarget) {
-            const auto parent = getFirstAncestor<BoundingBox>();
-            const auto parentTransform = parent->getTransformAnimator();
-            const auto targetTransform = newTarget->getTransformAnimator();
-            conn << connect(targetTransform, &Property::prp_absFrameRangeChanged,
-                            this, [parentTransform](const FrameRange& range,
-                            const bool clip) {
-                parentTransform->prp_afterChangedAbsRange(range, clip);
-            });
-            conn << connect(targetTransform,
-                            &AdvancedTransformAnimator::totalTransformChanged,
-                            this, [parentTransform](const UpdateReason reason) {
-                parentTransform->prp_afterChangedCurrent(reason);
-            });
-            conn << connect(parentTransform,
-                            &AdvancedTransformAnimator::inheritedTransformChanged,
-                            this, [parentTransform](const UpdateReason reason) {
-                parentTransform->prp_afterChangedCurrent(reason);
-            });
-        }
-    });
-
-    ca_addChild(mInfluence);
-    ca_addChild(mTarget);
+    ca_prependChild(targetProperty(), mInfluence);
 }
 
 void TrackTransformEffect::applyEffect(
@@ -72,7 +45,7 @@ void TrackTransformEffect::applyEffect(
     Q_UNUSED(shearY);
 
     if(!parent) return;
-    const auto target = mTarget->getTarget();
+    const auto target = targetProperty()->getTarget();
     if(!target) return;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     const qreal targetRelFrame = target->prp_absFrameToRelFrameF(absFrame);

@@ -17,12 +17,11 @@
 #include "followobjecttransformeffect.h"
 
 #include "Boxes/boundingbox.h"
-#include "Animators/qrealanimator.h"
 #include "Animators/transformanimator.h"
+#include "Animators/qrealanimator.h"
 
 FollowObjectTransformEffect::FollowObjectTransformEffect() :
-    TransformEffect("follow object", TransformEffectType::followObject) {
-    mTarget = enve::make_shared<BoxTargetProperty>("target");
+    TargetTransformEffect("follow object", TransformEffectType::followObject) {
     mPosInfluence = enve::make_shared<QPointFAnimator>(
                         QPointF{1., 1.}, QPointF{-10., -10.},
                         QPointF{10., 10.}, QPointF{0.01, 0.01},
@@ -34,27 +33,6 @@ FollowObjectTransformEffect::FollowObjectTransformEffect() :
     mRotInfluence = enve::make_shared<QrealAnimator>(
                         1, -10, 10, 0.01, "rot influence");
 
-    connect(mTarget.get(), &BoxTargetProperty::targetSet,
-            this, [this](BoundingBox* const newTarget) {
-        auto& conn = mTargetConn.assign(newTarget);
-        if(newTarget) {
-            const auto parent = getFirstAncestor<BoundingBox>();
-            const auto parentTransform = parent->getTransformAnimator();
-            const auto targetTransform = newTarget->getTransformAnimator();
-            conn << connect(targetTransform, &Property::prp_absFrameRangeChanged,
-                            this, [parentTransform](const FrameRange& range,
-                            const bool clip) {
-                parentTransform->prp_afterChangedAbsRange(range, clip);
-            });
-            conn << connect(targetTransform,
-                            &AdvancedTransformAnimator::totalTransformChanged,
-                            this, [parentTransform](const UpdateReason reason) {
-                parentTransform->prp_afterChangedCurrent(reason);
-            });
-        }
-    });
-
-    ca_addChild(mTarget);
     ca_addChild(mPosInfluence);
     ca_addChild(mScaleInfluence);
     ca_addChild(mRotInfluence);
@@ -75,7 +53,7 @@ void FollowObjectTransformEffect::applyEffect(
     Q_UNUSED(shearY);
 
     if(!parent) return;
-    const auto target = mTarget->getTarget();
+    const auto target = targetProperty()->getTarget();
     if(!target) return;
     const auto targetTransformAnimator = target->getTransformAnimator();
 
