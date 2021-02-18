@@ -110,9 +110,9 @@ bool ContainerBox::SWT_dropInto(const int index, const QMimeData * const data) {
     if(eMimeData::sHasType<eBoxOrSound>(data)) {
         const auto eData = static_cast<const eMimeData*>(data);
         const auto bData = static_cast<const eDraggedObjects*>(eData);
+        const auto objects = bData->getObjects<eBoxOrSound>();
         int dropId = index;
-        for(int i = 0; i < bData->count(); i++) {
-            const auto iObj = bData->getObject<eBoxOrSound>(i);
+        for(const auto iObj : objects) {
             if(const auto box = enve_cast<ContainerBox*>(iObj)) {
                 if(box == this) continue;
                 if(isAncestor(box)) continue;

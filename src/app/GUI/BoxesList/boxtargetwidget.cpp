@@ -37,34 +37,21 @@ void BoxTargetWidget::setTargetProperty(BoxTargetProperty *property) {
 
 void BoxTargetWidget::dropEvent(QDropEvent *event) {
     if(!mProperty) return;
-    if(eMimeData::sHasType<BoundingBox>(event->mimeData())) {
-        auto boxMimeData = static_cast<const eMimeData*>(event->mimeData());
-        const auto box = boxMimeData->getObjects<BoundingBox>().first();
-        const auto& validator = mProperty->validator();
-        if(box && (!validator || validator(box))) {
-            mProperty->setTargetAction(box);
-        }
-        mDragging = false;
-        update();
-        Document::sInstance->actionFinished();
-    }
+    const auto mimeData = event->mimeData();
+    mProperty->SWT_drop(mimeData);
+    mDragging = false;
+    update();
+    Document::sInstance->actionFinished();
 }
 
 void BoxTargetWidget::dragEnterEvent(QDragEnterEvent *event) {
     if(!mProperty) return;
-    if(eMimeData::sHasType<BoundingBox>(event->mimeData())) {
-        auto boxMimeData = static_cast<const eMimeData*>(event->mimeData());
-        const auto box = boxMimeData->getObjects<BoundingBox>().first();
-        const auto parentBox = mProperty->getFirstAncestor<BoundingBox>();
-        Q_ASSERT(parentBox);
-        Q_ASSERT(box);
-        if(parentBox == box) return;
-        const auto& validator = mProperty->validator();
-        if(validator && !validator(box)) return;
-        event->acceptProposedAction();
-        mDragging = true;
-        update();
-    }
+    const auto mimeData = event->mimeData();
+    const bool support = mProperty->SWT_dropSupport(mimeData);
+    if(!support) return;
+    event->acceptProposedAction();
+    mDragging = true;
+    update();
 }
 
 void BoxTargetWidget::dragMoveEvent(QDragMoveEvent *event) {

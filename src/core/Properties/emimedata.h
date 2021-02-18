@@ -23,19 +23,17 @@
 class CORE_EXPORT eDraggedObjects {
 public:
     template <typename T>
-    eDraggedObjects(const QList<T*>& objs) :
-        mMetaObj(T::staticMetaObject) {
+    eDraggedObjects(const QList<T*>& objs) {
         for(const auto& obj : objs) mObjects << obj;
     }
 
     template <typename T>
     bool hasType() const {
-        return &mMetaObj == &T::staticMetaObject;
+        return getObjects<T>().count() != 0;
     }
 
     template <typename T>
     QList<T*> getObjects() const {
-        if(!hasType<T>()) RuntimeThrow("Incompatible type");
         QList<T*> result;
         for(const auto& obj : mObjects) {
             const auto ObjT = enve_cast<T*>(obj);
@@ -43,22 +41,7 @@ public:
         }
         return result;
     }
-
-    template <typename T>
-    T* getObject(const int index) const {
-        return enve_cast<T*>(mObjects.at(index));
-    }
-
-    int count() const { return mObjects.count(); }
-
-    bool hasObject(QObject* const obj) const {
-        for(const auto& iObj : mObjects) {
-            if(iObj == obj) return true;
-        }
-        return false;
-    }
 private:
-    const QMetaObject& mMetaObj;
     QList<QObject*> mObjects;
 };
 

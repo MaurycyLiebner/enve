@@ -67,14 +67,21 @@ bool BoxTargetProperty::SWT_dropSupport(const QMimeData * const data) {
     if(!eMimeData::sHasType<BoundingBox>(data)) return false;
     const auto eData = static_cast<const eMimeData*>(data);
     const auto bData = static_cast<const eDraggedObjects*>(eData);
-    return bData->count() == 1;
+    const auto objs = bData->getObjects<BoundingBox>();
+    if(objs.count() != 1) return false;
+    const auto obj = objs.first();
+    if(mValidator && !mValidator(obj)) return false;
+    const auto parentBox = getFirstAncestor<BoundingBox>();
+    if(parentBox == obj) return false;
+    return true;
 }
 
 bool BoxTargetProperty::SWT_drop(const QMimeData * const data) {
+    if(!SWT_dropSupport(data)) return false;
     const auto eData = static_cast<const eMimeData*>(data);
     const auto bData = static_cast<const eDraggedObjects*>(eData);
-    const auto obj = bData->getObject<BoundingBox>(0);
-    setTargetAction(obj);
+    const auto objs = bData->getObjects<BoundingBox>();
+    setTargetAction(objs.first());
     return true;
 }
 
