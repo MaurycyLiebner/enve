@@ -70,17 +70,17 @@ void generateButtons(const int minWidgetDim, const int buttonDim) {
 
     QImage uncheckedBase(buttonSize, QImage::Format_ARGB32);
     uncheckedBase.fill(Qt::transparent);
-    renderSvg(":/icons/toolbarButtons/uncheckedBg", uncheckedBase);
+    renderSvg(":/icons/toolbarButtons/uncheckedBg.svg", uncheckedBase);
 
     QImage checkedBase(buttonSize, QImage::Format_ARGB32);
     checkedBase.fill(Qt::transparent);
-    renderSvg(":/icons/toolbarButtons/checkedBg", checkedBase);
+    renderSvg(":/icons/toolbarButtons/checkedBg.svg", checkedBase);
 
     const QString dir = eSettings::sSettingsDir() + "/" + mkPath;
     QDirIterator checkableIt(":/icons/toolbarButtons/checkable");
     while(checkableIt.hasNext()) {
         const auto path = checkableIt.next();
-        const auto fileName = checkableIt.fileName();
+        const auto fileName = checkableIt.fileName().chopped(4);
         const auto pngFileName = fileName + ".png";
 
         if(fileName.contains("Checked")) {
@@ -98,7 +98,7 @@ void generateButtons(const int minWidgetDim, const int buttonDim) {
     QDirIterator plainIt(":/icons/toolbarButtons/plain");
     while(plainIt.hasNext()) {
         const auto path = plainIt.next();
-        const auto fileName = plainIt.fileName();
+        const auto fileName = plainIt.fileName().chopped(4);;
         generate(path, uncheckedBase, dir + "/" + fileName + ".png");
     }
 }
@@ -127,7 +127,7 @@ void IconLoader::generateAll(const int minWidgetDim, const int buttonDim) {
     while(baseIt.hasNext()) {
         const auto path = baseIt.next();
         if(baseIt.fileInfo().isDir()) continue;
-        const auto fileName = baseIt.fileName();
+        const auto fileName = baseIt.fileName().chopped(4);
         const auto pngPath = iconsDir.filePath(QString::number(minWidgetDim) + "/" + fileName + ".png");
         generate(path, minWidgetDim/22., pngPath);
     }

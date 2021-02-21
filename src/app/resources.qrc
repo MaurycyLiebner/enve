@@ -1,12 +1,12 @@
 <RCC>
     <qresource prefix="/styles">
         <file alias="stylesheet.qss">stylesheet.qss</file>
-        <file>icons/toolbarButtons/plain/alignCenter</file>
-        <file>icons/toolbarButtons/plain/alignLeft</file>
-        <file>icons/toolbarButtons/plain/alignRight</file>
-        <file>icons/toolbarButtons/plain/alignVCenter</file>
-        <file>icons/toolbarButtons/plain/alignTop</file>
-        <file>icons/toolbarButtons/plain/alignBottom</file>
+        <file>icons/toolbarButtons/plain/alignCenter.svg</file>
+        <file>icons/toolbarButtons/plain/alignLeft.svg</file>
+        <file>icons/toolbarButtons/plain/alignRight.svg</file>
+        <file>icons/toolbarButtons/plain/alignVCenter.svg</file>
+        <file>icons/toolbarButtons/plain/alignTop.svg</file>
+        <file>icons/toolbarButtons/plain/alignBottom.svg</file>
     </qresource>
     <qresource prefix="/cursors">
         <file alias="cursor-node.xpm">pixmaps/cursor-node.xpm</file>
@@ -36,19 +36,19 @@
     </qresource>
     <qresource prefix="/pixmaps">
         <file>splash.svg</file>
-        <file>icons/toolbarButtons/plain/horizontalLinesOff</file>
-        <file>icons/toolbarButtons/plain/horizontalLinesOn</file>
+        <file>icons/toolbarButtons/plain/horizontalLinesOff.svg</file>
+        <file>icons/toolbarButtons/plain/horizontalLinesOn.svg</file>
     </qresource>
     <qresource prefix="/other">
         <file>GPL3-license.txt</file>
     </qresource>
     <qresource prefix="/">
-        <file>icons/toolbarButtons/plain/brush-</file>
-        <file>icons/toolbarButtons/plain/brush+</file>
-        <file>icons/toolbarButtons/plain/nodeNew</file>
-        <file>icons/toolbarButtons/plain/newEmpty</file>
-        <file>icons/toolbarButtons/plain/onionDisabled</file>
-        <file>icons/toolbarButtons/plain/onionEnabled</file>
+        <file>icons/toolbarButtons/plain/brush-.svg</file>
+        <file>icons/toolbarButtons/plain/brush+.svg</file>
+        <file>icons/toolbarButtons/plain/nodeNew.svg</file>
+        <file>icons/toolbarButtons/plain/newEmpty.svg</file>
+        <file>icons/toolbarButtons/plain/onionDisabled.svg</file>
+        <file>icons/toolbarButtons/plain/onionEnabled.svg</file>
     </qresource>
     <qresource prefix="/checkbox">
         <file alias="Checkbox_checked_normal.png">pixmaps/Checkbox_checked_normal.png</file>
