@@ -12,8 +12,8 @@
    viewBox="0 0 6.6145832 6.6145835"
    version="1.1"
    id="svg1468"
-   inkscape:version="1.0.2 (1.0.2+r75+1)"
-   sodipodi:docname="lockAlphaUnchecked.svg">
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="lockAlpha.svg">
   <defs
      id="defs1462" />
   <sodipodi:namedview
@@ -23,15 +23,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.2"
-     inkscape:cx="-1.7299838"
-     inkscape:cy="7.0902071"
+     inkscape:zoom="22.627417"
+     inkscape:cx="12.632183"
+     inkscape:cy="14.636213"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      units="px"
-     inkscape:window-width="1366"
-     inkscape:window-height="737"
+     inkscape:window-width="1920"
+     inkscape:window-height="1054"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -44,7 +44,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -54,13 +54,9 @@
      id="layer1"
      transform="translate(0,-290.3854)">
     <path
-       id="circle874"
-       style="fill:#f9f9f9;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.290923;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
-       d="m 5.4684346,293.69269 a 2.1611428,2.1611428 0 0 1 -2.1611429,2.16114 2.1611428,2.1611428 0 0 1 -2.1611428,-2.16114 2.1611428,2.1611428 0 0 1 2.1611428,-2.16114 2.1611428,2.1611428 0 0 1 2.1611429,2.16114 z" />
-    <path
-       id="path870"
-       d="m 4.7411686,292.9621 a 1.9565473,1.9565473 0 0 0 -1.9564696,1.95647 1.9565473,1.9565473 0 0 0 0.2268595,0.91209 2.1611428,2.1611428 0 0 0 0.2955891,0.0233 2.1611428,2.1611428 0 0 0 2.1611084,-2.16111 2.1611428,2.1611428 0 0 0 -0.093534,-0.62322 1.9565473,1.9565473 0 0 0 -0.633553,-0.10749 z"
-       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.290923;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
-       inkscape:connector-curvature="0" />
+       style="fill:#f9f9f9;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.09955144;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+       d="M 12.5 4.3320312 A 8.1680988 8.1680988 0 0 0 4.3320312 12.5 A 8.1680988 8.1680988 0 0 0 10.541016 20.419922 A 8.1680988 8.1680988 0 0 1 10.175781 18.03125 A 8.1680988 8.1680988 0 0 1 18.34375 9.8632812 A 8.1680988 8.1680988 0 0 1 20.302734 10.111328 A 8.1680988 8.1680988 0 0 0 12.5 4.3320312 z "
+       transform="matrix(0.26458333,0,0,0.26458333,0,290.3854)"
+       id="circle874" />
   </g>
 </svg>

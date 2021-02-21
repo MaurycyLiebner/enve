@@ -12,8 +12,8 @@
    viewBox="0 0 6.6145832 6.6145835"
    version="1.1"
    id="svg1468"
-   inkscape:version="1.0.2 (1.0.2+r75+1)"
-   sodipodi:docname="colorizeUnchecked.svg">
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="colorize.svg">
   <defs
      id="defs1462" />
   <sodipodi:namedview
@@ -23,15 +23,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="15.839192"
-     inkscape:cx="8.4528432"
-     inkscape:cy="15.748054"
+     inkscape:zoom="2.8"
+     inkscape:cx="-106.08842"
+     inkscape:cy="44.198727"
      inkscape:document-units="mm"
      inkscape:current-layer="g830"
      showgrid="false"
      units="px"
-     inkscape:window-width="1366"
-     inkscape:window-height="737"
+     inkscape:window-width="1920"
+     inkscape:window-height="1054"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -44,7 +44,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -57,19 +57,19 @@
        id="g830"
        transform="translate(-0.03838452,-0.02416624)">
       <circle
-         style="fill:#ff9f9f;fill-rule:evenodd;stroke-width:0.222408;fill-opacity:1"
+         style="fill:#ff5f5f;fill-rule:evenodd;stroke-width:0.222408;fill-opacity:1"
          id="path833"
          cx="3.3456762"
          cy="292.69403"
          r="1.4636458" />
       <circle
-         style="mix-blend-mode:normal;fill:#bdffaa;fill-opacity:1;fill-rule:evenodd;stroke-width:0.222408"
+         style="mix-blend-mode:normal;fill:#83ff5f;fill-opacity:1;fill-rule:evenodd;stroke-width:0.222408"
          id="circle835"
          cx="4.4723654"
          cy="294.73969"
          r="1.4636458" />
       <circle
-         style="mix-blend-mode:normal;fill:#bbb6ff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.222408"
+         style="mix-blend-mode:normal;fill:#6a5fff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.222408"
          id="circle837"
          cx="2.218987"
          cy="294.73969"

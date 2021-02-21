@@ -65,9 +65,9 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
             keysView, &KeysView::graphResetValueScaleAndMinShownAction);
 
     const auto valueLines = SwitchButton::sCreate2Switch(
-                                "toolbarButtons/horizontalLinesOn.png",
-                                "toolbarButtons/horizontalLinesOff.png",
-                                gSingleLineTooltip("Disable Value Lines"),
+                                "toolbarButtons/horizontalLinesChecked.png",
+                                "toolbarButtons/horizontalLinesUnchecked.png",
+                                gSingleLineTooltip("Show/Hide Value Lines"),
                                 this);
     connect(valueLines, &SwitchButton::toggled,
             keysView, &KeysView::graphSetValueLinesDisabled);
