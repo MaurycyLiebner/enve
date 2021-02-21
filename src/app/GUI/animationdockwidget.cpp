@@ -73,8 +73,8 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
             keysView, &KeysView::graphSetValueLinesDisabled);
 
     const auto selectedVisible = SwitchButton::sCreate2Switch(
-                                     "toolbarButtons/notOnlySelectedVisible.png",
-                                     "toolbarButtons/onlySelectedVisible.png",
+                                     "toolbarButtons/onlySelectedVisibleUnchecked.png",
+                                     "toolbarButtons/onlySelectedVisibleChecked.png",
                                      gSingleLineTooltip("View Only Selected Objects' Properties"),
                                      this);
     connect(selectedVisible, &SwitchButton::toggled,

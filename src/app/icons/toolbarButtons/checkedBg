@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -15,7 +13,7 @@
    viewBox="0 0 6.6145832 6.6145835"
    version="1.1"
    id="svg1468"
-   inkscape:version="0.92.4 (unknown)"
+   inkscape:version="1.0.2 (1.0.2+r75+1)"
    sodipodi:docname="checkedBg.svg">
   <defs
      id="defs1462">
@@ -24,7 +22,7 @@
        xlink:href="#linearGradient4390"
        id="linearGradient5110"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.26458333,0,0,0.26458333,-56.516323,305.92589)"
+       gradientTransform="matrix(0.27380639,0,0,0.27380639,-58.597093,306.34773)"
        x1="218.29865"
        y1="-52.990284"
        x2="233.89726"
@@ -50,21 +48,25 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.2"
-     inkscape:cx="-2.8670047"
-     inkscape:cy="8.8091385"
+     inkscape:cx="-1.2529795"
+     inkscape:cy="16.392379"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      units="px"
-     inkscape:window-width="1918"
-     inkscape:window-height="1055"
+     inkscape:window-width="1366"
+     inkscape:window-height="737"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0" />
+     fit-margin-bottom="0"
+     inkscape:document-rotation="0"
+     inkscape:snap-object-midpoints="true"
+     inkscape:snap-bbox="true"
+     inkscape:snap-bbox-midpoints="true" />
   <metadata
      id="metadata1465">
     <rdf:RDF>
@@ -83,12 +85,12 @@
      id="layer1"
      transform="translate(0.13229161,-290.5177)">
     <rect
-       ry="0.82682294"
-       y="290.64999"
-       x="4.7683717e-08"
-       height="6.3499999"
-       width="6.3499999"
+       ry="0.85564506"
+       y="290.53931"
+       x="-0.11067682"
+       height="6.5713539"
+       width="6.5713539"
        id="rect5072"
-       style="opacity:1;fill:url(#linearGradient5110);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.26458332;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+       style="opacity:1;fill:url(#linearGradient5110);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.273806;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
   </g>
 </svg>

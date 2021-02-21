@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -14,8 +12,8 @@
    viewBox="0 0 6.6145832 6.6145835"
    version="1.1"
    id="svg1468"
-   inkscape:version="0.92.4 (unknown)"
-   sodipodi:docname="notOnlySelectedVisible.svg">
+   inkscape:version="1.0.2 (1.0.2+r75+1)"
+   sodipodi:docname="colorizeUnchecked.svg">
   <defs
      id="defs1462" />
   <sodipodi:namedview
@@ -25,18 +23,19 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.2"
-     inkscape:cx="8.2487619"
-     inkscape:cy="-2.7975731"
+     inkscape:zoom="15.839192"
+     inkscape:cx="8.4528432"
+     inkscape:cy="15.748054"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g830"
      showgrid="false"
      units="px"
-     inkscape:window-width="1918"
-     inkscape:window-height="1055"
+     inkscape:window-width="1366"
+     inkscape:window-height="737"
      inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0" />
   <metadata
      id="metadata1465">
     <rdf:RDF>
@@ -54,11 +53,27 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-290.3854)">
-    <path
-       style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.26499999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:9.39999962;stroke-opacity:1"
-       d="m 1.7184816,292.10388 1.0523723,3.08697 0.5605356,-0.95956 0.7293901,1.05021 0.8353214,-0.83532 -1.0491206,-0.72902 0.9584638,-0.5609 z"
-       id="path1456"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccccccc" />
+    <g
+       id="g830"
+       transform="translate(-0.03838452,-0.02416624)">
+      <circle
+         style="fill:#ff9f9f;fill-rule:evenodd;stroke-width:0.222408;fill-opacity:1"
+         id="path833"
+         cx="3.3456762"
+         cy="292.69403"
+         r="1.4636458" />
+      <circle
+         style="mix-blend-mode:normal;fill:#bdffaa;fill-opacity:1;fill-rule:evenodd;stroke-width:0.222408"
+         id="circle835"
+         cx="4.4723654"
+         cy="294.73969"
+         r="1.4636458" />
+      <circle
+         style="mix-blend-mode:normal;fill:#bbb6ff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.222408"
+         id="circle837"
+         cx="2.218987"
+         cy="294.73969"
+         r="1.4636458" />
+    </g>
   </g>
 </svg>

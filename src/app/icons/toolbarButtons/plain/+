@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -14,7 +12,7 @@
    viewBox="0 0 6.6145832 6.6145835"
    version="1.1"
    id="svg1468"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:version="1.0.2 (1.0.2+r75+1)"
    sodipodi:docname="+.svg">
   <defs
      id="defs1462" />
@@ -25,18 +23,19 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.2"
-     inkscape:cx="-3.8401471"
-     inkscape:cy="1.5876762"
+     inkscape:zoom="31.678384"
+     inkscape:cx="13.567271"
+     inkscape:cy="11.151596"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      units="px"
-     inkscape:window-width="1920"
-     inkscape:window-height="1031"
+     inkscape:window-width="1366"
+     inkscape:window-height="737"
      inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="1" />
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0" />
   <metadata
      id="metadata1465">
     <rdf:RDF>
@@ -55,8 +54,8 @@
      id="layer1"
      transform="translate(0,-290.3854)">
     <path
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:1.25;font-family:Chilanka;-inkscape-font-specification:Chilanka;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.99999994;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 12.5 5.2851562 C 12.045184 5.2851563 11.658032 5.4454738 11.337891 5.765625 C 11.01775 6.0857258 10.857422 6.4728808 10.857422 6.9277344 L 10.857422 10.857422 L 6.9277344 10.857422 C 6.4728645 10.857422 6.0857172 11.017739 5.765625 11.337891 C 5.4455325 11.657966 5.2851562 12.045121 5.2851562 12.5 C 5.2851562 12.954828 5.4455325 13.341983 5.765625 13.662109 C 6.085718 13.982261 6.4728652 14.142578 6.9277344 14.142578 L 10.857422 14.142578 L 10.857422 18.072266 C 10.857422 18.527094 11.01775 18.914224 11.337891 19.234375 C 11.657967 19.554501 12.045119 19.714844 12.5 19.714844 C 12.954816 19.714844 13.341968 19.554501 13.662109 19.234375 C 13.982251 18.914249 14.142578 18.527119 14.142578 18.072266 L 14.142578 14.142578 L 18.072266 14.142578 C 18.527135 14.142578 18.914283 13.982261 19.234375 13.662109 C 19.554467 13.342034 19.714844 12.954879 19.714844 12.5 C 19.714844 12.045197 19.554467 11.658042 19.234375 11.337891 C 18.914282 11.017739 18.527135 10.857422 18.072266 10.857422 L 14.142578 10.857422 L 14.142578 6.9277344 C 14.142578 6.472906 13.982251 6.085751 13.662109 5.765625 C 13.342033 5.4454738 12.954881 5.2851562 12.5 5.2851562 z "
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:1.25;font-family:Chilanka;-inkscape-font-specification:Chilanka;letter-spacing:0px;word-spacing:0px;fill:#f9f9f9;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 12.5,5.2851562 c -0.454816,10e-8 -0.841968,0.1603176 -1.162109,0.4804688 -0.320141,0.3201008 -0.480469,0.7072558 -0.480469,1.1621094 V 10.857422 H 6.9277344 c -0.4548699,0 -0.8420172,0.160317 -1.1621094,0.480469 -0.3200925,0.320075 -0.4804688,0.70723 -0.4804688,1.162109 0,0.454828 0.1603763,0.841983 0.4804688,1.162109 0.320093,0.320152 0.7072402,0.480469 1.1621094,0.480469 h 3.9296876 v 3.929688 c 0,0.454828 0.160328,0.841958 0.480469,1.162109 0.320076,0.320126 0.707228,0.480469 1.162109,0.480469 0.454816,0 0.841968,-0.160343 1.162109,-0.480469 0.320142,-0.320126 0.480469,-0.707256 0.480469,-1.162109 v -3.929688 h 3.929688 c 0.454869,0 0.842017,-0.160317 1.162109,-0.480469 0.320092,-0.320075 0.480469,-0.70723 0.480469,-1.162109 0,-0.454803 -0.160377,-0.841958 -0.480469,-1.162109 -0.320093,-0.320152 -0.70724,-0.480469 -1.162109,-0.480469 H 14.142578 V 6.9277344 C 14.142578,6.472906 13.982251,6.085751 13.662109,5.765625 13.342033,5.4454738 12.954881,5.2851562 12.5,5.2851562 Z"
        id="path836"
        transform="matrix(0.26458333,0,0,0.26458333,0,290.3854)" />
   </g>

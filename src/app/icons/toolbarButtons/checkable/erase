@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -14,10 +12,28 @@
    viewBox="0 0 6.6145832 6.6145835"
    version="1.1"
    id="svg1468"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="erase.svg">
+   inkscape:version="1.0.2 (1.0.2+r75+1)"
+   sodipodi:docname="eraseUnchecked.svg">
   <defs
-     id="defs1462" />
+     id="defs1462">
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect839"
+       is_visible="true"
+       lpeversion="1"
+       satellites_param="F,0,0,1,0,0.3895933,0,1 @ F,0,1,1,0,0.3895933,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
+       unit="px"
+       method="auto"
+       mode="F"
+       radius="0"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -25,18 +41,19 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="-137.66376"
-     inkscape:cy="-17.284785"
+     inkscape:zoom="11.2"
+     inkscape:cx="8.652592"
+     inkscape:cy="16.075902"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      units="px"
-     inkscape:window-width="1920"
-     inkscape:window-height="1031"
+     inkscape:window-width="1366"
+     inkscape:window-height="737"
      inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="1" />
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0" />
   <metadata
      id="metadata1465">
     <rdf:RDF>
@@ -55,10 +72,8 @@
      id="layer1"
      transform="translate(0,-290.3854)">
     <path
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.33072916;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 1.0309707,292.97872 2.6930805,3.012 1.8544454,-1.58276 -2.7875742,-3.01202 z"
-       id="path815"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccc" />
+       id="rect835"
+       style="fill:#f9f9f9;fill-rule:evenodd;stroke-width:0.168373"
+       d="m 4.5788789,296.22489 1.0248154,-0.86512 a 0.36141651,0.36141651 0 0 0 0.042989,-0.50931 l -0.8085104,-0.95774 -1.577153,1.33139 0.8085202,0.95775 a 0.36141651,0.36141651 0 0 0 0.5092894,0.043 z m -3.69624684,-3.81821 1.57715304,-1.3314 2.2135674,2.62215 -1.5771432,1.3314 z" />
   </g>
 </svg>

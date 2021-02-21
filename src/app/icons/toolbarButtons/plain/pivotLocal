@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -14,7 +12,7 @@
    viewBox="0 0 6.6145832 6.6145835"
    version="1.1"
    id="svg1468"
-   inkscape:version="0.92.4 (unknown)"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
    sodipodi:docname="pivotLocal.svg">
   <defs
      id="defs1462" />
@@ -25,18 +23,20 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.2"
-     inkscape:cx="2.306946"
-     inkscape:cy="6.7441323"
+     inkscape:zoom="44.8"
+     inkscape:cx="2.1810989"
+     inkscape:cy="12.692632"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      units="px"
-     inkscape:window-width="1918"
-     inkscape:window-height="1055"
+     inkscape:window-width="1920"
+     inkscape:window-height="1054"
      inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0"
+     inkscape:snap-object-midpoints="true" />
   <metadata
      id="metadata1465">
     <rdf:RDF>
@@ -54,35 +54,28 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-290.3854)">
-    <g
-       id="g4537"
-       transform="matrix(0.18708867,0.18708867,-0.18708867,0.18708867,-47.393983,260.06735)">
-      <circle
-         r="5.3538647"
-         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000107;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-         id="circle4539"
-         cx="219.26482"
-         cy="-45.561199"
-         transform="matrix(0.99999946,-0.00104161,-0.00104161,0.99999946,0,0)" />
-      <circle
-         cy="-45.527149"
-         cx="231.42561"
-         id="circle4541"
-         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-         r="5.3537483"
-         transform="matrix(0.99999999,1.5102312e-4,1.5102312e-4,0.99999999,0,0)" />
-      <circle
-         r="2.2097087"
-         cy="-45.492195"
-         cx="231.41873"
-         id="circle4569"
-         style="opacity:1;fill:#7dff7d;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
-      <circle
-         style="opacity:1;fill:#7dff7d;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-         id="circle4543"
-         cx="219.31215"
-         cy="-45.789562"
-         r="2.2097087" />
-    </g>
+    <path
+       id="path842"
+       style="fill:#f9f9f9;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 4.3813183,293.43728 a 1.418018,1.4150671 0 0 0 -0.9710001,0.41444 1.418018,1.4150671 0 0 0 0,2.00091 1.418018,1.4150671 0 0 0 2.0050456,0 1.418018,1.4150671 0 0 0 0,-2.00091 1.418018,1.4150671 0 0 0 -1.0340455,-0.41444 z m 0.037207,0.33589 a 1.081131,1.0788812 0 0 1 0.75861,0.31626 1.081131,1.0788812 0 0 1 0,1.52549 1.081131,1.0788812 0 0 1 -1.5285889,0 1.081131,1.0788812 0 0 1 0,-1.52549 1.081131,1.0788812 0 0 1 0.7699789,-0.31626 z" />
+    <circle
+       style="fill:#f9f9f9;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="circle844"
+       cx="211.61232"
+       cy="205.37152"
+       r="0.58465207"
+       transform="rotate(45)" />
+    <path
+       id="circle4539"
+       style="fill:#f9f9f9;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.999998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 8.2089844,2.7636719 a 5.3594383,5.3482852 0 0 0 -3.6699219,1.5664062 5.3594383,5.3482852 0 0 0 0,7.5624999 5.3594383,5.3482852 0 0 0 7.5781255,0 5.3594383,5.3482852 0 0 0 0,-7.5624999 5.3594383,5.3482852 0 0 0 -3.9082036,-1.5664062 z m 0.140625,1.2695312 a 4.0861646,4.0776612 0 0 1 2.8671876,1.1953125 4.0861646,4.0776612 0 0 1 0,5.7656254 4.0861646,4.0776612 0 0 1 -5.7773439,0 4.0861646,4.0776612 0 0 1 0,-5.7656254 4.0861646,4.0776612 0 0 1 2.9101563,-1.1953125 z"
+       transform="matrix(0.26458333,0,0,0.26458333,0,290.3854)" />
+    <circle
+       style="fill:#f9f9f9;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="circle4543"
+       cx="208.40912"
+       cy="205.29283"
+       r="0.58465207"
+       transform="rotate(45)" />
   </g>
 </svg>
