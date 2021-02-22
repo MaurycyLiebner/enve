@@ -605,6 +605,7 @@ protected:
     qsptr<ColorAnimator> mBackgroundColor = enve::make_shared<ColorAnimator>();
 
     SmartVectorPath *getPathResultingFromOperation(const SkPathOp &pathOp);
+    SmartVectorPath *getPathResultingFromCombine();
 
 //    void sortSelectedBoxesAsc();
     void sortSelectedBoxesDesc();
