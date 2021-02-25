@@ -31,7 +31,7 @@ TipsWidget::TipsWidget(QWidget* const parent) : QWidget(parent) {
 
     const QString iconsDir = eSettings::sIconsDir();
 
-    const QIcon leftIcon(iconsDir + "/left-arrow-black.png");
+    const QIcon leftIcon(iconsDir + "/left-arrow.png");
     const auto leftButton = new QPushButton(leftIcon, "");
     leftButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     connect(leftButton, &QPushButton::released,
@@ -42,7 +42,7 @@ TipsWidget::TipsWidget(QWidget* const parent) : QWidget(parent) {
     mNumber->setAlignment(Qt::AlignCenter);
     titleLayout->addWidget(mNumber);
 
-    const QIcon rightIcon(iconsDir + "/right-arrow-black.png");
+    const QIcon rightIcon(iconsDir + "/right-arrow.png");
     const auto rightButton = new QPushButton(rightIcon, "");
     rightButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     connect(rightButton, &QPushButton::released,

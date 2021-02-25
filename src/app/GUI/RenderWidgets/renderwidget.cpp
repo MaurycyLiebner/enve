@@ -69,7 +69,6 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
     mContLayout->setSpacing(0);
     mContWidget->setLayout(mContLayout);
     mScrollArea = new ScrollArea(this);
-    mScrollArea->setStyleSheet("QScrollArea { border-top: 1px solid black; }");
     mScrollArea->setWidget(mContWidget);
     mScrollArea->setWidgetResizable(true);
     mScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

@@ -8,8 +8,6 @@ BookmarkedWidget::BookmarkedWidget(const bool vertical,
     QWidget(parent), mVertical(vertical), mDimension(dimension) {
     mUpArrow = new QPushButton(this);
     mDownArrow = new QPushButton(this);
-    mUpArrow->setObjectName("darkButton");
-    mDownArrow->setObjectName("darkButton");
     if(mVertical) {
         setFixedWidth(dimension);
         mUpArrow->setFixedWidth(dimension);

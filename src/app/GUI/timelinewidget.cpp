@@ -170,23 +170,15 @@ TimelineWidget::TimelineWidget(Document &document,
     connect(mGraphAct, &QAction::toggled,
             this, &TimelineWidget::setGraphEnabled);
 
-    mCornerMenuBar->setStyleSheet("QWidget#menuBarWidget {"
-                                      "border-right: 1px solid black;"
-                                  "}");
     mCornerMenuBar->setContentsMargins(0, 0, 1, 0);
 
     mSearchLine = new QLineEdit("", mBoxesListMenuBar);
     mSearchLine->setMinimumHeight(0);
     mSearchLine->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     MainWindow::sGetInstance()->installLineFilter(mSearchLine);
-    mSearchLine->setStyleSheet("background-color: white;"
-                               "color: black;"
-                               "border-radius: 0;"
-                               "border: 0;"
-                               "border-right: 1px solid black;"
-                               "border-left: 1px solid black;"
-                               "border-bottom: 1px solid black;"
-                               "margin: 0;");
+    mSearchLine->setStyleSheet("border-radius: 0;"
+                               "border: 0;");
+    mSearchLine->setPlaceholderText("search");
     connect(mSearchLine, &QLineEdit::textChanged,
             this, &TimelineWidget::setSearchText);
     mSearchLine->setFocusPolicy(Qt::ClickFocus);

@@ -251,6 +251,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
 
     mBlendModeCombo = createCombo(this);
     mMainLayout->addWidget(mBlendModeCombo);
+    mBlendModeCombo->setObjectName("blendModeCombo");
 
     for(int modeId = int(SkBlendMode::kSrcOver);
         modeId <= int(SkBlendMode::kLastMode); modeId++) {

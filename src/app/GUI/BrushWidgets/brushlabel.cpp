@@ -38,7 +38,6 @@ BrushLabel::BrushLabel(BrushesContext* const ctxt) : TriggerLabel(nullptr) {
     });
     setStyleSheet("QWidget {"
                       "background: white;"
-                      "border: 1px solid black;"
                   "}");
     setFixedSize(48, 48);
 }

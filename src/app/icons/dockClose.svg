@@ -9,13 +9,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="17"
-   height="17"
-   viewBox="0 0 4.4979169 4.4979168"
+   width="15"
+   height="16"
+   viewBox="0 0 3.9687502 4.2333334"
    version="1.1"
    id="svg1500"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="capSquare.svg">
+   sodipodi:docname="dockClose.svg">
   <defs
      id="defs1494" />
   <sodipodi:namedview
@@ -25,9 +25,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.2"
-     inkscape:cx="-16.354152"
-     inkscape:cy="2.4649131"
+     inkscape:zoom="22.4"
+     inkscape:cx="-1.4360847"
+     inkscape:cy="7.2509132"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -57,28 +57,24 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-48.702232,-30.75357)">
+     transform="translate(-48.702232,-31.018153)">
     <g
-       inkscape:export-ydpi="96"
+       id="g1466"
+       transform="matrix(0.41359325,0,0,0.41359325,-49.694896,225.99397)"
+       style="fill:none;stroke:#ffffff;stroke-width:0.93706161;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       inkscape:export-filename="/home/ailuropoda/Dev/enve/src/app/pixmaps/icons/close.png"
        inkscape:export-xdpi="96"
-       inkscape:export-filename="/home/ailuropoda/Dev/AniVect/pixmaps/icons/cap_square.png"
-       id="g5838"
-       transform="matrix(0,-0.18450399,0.18450399,0,19.539386,201.17792)"
-       style="display:inline;stroke:#000000;stroke-width:0.99951541;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">
-      <rect
-         y="158.25"
-         x="899.5"
-         height="24.000002"
-         width="24"
-         id="rect5832"
-         style="display:inline;opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.99951541;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none" />
-      <rect
-         y="163.95876"
-         x="901.0094"
-         height="12.830889"
-         width="18.121752"
-         id="rect5834"
-         style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.25763988;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       inkscape:export-ydpi="96">
+      <path
+         style="fill:none;stroke:#ffffff;stroke-width:0.93706161;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 240.12067,-468.9038 5.1875,5.1875"
+         id="path1461"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1459"
+         d="m 245.30817,-468.90379 -5.1875,5.1875"
+         style="fill:none;stroke:#ffffff;stroke-width:0.93706161;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
   </g>
 </svg>

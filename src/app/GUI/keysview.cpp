@@ -458,7 +458,7 @@ void KeysView::paintEvent(QPaintEvent *) {
     else p.fillRect(rect(), QColor(60, 60, 60));
 
     if(mPixelsPerFrame < 0.001) return;
-    if(!mGraphViewed) {    
+    if(!mGraphViewed) {
         int currY = eSizesUI::widget;
         p.setPen(QPen(QColor(40, 40, 40), 1));
         while(currY < height()) {
@@ -515,7 +515,7 @@ void KeysView::paintEvent(QPaintEvent *) {
         drawKeys(&p, mPixelsPerFrame, viewedFrameRange);
         p.restore();
         if(mSelecting) {
-            p.setPen(QPen(Qt::blue, 2, Qt::DotLine));
+            p.setPen(QPen(Qt::white, 1.5, Qt::DotLine));
             p.setBrush(Qt::NoBrush);
             p.drawRect(QRectF((mSelectionRect.x() - mMinViewedFrame)*mPixelsPerFrame,
                               mSelectionRect.y() - mViewedTop,

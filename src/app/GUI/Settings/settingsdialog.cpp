@@ -84,7 +84,7 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
         } catch(const std::exception& e) {
             gPrintExceptionCritical(e);
         }
-        statusBar->showMessage("Settings Applied", 1500);
+        statusBar->showMessage("Settings Applied, you might have to restart", 1500);
     });
 
     updateSettings();

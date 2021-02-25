@@ -14,7 +14,7 @@
    viewBox="0 0 2.3812501 2.6458334"
    version="1.1"
    id="svg1500"
-   inkscape:version="0.92.4 (unknown)"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
    sodipodi:docname="close.svg">
   <defs
      id="defs1494" />
@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="22.4"
-     inkscape:cx="-1.4660076"
-     inkscape:cy="7.7227616"
+     inkscape:cx="0.30498671"
+     inkscape:cy="10.108056"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -36,8 +36,8 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      units="px"
-     inkscape:window-width="1918"
-     inkscape:window-height="1055"
+     inkscape:window-width="1920"
+     inkscape:window-height="1054"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1" />
@@ -49,7 +49,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -61,12 +61,12 @@
     <g
        id="g1466"
        transform="matrix(0.28235426,0,0,0.28235426,-18.638593,165.5932)"
-       style="stroke-width:0.93706161;stroke-miterlimit:4;stroke-dasharray:none"
+       style="stroke-width:0.93706161;stroke-miterlimit:4;stroke-dasharray:none;fill:none;stroke:#ffffff;stroke-opacity:1"
        inkscape:export-filename="/home/ailuropoda/Dev/enve/src/app/pixmaps/icons/close.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96">
       <path
-         style="fill:none;stroke:#000000;stroke-width:0.93706161;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:none;stroke:#ffffff;stroke-width:0.93706161;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          d="m 240.12067,-468.9038 5.1875,5.1875"
          id="path1461"
          inkscape:connector-curvature="0" />
@@ -74,7 +74,7 @@
          inkscape:connector-curvature="0"
          id="path1459"
          d="m 245.30817,-468.90379 -5.1875,5.1875"
-         style="fill:none;stroke:#000000;stroke-width:0.93706161;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:none;stroke:#ffffff;stroke-width:0.93706161;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
   </g>
 </svg>

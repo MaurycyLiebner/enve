@@ -47,7 +47,7 @@ void FrameScrollBar::setCurrentCanvas(Canvas * const canvas) {
 
 void FrameScrollBar::paintEvent(QPaintEvent *) {
     QPainter p(this);
-    p.fillRect(rect(), QColor(60, 60, 60));
+    p.fillRect(rect(), QColor(25, 25, 25));
 
     const int dFrame = mFrameRange.fMax - mFrameRange.fMin + (mRange ? 0 : 1);
     if(dFrame <= 0) return;
@@ -61,23 +61,6 @@ void FrameScrollBar::paintEvent(QPaintEvent *) {
     const int f1 = qCeil(1.5*eSizesUI::widget/pixPerFrame);
     const int maxFrame = mFrameRange.fMax + f1;
     const qreal w1 = width() - 1.5*eSizesUI::widget + f1*pixPerFrame - x0;
-
-    QRect canvasMinRect;
-    canvasMinRect.setLeft(qRound(x0));
-    canvasMinRect.setTop(0);
-    const int cRightFrames = mCanvasRange.fMin - minFrame;
-    canvasMinRect.setRight(qRound(x0 + cRightFrames*pixPerFrame));
-    canvasMinRect.setBottom(height());
-    p.fillRect(canvasMinRect, QColor(30, 30, 30));
-
-    QRect canvasMaxRect;
-    const int cLeftFrames = mCanvasRange.fMax - minFrame + (mRange ? 0 : 1);
-    const qreal left = cLeftFrames*pixPerFrame + x0;
-    canvasMaxRect.setLeft(qMax(0, qRound(left)));
-    canvasMaxRect.setTop(0);
-    canvasMaxRect.setWidth(width());
-    canvasMaxRect.setBottom(height());
-    p.fillRect(canvasMaxRect, QColor(30, 30, 30));
 
     QColor col = mHandleColor;
     if(mPressed) {
@@ -138,10 +121,6 @@ void FrameScrollBar::paintEvent(QPaintEvent *) {
         p.drawText(textRect, Qt::AlignVCenter | Qt::AlignLeft,
                    QString::number(mFirstViewedFrame));
     }
-
-    p.setPen(QPen(Qt::black, 1));
-    if(mRange) p.drawLine(0, 0, width(), 0);
-    else p.drawLine(0, height() - 1, width(), height() - 1);
 
     p.end();
 }

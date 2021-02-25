@@ -14,7 +14,7 @@
    viewBox="0 0 4.4979169 4.4979168"
    version="1.1"
    id="svg1500"
-   inkscape:version="0.92.4 (unknown)"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
    sodipodi:docname="capRound.svg">
   <defs
      id="defs1494" />
@@ -26,7 +26,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.2"
-     inkscape:cx="-0.28272344"
+     inkscape:cx="-16.354152"
      inkscape:cy="2.4649131"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -36,8 +36,8 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      units="px"
-     inkscape:window-width="1918"
-     inkscape:window-height="1055"
+     inkscape:window-width="1920"
+     inkscape:window-height="1054"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1" />
@@ -49,7 +49,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -73,7 +73,7 @@
          x="899.5"
          y="158.25" />
       <path
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25763988;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.25763988;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          d="m 901.0094,163.95876 h 12.47178 c 0,0 5.64998,0.59535 5.64998,6.41545 0,5.8201 -5.64998,6.41544 -5.64998,6.41544 H 901.0094 Z"
          id="rect5844"
          inkscape:connector-curvature="0"

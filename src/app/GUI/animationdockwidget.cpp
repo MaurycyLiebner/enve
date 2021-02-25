@@ -93,9 +93,9 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     addWidget(selectedVisible);
 
     setStyleSheet("QToolBar {"
-                      "border: 1px solid black;"
                       "padding: 10px;"
-                      "margin-bottom: -1px"
+                      "margin-bottom: -1px;"
+                      "border: 3px solid rgb(25, 25, 25);"
                   "}");
 }
 
