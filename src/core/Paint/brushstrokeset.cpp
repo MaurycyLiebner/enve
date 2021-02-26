@@ -52,8 +52,10 @@ QList<BrushStrokeSet> BrushStrokeSet::sFromSkPath(
     if(segLists.isEmpty()) return result;
     for(auto& segs : segLists) {
         if(segs.isEmpty()) continue;
+        const double totLen = segs.getTotalLength();
+        if(isZero4Dec(totLen)) continue;
         const double minL = 0;
-        const double maxL = segs.isClosed() ? 1 + 10/segs.getTotalLength() : 1;
+        const double maxL = segs.isClosed() ? 1 + 10/totLen : 1;
         auto segsT = segs.getFragmentUnbound(minL, maxL);
         result << sFromCubicList(segsT, timeCurve,
                                  pressureCurve, widthCurve, spacingCurve);

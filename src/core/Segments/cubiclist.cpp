@@ -34,10 +34,12 @@ CubicList::CubicList(const CubicList &src) {
 CubicList CubicList::getFragment(const qreal minLenFrac,
                                  const qreal maxLenFrac) const {
     if(minLenFrac > maxLenFrac) return CubicList();
+    const qreal totLen = getTotalLength();
+    if(isZero4Dec(totLen)) return *this;
     //Q_ASSERT(minLenFrac > 0);
     //Q_ASSERT(maxLenFrac < 1);
-    const qreal minLen = getTotalLength()*CLAMP01(minLenFrac);
-    const qreal maxLen = getTotalLength()*CLAMP01(maxLenFrac);
+    const qreal minLen = totLen*CLAMP01(minLenFrac);
+    const qreal maxLen = totLen*CLAMP01(maxLenFrac);
     qreal minT = 0, maxT = 1;
     int minI = -1, maxI = mSegments.count() - 1;
     qreal currLen = 0;
@@ -58,6 +60,7 @@ CubicList CubicList::getFragment(const qreal minLenFrac,
             break;
         }
     }
+    if(minI == -1) return CubicList();
 
     QList<qCubicSegment2D> fragSegs;
     if(minI == maxI) {
