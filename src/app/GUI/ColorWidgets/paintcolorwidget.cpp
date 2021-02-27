@@ -18,6 +18,10 @@
 
 #include "colorvaluerect.h"
 #include "colorlabel.h"
+#include "colorpickingwidget.h"
+#include "GUI/mainwindow.h"
+#include "GUI/actionbutton.h"
+#include <QWindow>
 
 #include <QVBoxLayout>
 
@@ -75,7 +79,15 @@ PaintColorWidget::PaintColorWidget(QWidget* const parent) :
 
     layout->addWidget(aRect);
 
-    layout->addWidget(mColorLabel);
+    const QString pickIcon = "toolbarButtons/pickUnchecked.png";
+    const auto pickingButton = new ActionButton(pickIcon, "", this);
+    connect(pickingButton, &ActionButton::released,
+            this, &PaintColorWidget::startColorPicking);
+
+    const auto colorPickLay = new QHBoxLayout();
+    colorPickLay->addWidget(mColorLabel);
+    colorPickLay->addWidget(pickingButton);
+    layout->addLayout(colorPickLay);
 
     setLayout(layout);
 }
@@ -109,6 +121,16 @@ void PaintColorWidget::setDisplayedColor(const QColor& color) {
 
     mColorLabel->setColor(color);
     mColorLabel->setAlpha(color.alphaF());
+}
+
+void PaintColorWidget::startColorPicking() {
+    const auto parent = MainWindow::sGetInstance();
+    const auto screen = parent->windowHandle()->screen();
+    const auto wid = new ColorPickingWidget(screen, parent);
+    connect(wid, &ColorPickingWidget::colorSelected,
+            [this](const QColor & color) {
+        setColor(color);
+    });
 }
 
 void PaintColorWidget::setColor(const QColor& color) {

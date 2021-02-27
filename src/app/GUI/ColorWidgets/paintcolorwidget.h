@@ -32,6 +32,7 @@ public:
 signals:
     void colorChanged(const QColor& color);
 private:
+    void startColorPicking();
     void setColor(const QColor& color);
 
     void updateFromRGB();
