@@ -29,6 +29,8 @@ BoundingBox* BoxTargetProperty::getTarget() const {
 
 void BoxTargetProperty::setTargetAction(BoundingBox* const box) {
     if(box == mTarget_d) return;
+    const auto oldValue = mTarget_d.get();
+    emit setActionStarted(oldValue, box);
     {
         prp_pushUndoRedoName("Set Box Target");
         UndoRedo ur;
@@ -44,6 +46,7 @@ void BoxTargetProperty::setTargetAction(BoundingBox* const box) {
     }
 
     setTarget(box);
+    emit setActionFinished(oldValue, box);
 }
 
 void BoxTargetProperty::setTarget(BoundingBox* const box) {

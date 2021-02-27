@@ -27,6 +27,43 @@ TrackTransformEffect::TrackTransformEffect() :
     ca_prependChild(targetProperty(), mInfluence);
 }
 
+qreal calculateTrackAngle(const QPointF& parentPos,
+                          const QPointF& targetPos) {
+    const QLineF baseLine(parentPos, parentPos + QPointF(100., 0.));
+    const QLineF trackLine(parentPos, targetPos);
+    qreal trackAngle = trackLine.angleTo(baseLine);
+    if(trackAngle > 180) trackAngle -= 360;
+    return trackAngle;
+}
+
+void TrackTransformEffect::setRotScaleAfterTargetChange(
+        BoundingBox* const oldTarget, BoundingBox* const newTarget) {
+    const auto parent = getFirstAncestor<BoundingBox>();
+    if(!parent) return;
+
+    const qreal infl = mInfluence->getEffectiveValue();
+
+    qreal rot = 0.;
+    if(oldTarget) {
+        const auto targetPos = oldTarget->getPivotAbsPos();
+        const auto parentPos = parent->getPivotAbsPos();
+
+        const qreal trackAngle = calculateTrackAngle(parentPos, targetPos);
+        rot += trackAngle*infl;
+    }
+
+    if(newTarget) {
+        const auto targetPos = newTarget->getPivotAbsPos();
+        const auto parentPos = parent->getPivotAbsPos();
+
+        const qreal trackAngle = calculateTrackAngle(parentPos, targetPos);
+        rot -= trackAngle*infl;
+    }
+
+    parent->startRotTransform();
+    parent->rotateBy(rot);
+}
+
 void TrackTransformEffect::applyEffect(
         const qreal relFrame,
         qreal& pivotX, qreal& pivotY,
@@ -54,12 +91,7 @@ void TrackTransformEffect::applyEffect(
     const auto targetPos = target->getPivotAbsPos(targetRelFrame);
     const auto parentPos = parent->getPivotAbsPos(relFrame);
 
-    const QLineF baseLine(parentPos, parentPos + QPointF(100., 0.));
-    const QLineF trackLine(parentPos, targetPos);
-    qreal trackAngle = trackLine.angleTo(baseLine);
-    if(trackAngle > 180) trackAngle -= 360;
-
     const qreal infl = mInfluence->getEffectiveValue(relFrame);
-
+    const qreal trackAngle = calculateTrackAngle(parentPos, targetPos);
     rot += trackAngle*infl;
 }

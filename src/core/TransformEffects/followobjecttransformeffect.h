@@ -33,6 +33,11 @@ public:
                      qreal &shearX, qreal &shearY,
                      BoundingBox* const parent) override;
 private:
+    void setRotScaleAfterTargetChange(
+                BoundingBox* const oldTarget,
+                BoundingBox* const newTarget) override;
+
+
     qsptr<QPointFAnimator> mPosInfluence;
     qsptr<QPointFAnimator> mScaleInfluence;
     qsptr<QrealAnimator> mRotInfluence;

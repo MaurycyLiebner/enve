@@ -53,6 +53,8 @@ public:
     void setValidator(const Validator& validator)
     { mValidator = validator; }
 signals:
+    void setActionStarted(BoundingBox*, BoundingBox*);
+    void setActionFinished(BoundingBox*, BoundingBox*);
     void targetSet(BoundingBox*);
 private:
     std::function<bool(BoundingBox*)> mValidator = nullptr;

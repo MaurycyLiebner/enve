@@ -186,16 +186,8 @@ void BasicTransformAnimator::moveByAbs(const QPointF &absTrans) {
     if(!mParentTransform) return;
     const auto savedRelPos = mPosAnimator->getSavedValue();
     const auto savedAbsPos = mParentTransform->mapRelPosToAbs(savedRelPos);
-    moveToAbs(savedAbsPos + absTrans);
-}
-
-void BasicTransformAnimator::moveToAbs(const QPointF &absPos) {
-    setAbsolutePos(absPos);
-}
-
-void BasicTransformAnimator::setAbsolutePos(const QPointF &pos) {
-    if(!mParentTransform) return;
-    setRelativePos(mParentTransform->mapAbsPosToRel(pos));
+    const auto relPos = mParentTransform->mapAbsPosToRel(savedAbsPos + absTrans);
+    setRelativePos(relPos);
 }
 
 void BasicTransformAnimator::setRelativePos(const QPointF &relPos) {

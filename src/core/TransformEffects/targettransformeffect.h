@@ -28,8 +28,13 @@ public:
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 protected:
+    virtual void setRotScaleAfterTargetChange(
+            BoundingBox* const oldTarget,
+            BoundingBox* const newTarget);
+
     BoxTargetProperty* targetProperty() const;
 private:
+    QPointF mPosBeforeTargetChange;
     ConnContextQPtr<BoundingBox> mTargetConn;
     qsptr<BoxTargetProperty> mTarget;
 };

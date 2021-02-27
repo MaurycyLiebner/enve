@@ -54,8 +54,6 @@ public:
     void startScaleTransform();
 
     void setRelativePos(const QPointF &relPos);
-    void setAbsolutePos(const QPointF &pos);
-    void moveToAbs(const QPointF &absPos);
     void moveByAbs(const QPointF &absTrans);
 
     void rotateRelativeToSavedValue(const qreal rotRel);

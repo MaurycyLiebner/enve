@@ -18,6 +18,8 @@
 
 #include "Boxes/boundingbox.h"
 #include "Animators/transformanimator.h"
+#include "Animators/qrealanimator.h"
+#include "Animators/qpointfanimator.h"
 
 TargetTransformEffect::TargetTransformEffect(
         const QString& name,
@@ -50,6 +52,28 @@ TargetTransformEffect::TargetTransformEffect(
         }
     });
 
+    connect(mTarget.get(), &BoxTargetProperty::setActionStarted,
+            this, [this]() {
+        const auto parent = getFirstAncestor<BoundingBox>();
+        if(!parent) return;
+        mPosBeforeTargetChange = parent->getPivotAbsPos();
+    });
+
+    connect(mTarget.get(), &BoxTargetProperty::setActionFinished,
+            this, [this](BoundingBox* const oldTarget,
+                         BoundingBox* const newTarget) {
+        const auto parent = getFirstAncestor<BoundingBox>();
+        if(!parent) return;
+        const auto posAfter = parent->getPivotAbsPos();
+
+        parent->startPosTransform();
+        parent->moveByAbs(mPosBeforeTargetChange - posAfter);
+
+        setRotScaleAfterTargetChange(oldTarget, newTarget);
+
+        parent->finishTransform();
+    });
+
     ca_addChild(mTarget);
 }
 
@@ -64,6 +88,12 @@ FrameRange TargetTransformEffect::prp_getIdenticalRelRange(
     const auto parentIdent = targetTransform->prp_getIdenticalRelRange(tRelFrame);
     const auto absParentIdent = targetTransform->prp_relRangeToAbsRange(parentIdent);
     return thisIdent*prp_absRangeToRelRange(absParentIdent);
+}
+
+void TargetTransformEffect::setRotScaleAfterTargetChange(
+        BoundingBox* const oldTarget, BoundingBox* const newTarget) {
+    Q_UNUSED(oldTarget)
+    Q_UNUSED(newTarget)
 }
 
 BoxTargetProperty* TargetTransformEffect::targetProperty() const {

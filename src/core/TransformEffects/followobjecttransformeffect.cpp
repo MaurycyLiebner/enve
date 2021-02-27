@@ -38,6 +38,51 @@ FollowObjectTransformEffect::FollowObjectTransformEffect() :
     ca_addChild(mRotInfluence);
 }
 
+void FollowObjectTransformEffect::setRotScaleAfterTargetChange(
+        BoundingBox* const oldTarget, BoundingBox* const newTarget) {
+    const auto parent = getFirstAncestor<BoundingBox>();
+    if(!parent) return;
+
+    const qreal scaleXInfl = mScaleInfluence->getEffectiveXValue();
+    const qreal scaleYInfl = mScaleInfluence->getEffectiveYValue();
+    const qreal rotInfl = mRotInfluence->getEffectiveValue();
+
+    qreal rot = 0.;
+    qreal scaleX = 1.;
+    qreal scaleY = 1.;
+    if(oldTarget) {
+        const auto trans = oldTarget->getTransformAnimator();
+        const auto rotAnim = trans->getRotAnimator();
+        const auto scaleAnim = trans->getScaleAnimator();
+
+        rot += rotAnim->getEffectiveValue()*rotInfl;
+        scaleX *= 1 + (scaleAnim->getEffectiveXValue() - 1)*scaleXInfl;
+        scaleY *= 1 + (scaleAnim->getEffectiveYValue() - 1)*scaleYInfl;
+    }
+
+    if(newTarget) {
+        const auto trans = newTarget->getTransformAnimator();
+        const auto rotAnim = trans->getRotAnimator();
+        const auto scaleAnim = trans->getScaleAnimator();
+
+        rot -= rotAnim->getEffectiveValue()*rotInfl;
+        const qreal scaleXDiv = 1 + (scaleAnim->getEffectiveXValue() - 1)*scaleXInfl;
+        const qreal scaleYDiv = 1 + (scaleAnim->getEffectiveYValue() - 1)*scaleYInfl;
+        if(!isZero4Dec(scaleXDiv)) {
+            scaleX /= scaleXDiv;
+        }
+
+        if(!isZero4Dec(scaleYDiv)) {
+            scaleY /= scaleYDiv;
+        }
+    }
+
+    parent->startRotTransform();
+    parent->rotateBy(rot);
+
+    parent->startScaleTransform();
+    parent->scale(scaleX, scaleY);
+}
 
 void FollowObjectTransformEffect::applyEffect(
         const qreal relFrame,
