@@ -858,6 +858,7 @@ void AutoTilesData::crop(const QRect &cropRect) {
     const QRect iniRect = pixelBoundingRect();
     const QRect normalizedCrop = cropRect.normalized();
     const QRect clampedCrop = normalizedCrop.intersected(iniRect);
+    if(!clampedCrop.isValid()) return;
 
     {
         const int dl = clampedCrop.left() - iniRect.left();
