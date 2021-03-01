@@ -46,6 +46,7 @@ enum class CanvasMode : short {
     rectCreate,
     textCreate,
 
+    nullCreate,
     pickFillStroke
 };
 
@@ -268,7 +269,7 @@ signals:
     void prp_parentChanged(ComplexAnimator*, QPrivateSignal);
     void prp_ancestorChanged(QPrivateSignal);
     void prp_pathChanged();
-    void prp_sceneChanged();
+    void prp_sceneChanged(Canvas*, Canvas*);
 private:
     bool prp_mSelected = false;
     bool mDrawOnCanvas = false;

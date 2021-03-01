@@ -232,6 +232,7 @@ stdsptr<BoxRenderData> ILBB::createRenderData() {
     const auto linkTarget = getLinkTarget();
     if(!linkTarget) return nullptr;
     const auto renderData = linkTarget->createRenderData();
+    if(!renderData) return nullptr;
     renderData->fParentBox = this;
     if(!mInnerLink) renderData->fBlendEffectIdentifier = this;
     return renderData;

@@ -103,6 +103,7 @@ public:
     void setCircleMode();
     void setTextMode();
 
+    void setNullMode();
     void setPickPaintSettingsMode();
 //
     bool smoothChange() const { return mSmoothChange; }

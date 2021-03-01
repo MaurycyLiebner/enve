@@ -252,6 +252,7 @@ private:
     SwitchButton *mRectangleMode;
     SwitchButton *mTextMode;
 //
+    SwitchButton *mNullMode;
     SwitchButton *mPickPaintSettingsMode;
 
     ActionButton *mActionConnectPoints;

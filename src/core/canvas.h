@@ -56,6 +56,7 @@ struct ShaderEffectCreator;
 class VideoBox;
 class ImageBox;
 class Document;
+class NullObject;
 
 class eMouseEvent;
 class eKeyEvent;
@@ -568,6 +569,9 @@ public:
 
     SceneBoundGradient * getGradientWithRWId(const int rwId) const;
     SceneBoundGradient * getGradientWithDocumentId(const int id) const;
+
+    void addNullObject(NullObject* const obj);
+    void removeNullObject(NullObject* const obj);
 private:
     void addGradient(const qsptr<SceneBoundGradient>& grad);
 
@@ -589,6 +593,7 @@ private:
     TransformMode mTransMode = TransformMode::none;
 
     QList<qsptr<SceneBoundGradient>> mGradients;
+    QList<NullObject*> mNullObjects;
 protected:
     Document& mDocument;
     bool mDrawnSinceQue = true;

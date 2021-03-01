@@ -783,6 +783,10 @@ void Actions::setPaintMode() {
     mDocument.setCanvasMode(CanvasMode::paint);
 }
 
+void Actions::setNullMode() {
+    mDocument.setCanvasMode(CanvasMode::nullCreate);
+}
+
 void Actions::finishSmoothChange() {
     mSmoothChange = false;
     //    mDocument.actionFinished();

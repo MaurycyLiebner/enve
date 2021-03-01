@@ -45,6 +45,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 include(core.pri)
 
 SOURCES += \
+    Boxes/nullobject.cpp \
     Expressions/expression.cpp \
     Expressions/framebinding.cpp \
     Expressions/propertybinding.cpp \
@@ -362,6 +363,7 @@ SOURCES += \
     zipfilesaver.cpp
 
 HEADERS += \
+    Boxes/nullobject.h \
     Expressions/expression.h \
     Expressions/framebinding.h \
     Expressions/propertybinding.h \

@@ -76,6 +76,7 @@ enum class eBoxType {
     group,
     custom,
     deprecated0, // sculptPath,
+    nullObject,
 
     count
 };

@@ -556,6 +556,7 @@ stdsptr<BoxRenderData> BoundingBox::createRenderData(const qreal relFrame) {
 
 BoxRenderData *BoundingBox::updateCurrentRenderData(const qreal relFrame) {
     const auto renderData = createRenderData(relFrame);
+    if(!renderData) return nullptr;
     mRenderDataHandler.addItemAtRelFrame(renderData);
     return renderData.get();
 }

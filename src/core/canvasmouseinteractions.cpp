@@ -29,6 +29,7 @@
 #include "Boxes/containerbox.h"
 #include "Boxes/smartvectorpath.h"
 #include "Boxes/paintbox.h"
+#include "Boxes/nullobject.h"
 
 #include "pointtypemenu.h"
 #include "pointhelpers.h"
@@ -237,6 +238,13 @@ void Canvas::handleLeftButtonMousePress(const eMouseEvent& e) {
 
         mCurrentCircle = newPath.get();
 
+    } else if(mCurrentMode == CanvasMode::nullCreate) {
+        const auto newPath = enve::make_shared<NullObject>();
+        newPath->planCenterPivotPosition();
+        mCurrentContainer->addContained(newPath);
+        newPath->setAbsolutePos(e.fPos);
+        clearBoxesSelection();
+        addBoxToSelection(newPath.get());
     } else if(mCurrentMode == CanvasMode::rectCreate) {
         const auto newPath = enve::make_shared<RectangleBox>();
         newPath->planCenterPivotPosition();

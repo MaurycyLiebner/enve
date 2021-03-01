@@ -38,6 +38,7 @@
 #include "svgexporter.h"
 #include "ReadWrite/evformat.h"
 #include "eevent.h"
+#include "Boxes/nullobject.h"
 
 Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
@@ -274,6 +275,11 @@ void Canvas::renderSk(SkCanvas * const canvas,
             canvas->save();
             iBox->drawBoundingRect(canvas, invZoom);
             iBox->drawAllCanvasControls(canvas, mCurrentMode, invZoom, ctrlPressed);
+            canvas->restore();
+        }
+        for(const auto obj : mNullObjects) {
+            canvas->save();
+            obj->drawNullObject(canvas, mCurrentMode, invZoom, ctrlPressed);
             canvas->restore();
         }
     }
@@ -1105,6 +1111,14 @@ SceneBoundGradient *Canvas::getGradientWithDocumentId(const int id) const {
         if(grad->getDocumentId() == id) return grad.get();
     }
     return nullptr;
+}
+
+void Canvas::addNullObject(NullObject* const obj) {
+    mNullObjects.append(obj);
+}
+
+void Canvas::removeNullObject(NullObject* const obj) {
+    mNullObjects.removeOne(obj);
 }
 
 #include "simpletask.h"

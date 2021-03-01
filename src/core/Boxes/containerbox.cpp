@@ -1466,6 +1466,7 @@ void ContainerBox::writeBoxOrSoundXEV(const stdsptr<XevZipFileSaver>& xevFileSav
 #include "internallinkbox.h"
 #include "customboxcreator.h"
 #include "svglinkbox.h"
+#include "nullobject.h"
 
 qsptr<BoundingBox> createBoxOfNonCustomType(const eBoxType type) {
     switch(type) {
@@ -1497,6 +1498,8 @@ qsptr<BoundingBox> createBoxOfNonCustomType(const eBoxType type) {
             return enve::make_shared<SvgLinkBox>();
         case(eBoxType::internalLinkCanvas):
             return enve::make_shared<InternalLinkCanvas>(nullptr, false);
+        case(eBoxType::nullObject):
+            return enve::make_shared<NullObject>();
         case(eBoxType::deprecated0): break;
         case(eBoxType::canvas) : break;
         case(eBoxType::count) : break;

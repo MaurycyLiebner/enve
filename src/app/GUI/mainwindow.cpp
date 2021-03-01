@@ -909,10 +909,16 @@ void MainWindow::setupToolBar() {
 
     mToolBar->addSeparator();
 
+    mNullMode = SwitchButton::sCreate2Switch(
+                "toolbarButtons/nullCreateUnchecked.png",
+                "toolbarButtons/nullCreateChecked.png",
+                gSingleLineTooltip(tr("Add Null Object Mode", "ToolBar"), "F9"), this);
+    mToolBar->addWidget(mNullMode);
+
     mPickPaintSettingsMode = SwitchButton::sCreate2Switch(
                 "toolbarButtons/pickUnchecked.png",
                 "toolbarButtons/pickChecked.png",
-                gSingleLineTooltip(tr("Pick Mode", "ToolBar"), "F9"), this);
+                gSingleLineTooltip(tr("Pick Mode", "ToolBar"), "F10"), this);
     mToolBar->addWidget(mPickPaintSettingsMode);
 
     mToolBar->widgetForAction(mToolBar->addAction("     "))->
@@ -998,6 +1004,8 @@ void MainWindow::connectToolBarActions() {
     connect(mTextMode, &ActionButton::pressed,
             &mActions, &Actions::setTextMode);
 
+    connect(mNullMode, &ActionButton::pressed,
+            &mActions, &Actions::setNullMode);
     connect(mPickPaintSettingsMode, &ActionButton::pressed,
             &mActions, &Actions::setPickPaintSettingsMode);
 
@@ -1053,6 +1061,7 @@ void MainWindow::updateCanvasModeButtonsChecked() {
     mRectangleMode->setState(mode == CanvasMode::rectCreate);
     mTextMode->setState(mode == CanvasMode::textCreate);
 
+    mNullMode->setState(mode == CanvasMode::nullCreate);
     mPickPaintSettingsMode->setState(mode == CanvasMode::pickFillStroke);
 
     const bool boxMode = mode == CanvasMode::boxTransform;
@@ -1200,6 +1209,8 @@ bool handleCanvasModeKeyPress(Document& document, const int key) {
     } else if(key == Qt::Key_F8) {
         document.setCanvasMode(CanvasMode::textCreate);
     } else if(key == Qt::Key_F9) {
+        document.setCanvasMode(CanvasMode::nullCreate);
+    } else if(key == Qt::Key_F10) {
         document.setCanvasMode(CanvasMode::pickFillStroke);
     } else return false;
     KeyFocusTarget::KFT_sSetRandomTarget();
