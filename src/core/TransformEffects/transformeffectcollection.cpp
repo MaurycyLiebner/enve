@@ -20,6 +20,7 @@
 #include "tracktransformeffect.h"
 #include "followpathtransformeffect.h"
 #include "followobjecttransformeffect.h"
+#include "followobjectrelativetransformeffect.h"
 
 TransformEffectCollection::TransformEffectCollection() :
     TransformEffectCollectionBase("transform effects") {}
@@ -47,6 +48,13 @@ void TransformEffectCollection::prp_setupTreeViewMenu(PropertyMenu * const menu)
             coll->addChild(enve::make_shared<FollowObjectTransformEffect>());
         };
         menu->addPlainAction("Add Follow Object Effect", aOp);
+    }
+    {
+        const PropertyMenu::PlainSelectedOp<TransformEffectCollection> aOp =
+        [](TransformEffectCollection * coll) {
+            coll->addChild(enve::make_shared<FollowObjectRelativeTransformEffect>());
+        };
+        menu->addPlainAction("Add Follow Object Relative Effect", aOp);
     }
     menu->addSeparator();
     TransformEffectCollection::prp_setupTreeViewMenu(menu);
@@ -97,6 +105,8 @@ qsptr<TransformEffect> createTransformEffectForType(
             return enve::make_shared<FollowPathTransformEffect>();
         case(TransformEffectType::followObject):
             return enve::make_shared<FollowObjectTransformEffect>();
+        case(TransformEffectType::followObjectRelative):
+            return enve::make_shared<FollowObjectRelativeTransformEffect>();
         default: RuntimeThrow("Invalid transform effect type '" +
                               QString::number(int(type)) + "'");
     }

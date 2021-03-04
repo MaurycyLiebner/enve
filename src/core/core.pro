@@ -244,6 +244,7 @@ SOURCES += \
     Timeline/animationrect.cpp \
     Timeline/durationrectangle.cpp \
     Timeline/fixedlenanimationrect.cpp \
+    TransformEffects/followobjectrelativetransformeffect.cpp \
     TransformEffects/followobjecttransformeffect.cpp \
     TransformEffects/followpathtransformeffect.cpp \
     TransformEffects/targettransformeffect.cpp \
@@ -583,6 +584,7 @@ HEADERS += \
     Timeline/animationrect.h \
     Timeline/durationrectangle.h \
     Timeline/fixedlenanimationrect.h \
+    TransformEffects/followobjectrelativetransformeffect.h \
     TransformEffects/followobjecttransformeffect.h \
     TransformEffects/followpathtransformeffect.h \
     TransformEffects/targettransformeffect.h \

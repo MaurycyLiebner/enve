@@ -20,7 +20,7 @@
 #include "Animators/eeffect.h"
 
 enum class TransformEffectType {
-    track, followPath, followObject
+    track, followPath, followObject, followObjectRelative
 };
 
 class TransformEffect : public eEffect {
