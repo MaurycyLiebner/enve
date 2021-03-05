@@ -20,7 +20,9 @@
 #include "Animators/eeffect.h"
 
 enum class TransformEffectType {
-    track, followPath, followObject, followObjectRelative
+    track, followPath,
+    followObject, followObjectRelative,
+    parent
 };
 
 class TransformEffect : public eEffect {
@@ -36,6 +38,7 @@ public:
                              qreal& rot,
                              qreal& scaleX, qreal& scaleY,
                              qreal& shearX, qreal& shearY,
+                             QMatrix& postTransform,
                              BoundingBox* const parent) = 0;
 
     void prp_setupTreeViewMenu(PropertyMenu * const menu);

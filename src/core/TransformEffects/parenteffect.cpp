@@ -14,17 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "followobjecteffect.h"
+#include "parenteffect.h"
 
 #include "Boxes/boundingbox.h"
 #include "Animators/transformanimator.h"
 #include "Animators/qrealanimator.h"
 
-FollowObjectEffect::FollowObjectEffect() :
-    FollowObjectEffectBase("follow object",
-                           TransformEffectType::followObject) {}
+ParentEffect::ParentEffect() :
+    FollowObjectEffectBase("parent", TransformEffectType::parent) {}
 
-void FollowObjectEffect::applyEffect(const qreal relFrame,
+void ParentEffect::applyEffect(
+        const qreal relFrame,
         qreal& pivotX, qreal& pivotY,
         qreal& posX, qreal& posY,
         qreal& rot,
@@ -34,9 +34,13 @@ void FollowObjectEffect::applyEffect(const qreal relFrame,
         BoundingBox* const parent) {
     Q_UNUSED(pivotX)
     Q_UNUSED(pivotY)
+    Q_UNUSED(posX)
+    Q_UNUSED(posY)
+    Q_UNUSED(rot)
+    Q_UNUSED(scaleX)
+    Q_UNUSED(scaleY)
     Q_UNUSED(shearX)
     Q_UNUSED(shearY)
-    Q_UNUSED(postTransform)
 
     if(!isVisible()) return;
 
@@ -46,12 +50,6 @@ void FollowObjectEffect::applyEffect(const qreal relFrame,
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     const qreal targetRelFrame = target->prp_absFrameToRelFrameF(absFrame);
 
-    const auto parentTransform = parent->getInheritedTransformAtFrame(relFrame);
-    const auto targetTransform = target->getTotalTransformAtFrame(targetRelFrame);
-    const auto transform = targetTransform*parentTransform.inverted();
-
-    applyEffectWithTransform(relFrame, pivotX, pivotY,
-                             posX, posY, rot,
-                             scaleX, scaleY, shearX, shearY,
-                             parent, transform);
+    const auto targetTransAnim = target->getTransformAnimator();
+    postTransform = targetTransAnim->getRelativeTransformAtFrame(targetRelFrame);
 }

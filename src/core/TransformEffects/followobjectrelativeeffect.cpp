@@ -32,11 +32,13 @@ void FollowObjectRelativeEffect::applyEffect(
         qreal& rot,
         qreal& scaleX, qreal& scaleY,
         qreal& shearX, qreal& shearY,
+        QMatrix& postTransform,
         BoundingBox* const parent) {
-    Q_UNUSED(pivotX);
-    Q_UNUSED(pivotY);
-    Q_UNUSED(shearX);
-    Q_UNUSED(shearY);
+    Q_UNUSED(pivotX)
+    Q_UNUSED(pivotY)
+    Q_UNUSED(shearX)
+    Q_UNUSED(shearY)
+    Q_UNUSED(postTransform)
 
     if(!isVisible()) return;
 

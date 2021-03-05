@@ -21,6 +21,7 @@
 #include "followpatheffect.h"
 #include "followobjecteffect.h"
 #include "followobjectrelativeeffect.h"
+#include "parenteffect.h"
 
 TransformEffectCollection::TransformEffectCollection() :
     TransformEffectCollectionBase("transform effects") {}
@@ -56,6 +57,13 @@ void TransformEffectCollection::prp_setupTreeViewMenu(PropertyMenu * const menu)
         };
         menu->addPlainAction("Add Follow Object Relative Effect", aOp);
     }
+    {
+        const PropertyMenu::PlainSelectedOp<TransformEffectCollection> aOp =
+        [](TransformEffectCollection * coll) {
+            coll->addChild(enve::make_shared<ParentEffect>());
+        };
+        menu->addPlainAction("Add Parent Effect", aOp);
+    }
     menu->addSeparator();
     TransformEffectCollection::prp_setupTreeViewMenu(menu);
 }
@@ -81,6 +89,7 @@ void TransformEffectCollection::applyEffects(
         qreal& rot,
         qreal& scaleX, qreal& scaleY,
         qreal& shearX, qreal& shearY,
+        QMatrix& postTransform,
         BoundingBox* const parent) const {
     const int iMax = ca_getNumberOfChildren();
     for(int i = 0; i < iMax; i++) {
@@ -92,6 +101,7 @@ void TransformEffectCollection::applyEffects(
                             rot,
                             scaleX, scaleY,
                             shearX, shearY,
+                            postTransform,
                             parent);
     }
 }
@@ -107,6 +117,8 @@ qsptr<TransformEffect> createTransformEffectForType(
             return enve::make_shared<FollowObjectEffect>();
         case(TransformEffectType::followObjectRelative):
             return enve::make_shared<FollowObjectRelativeEffect>();
+        case(TransformEffectType::parent):
+            return enve::make_shared<ParentEffect>();
         default: RuntimeThrow("Invalid transform effect type '" +
                               QString::number(int(type)) + "'");
     }

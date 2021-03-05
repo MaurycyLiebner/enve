@@ -248,6 +248,7 @@ SOURCES += \
     TransformEffects/followobjecteffectbase.cpp \
     TransformEffects/followobjectrelativeeffect.cpp \
     TransformEffects/followpatheffect.cpp \
+    TransformEffects/parenteffect.cpp \
     TransformEffects/targettransformeffect.cpp \
     TransformEffects/trackeffect.cpp \
     TransformEffects/transformeffect.cpp \
@@ -589,6 +590,7 @@ HEADERS += \
     TransformEffects/followobjecteffectbase.h \
     TransformEffects/followobjectrelativeeffect.h \
     TransformEffects/followpatheffect.h \
+    TransformEffects/parenteffect.h \
     TransformEffects/targettransformeffect.h \
     TransformEffects/trackeffect.h \
     TransformEffects/transformeffect.h \

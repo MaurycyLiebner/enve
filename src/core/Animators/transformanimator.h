@@ -34,8 +34,8 @@ protected:
     BasicTransformAnimator();
 public:
     virtual void reset();
-    virtual QMatrix getCurrentTransform() const;
-    virtual QMatrix getRelativeTransformAtFrame(const qreal relFrame) const;
+    virtual QMatrix getRelativeTransformAtFrame(
+            const qreal relFrame, QMatrix* postTransform = nullptr) const;
     virtual QMatrix getInheritedTransformAtFrame(const qreal relFrame) const;
     virtual QMatrix getTotalTransformAtFrame(const qreal relFrame) const;
 
@@ -92,8 +92,6 @@ public:
 
     void setParentTransformAnimator(BasicTransformAnimator *parent);
 
-    QMatrix getParentTotalTransformAtRelFrame(const qreal relFrame);
-
     QPointFAnimator *getPosAnimator() const;
     QPointFAnimator *getScaleAnimator() const;
     QrealAnimator *getRotAnimator() const;
@@ -103,6 +101,7 @@ protected:
     QList<qsptr<BasicTransformAnimator>> mChildBoxes;
 
     QMatrix mRelTransform;
+    QMatrix mPostTransform;
     QMatrix mInheritedTransform;
     QMatrix mTotalTransform;
 
@@ -124,15 +123,16 @@ protected:
     AdvancedTransformAnimator();
 public:
     void reset();
-    QMatrix getRelativeTransformAtFrame(const qreal relFrame) const;
-    QMatrix getCurrentTransform() const;
+    QMatrix getRelativeTransformAtFrame(
+            const qreal relFrame, QMatrix* postTransform = nullptr) const;
 
     void applyTransformEffects(const qreal relFrame,
                                qreal& pivotX, qreal& pivotY,
                                qreal& posX, qreal& posY,
                                qreal& rot,
                                qreal& scaleX, qreal& scaleY,
-                               qreal& shearX, qreal& shearY) const;
+                               qreal& shearX, qreal& shearY,
+                               QMatrix& postTransform) const;
 
     void setValues(const TransformValues& values);
 

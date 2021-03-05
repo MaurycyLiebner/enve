@@ -413,7 +413,8 @@ public:
                                qreal& posX, qreal& posY,
                                qreal& rot,
                                qreal& scaleX, qreal& scaleY,
-                               qreal& shearX, qreal& shearY);
+                               qreal& shearX, qreal& shearY,
+                               QMatrix& postTransform);
 
     bool hasTransformEffects() const;
 

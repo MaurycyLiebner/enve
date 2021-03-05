@@ -14,14 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef FOLLOWOBJECTEFFECT_H
-#define FOLLOWOBJECTEFFECT_H
+#ifndef PARENTEFFECT_H
+#define PARENTEFFECT_H
 
 #include "followobjecteffectbase.h"
 
-class FollowObjectEffect : public FollowObjectEffectBase {
+class ParentEffect : public FollowObjectEffectBase {
 public:
-    FollowObjectEffect();
+    ParentEffect();
 
     void applyEffect(const qreal relFrame,
                      qreal &pivotX, qreal &pivotY,
@@ -33,4 +33,4 @@ public:
                      BoundingBox* const parent) override;
 };
 
-#endif // FOLLOWOBJECTEFFECT_H
+#endif // PARENTEFFECT_H

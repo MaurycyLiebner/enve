@@ -36,7 +36,7 @@ protected:
             qreal &shearX, qreal &shearY,
             BoundingBox* const parent,
             const QMatrix& transform);
-private:
+protected:
     void setRotScaleAfterTargetChange(
                 BoundingBox* const oldTarget,
                 BoundingBox* const newTarget) override;

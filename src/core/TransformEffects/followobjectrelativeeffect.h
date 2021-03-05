@@ -30,6 +30,7 @@ public:
                      qreal &rot,
                      qreal &scaleX, qreal &scaleY,
                      qreal &shearX, qreal &shearY,
+                     QMatrix& postTransform,
                      BoundingBox* const parent) override;
 };
 

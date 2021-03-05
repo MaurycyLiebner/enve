@@ -310,14 +310,15 @@ void BoundingBox::applyTransformEffects(
         qreal& posX, qreal& posY,
         qreal& rot,
         qreal& scaleX, qreal& scaleY,
-        qreal& shearX, qreal& shearY) {
+        qreal& shearX, qreal& shearY,
+        QMatrix& postTransform) {
     mTransformEffectCollection->applyEffects(relFrame,
                                              pivotX, pivotY,
                                              posX, posY,
                                              rot,
                                              scaleX, scaleY,
                                              shearX, shearY,
-                                             this);
+                                             postTransform, this);
 }
 
 bool BoundingBox::hasTransformEffects() const {

@@ -29,6 +29,7 @@ public:
                      qreal &rot,
                      qreal &scaleX, qreal &scaleY,
                      qreal &shearX, qreal &shearY,
+                     QMatrix& postTransform,
                      BoundingBox* const parent) override;
 private:
     void setRotScaleAfterTargetChange(

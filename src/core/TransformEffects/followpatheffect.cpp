@@ -124,20 +124,21 @@ void FollowPathEffect::setRotScaleAfterTargetChange(
     parent->rotateBy(rot);
 }
 
-void FollowPathEffect::applyEffect(
-        const qreal relFrame,
+void FollowPathEffect::applyEffect(const qreal relFrame,
         qreal& pivotX, qreal& pivotY,
         qreal& posX, qreal& posY,
         qreal& rot,
         qreal& scaleX, qreal& scaleY,
         qreal& shearX, qreal& shearY,
+        QMatrix& postTransform,
         BoundingBox* const parent) {
-    Q_UNUSED(pivotX);
-    Q_UNUSED(pivotY);
-    Q_UNUSED(scaleX);
-    Q_UNUSED(scaleY);
-    Q_UNUSED(shearX);
-    Q_UNUSED(shearY);
+    Q_UNUSED(pivotX)
+    Q_UNUSED(pivotY)
+    Q_UNUSED(scaleX)
+    Q_UNUSED(scaleY)
+    Q_UNUSED(shearX)
+    Q_UNUSED(shearY)
+    Q_UNUSED(postTransform)
 
     if(!isVisible()) return;
 
