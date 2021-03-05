@@ -244,11 +244,12 @@ SOURCES += \
     Timeline/animationrect.cpp \
     Timeline/durationrectangle.cpp \
     Timeline/fixedlenanimationrect.cpp \
-    TransformEffects/followobjectrelativetransformeffect.cpp \
-    TransformEffects/followobjecttransformeffect.cpp \
-    TransformEffects/followpathtransformeffect.cpp \
+    TransformEffects/followobjecteffect.cpp \
+    TransformEffects/followobjecteffectbase.cpp \
+    TransformEffects/followobjectrelativeeffect.cpp \
+    TransformEffects/followpatheffect.cpp \
     TransformEffects/targettransformeffect.cpp \
-    TransformEffects/tracktransformeffect.cpp \
+    TransformEffects/trackeffect.cpp \
     TransformEffects/transformeffect.cpp \
     TransformEffects/transformeffectcollection.cpp \
     XML/xevexporter.cpp \
@@ -584,11 +585,12 @@ HEADERS += \
     Timeline/animationrect.h \
     Timeline/durationrectangle.h \
     Timeline/fixedlenanimationrect.h \
-    TransformEffects/followobjectrelativetransformeffect.h \
-    TransformEffects/followobjecttransformeffect.h \
-    TransformEffects/followpathtransformeffect.h \
+    TransformEffects/followobjecteffect.h \
+    TransformEffects/followobjecteffectbase.h \
+    TransformEffects/followobjectrelativeeffect.h \
+    TransformEffects/followpatheffect.h \
     TransformEffects/targettransformeffect.h \
-    TransformEffects/tracktransformeffect.h \
+    TransformEffects/trackeffect.h \
     TransformEffects/transformeffect.h \
     TransformEffects/transformeffectcollection.h \
     XML/runtimewriteid.h \

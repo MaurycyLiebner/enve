@@ -14,14 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef TRACKTRANSFORMEFFECT_H
-#define TRACKTRANSFORMEFFECT_H
+#ifndef FOLLOWPATHEFFECT_H
+#define FOLLOWPATHEFFECT_H
 
 #include "targettransformeffect.h"
 
-class TrackTransformEffect : public TargetTransformEffect {
+#include "Properties/boolproperty.h"
+
+class FollowPathEffect : public TargetTransformEffect {
 public:
-    TrackTransformEffect();
+    FollowPathEffect();
 
     void applyEffect(const qreal relFrame,
                      qreal &pivotX, qreal &pivotY,
@@ -35,7 +37,11 @@ private:
                 BoundingBox* const oldTarget,
                 BoundingBox* const newTarget) override;
 
+    qsptr<BoolProperty> mRotate;
+    qsptr<BoolProperty> mLengthBased;
+    qsptr<QrealAnimator> mComplete;
     qsptr<QrealAnimator> mInfluence;
 };
 
-#endif // TRACKTRANSFORMEFFECT_H
+
+#endif // FOLLOWPATHEFFECT_H

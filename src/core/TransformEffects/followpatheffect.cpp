@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "followpathtransformeffect.h"
+#include "followpatheffect.h"
 
 #include "Boxes/pathbox.h"
 #include "Animators/qrealanimator.h"
 #include "Animators/transformanimator.h"
 
-FollowPathTransformEffect::FollowPathTransformEffect() :
+FollowPathEffect::FollowPathEffect() :
     TargetTransformEffect("follow path", TransformEffectType::followPath) {
     targetProperty()->setValidator<PathBox>();
 
@@ -74,7 +74,7 @@ void calculateFollowRotPosChange(
     posYChange = p1.y();
 }
 
-void FollowPathTransformEffect::setRotScaleAfterTargetChange(
+void FollowPathEffect::setRotScaleAfterTargetChange(
         BoundingBox* const oldTarget, BoundingBox* const newTarget) {
     const bool rotate = mRotate->getValue();
     if(!rotate) return;
@@ -124,7 +124,7 @@ void FollowPathTransformEffect::setRotScaleAfterTargetChange(
     parent->rotateBy(rot);
 }
 
-void FollowPathTransformEffect::applyEffect(
+void FollowPathEffect::applyEffect(
         const qreal relFrame,
         qreal& pivotX, qreal& pivotY,
         qreal& posX, qreal& posY,

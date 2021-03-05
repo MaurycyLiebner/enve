@@ -17,10 +17,10 @@
 #include "transformeffectcollection.h"
 #include "ReadWrite/evformat.h"
 
-#include "tracktransformeffect.h"
-#include "followpathtransformeffect.h"
-#include "followobjecttransformeffect.h"
-#include "followobjectrelativetransformeffect.h"
+#include "trackeffect.h"
+#include "followpatheffect.h"
+#include "followobjecteffect.h"
+#include "followobjectrelativeeffect.h"
 
 TransformEffectCollection::TransformEffectCollection() :
     TransformEffectCollectionBase("transform effects") {}
@@ -31,28 +31,28 @@ void TransformEffectCollection::prp_setupTreeViewMenu(PropertyMenu * const menu)
     {
         const PropertyMenu::PlainSelectedOp<TransformEffectCollection> aOp =
         [](TransformEffectCollection * coll) {
-            coll->addChild(enve::make_shared<TrackTransformEffect>());
+            coll->addChild(enve::make_shared<TrackEffect>());
         };
         menu->addPlainAction("Add Track Effect", aOp);
     }
     {
         const PropertyMenu::PlainSelectedOp<TransformEffectCollection> aOp =
         [](TransformEffectCollection * coll) {
-            coll->addChild(enve::make_shared<FollowPathTransformEffect>());
+            coll->addChild(enve::make_shared<FollowPathEffect>());
         };
         menu->addPlainAction("Add Follow Path Effect", aOp);
     }
     {
         const PropertyMenu::PlainSelectedOp<TransformEffectCollection> aOp =
         [](TransformEffectCollection * coll) {
-            coll->addChild(enve::make_shared<FollowObjectTransformEffect>());
+            coll->addChild(enve::make_shared<FollowObjectEffect>());
         };
         menu->addPlainAction("Add Follow Object Effect", aOp);
     }
     {
         const PropertyMenu::PlainSelectedOp<TransformEffectCollection> aOp =
         [](TransformEffectCollection * coll) {
-            coll->addChild(enve::make_shared<FollowObjectRelativeTransformEffect>());
+            coll->addChild(enve::make_shared<FollowObjectRelativeEffect>());
         };
         menu->addPlainAction("Add Follow Object Relative Effect", aOp);
     }
@@ -100,13 +100,13 @@ qsptr<TransformEffect> createTransformEffectForType(
         const TransformEffectType type) {
     switch(type) {
         case(TransformEffectType::track):
-            return enve::make_shared<TrackTransformEffect>();
+            return enve::make_shared<TrackEffect>();
         case(TransformEffectType::followPath):
-            return enve::make_shared<FollowPathTransformEffect>();
+            return enve::make_shared<FollowPathEffect>();
         case(TransformEffectType::followObject):
-            return enve::make_shared<FollowObjectTransformEffect>();
+            return enve::make_shared<FollowObjectEffect>();
         case(TransformEffectType::followObjectRelative):
-            return enve::make_shared<FollowObjectRelativeTransformEffect>();
+            return enve::make_shared<FollowObjectRelativeEffect>();
         default: RuntimeThrow("Invalid transform effect type '" +
                               QString::number(int(type)) + "'");
     }

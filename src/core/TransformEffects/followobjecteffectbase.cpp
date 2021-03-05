@@ -14,15 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "followobjectrelativetransformeffect.h"
+#include "followobjecteffectbase.h"
 
 #include "Boxes/boundingbox.h"
 #include "Animators/transformanimator.h"
 #include "Animators/qrealanimator.h"
 
-FollowObjectRelativeTransformEffect::FollowObjectRelativeTransformEffect() :
-    TargetTransformEffect("follow object relative",
-                          TransformEffectType::followObjectRelative) {
+FollowObjectEffectBase::FollowObjectEffectBase(
+        const QString& name, const TransformEffectType type) :
+    TargetTransformEffect(name, type) {
     mPosInfluence = enve::make_shared<QPointFAnimator>(
                         QPointF{1., 1.}, QPointF{-10., -10.},
                         QPointF{10., 10.}, QPointF{0.01, 0.01},
@@ -39,7 +39,55 @@ FollowObjectRelativeTransformEffect::FollowObjectRelativeTransformEffect() :
     ca_addChild(mRotInfluence);
 }
 
-void FollowObjectRelativeTransformEffect::setRotScaleAfterTargetChange(
+void FollowObjectEffectBase::applyEffectWithTransform(
+        const qreal relFrame,
+        qreal& pivotX, qreal& pivotY,
+        qreal& posX, qreal& posY, qreal& rot,
+        qreal& scaleX, qreal& scaleY,
+        qreal& shearX, qreal& shearY,
+        BoundingBox* const parent,
+        const QMatrix& transform) {
+    Q_UNUSED(pivotX);
+    Q_UNUSED(pivotY);
+    Q_UNUSED(shearX);
+    Q_UNUSED(shearY);
+
+    if(!isVisible()) return;
+
+    if(!parent) return;
+    const auto target = targetProperty()->getTarget();
+    if(!target) return;
+    const auto targetTransformAnimator = target->getTransformAnimator();
+
+    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+    const qreal targetRelFrame = target->prp_absFrameToRelFrameF(absFrame);
+
+    const auto relPivot = target->getPivotRelPos(targetRelFrame);
+    const auto p1 = relPivot*transform;
+
+    const auto rotAnim = targetTransformAnimator->getRotAnimator();
+    const qreal targetRot = rotAnim->getEffectiveValue(targetRelFrame);
+
+    const auto scaleAnim = targetTransformAnimator->getScaleAnimator();
+    const qreal xScale = scaleAnim->getEffectiveXValue(targetRelFrame);
+    const qreal yScale = scaleAnim->getEffectiveYValue(targetRelFrame);
+
+    const qreal posXInfl = mPosInfluence->getEffectiveXValue(relFrame);
+    const qreal posYInfl = mPosInfluence->getEffectiveYValue(relFrame);
+    const qreal scaleXInfl = mScaleInfluence->getEffectiveXValue(relFrame);
+    const qreal scaleYInfl = mScaleInfluence->getEffectiveYValue(relFrame);
+    const qreal rotInfl = mRotInfluence->getEffectiveValue(relFrame);
+
+    posX += p1.x()*posXInfl;
+    posY += p1.y()*posYInfl;
+
+    scaleX *= 1 + (xScale - 1)*scaleXInfl;
+    scaleY *= 1 + (yScale - 1)*scaleYInfl;
+
+    rot += targetRot*rotInfl;
+}
+
+void FollowObjectEffectBase::setRotScaleAfterTargetChange(
         BoundingBox* const oldTarget, BoundingBox* const newTarget) {
     const auto parent = getFirstAncestor<BoundingBox>();
     if(!parent) return;
@@ -83,54 +131,4 @@ void FollowObjectRelativeTransformEffect::setRotScaleAfterTargetChange(
 
     parent->startScaleTransform();
     parent->scale(scaleX, scaleY);
-}
-
-void FollowObjectRelativeTransformEffect::applyEffect(
-        const qreal relFrame,
-        qreal& pivotX, qreal& pivotY,
-        qreal& posX, qreal& posY,
-        qreal& rot,
-        qreal& scaleX, qreal& scaleY,
-        qreal& shearX, qreal& shearY,
-        BoundingBox* const parent) {
-    Q_UNUSED(pivotX);
-    Q_UNUSED(pivotY);
-    Q_UNUSED(shearX);
-    Q_UNUSED(shearY);
-
-    if(!isVisible()) return;
-
-    if(!parent) return;
-    const auto target = targetProperty()->getTarget();
-    if(!target) return;
-    const auto targetTransformAnimator = target->getTransformAnimator();
-
-    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-    const qreal targetRelFrame = target->prp_absFrameToRelFrameF(absFrame);
-
-    const auto targetTransform = target->getTotalTransformAtFrame(targetRelFrame);
-
-    const auto relPivot = target->getPivotRelPos(targetRelFrame);
-    const auto p1 = relPivot*targetTransform;
-
-    const auto rotAnim = targetTransformAnimator->getRotAnimator();
-    const qreal targetRot = rotAnim->getEffectiveValue(targetRelFrame);
-
-    const auto scaleAnim = targetTransformAnimator->getScaleAnimator();
-    const qreal xScale = scaleAnim->getEffectiveXValue(targetRelFrame);
-    const qreal yScale = scaleAnim->getEffectiveYValue(targetRelFrame);
-
-    const qreal posXInfl = mPosInfluence->getEffectiveXValue(relFrame);
-    const qreal posYInfl = mPosInfluence->getEffectiveYValue(relFrame);
-    const qreal scaleXInfl = mScaleInfluence->getEffectiveXValue(relFrame);
-    const qreal scaleYInfl = mScaleInfluence->getEffectiveYValue(relFrame);
-    const qreal rotInfl = mRotInfluence->getEffectiveValue(relFrame);
-
-    posX += p1.x()*posXInfl;
-    posY += p1.y()*posYInfl;
-
-    scaleX *= 1 + (xScale - 1)*scaleXInfl;
-    scaleY *= 1 + (yScale - 1)*scaleYInfl;
-
-    rot += targetRot*rotInfl;
 }

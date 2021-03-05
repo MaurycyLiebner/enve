@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "tracktransformeffect.h"
+#include "trackeffect.h"
 
 #include "Boxes/boundingbox.h"
 #include "Animators/qrealanimator.h"
 #include "Animators/transformanimator.h"
 
-TrackTransformEffect::TrackTransformEffect() :
+TrackEffect::TrackEffect() :
     TargetTransformEffect("track", TransformEffectType::track) {
     mInfluence = enve::make_shared<QrealAnimator>(1, -1, 1, 0.01, "influence");
 
@@ -36,7 +36,7 @@ qreal calculateTrackAngle(const QPointF& parentPos,
     return trackAngle;
 }
 
-void TrackTransformEffect::setRotScaleAfterTargetChange(
+void TrackEffect::setRotScaleAfterTargetChange(
         BoundingBox* const oldTarget, BoundingBox* const newTarget) {
     const auto parent = getFirstAncestor<BoundingBox>();
     if(!parent) return;
@@ -64,7 +64,7 @@ void TrackTransformEffect::setRotScaleAfterTargetChange(
     parent->rotateBy(rot);
 }
 
-void TrackTransformEffect::applyEffect(
+void TrackEffect::applyEffect(
         const qreal relFrame,
         qreal& pivotX, qreal& pivotY,
         qreal& posX, qreal& posY,

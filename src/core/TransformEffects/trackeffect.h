@@ -14,16 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef FOLLOWOBJECTTRANSFORMEFFECT_H
-#define FOLLOWOBJECTTRANSFORMEFFECT_H
+#ifndef TRACKEFFECT_H
+#define TRACKEFFECT_H
 
 #include "targettransformeffect.h"
 
-#include "Animators/qpointfanimator.h"
-
-class FollowObjectTransformEffect : public TargetTransformEffect {
+class TrackEffect : public TargetTransformEffect {
 public:
-    FollowObjectTransformEffect();
+    TrackEffect();
 
     void applyEffect(const qreal relFrame,
                      qreal &pivotX, qreal &pivotY,
@@ -37,10 +35,7 @@ private:
                 BoundingBox* const oldTarget,
                 BoundingBox* const newTarget) override;
 
-
-    qsptr<QPointFAnimator> mPosInfluence;
-    qsptr<QPointFAnimator> mScaleInfluence;
-    qsptr<QrealAnimator> mRotInfluence;
+    qsptr<QrealAnimator> mInfluence;
 };
 
-#endif // FOLLOWOBJECTTRANSFORMEFFECT_H
+#endif // TRACKEFFECT_H

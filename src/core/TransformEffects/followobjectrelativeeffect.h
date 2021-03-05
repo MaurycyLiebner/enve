@@ -14,16 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef FOLLOWOBJECTRELATIVETRANSFORMEFFECT_H
-#define FOLLOWOBJECTRELATIVETRANSFORMEFFECT_H
+#ifndef FOLLOWOBJECTRELATIVEEFFECT_H
+#define FOLLOWOBJECTRELATIVEEFFECT_H
 
-#include "targettransformeffect.h"
+#include "followobjecteffectbase.h"
 
-#include "Animators/qpointfanimator.h"
-
-class FollowObjectRelativeTransformEffect : public TargetTransformEffect {
+class FollowObjectRelativeEffect :
+        public FollowObjectEffectBase {
 public:
-    FollowObjectRelativeTransformEffect();
+    FollowObjectRelativeEffect();
 
     void applyEffect(const qreal relFrame,
                      qreal &pivotX, qreal &pivotY,
@@ -32,15 +31,6 @@ public:
                      qreal &scaleX, qreal &scaleY,
                      qreal &shearX, qreal &shearY,
                      BoundingBox* const parent) override;
-private:
-    void setRotScaleAfterTargetChange(
-                BoundingBox* const oldTarget,
-                BoundingBox* const newTarget) override;
-
-
-    qsptr<QPointFAnimator> mPosInfluence;
-    qsptr<QPointFAnimator> mScaleInfluence;
-    qsptr<QrealAnimator> mRotInfluence;
 };
 
-#endif // FOLLOWOBJECTRELATIVETRANSFORMEFFECT_H
+#endif // FOLLOWOBJECTRELATIVEEFFECT_H
