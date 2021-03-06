@@ -34,7 +34,7 @@ QList<SmartNodePoint*> Canvas::getSortedSelectedNodes() {
     return nodes;
 }
 
-void Canvas::connectPoints() {
+bool Canvas::connectPoints() {
     prp_pushUndoRedoName("Connect Nodes");
     const auto nodes = getSortedSelectedNodes();
     QList<SmartNodePoint*> endNodes;
@@ -57,8 +57,9 @@ void Canvas::connectPoints() {
             const int targetId2 = node2->getNodeId();
             const auto sel2 = handler->getPointWithId<SmartNodePoint>(targetId2);
             addPointToSelection(sel2);
-        }
+        } else return false;
     }
+    return true;
 }
 
 void Canvas::disconnectPoints() {
@@ -86,8 +87,8 @@ void Canvas::mergePoints() {
                            firstPoint->getNextPoint() == secondPoint;
         if(!ends && !neigh) return;
         if(ends) {
-            connectPoints();
-            mergePoints();
+            const bool success = connectPoints();
+            if(success) mergePoints();
             return;
         }
         removePointFromSelection(secondPoint);

@@ -190,7 +190,7 @@ public:
 
     void mergePoints();
     void disconnectPoints();
-    void connectPoints();
+    bool connectPoints();
     void subdivideSegments();
 
     void setSelectedTextAlignment(const Qt::Alignment alignment) const;
