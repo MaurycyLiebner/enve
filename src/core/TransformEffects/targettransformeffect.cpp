@@ -41,7 +41,9 @@ TargetTransformEffect::TargetTransformEffect(
             });
             conn << connect(targetTransform,
                             &AdvancedTransformAnimator::totalTransformChanged,
-                            this, [parentTransform](const UpdateReason reason) {
+                            this, [parentTransform, targetTransform](const UpdateReason reason) {
+                const int absFrame = targetTransform->anim_getCurrentAbsFrame();
+                parentTransform->anim_setAbsFrame(absFrame);
                 parentTransform->prp_afterChangedCurrent(reason);
             });
             conn << connect(parentTransform,
