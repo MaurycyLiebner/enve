@@ -88,14 +88,14 @@ void OverlappingKeys::merge() {
             if(iKey.get() == target) continue;
             const auto cKey = static_cast<ComplexKey*>(iKey.get());
             cKey->moveAllKeysTo(cTarget);
-            mAnimator->anim_removeKey(iKey);
+            mAnimator->anim_removeKeyAction(iKey);
             i--;
         }
     } else {
         for(int i = 0; i < mKeys.count(); i++) {
             const auto& iKey = mKeys.at(i);
             if(iKey.get() == target) continue;
-            mAnimator->anim_removeKey(iKey);
+            mAnimator->anim_removeKeyAction(iKey);
             i--;
         }
     }

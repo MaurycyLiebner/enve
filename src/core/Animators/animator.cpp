@@ -253,7 +253,7 @@ void Animator::anim_appendKeyAction(const stdsptr<Key>& newKey) {
     }
 }
 
-void Animator::anim_removeKeyAction(const stdsptr<Key>& newKey) {
+void Animator::anim_removeKeyAction(const stdsptr<Key> newKey) {
     anim_removeKey(newKey);
     {
         prp_pushUndoRedoName("Remove Key");

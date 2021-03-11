@@ -185,7 +185,7 @@ public:
     void anim_addKeysWhereOtherHasKeys(const Animator * const other);
 
     void anim_appendKeyAction(const stdsptr<Key> &newKey);
-    void anim_removeKeyAction(const stdsptr<Key> &newKey);
+    void anim_removeKeyAction(const stdsptr<Key> newKey);
 
     using ValueGetter = std::function<QString(const int relFrane)>;
     void saveSVG(SvgExporter& exp,
