@@ -118,7 +118,7 @@ void KeysClipboard::paste(const int pasteFrame, const bool merge,
         animatorKeys << keys;
     }
     if(firstKeyFrame == FrameRange::EMAX) return;
-    int dFrame = pasteFrame - firstKeyFrame;
+    const int dFrame = pasteFrame - firstKeyFrame;
 
     int keysId = 0;
     for(const auto &animData : mAnimatorData) {

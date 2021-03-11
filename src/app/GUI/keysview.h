@@ -178,7 +178,6 @@ private:
     void graphConstrainAnimatorCtrlsFrameValues();
     void graphGetAnimatorsMinMaxValue(qreal &minVal, qreal &maxVal);
     void graphMakeSegmentsSmoothAction(const bool smooth);
-    void sortSelectedKeys();
     void clearHoveredKey();
 
     stdsptr<KeysClipboard> getSelectedKeysClipboardContainer();
