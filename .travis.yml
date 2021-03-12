@@ -4,7 +4,6 @@ sudo: required
 matrix:
   include:
     - os: linux
-      compiler: clang
       dist: xenial
       addons:
         apt:
