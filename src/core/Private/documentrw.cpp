@@ -127,6 +127,9 @@ void Document::writeDoxumentXEV(QDomDocument& doc) const {
         scene.setAttribute("height", s->getCanvasHeight());
         scene.setAttribute("fps", s->getFps());
         scene.setAttribute("clip", s->clipToCanvas() ? "true" : "false");
+        const auto range = s->getFrameRange();
+        const auto rangeStr = QString("%1 %2").arg(range.fMin).arg(range.fMax);
+        scene.setAttribute("frameRange", rangeStr);
 
         scenes.appendChild(scene);
     }
@@ -209,6 +212,11 @@ void Document::readDocumentXEV(const QDomDocument& doc,
         const int height = XmlExportHelpers::stringToInt(sceneEle.attribute("height"));
         const qreal fps = XmlExportHelpers::stringToDouble(sceneEle.attribute("fps"));
         const bool clip = sceneEle.attribute("clip") == "true";
+        const auto rangeStr = sceneEle.attribute("frameRange", "0 200");
+        const auto rangeStrs = rangeStr.split(' ', QString::SkipEmptyParts);
+        if(rangeStrs.count() != 2) RuntimeThrow("Invalid frame range " + rangeStr);
+        const int rangeMin = XmlExportHelpers::stringToInt(rangeStrs[0]);
+        const int rangeMax = XmlExportHelpers::stringToInt(rangeStrs[1]);
 
         const auto newScene = createNewScene();
         newScene->setResolution(res);
@@ -217,6 +225,7 @@ void Document::readDocumentXEV(const QDomDocument& doc,
         newScene->setCanvasSize(width, height);
         newScene->setFps(fps);
         newScene->setClipToCanvas(clip);
+        newScene->setFrameRange(FrameRange{rangeMin, rangeMax});
 
         scenes << newScene;
     }
