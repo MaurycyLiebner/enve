@@ -158,20 +158,19 @@ QString SceneSettingsDialog::getCanvasName() const {
 }
 
 FrameRange SceneSettingsDialog::getFrameRange() const {
-
-  QString typetime = mTypeTime->currentText();
-    if (typetime == "Frames"){
-    FrameRange range = {mMinFrameSpin->value(), mMaxFrameSpin->value()};
-    range.fixOrder();
-    return range;}
-    else{
-        int SpinMaxFrame = mMaxFrameSpin->value();
-        int SpinMinFrame = mMinFrameSpin->value();
-        int SpinFPSFrame = mFPSSpinBox->value();
-        FrameRange range = {SpinMinFrame*SpinFPSFrame, SpinMaxFrame*SpinFPSFrame};
-        range.fixOrder();
-        return range;
-    }
+    QString typetime = mTypeTime->currentText();
+        if (typetime == "Frames"){
+            FrameRange range = {mMinFrameSpin->value(), mMaxFrameSpin->value()};
+            range.fixOrder();
+            return range;}
+        else{
+            int SpinMaxFrame = mMaxFrameSpin->value();
+            int SpinMinFrame = mMinFrameSpin->value();
+            int SpinFPSFrame = mFPSSpinBox->value();
+            FrameRange range = {SpinMinFrame*SpinFPSFrame, SpinMaxFrame*SpinFPSFrame};
+            range.fixOrder();
+            return range;
+            }
 }
 
 qreal SceneSettingsDialog::getFps() const {
