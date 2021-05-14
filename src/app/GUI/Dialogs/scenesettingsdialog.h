@@ -23,8 +23,10 @@
 #include <QSpinBox>
 #include <QLineEdit>
 #include <QLabel>
+#include <QComboBox>
 #include "smartPointers/ememory.h"
 #include "framerange.h"
+
 
 class Document;
 class Canvas;
@@ -75,6 +77,7 @@ private:
     QLabel *mFrameRangeLabel;
     QSpinBox *mMinFrameSpin;
     QSpinBox *mMaxFrameSpin;
+    QComboBox *mTypeTime;
 
     QHBoxLayout *mFPSLayout;
     QLabel *mFPSLabel;

@@ -1041,6 +1041,7 @@ void MainWindow::connectToolBarActions() {
 
     connect(mActionNewEmptyPaintFrame, &ActionButton::pressed,
             &mActions, &Actions::newEmptyPaintFrame);
+
 }
 
 MainWindow *MainWindow::sGetInstance() {
@@ -1422,6 +1423,7 @@ void MainWindow::importFile() {
     const QString fileTypes = "(*.ev *.xev *.svg " +
             FileExtensions::videoFilters() +
             FileExtensions::imageFilters() +
+            FileExtensions::layersFilters() +
             FileExtensions::soundFilters() + ")";
     const auto importPaths = eDialogs::openFiles(
                 title, defPath, fileType.arg(fileTypes));
