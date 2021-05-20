@@ -187,13 +187,14 @@ public:
     void anim_appendKeyAction(const stdsptr<Key> &newKey);
     void anim_removeKeyAction(const stdsptr<Key> newKey);
 
-    using ValueGetter = std::function<QString(const int relFrane)>;
+    using ValueGetter = std::function<QString(const int relFrame)>;
     void saveSVG(SvgExporter& exp,
                  QDomElement& parent,
                  const FrameRange& visRange,
                  const QString& attrName,
                  const ValueGetter& valueGetter,
-                 const QString& interpolation = "linear") const;
+                 const QString& interpolation = "linear",
+                 QList<Animator*> const extInfl = QList<Animator*>()) const;
     void saveSVG(SvgExporter& exp,
                  QDomElement& parent,
                  const FrameRange& visRange,
@@ -201,7 +202,8 @@ public:
                  const ValueGetter& valueGetter,
                  const bool transform,
                  const QString& type,
-                 const QString& interpolation = "linear") const;
+                 const QString& interpolation = "linear",
+                 QList<Animator*> const extInfl = QList<Animator*>()) const;
 protected:
     void anim_readKeys(eReadStream &src);
     void anim_writeKeys(eWriteStream& dst) const;

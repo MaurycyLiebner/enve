@@ -58,7 +58,8 @@ void SmartPathCollection::savePathsSVG(SvgExporter& exp,
                                        QDomElement& parent,
                                        const EffectApplier& applier,
                                        const bool forceDumbIncrement,
-                                       const FrameRange& visRange) {
+                                       const FrameRange& visRange,
+                                       QList<Animator*> const extInfl) {
     if(!forceDumbIncrement && ca_getNumberOfChildren() == 1) {
         const auto path0 = getChild(0);
         path0->graph_saveSVG(exp, parent, visRange, "d",
@@ -79,7 +80,7 @@ void SmartPathCollection::savePathsSVG(SvgExporter& exp,
             SkParsePath::ToSVGString(path, &pathStr);
             if(pathStr.isEmpty()) return QString("M0 0");
             return QString(pathStr.c_str());
-        }, "discrete");
+        }, "discrete", extInfl);
     }
 }
 

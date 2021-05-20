@@ -40,7 +40,8 @@ public:
                       QDomElement& parent,
                       const EffectApplier& applier,
                       const bool forceDumbIncrement,
-                      const FrameRange& visRange);
+                      const FrameRange& visRange,
+                      const QList<Animator*> extInfl);
 
     SmartNodePoint * createNewSubPathAtRelPos(const QPointF &relPos);
     SmartNodePoint * createNewSubPathAtPos(const QPointF &absPos);

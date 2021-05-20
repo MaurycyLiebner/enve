@@ -64,9 +64,12 @@ void SmartVectorPath::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
                 applyFillEffects(relFrame, path);
             };
         };
+        QList<Animator*> fillExtInfl;
+        if(baseEffects) fillExtInfl << mPathEffectsAnimators.get();
+        if(fillEffects) fillExtInfl << mFillPathEffectsAnimators.get();
         mPathAnimator->savePathsSVG(exp, fill, fillApplier,
                                     baseEffects || fillEffects,
-                                    task->visRange());
+                                    task->visRange(), fillExtInfl);
         saveFillSettingsSVG(exp, fill, task->visRange());
         fill.setAttribute("stroke", "none");
         ele.appendChild(fill);
@@ -92,9 +95,14 @@ void SmartVectorPath::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
                 applyOutlineEffects(relFrame, path);
             };
         };
+        QList<Animator*> strokeExtInfl;
+        if(baseEffects) fillExtInfl << mPathEffectsAnimators.get();
+        if(outlineBaseEffects) fillExtInfl << mOutlineBasePathEffectsAnimators.get();
+        if(outlineEffects) fillExtInfl << mOutlinePathEffectsAnimators.get();
+        const bool forceDumb = baseEffects || outlineBaseEffects || outlineEffects;
         mPathAnimator->savePathsSVG(exp, stroke, strokeApplier,
-                                    baseEffects || outlineBaseEffects ||
-                                    outlineEffects, task->visRange());
+                                    forceDumb, task->visRange(),
+                                    strokeExtInfl);
         saveStrokeSettingsSVG(exp, stroke, task->visRange(), outlineEffects);
         stroke.setAttribute(outlineEffects ? "stroke" : "fill", "none");
         if(outlineEffects) stroke.setAttribute("fill-rule", "nonzero");
@@ -108,8 +116,10 @@ void SmartVectorPath::saveSVG(SvgExporter& exp, DomEleTask* const task) const {
                 applyBasePathEffects(relFrame, path);
             };
         };
+        QList<Animator*> extInfl;
+        if(baseEffects) extInfl << mPathEffectsAnimators.get();
         mPathAnimator->savePathsSVG(exp, ele, applier, baseEffects,
-                                    task->visRange());
+                                    task->visRange(), extInfl);
         savePathBoxSVG(exp, ele, task->visRange());
     }
 }

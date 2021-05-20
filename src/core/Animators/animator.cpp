@@ -712,9 +712,16 @@ void Animator::saveSVG(SvgExporter& exp,
                        const ValueGetter& valueGetter,
                        const bool transform,
                        const QString& type,
-                       const QString& interpolation) const {
+                       const QString& interpolation,
+                       const QList<Animator*> extInfl) const {
     Q_ASSERT(!transform || attrName == "transform");
-    const auto idRange = prp_getIdenticalRelRange(visRange.fMin);
+
+    const auto thisIdRange = prp_getIdenticalRelRange(visRange.fMin);
+    auto idRange = thisIdRange;
+    for(const auto& infl : extInfl) {
+        const auto extIdRange = infl->prp_getIdenticalRelRange(visRange.fMin);
+        idRange = idRange*extIdRange;
+    }
     const int span = exp.fAbsRange.span();
     if(idRange.inRange(visRange) || span == 1) {
         auto value = valueGetter(visRange.fMin);
@@ -738,7 +745,12 @@ void Animator::saveSVG(SvgExporter& exp,
         while(true) {
             const auto value = valueGetter(i);
             values << value;
-            const auto iRange = exp.fAbsRange*prp_getIdenticalAbsRange(i);
+            const auto thisIRange = exp.fAbsRange*prp_getIdenticalAbsRange(i);
+            FrameRange iRange = thisIRange;
+            for(const auto& infl : extInfl) {
+                const auto extIdRange = infl->prp_getIdenticalAbsRange(i);
+                iRange = iRange*extIdRange;
+            }
             const qreal minTime = (iRange.fMin - exp.fAbsRange.fMin)/div;
             keyTimes << QString::number(minTime);
             if(iRange.fMin != iRange.fMax) {
@@ -747,7 +759,12 @@ void Animator::saveSVG(SvgExporter& exp,
                 keyTimes << QString::number(maxTime);
             }
             if(iRange.fMax >= visRange.fMax) break;
-            i = prp_nextDifferentRelFrame(i);
+            int newI = prp_nextDifferentRelFrame(i);
+            for(const auto& infl : extInfl) {
+                const auto extI = infl->prp_nextDifferentRelFrame(i);
+                newI = qMin(extI, newI);
+            }
+            i = newI;
         }
         if(keyTimes.isEmpty()) return;
         if(keyTimes.last() != "1") {
@@ -770,7 +787,8 @@ void Animator::saveSVG(SvgExporter& exp,
                        const FrameRange& visRange,
                        const QString& attrName,
                        const ValueGetter& valueGetter,
-                       const QString& interpolation) const {
+                       const QString& interpolation,
+                       const QList<Animator*> extInfl) const {
     saveSVG(exp, parent, visRange, attrName, valueGetter,
-            false, "", interpolation);
+            false, "", interpolation, extInfl);
 }
