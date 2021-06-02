@@ -606,6 +606,53 @@ void MainWindow::setupMenuBar() {
 
     mViewMenu = mMenuBar->addMenu(tr("View", "MenuBar"));
 
+    const auto ViewTransformMenu = mViewMenu->addMenu(
+                tr("Views","MenuBar_View"));
+
+    mZoomInMenu = ViewTransformMenu->addAction(
+                tr("Zoom In", "MenuBar_Views"));
+    mZoomInMenu->setShortcut(Qt::Key_Plus);
+    connect(mZoomInMenu, &QAction::triggered,
+            this, [](){
+        const auto target = KeyFocusTarget::KFT_getCurrentTarget();
+        const auto cwTarget = dynamic_cast<CanvasWindow*>(target);
+        if (!cwTarget) return;
+        cwTarget->zoomInView();
+    });
+
+    mZoomOutMenu = ViewTransformMenu->addAction(
+                tr("Zoom Out", "MenuBar_Views"));
+    mZoomOutMenu->setShortcut(Qt::Key_Minus);
+    connect(mZoomOutMenu, &QAction::triggered,
+            this, [](){
+        const auto target = KeyFocusTarget::KFT_getCurrentTarget();
+        const auto cwTarget = dynamic_cast<CanvasWindow*>(target);
+        if (!cwTarget) return;
+        cwTarget->zoomOutView();
+    });
+
+    mFitViewMenu = ViewTransformMenu->addAction(
+                tr("Fit to Canvas", "MenuBar_Views"));
+    mFitViewMenu->setShortcut(Qt::Key_0);
+    connect(mFitViewMenu, &QAction::triggered,
+            this, [](){
+        const auto target = KeyFocusTarget::KFT_getCurrentTarget();
+        const auto cwTarget = dynamic_cast<CanvasWindow*>(target);
+        if (!cwTarget) return;
+        cwTarget->fitCanvasToSize();
+    });
+
+    mResetZoomMenu = ViewTransformMenu->addAction(
+                tr("Reset Zoom", "MenuBar_Views"));
+    mResetZoomMenu->setShortcut(Qt::Key_1);
+    connect(mResetZoomMenu, &QAction::triggered,
+            this, [](){
+        const auto target = KeyFocusTarget::KFT_getCurrentTarget();
+        const auto cwTarget = dynamic_cast<CanvasWindow*>(target);
+        if (!cwTarget) return;
+        cwTarget->resetTransormation();
+    });
+
     const auto filteringMenu = mViewMenu->addMenu(
                 tr("Filtering", "MenuBar_View"));
 
