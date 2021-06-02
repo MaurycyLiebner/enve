@@ -155,6 +155,8 @@ public:
 
     void fitCanvasToSize();
     void resetTransormation();
+    void zoomInView();
+    void zoomOutView();
 };
 
 #endif // CANVASWINDOW_H

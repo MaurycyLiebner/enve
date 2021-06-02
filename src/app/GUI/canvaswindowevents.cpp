@@ -70,6 +70,22 @@ void CanvasWindow::fitCanvasToSize() {
     mViewTransform.scale(minScale, minScale);
 }
 
+void CanvasWindow::zoomInView() {
+    if(!mCurrentCanvas) return;
+    const auto canvasSize = mCurrentCanvas->getCanvasSize();
+    mViewTransform.translate(canvasSize.width()*0.5, canvasSize.height()*0.5);
+    mViewTransform.scale(1.1, 1.1);
+    mViewTransform.translate(-canvasSize.width()*0.5, -canvasSize.height()*0.5);
+}
+
+void CanvasWindow::zoomOutView() {
+    if(!mCurrentCanvas) return;
+    const auto canvasSize = mCurrentCanvas->getCanvasSize();
+    mViewTransform.translate(canvasSize.width()*0.5, canvasSize.height()*0.5);
+    mViewTransform.scale(0.9, 0.9);
+    mViewTransform.translate(-canvasSize.width()*0.5, -canvasSize.height()*0.5);
+}
+
 #include <QEvent>
 
 bool CanvasWindow::event(QEvent *e) {
