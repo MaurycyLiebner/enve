@@ -75,6 +75,7 @@ struct SvgGradient {
     qreal fX2;
     qreal fY2;
     QMatrix fTrans;
+    GradientType fType;
 };
 
 class FillSvgAttributes {
@@ -101,6 +102,7 @@ protected:
     QColor mColor;
     PaintType mPaintType = NOPAINT;
     Gradient *mGradient = nullptr;
+    GradientType mGradientType = GradientType::LINEAR;
     QPointF mGradientP1;
     QPointF mGradientP2;
     QMatrix mGradientTransform;
@@ -648,7 +650,13 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
             }
         }
         return;
-    } else if(tagName == "linearGradient") {
+    } else if(tagName == "linearGradient" || tagName == "radialGradient") {
+        GradientType type;
+        if(tagName == "linearGradient") {
+            type = GradientType::LINEAR;
+        } else { //if(tagName == "radialGradient") {
+            type = GradientType::RADIAL;
+        }
         const QString id = element.attribute("id");
         QString linkId = element.attribute("xlink:href");
         Gradient* gradient = nullptr;
@@ -702,25 +710,58 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
         if(it != gUnresolvedGradientLinks.end()) {
             if(gradient) {
                 for(const auto& linking : it.value()) {
-                    gGradients[linking].fGradient = gradient;
+                    auto& grad = gGradients[linking];
+                    grad.fGradient = gradient;
+                    grad.fType = type;
                 }
             } else {
                 gUnresolvedGradientLinks[linkId] = it.value();
             }
         }
 
-        const QString x1 = element.attribute("x1");
-        const QString y1 = element.attribute("y1");
-        const QString x2 = element.attribute("x2");
-        const QString y2 = element.attribute("y2");
+        double x1;
+        double x2;
+        double y1;
+        double y2;
+        switch(type) {
+        case GradientType::LINEAR:
+        {
+            const QString x1s = element.attribute("x1");
+            const QString y1s = element.attribute("y1");
+            const QString x2s = element.attribute("x2");
+            const QString y2s = element.attribute("y2");
+
+            x1 = toDouble(x1s);
+            y1 = toDouble(y1s),
+            x2 = toDouble(x2s);
+            y2 = toDouble(y2s);
+            break;
+        }
+        case GradientType::RADIAL:
+        {
+            const QString cxs = element.attribute("cx");
+            const QString cys = element.attribute("cy");
+            const QString rs = element.attribute("r");
+
+            const double cx = toDouble(cxs);
+            const double cy = toDouble(cys);
+            const double r = toDouble(rs);
+
+            x1 = cx;
+            y1 = cy;
+            x2 = cx + r;
+            y2 = cy + r;
+            break;
+        }
+        }
+
         const QString gradTrans = element.attribute("gradientTransform");
         const QMatrix trans = getMatrixFromString(gradTrans);
         gGradients.insert(id, {gradient,
-                               toDouble(x1), toDouble(y1),
-                               toDouble(x2), toDouble(y2),
-                               trans});
-    }
-    if(tagName == "path" || tagName == "polyline" || tagName == "polygon") {
+                               x1, y1,
+                               x2, y2,
+                               trans, type});
+    } else if(tagName == "path" || tagName == "polyline" || tagName == "polygon") {
         VectorPathSvgAttributes attributes;
         attributes.setParent(parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
@@ -1115,6 +1156,7 @@ void FillSvgAttributes::setPaintType(const PaintType type) {
 }
 
 void FillSvgAttributes::setGradient(const SvgGradient& gradient) {
+    mGradientType = gradient.fType;
     mGradient = gradient.fGradient;
     mGradientP1 = gradient.fTrans.map(QPointF{gradient.fX1, gradient.fY1});
     mGradientP2 = gradient.fTrans.map(QPointF{gradient.fX2, gradient.fY2});
@@ -1145,6 +1187,7 @@ void FillSvgAttributes::apply(BoundingBox * const box,
         ColorPaintSetting(target, colorSetting).apply(pathBox);
     } else if(mPaintType == GRADIENTPAINT) {
         GradientPaintSetting(target, mGradient).apply(pathBox);
+        GradientTypePaintSetting(target, mGradientType).apply(pathBox);
         GradientPtsPosSetting(target, mGradientP1, mGradientP2).apply(pathBox);
         GradientTransformSetting(target, mGradientTransform).apply(pathBox);
     }
