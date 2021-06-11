@@ -606,13 +606,12 @@ void MainWindow::setupMenuBar() {
 
     mViewMenu = mMenuBar->addMenu(tr("View", "MenuBar"));
 
-    const auto ViewTransformMenu = mViewMenu->addMenu(
-                tr("Views","MenuBar_View"));
+    const auto zoomMenu = mViewMenu->addMenu(
+                tr("Zoom","MenuBar_View"));
 
-    mZoomInMenu = ViewTransformMenu->addAction(
-                tr("Zoom In", "MenuBar_Views"));
-    mZoomInMenu->setShortcut(Qt::Key_Plus);
-    connect(mZoomInMenu, &QAction::triggered,
+    mZoomInAction = zoomMenu->addAction(tr("Zoom In", "MenuBar_View_Zoom"));
+    mZoomInAction->setShortcut(Qt::KeypadModifier + Qt::Key_Plus);
+    connect(mZoomInAction, &QAction::triggered,
             this, [](){
         const auto target = KeyFocusTarget::KFT_getCurrentTarget();
         const auto cwTarget = dynamic_cast<CanvasWindow*>(target);
@@ -620,10 +619,9 @@ void MainWindow::setupMenuBar() {
         cwTarget->zoomInView();
     });
 
-    mZoomOutMenu = ViewTransformMenu->addAction(
-                tr("Zoom Out", "MenuBar_Views"));
-    mZoomOutMenu->setShortcut(Qt::Key_Minus);
-    connect(mZoomOutMenu, &QAction::triggered,
+    mZoomOutAction = zoomMenu->addAction(tr("Zoom Out", "MenuBar_View_Zoom"));
+    mZoomOutAction->setShortcut(Qt::KeypadModifier + Qt::Key_Minus);
+    connect(mZoomOutAction, &QAction::triggered,
             this, [](){
         const auto target = KeyFocusTarget::KFT_getCurrentTarget();
         const auto cwTarget = dynamic_cast<CanvasWindow*>(target);
@@ -631,10 +629,11 @@ void MainWindow::setupMenuBar() {
         cwTarget->zoomOutView();
     });
 
-    mFitViewMenu = ViewTransformMenu->addAction(
-                tr("Fit to Canvas", "MenuBar_Views"));
-    mFitViewMenu->setShortcut(Qt::Key_0);
-    connect(mFitViewMenu, &QAction::triggered,
+
+
+    mFitViewAction = zoomMenu->addAction(tr("Fit to Canvas", "MenuBar_View_Zoom"));
+    mFitViewAction->setShortcut(Qt::KeypadModifier + Qt::Key_0);
+    connect(mFitViewAction, &QAction::triggered,
             this, [](){
         const auto target = KeyFocusTarget::KFT_getCurrentTarget();
         const auto cwTarget = dynamic_cast<CanvasWindow*>(target);
@@ -642,10 +641,9 @@ void MainWindow::setupMenuBar() {
         cwTarget->fitCanvasToSize();
     });
 
-    mResetZoomMenu = ViewTransformMenu->addAction(
-                tr("Reset Zoom", "MenuBar_Views"));
-    mResetZoomMenu->setShortcut(Qt::Key_1);
-    connect(mResetZoomMenu, &QAction::triggered,
+    mResetZoomAction = zoomMenu->addAction(tr("Reset Zoom", "MenuBar_View_Zoom"));
+    mResetZoomAction->setShortcut(Qt::KeypadModifier + Qt::Key_1);
+    connect(mResetZoomAction, &QAction::triggered,
             this, [](){
         const auto target = KeyFocusTarget::KFT_getCurrentTarget();
         const auto cwTarget = dynamic_cast<CanvasWindow*>(target);
