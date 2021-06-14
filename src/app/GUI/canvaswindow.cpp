@@ -537,6 +537,10 @@ bool CanvasWindow::KFT_keyPressEvent(QKeyEvent *event) {
         if(canvasMode == CanvasMode::paint) mDocument.incBrushRadius();
     } else if(e.fKey == Qt::Key_Q) {
         if(canvasMode == CanvasMode::paint) mDocument.decBrushRadius();
+    } else if(e.fKey == Qt::Key_E) {
+        if(canvasMode == CanvasMode::paint) mDocument.setPaintMode(PaintMode::erase);
+    } else if(e.fKey == Qt::Key_B) {
+        if(canvasMode == CanvasMode::paint) mDocument.setPaintMode(PaintMode::normal);
     } else if((e.fKey == Qt::Key_Enter || e.fKey == Qt::Key_Return) &&
               canvasMode == CanvasMode::drawPath) {
         const bool manual = mDocument.fDrawPathManual;

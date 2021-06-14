@@ -188,7 +188,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mPaintNormalMode = SwitchButton::sCreate2Switch(
                 "toolbarButtons/paintChecked.png",
                 "toolbarButtons/paintUnchecked.png",
-                gSingleLineTooltip("Paint"), this);
+                gSingleLineTooltip("Paint", "B"), this);
     connect(mPaintNormalMode, &SwitchButton::toggled,
             this, [this](const int state) {
         if(state == 0) {
@@ -199,7 +199,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mPaintEraseMode = SwitchButton::sCreate2Switch(
                 "toolbarButtons/eraseChecked.png",
                 "toolbarButtons/eraseUnchecked.png",
-                gSingleLineTooltip("Erase"), this);
+                gSingleLineTooltip("Erase", "E"), this);
     mPaintEraseMode->setState(1);
     connect(mPaintEraseMode, &SwitchButton::toggled,
             this, [this](const int state) {

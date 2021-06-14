@@ -785,7 +785,7 @@ void MainWindow::setupMenuBar() {
                 tr("Fill and Stroke", "MenuBar_View_Docks"));
     mFillAndStrokeDockAct->setCheckable(true);
     mFillAndStrokeDockAct->setChecked(true);
-    mFillAndStrokeDockAct->setShortcut(QKeySequence(Qt::Key_E));
+    mFillAndStrokeDockAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
     connect(mFillStrokeSettingsDock, &CloseSignalingDockWidget::madeVisible,
             mFillAndStrokeDockAct, &QAction::setChecked);
@@ -796,7 +796,7 @@ void MainWindow::setupMenuBar() {
                 tr("Paint Brush", "MenuBar_View_Docks"));
     mBrushDockAction->setCheckable(true);
     mBrushDockAction->setChecked(false);
-    mBrushDockAction->setShortcut(QKeySequence(Qt::Key_B));
+    mBrushDockAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
 
     connect(mBrushSettingsDock, &CloseSignalingDockWidget::madeVisible,
             mBrushDockAction, &QAction::setChecked);
