@@ -95,7 +95,7 @@ qsptr<PathEffect> readIdCreatePathEffect(eReadStream &src) {
         const auto id = CustomIdentifier::sRead(src);
         const auto eff = CustomPathEffectCreator::sCreateForIdentifier(id);
         if(eff) return eff;
-        RuntimeThrow("Unrecogized CustomPathEffect identifier " + id.toString());
+        RuntimeThrow("Unrecognized CustomPathEffect identifier " + id.toString());
     } else RuntimeThrow("Invalid path effect type '" +
                         QString::number(int(type)) + "'");
 }
@@ -114,7 +114,7 @@ qsptr<PathEffect> readIdCreatePathEffectXEV(const QDomElement& ele) {
         const auto id = CustomIdentifier::sReadXEV(ele);
         const auto eff = CustomPathEffectCreator::sCreateForIdentifier(id);
         if(eff) return eff;
-        RuntimeThrow("Unrecogized CustomPathEffect identifier " + id.toString());
+        RuntimeThrow("Unrecognized CustomPathEffect identifier " + id.toString());
     } else RuntimeThrow("Invalid path effect type '" +
                         QString::number(int(type)) + "'");
 }

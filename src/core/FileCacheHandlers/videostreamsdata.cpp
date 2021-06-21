@@ -104,7 +104,7 @@ void VideoStreamsData::open(const char * const path) {
     }
     if(fVideoStreamIndex == -1)
         RuntimeThrow("Could not retrieve video stream");
-    if(!vidCodec) RuntimeThrow("Unsuported codec");
+    if(!vidCodec) RuntimeThrow("Unsupported codec");
 
     fCodecContext = avcodec_alloc_context3(vidCodec);
     if(!fCodecContext) RuntimeThrow("Error allocating AVCodecContext");

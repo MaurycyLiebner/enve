@@ -380,7 +380,7 @@ macx {
                           -change /usr/local/lib/libtcmalloc.4.dylib @rpath/libtcmalloc.4.dylib \
                           $$MAC_APP_FOLDER/Contents/MacOS/$$TARGET
 
-    # Wrap all application depdendencies for deployment. Apply -dmg flag for release DMG image.
+    # Wrap all application dependencies for deployment. Apply -dmg flag for release DMG image.
     # Use -appstore-compliant flag to workaround the inclusion of OBDC and PostgreSQL plugins.
     CONFIG(release, debug|release): QMAKE_POST_LINK += && macdeployqt $$MAC_APP_FOLDER -appstore-compliant -dmg
 }

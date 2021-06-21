@@ -2,7 +2,7 @@
     "comment": "MyPaint brush file", 
     "description": "Soft Fine Fountain Pen", 
     "group": "", 
-    "notes": "Quick movements will starve ink suppy.  Hard pressure will cause \"railroading\".  Can splatter a bit.\n\nAuthor: Brien Dieterle\nLicense: CC0/Public Domain", 
+    "notes": "Quick movements will starve ink supply.  Hard pressure will cause \"railroading\".  Can splatter a bit.\n\nAuthor: Brien Dieterle\nLicense: CC0/Public Domain", 
     "parent_brush_name": "Dieterle/Fountain_SF#1", 
     "settings": {
         "anti_aliasing": {

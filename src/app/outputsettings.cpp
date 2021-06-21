@@ -70,7 +70,7 @@ const std::map<uint64_t, QString> gChannelLayouts = {
     {AV_CH_BACK_LEFT, "Back left"},
     {AV_CH_BACK_RIGHT, "Back right"},
     {AV_CH_TOP_CENTER, "Top center"},
-    {AV_CH_TOP_FRONT_LEFT, "Top fron left"},
+    {AV_CH_TOP_FRONT_LEFT, "Top front left"},
     {AV_CH_TOP_FRONT_CENTER, "Top front center"},
     {AV_CH_TOP_FRONT_RIGHT, "Top front right"},
     {AV_CH_TOP_BACK_LEFT, "Top back left"},

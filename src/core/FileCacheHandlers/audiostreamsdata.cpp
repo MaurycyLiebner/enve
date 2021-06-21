@@ -156,7 +156,7 @@ void AudioStreamsData::open(AVFormatContext * const formatContext) {
     }
     if(fAudioStreamIndex == -1)
         RuntimeThrow("Could not retrieve audio stream");
-    if(!audCodec) RuntimeThrow("Unsuported codec");
+    if(!audCodec) RuntimeThrow("Unsupported codec");
 
     fCodecContext = avcodec_alloc_context3(audCodec);
     if(!fCodecContext) RuntimeThrow("Error allocating AVCodecContext");
