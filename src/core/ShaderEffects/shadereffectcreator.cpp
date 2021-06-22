@@ -506,7 +506,7 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
 
     QDomElement root = document.firstChildElement();
     if(root.tagName() != "ShaderEffect")
-        RuntimeThrow("Unrecogized root " + root.tagName() +
+        RuntimeThrow("Unrecognized root " + root.tagName() +
                      " in ShaderEffect source.");
     const QString effectName = root.attribute("name");
     const QString menuPath = root.attribute("menuPath");

@@ -238,7 +238,7 @@ void ExternalPaintAppHandler::setupFor(AnimatedSurface * const aSurface,
             gPrintException(false, "Could not open " + app + " using \"" + mExec + "\".\n"
                                    "Make sure the path to " + app + " executable is valid.");
             deleteLater();
-        } else gPrintException(false, "Error occured while running " + app + " using \"" + mExec + "\".\n"
+        } else gPrintException(false, "Error occurred while running " + app + " using \"" + mExec + "\".\n"
                                       "Make sure the path to " + app + " executable is valid.");
     });
     connect(execProc, qOverload<int, QProcess::ExitStatus>(&QProcess::finished),

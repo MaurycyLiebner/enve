@@ -173,7 +173,7 @@ qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream &src) {
         const auto id = CustomIdentifier::sRead(src);
         const auto eff = CustomRasterEffectCreator::sCreateForIdentifier(id);
         if(eff) return eff;
-        RuntimeThrow("Unrecogized CustomRasterEffect identifier " + id.toString());
+        RuntimeThrow("Unrecognized CustomRasterEffect identifier " + id.toString());
     } else if(type == RasterEffectType::CUSTOM_SHADER) {
         return readIdCreateShaderEffect(src);
     } else RuntimeThrow("Invalid RasterEffect type '" +
@@ -194,7 +194,7 @@ qsptr<RasterEffect> readIdCreateRasterEffectXEV(const QDomElement& ele) {
         const auto id = CustomIdentifier::sReadXEV(ele);
         const auto eff = CustomRasterEffectCreator::sCreateForIdentifier(id);
         if(eff) return eff;
-        RuntimeThrow("Unrecogized CustomRasterEffect identifier " + id.toString());
+        RuntimeThrow("Unrecognized CustomRasterEffect identifier " + id.toString());
     } else if(type == RasterEffectType::CUSTOM_SHADER) {
         return readIdCreateShaderEffectXEV(ele);
     } else RuntimeThrow("Invalid RasterEffect type '" +
