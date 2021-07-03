@@ -25,11 +25,20 @@ protected:
     void drawContents(QPainter* const p);
     void mousePressEvent(QMouseEvent *);
 private:
+    QString mTitle;
+    QString mSubTitle;
     QString mText;
+    QString mSponsors;
+    QString mAuthor;
+
+    QRect mTitleRect;
+    QRect mSubTitleRect;
     QRect mTextRect;
-    QRect mMessageRect;
-    QRect mBottomRect;
     QRect mSponsorsRect;
+    QRect mMessageRect;
+    QRect mAuthorRect;
+    QRect mBottomRect;
+
 };
 
 #endif // ENVESPLASH_H
