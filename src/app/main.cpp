@@ -175,11 +175,11 @@ int main(int argc, char *argv[]) {
     eFilterSettings filterSettings;
     QDir(eSettings::sSettingsDir()).mkpath(eSettings::sIconsDir());
     try {
-        const QString pngPath = eSettings::sIconsDir() + "/splash1.png";
+        const QString pngPath = eSettings::sIconsDir() + "/splash2021.png";
 #ifdef QT_DEBUG
         QFile(pngPath).remove();
 #endif
-        IconLoader::generate(":/pixmaps/splash.svg", eSizesUI::widget/22., pngPath);
+        IconLoader::generate(":/pixmaps/splash2021.svg", eSizesUI::widget/22., pngPath);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
     }
