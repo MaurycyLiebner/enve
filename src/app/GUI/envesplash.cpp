@@ -30,7 +30,7 @@ EnveSplash::EnveSplash() {
     mSponsors = "Thank you for your support!";
     mAuthor = "Maurycy Liebner";
 
-    const auto splashPath = eSettings::sIconsDir() + "/splash1.png";
+    const auto splashPath = eSettings::sIconsDir() + "/splash2021.png";
     const QPixmap pixmap(splashPath);
     const int x = qRound(0.4*pixmap.width());
     const int width = qRound(0.55*pixmap.width());
