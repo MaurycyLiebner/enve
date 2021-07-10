@@ -107,6 +107,8 @@ MainWindow::MainWindow(Document& document,
     connect(&mDocument, &Document::sceneCreated,
             this, &MainWindow::closeWelcomeDialog);
 
+
+
     const auto iconDir = eSettings::sIconsDir();
     setWindowIcon(QIcon(iconDir + "/enve.png"));
     const auto downArr = iconDir + "/down-arrow.png";
@@ -249,8 +251,13 @@ MainWindow::MainWindow(Document& document,
         mFilesDock->setMaximumWidth(size*20);
     });
 
-    mFilesDock->setWidget(new FileSourceList(this));
+    const auto fsl = new FileSourceList(this);
+    mFilesDock->setWidget(fsl);
     addDockWidget(Qt::LeftDockWidgetArea, mFilesDock);
+    connect(fsl, &FileSourceList::doubleClicked,
+            this, &MainWindow::importFile);
+
+
 
 
     {
@@ -943,7 +950,7 @@ void MainWindow::setupToolBar() {
     mRectangleMode = SwitchButton::sCreate2Switch(
                 "toolbarButtons/rectCreateUnchecked.png",
                 "toolbarButtons/rectCreateChecked.png",
-                gSingleLineTooltip(tr("Add Rectange Mode", "ToolBar"), "F7"), this);
+                gSingleLineTooltip(tr("Add Rectangle Mode", "ToolBar"), "F7"), this);
     mToolBar->addWidget(mRectangleMode);
 
     mTextMode = SwitchButton::sCreate2Switch(

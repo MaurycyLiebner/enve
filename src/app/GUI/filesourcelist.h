@@ -58,6 +58,7 @@ public:
     void setTargetCache(FileCacheHandlerAbstraction *target);
 
     void switchFileNameOnly();
+
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -123,13 +124,18 @@ protected:
 };
 
 class FileSourceList : public ScrollArea {
+    Q_OBJECT
 public:
     FileSourceList(QWidget *parent = nullptr);
+
+signals:
+    void doubleClicked();
 
 protected:
     void dropEvent(QDropEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *) { emit doubleClicked(); }
 private:
     FileSourceListScrollWidget *mScrollWidget;
 };
