@@ -257,9 +257,6 @@ MainWindow::MainWindow(Document& document,
     connect(fsl, &FileSourceList::doubleClicked,
             this, &MainWindow::importFile);
 
-
-
-
     {
         const auto brush = BrushCollectionData::sGetBrush("Deevad", "2B_pencil");
         const auto paintCtxt = BrushSelectionWidget::sPaintContext;

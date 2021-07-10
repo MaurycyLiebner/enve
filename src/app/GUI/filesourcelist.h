@@ -127,10 +127,8 @@ class FileSourceList : public ScrollArea {
     Q_OBJECT
 public:
     FileSourceList(QWidget *parent = nullptr);
-
 signals:
     void doubleClicked();
-
 protected:
     void dropEvent(QDropEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
