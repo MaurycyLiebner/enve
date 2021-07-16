@@ -550,6 +550,9 @@ QColor ColorSettingsWidget::getCurrentQColor() {
     const qreal green = gSpin->value();
     const qreal blue = bSpin->value();
     const qreal alpha = aSpin->value();
+    const auto colorSetting = getColorSetting(ColorSettingType::change,
+                                              mLastTriggered);
+    emit colorSettingSignal(colorSetting);
     return QColor::fromRgbF(red, green, blue, alpha);
 }
 
