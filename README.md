@@ -41,7 +41,7 @@ See [Source and Building info.md](/Source%20and%20building%20info.md) for in-det
 
 ## Authors
 
-**Maurycy Liebner** - 2016 - 2020 - [MaurycyLiebner](https://github.com/MaurycyLiebner)
+**Maurycy Liebner** - 2016 - 2021 - [MaurycyLiebner](https://github.com/MaurycyLiebner)
 
 ## License
 
