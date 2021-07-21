@@ -62,6 +62,9 @@ void ColorSettingsWidget::updateWidgetTargets() {
         }
 
         updateAlphaFromSpin();
+        const auto currColor = getCurrentQColor();
+        mHexEdit->setText(currColor.name(QColor::HexArgb));
+
     } else {
         rSpin->setTarget(nullptr);
         gSpin->setTarget(nullptr);
@@ -88,6 +91,7 @@ void ColorSettingsWidget::setTarget(ColorAnimator * const target) {
         conn << connect(target, &ColorAnimator::colorChanged,
                         mBookmarkedColors, &SavedColorsWidget::setColor);
         mBookmarkedColors->setColor(getCurrentQColor());
+
     }
 }
 
@@ -337,8 +341,8 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
 
     hexLayout = new QHBoxLayout;
     hexLayout->addWidget(new QLabel("Hex", this));
-    const auto hexEdit = new QLineEdit("#FF000000", this);
-    hexLayout->addWidget(hexEdit);
+    mHexEdit = new QLineEdit("#FF000000", this);
+    hexLayout->addWidget(mHexEdit);
     mRGBLayout->addLayout(hexLayout);
 
     mColorModeLayout->addWidget(mColorModeLabel);
@@ -453,11 +457,11 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
             this, &ColorSettingsWidget::emitEditingFinishedSignal);
 
     connect(this, &ColorSettingsWidget::colorSettingSignal,
-            hexEdit, [hexEdit](const ColorSetting& sett) {
-        if(hexEdit->hasFocus()) return;
-        hexEdit->setText(sett.getColor().name(QColor::HexArgb));
+            this, [this](const ColorSetting& sett) {
+        if(mHexEdit->hasFocus()) return;
+        mHexEdit->setText(sett.getColor().name(QColor::HexArgb));
     });
-    connect(hexEdit, &QLineEdit::textEdited,
+    connect(mHexEdit, &QLineEdit::textEdited,
             this, [this](const QString& text) {
         const QColor color(text);
         emitStartFullColorChangedSignal();

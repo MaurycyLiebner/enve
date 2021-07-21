@@ -195,6 +195,7 @@ private:
             new QrealAnimatorValueSlider(0., 1., 0.01, this);
 
     QHBoxLayout *hexLayout;
+    QLineEdit *mHexEdit;
 
     QHBoxLayout *mColorLabelLayout = new QHBoxLayout();
     ActionButton *mPickingButton;
