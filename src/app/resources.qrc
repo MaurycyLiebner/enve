@@ -29,7 +29,7 @@
         <file alias="value.frag">GUI/ColorWidgets/colorwidgetshaders/value.frag</file>
     </qresource>
     <qresource prefix="/pixmaps">
-        <file>splash2021.svg</file>
+        <file>splash.svg</file>
     </qresource>
     <qresource prefix="/other">
         <file>GPL3-license.txt</file>

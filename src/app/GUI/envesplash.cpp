@@ -20,89 +20,59 @@
 
 #include "Private/esettings.h"
 
+QString EnveSplash::sSplashPath() {
+    return eSettings::sIconsDir() + "/splash2.png";
+}
+
 EnveSplash::EnveSplash() {
-    mTitle = "Welcome to Enve";
-    mSubTitle = "open-source 2D animation software";
-    mText = "Further development will only be possible with your support. \n"
+    mText = "Welcome to enve - open-source 2D animation software.\n\n"
+            "Further development will only be possible with your support. "
             "Press 'Support enve' on the menu bar for more information.\n\n"
-            "Please note that major version zero 0.x.y is for initial development; \n"
+            "Please note that major version zero 0.x.y is for initial development; "
             "hence numerous bugs should be expected.";
-    mSponsors = "Thank you for your support!";
-    mAuthor = "Maurycy Liebner";
-
-    const auto splashPath = eSettings::sIconsDir() + "/splash2021.png";
-    const QPixmap pixmap(splashPath);
-    const int x = qRound(0.4*pixmap.width());
-    const int width = qRound(0.55*pixmap.width());
-
-    mTitleRect = QRect(x, qRound(0.2*pixmap.height()),
-                      width, qRound(0.15*pixmap.height()));
-
-    mSubTitleRect = QRect(x, qRound(0.3*pixmap.height()),
-                            width, qRound(0.1*pixmap.height()));
-
-    mTextRect = QRect(x, qRound(0.4*pixmap.height()),
-                      width, qRound(0.3*pixmap.height()));
-
-    mSponsorsRect = QRect(x, qRound(0.65*pixmap.height()),
-                        width, qRound(0.15*pixmap.height()));
-
-    mAuthorRect = QRect(x, qRound(0.73*pixmap.height()),
-                        width, qRound(0.1*pixmap.height()));
-
-    mBottomRect = QRect(x, qRound(0.88*pixmap.height()),
+    const QPixmap pixmap(sSplashPath());
+    const int x = qRound(0.03*pixmap.width());
+    const int width = qRound(0.94*pixmap.width());
+    mTextRect = QRect(x, qRound(0.16*pixmap.height()),
+                      width, qRound(0.42*pixmap.height()));
+    mMessageRect = QRect(x, qRound(0.65*pixmap.height()),
+                         width, qRound(0.08*pixmap.height()));
+    mSponsorsRect = QRect(x, qRound(0.72*pixmap.height()),
+                        width, qRound(0.24*pixmap.height()));
+    mBottomRect = QRect(x, qRound(0.91*pixmap.height()),
                         width, qRound(0.09*pixmap.height()));
     setPixmap(pixmap);
     setFixedSize(pixmap.width(), pixmap.height());
-//    setWindowFlag(Qt::WindowStaysOnTopHint);
+    //    setWindowFlag(Qt::WindowStaysOnTopHint);
 }
 
 void EnveSplash::drawContents(QPainter * const p) {
+    p->setPen(QColor(125, 125, 125));
+    p->drawRect(mTextRect);
+    p->drawRect(mMessageRect);
+
     p->setPen(Qt::white);
 
-    QFont MainTitle = p->font();
-    MainTitle.setPointSizeF(MainTitle.pointSizeF()*2.4);
-    MainTitle.setWeight(QFont::Bold);
-    p->setFont(MainTitle);
-    p->drawText(mTitleRect,
-                Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, mTitle);
-
-    QFont SubTitle = p->font();
-    SubTitle.setPointSizeF(SubTitle.pointSizeF()*0.6);
-    SubTitle.setWeight(QFont::Bold);
-    p->setFont(SubTitle);
-    p->drawText(mSubTitleRect.adjusted(4, 0, 0, 0),
-                Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, mSubTitle);
-
-    QFont Texte = p->font();
-    Texte.setPointSizeF(SubTitle.pointSizeF()*0.6);
-    Texte.setWeight(QFont::Light);
-    p->setFont(Texte);
-    p->drawText(mTextRect.adjusted(4, 0, 0, 0),
+    QFont font = p->font();
+    font.setPointSizeF(font.pointSizeF()*1.5);
+    font.setFamily("FreeMono");
+    p->setFont(font);
+    const int w = width();
+    const int marg = w/80;
+    p->drawText(mTextRect.adjusted(marg, marg, -marg, -marg),
                 Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, mText);
-
-
-    QFont Sponsors = p->font();
-    Sponsors.setPointSizeF(Sponsors.pointSizeF()*1.6666);
-    Sponsors.setWeight(QFont::Bold);
-    p->setFont(Sponsors);
-    p->drawText(mSponsorsRect.adjusted(4, 0, 0, 0), Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, mSponsors);
-
-    QFont Autor = p->font();
-    Autor.setPointSizeF(Autor.pointSizeF()*0.6);
-    Autor.setWeight(QFont::Light);
-    p->setFont(Autor);
-    p->drawText(mAuthorRect.adjusted(4, 0, 0, 0), Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, mAuthor);
-
+    p->drawText(mMessageRect, Qt::AlignCenter, message());
+    p->setPen(QColor(Qt::gray));
+    p->drawText(mSponsorsRect, Qt::AlignVCenter, "Thank you for your support!");
+    p->drawText(mBottomRect, Qt::AlignVCenter | Qt::AlignLeft, "Maurycy Liebner");
     QString rightTxt;
-   #if defined(LATEST_COMMIT_HASH) && defined(LATEST_COMMIT_DATE)
-       const QString date(LATEST_COMMIT_DATE);
-       rightTxt = QString(LATEST_COMMIT_HASH) + " " + date.split(" ").first();
-   #else
-       rightTxt = ENVE_VERSION;
-   #endif
-       p->drawText(mBottomRect, Qt::AlignVCenter | Qt::AlignRight, rightTxt);
-
+#if defined(LATEST_COMMIT_HASH) && defined(LATEST_COMMIT_DATE)
+    const QString date(LATEST_COMMIT_DATE);
+    rightTxt = QString(LATEST_COMMIT_HASH) + " " + date.split(" ").first();
+#else
+    rightTxt = ENVE_VERSION;
+#endif
+    p->drawText(mBottomRect, Qt::AlignVCenter | Qt::AlignRight, rightTxt);
 }
 
 void EnveSplash::mousePressEvent(QMouseEvent *) {

@@ -21,6 +21,8 @@
 class EnveSplash : public QSplashScreen {
 public:
     EnveSplash();
+
+    static QString sSplashPath();
 protected:
     void drawContents(QPainter* const p);
     void mousePressEvent(QMouseEvent *);
