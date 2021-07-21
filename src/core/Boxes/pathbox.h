@@ -121,6 +121,7 @@ protected:
     SkPath mEditPathSk;
     SkPath mPathSk;
     SkPath mFillPathSk;
+    SkPath mOutlineBasePathSk;
     SkPath mOutlinePathSk;
 
     GradientPoints* mFillGradientPoints = nullptr;

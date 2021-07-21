@@ -99,7 +99,7 @@ void PathBoxRenderData::drawSk(SkCanvas * const canvas) {
             QMatrix trans;
             trans.translate(-fGlobalRect.x(), -fGlobalRect.y());
             trans = fScaledTransform*trans;
-            fPath.transform(toSkMatrix(trans), &pathT);
+            fOutlineBasePath.transform(toSkMatrix(trans), &pathT);
 
         //                const auto fillBrush = fStrokeSettings.fStrokeBrush->getBrush();
         //                auto fillWidthCurve = fStrokeSettings.fWidthCurve*fResolution;

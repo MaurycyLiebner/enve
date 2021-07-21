@@ -150,6 +150,7 @@ void PathBox::setupRenderData(const qreal relFrame,
     QList<stdsptr<PathEffectCaller>> outlineBaseEffects;
     QList<stdsptr<PathEffectCaller>> outlineEffects;
     if(currentOutlinePathCompatible) {
+        pathData->fOutlineBasePath = mOutlineBasePathSk;
         pathData->fOutlinePath = mOutlinePathSk;
     } else {
         setupStrokerSettings(pathData, relFrame);
@@ -378,6 +379,7 @@ void PathBox::updateCurrentPreviewDataFromRenderData(
         mCurrentPathsFrame = renderData->fRelFrame;
         mEditPathSk = pathRenderData->fEditPath;
         mPathSk = pathRenderData->fPath;
+        mOutlineBasePathSk = pathRenderData->fOutlineBasePath;
         mOutlinePathSk = pathRenderData->fOutlinePath;
         mFillPathSk = pathRenderData->fFillPath;
         mCurrentPathsOutdated = false;
