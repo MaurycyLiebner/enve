@@ -257,6 +257,9 @@ MainWindow::MainWindow(Document& document,
     connect(fsl, &FileSourceList::doubleClicked,
             this, &MainWindow::importFile);
 
+
+
+
     {
         const auto brush = BrushCollectionData::sGetBrush("Deevad", "2B_pencil");
         const auto paintCtxt = BrushSelectionWidget::sPaintContext;
@@ -1026,7 +1029,7 @@ void MainWindow::setupToolBar() {
     mActionNewEmptyPaintFrameAct = mToolBar->addWidget(mActionNewEmptyPaintFrame);
 
     eSizesUI::widget.add(mToolBar, [this](const int size) {
-        mToolBar->setFixedHeight(2*size);
+        mToolBar->setMinimumHeight(2*size);
     });
 
     addToolBar(mToolBar);
