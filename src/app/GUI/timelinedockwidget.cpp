@@ -83,7 +83,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
 
     mPlayFromBeginningButton = new ActionButton(
                 "toolbarButtons/preview.png",
-                gSingleLineTooltip("Play From the Beginning"), this);
+                gSingleLineTooltip("Play From the Beginning", "Shift + Space"), this);
     connect(mPlayFromBeginningButton, &ActionButton::pressed,
             this, [this]() {
         const auto scene = *mDocument.fActiveScene;
@@ -458,7 +458,18 @@ bool TimelineDockWidget::processKeyPress(QKeyEvent *event) {
         const auto state = RenderHandler::sInstance->currentPreviewState();
         if(state == PreviewSate::stopped) return false;
         interruptPreview();
-    } else if(key == Qt::Key_Space) {
+   //back to beginning
+    } else if (key == Qt::Key_Space && (mods & Qt::ShiftModifier)){
+        const auto scene = *mDocument.fActiveScene;
+        if(!scene) return false;
+        scene->anim_setAbsFrame(scene->getFrameRange().fMin);
+        interruptPreview();
+        const auto state = RenderHandler::sInstance->currentPreviewState();
+        if (state == PreviewSate::stopped) return false;
+        renderPreview();
+    }
+
+    else if(key == Qt::Key_Space) {
         const auto state = RenderHandler::sInstance->currentPreviewState();
         switch(state) {
             case PreviewSate::stopped: renderPreview(); break;
@@ -466,11 +477,11 @@ bool TimelineDockWidget::processKeyPress(QKeyEvent *event) {
             case PreviewSate::playing: pausePreview(); break;
             case PreviewSate::paused: resumePreview(); break;
         }
-    } else if(key == Qt::Key_Right && !(mods & Qt::ControlModifier)) {
+    } else if(key == Qt::Key_Right && (mods & Qt::ControlModifier)) {
         mDocument.incActiveSceneFrame();
-    } else if(key == Qt::Key_Left && !(mods & Qt::ControlModifier)) {
+    } else if(key == Qt::Key_Left && (mods & Qt::ControlModifier)) {
         mDocument.decActiveSceneFrame();
-    } else if(key == Qt::Key_Down && !(mods & Qt::ControlModifier)) {
+    } else if(key == Qt::Key_Down && (mods & Qt::ControlModifier)) {
         const auto scene = *mDocument.fActiveScene;
         if(!scene) return false;
         int targetFrame;
@@ -478,7 +489,7 @@ bool TimelineDockWidget::processKeyPress(QKeyEvent *event) {
         if(scene->anim_prevRelFrameWithKey(frame, targetFrame)) {
             mDocument.setActiveSceneFrame(targetFrame);
         }
-    } else if(key == Qt::Key_Up && !(mods & Qt::ControlModifier)) {
+    } else if(key == Qt::Key_Up && (mods & Qt::ControlModifier)) {
         const auto scene = *mDocument.fActiveScene;
         if(!scene) return false;
         int targetFrame;
