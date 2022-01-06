@@ -164,7 +164,7 @@ void MemoryChecker::checkMemory() {
     } else if(procFreeKB.fValue < 0) {
         emit handleMemoryState(LOW_MEMORY_STATE, longB(-procFreeKB));
         mLastMemoryState = LOW_MEMORY_STATE;
-    } else if(mLastMemoryState != NORMAL_MEMORY_STATE) {
+    } else/* if(mLastMemoryState != NORMAL_MEMORY_STATE)*/ {
         emit handleMemoryState(NORMAL_MEMORY_STATE, longB(0));
         mLastMemoryState = NORMAL_MEMORY_STATE;
     }
