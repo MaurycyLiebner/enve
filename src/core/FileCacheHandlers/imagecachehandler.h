@@ -33,7 +33,7 @@ public:
     void afterProcessing();
     void afterCanceled();
 protected:
-    ImageFileDataHandler * const mTargetHandler;
+    const qptr<ImageFileDataHandler> mTargetHandler;
     const QString mFilePath;
     sk_sp<SkImage> mImage;
 };

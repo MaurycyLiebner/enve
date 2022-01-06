@@ -89,11 +89,11 @@ void ImageLoader::process() {
 }
 
 void ImageLoader::afterProcessing() {
-    mTargetHandler->replaceImage(mImage);
+    if(mTargetHandler) mTargetHandler->replaceImage(mImage);
 }
 
 void ImageLoader::afterCanceled() {
-    mTargetHandler->replaceImage(mImage);
+    if(mTargetHandler) mTargetHandler->replaceImage(mImage);
 }
 
 void OraLoader::process() {
