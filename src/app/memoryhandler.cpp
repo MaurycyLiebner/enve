@@ -60,6 +60,10 @@ MemoryHandler::~MemoryHandler() {
     delete mMemoryChecker;
 }
 
+void MemoryHandler::clearMemory() {
+    freeMemory(NORMAL_MEMORY_STATE, longB(std::numeric_limits<qint64>::max()));
+}
+
 MemoryState MemoryHandler::sMemoryState() {
     return sInstance->mMemoryState;
 }

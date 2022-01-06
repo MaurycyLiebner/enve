@@ -26,6 +26,8 @@ public:
     explicit MemoryHandler(QObject * const parent = nullptr);
     ~MemoryHandler();
 
+    void clearMemory();
+
     static MemoryHandler *sInstance;
     static MemoryState sMemoryState();
 signals:

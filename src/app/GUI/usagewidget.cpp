@@ -20,6 +20,7 @@
 #include "Private/Tasks/taskscheduler.h"
 #include "Private/Tasks/complextask.h"
 #include "conncontextptr.h"
+#include "memoryhandler.h"
 
 #include <QTimer>
 #include <QLocale>
@@ -146,6 +147,13 @@ UsageWidget::UsageWidget(QWidget * const parent) : QStatusBar(parent) {
 
     mRamLabel = new QLabel(this);
 
+    const auto clearRamButton = new QPushButton("clear memory", this);
+    connect(clearRamButton, &QPushButton::clicked,
+            this, []() {
+        const auto m = MemoryHandler::sInstance;
+        m->clearMemory();
+    });
+
     addPermanentWidget(gpuLabel);
     addPermanentWidget(mGpuBar);
 
@@ -159,6 +167,8 @@ UsageWidget::UsageWidget(QWidget * const parent) : QStatusBar(parent) {
     addPermanentWidget(mRamBar);
 
     addPermanentWidget(mRamLabel);
+
+    addPermanentWidget(clearRamButton);
 
     setThreadsTotal(QThread::idealThreadCount());
 
@@ -200,7 +210,7 @@ void UsageWidget::setTotalRam(const qreal totalRamMB) {
 }
 
 void UsageWidget::addComplexTask(ComplexTask * const task) {
-    for(const auto wid : mTaskWidgets) {
+    for(const auto wid : qAsConst(mTaskWidgets)) {
         if(wid->isHidden()) {
             return wid->setComplexTask(task);
         }
