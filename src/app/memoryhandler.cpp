@@ -90,10 +90,10 @@ void MemoryHandler::freeMemory(const MemoryState newState,
         const auto cont = mDataHandler.takeFirst();
         memToFree -= cont->free_RAM_k();
     }
-    if(newState == CRITICAL_MEMORY_STATE) {
+    if(newState == CRITICAL_MEMORY_STATE ||
+       memToFree > 0) {
+        mMemoryState = CRITICAL_MEMORY_STATE;
         emit enteredCriticalState();
-        emit allMemoryUsed();
-    } else if(memToFree > 0) {
         emit allMemoryUsed();
     }
     emit memoryFreed();
