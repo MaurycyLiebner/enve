@@ -193,7 +193,6 @@ void RenderHandler::interruptPreview() {
 
 void RenderHandler::outOfMemory() {
     if(mRenderingPreview) {
-        TaskScheduler::sClearTasks();
         playPreview();
     }
 }
