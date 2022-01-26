@@ -93,8 +93,6 @@ int SmartPath::actionInsertNodeBetween(const int prevId,
     const auto next = getNodePtr(nextId);
 
     if(!mNodesList.nodesConnected(prevId, nextId)) {
-        if(!prev->isNormal() || !next->isNormal())
-            RuntimeThrow("Invalid insert between not connected nodes");
         const int prevNormalId = prev->getNodeId();
         const int nextNormalId = next->getNodeId();
         const int nDiss = prevNormalId < nextNormalId ?
