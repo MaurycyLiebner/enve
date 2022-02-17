@@ -229,6 +229,16 @@ public:
         return mParent_k->getFirstAncestor<T>();
     }
 
+    template <class T = Property, class U = BoundingBox>
+    QList<U*> getFirstAncestorList(const QList<U*>& in = QList<U*>()) const {
+        if(!mParent_k) return QList<U*>();
+        QList<U*> out = in;
+        out << getParent<U>();
+        const auto target = enve_cast<T*>(*mParent_k);
+        if(target) return out;
+        return mParent_k->getFirstAncestorList<T, U>(out);
+    }
+
     bool prp_isParentBoxSelected() const;
 
     bool prp_drawsOnCanvas() const

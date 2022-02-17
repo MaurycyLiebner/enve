@@ -323,10 +323,10 @@ public:
 
     stdsptr<BoxRenderData> createRenderData();
 
-    void setupRenderData(const qreal relFrame,
+    void setupRenderData(const qreal relFrame, const qreal parentRelFrame,
                          BoxRenderData * const data,
                          Canvas* const scene) {
-        ContainerBox::setupRenderData(relFrame, data, scene);
+        ContainerBox::setupRenderData(relFrame, parentRelFrame, data, scene);
         auto canvasData = static_cast<CanvasRenderData*>(data);
         canvasData->fBgColor = toSkColor(mBackgroundColor->getColor());
         canvasData->fCanvasHeight = mHeight;

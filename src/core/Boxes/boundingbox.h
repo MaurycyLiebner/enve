@@ -195,7 +195,7 @@ public:
 
     virtual void setupCanvasMenu(PropertyMenu * const menu);
 
-    virtual void setupRenderData(const qreal relFrame,
+    virtual void setupRenderData(const qreal relFrame, const qreal parentRelFrame,
                                  BoxRenderData * const data,
                                  Canvas * const scene);
     virtual void renderDataFinished(BoxRenderData *renderData);
@@ -252,7 +252,8 @@ public:
     BasicTransformAnimator *getTransformAnimator() const;
 
     stdsptr<BoxRenderData> createRenderData(const qreal relFrame);
-    stdsptr<BoxRenderData> queRender(const qreal relFrame);
+    stdsptr<BoxRenderData> queRender(const qreal relFrame,
+                                     const qreal parentRelFrame);
     stdsptr<BoxRenderData> queExternalRender(
             const qreal relFrame, const bool forceRasterize);
 

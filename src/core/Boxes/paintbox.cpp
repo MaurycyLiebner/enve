@@ -50,10 +50,10 @@ public:
     stdsptr<DrawableAutoTiledSurface> fSurface;
 };
 
-void PaintBox::setupRenderData(const qreal relFrame,
+void PaintBox::setupRenderData(const qreal relFrame, const qreal parentRelFrame,
                                BoxRenderData * const data,
                                Canvas* const scene) {
-    BoundingBox::setupRenderData(relFrame, data, scene);
+    BoundingBox::setupRenderData(relFrame, parentRelFrame, data, scene);
     const auto paintData = static_cast<PaintBoxRenderData*>(data);
     const int imgFrame = qFloor(relFrame);
     const auto imgTask = mSurface->getFrameImage(imgFrame, paintData->fImage);

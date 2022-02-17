@@ -44,7 +44,7 @@ protected:
 public:
     void setupCanvasMenu(PropertyMenu * const menu);
 
-    void setupRenderData(const qreal relFrame,
+    void setupRenderData(const qreal relFrame, const qreal parentRelFrame,
                          BoxRenderData * const data,
                          Canvas * const scene);
     stdsptr<BoxRenderData> createRenderData();

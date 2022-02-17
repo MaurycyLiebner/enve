@@ -59,8 +59,13 @@ public:
     qsptr<BoundingBox> createLink(const bool inner);
     stdsptr<BoxRenderData> createRenderData();
     void setupRenderData(const qreal relFrame,
+                         const qreal parentRelFrame,
                          BoxRenderData * const data,
                          Canvas * const scene);
+    void processChildrenData(const qreal relFrame,
+                             const qreal parentRelFrame,
+                             BoxRenderData* const data,
+                             Canvas* const scene);
 
     virtual BoundingBox *getBoxAt(const QPointF &absPos);
 

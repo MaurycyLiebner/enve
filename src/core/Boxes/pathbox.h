@@ -54,7 +54,7 @@ public:
 
     void drawHoveredSk(SkCanvas *canvas, const float invScale);
 
-    void setupRenderData(const qreal relFrame,
+    void setupRenderData(const qreal relFrame, const qreal parentRelFrame,
                          BoxRenderData * const data,
                          Canvas * const scene);
     stdsptr<BoxRenderData> createRenderData() {

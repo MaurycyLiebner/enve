@@ -943,6 +943,7 @@ void ContainerBox::updateIfUsesProgram(
 void processChildData(BoundingBox * const child,
                       ContainerBoxRenderData * const parentData,
                       const qreal childRelFrame,
+                      const qreal parentRelFrame,
                       const qreal absFrame,
                       QList<ChildRenderData>& delayed) {
     if(!child->isFrameFVisibleAndInDurationRect(childRelFrame)) return;
@@ -953,12 +954,15 @@ void processChildData(BoundingBox * const child,
         for(int i = minMax.fMax; i >= minMax.fMin; i--) {
             const auto& desc = descs.at(i);
             const qreal descRelFrame = desc->prp_absFrameToRelFrameF(absFrame);
-            processChildData(desc, parentData, descRelFrame, absFrame, delayed);
+            processChildData(desc, parentData, descRelFrame,
+                             parentRelFrame, absFrame, delayed);
         }
         return;
     }
     auto boxRenderData = child->getCurrentRenderData(childRelFrame);
-    if(!boxRenderData) boxRenderData = child->queRender(childRelFrame);
+    if(!boxRenderData) {
+        boxRenderData = child->queRender(childRelFrame, parentRelFrame);
+    }
     if(!boxRenderData) return;
     boxRenderData->addDependent(parentData);
     ChildRenderData cData = boxRenderData;
@@ -969,14 +973,10 @@ void processChildData(BoundingBox * const child,
     parentData->fChildrenRenderData << cData;
 }
 
-stdsptr<BoxRenderData> ContainerBox::createRenderData() {
-    return enve::make_shared<ContainerBoxRenderData>(this);
-}
-
-void ContainerBox::setupRenderData(const qreal relFrame,
-                                   BoxRenderData * const data,
-                                   Canvas* const scene) {
-    BoundingBox::setupRenderData(relFrame, data, scene);
+void ContainerBox::processChildrenData(const qreal relFrame,
+                                       const qreal parentRelFrame,
+                                       BoxRenderData * const data,
+                                       Canvas* const scene) {
     const auto groupData = static_cast<ContainerBoxRenderData*>(data);
     groupData->fChildrenRenderData.clear();
     groupData->fOtherGlobalRects.clear();
@@ -986,7 +986,8 @@ void ContainerBox::setupRenderData(const qreal relFrame,
     for(int i = minMax.fMax; i >= minMax.fMin; i--) {
         const auto& box = mContainedBoxes.at(i);
         const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
-        processChildData(box, groupData, boxRelFrame, absFrame, delayed);
+        processChildData(box, groupData, boxRelFrame,
+                         parentRelFrame, absFrame, delayed);
     }
     for(auto& del : delayed) {
         auto& iClip = del.fClip;
@@ -1012,13 +1013,25 @@ void ContainerBox::setupRenderData(const qreal relFrame,
         return c1.fClip.fTargetIndex < c2.fClip.fTargetIndex;
     });
     int shift = 0;
-    for(const auto& del : delayed) {
+    for(const auto& del : qAsConst(delayed)) {
         const auto& iClip = del.fClip;
         if(iClip.fTargetBox) continue;
         const int targetIndex = iClip.fTargetIndex + shift;
         groupData->fChildrenRenderData.insert(targetIndex, del);
         shift++;
     }
+}
+
+stdsptr<BoxRenderData> ContainerBox::createRenderData() {
+    return enve::make_shared<ContainerBoxRenderData>(this);
+}
+
+void ContainerBox::setupRenderData(const qreal relFrame,
+                                   const qreal parentRelFrame,
+                                   BoxRenderData * const data,
+                                   Canvas* const scene) {
+    BoundingBox::setupRenderData(relFrame, parentRelFrame, data, scene);
+    processChildrenData(relFrame, parentRelFrame, data, scene);
 }
 
 void ContainerBox::selectAllBoxesFromBoxesGroup() {

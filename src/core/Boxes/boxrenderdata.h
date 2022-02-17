@@ -96,6 +96,8 @@ public:
     qreal fOpacity = 1;
     qreal fResolution;
     qreal fRelFrame;
+    bool fAncLinkScene = false;
+    qreal fAncLinkSceneFrame;
 
     // for motion blur
     stdptr<BoxRenderData> fMotionBlurTarget;

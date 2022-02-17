@@ -39,29 +39,29 @@ void InternalLinkCanvas::disableFrameRemappingAction() {
     mFrameRemapping->disableAction();
 }
 
-#include "typemenu.h"
-#include <QInputDialog>
-void InternalLinkCanvas::setupCanvasMenu(PropertyMenu * const menu) {
-    if(menu->hasActionsForType<InternalLinkCanvas>()) return;
-    menu->addedActionsForType<InternalLinkCanvas>();
-
+void InternalLinkCanvas::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     const PropertyMenu::CheckSelectedOp<InternalLinkCanvas> remapOp =
-    [](InternalLinkCanvas * box, bool checked) {
+    [](InternalLinkCanvas* const box, const bool checked) {
         if(checked) box->enableFrameRemappingAction();
         else box->disableFrameRemappingAction();
     };
     menu->addCheckableAction("Frame Remapping",
-                             mFrameRemapping->enabled(), remapOp);
+                             mFrameRemapping->enabled(),
+                             remapOp);
 
-    BoundingBox::setupCanvasMenu(menu);
+    menu->addSeparator();
+
+    InternalLinkGroupBox::prp_setupTreeViewMenu(menu);
 }
 
-void InternalLinkCanvas::setupRenderData(const qreal relFrame,
+void InternalLinkCanvas::setupRenderData(const qreal relFrame, const qreal parentRelFrame,
                                          BoxRenderData * const data,
                                          Canvas* const scene) {
-    const qreal remapped = mFrameRemapping->frame(relFrame);
-    InternalLinkGroupBox::setupRenderData(remapped, data, scene);
-    data->fRelFrame = relFrame;
+    {
+        BoundingBox::setupRenderData(relFrame, parentRelFrame, data, scene);
+        const qreal remapped = mFrameRemapping->frame(relFrame);
+        processChildrenData(remapped, relFrame, data, scene);
+    }
 
     ContainerBox* finalTarget = getFinalTarget();
     auto canvasData = static_cast<LinkCanvasRenderData*>(data);

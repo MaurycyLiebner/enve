@@ -26,7 +26,7 @@ protected:
     InternalLinkCanvas(ContainerBox * const linkTarget,
                        const bool innerLink);
 public:
-    void setupRenderData(const qreal relFrame,
+    void setupRenderData(const qreal relFrame, const qreal parentRelFrame,
                          BoxRenderData * const data,
                          Canvas * const scene);
 
@@ -36,7 +36,8 @@ public:
 
     bool relPointInsidePath(const QPointF &relPos) const;
     void anim_setAbsFrame(const int frame);
-    void setupCanvasMenu(PropertyMenu * const menu);
+
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     void enableFrameRemappingAction();
     void disableFrameRemappingAction();

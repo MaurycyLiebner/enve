@@ -90,11 +90,11 @@ HardwareSupport PathBox::hardwareSupport() const {
     return HardwareSupport::cpuPreffered;
 }
 
-void PathBox::setupRenderData(const qreal relFrame,
+void PathBox::setupRenderData(const qreal relFrame, const qreal parentRelFrame,
                               BoxRenderData * const data,
                               Canvas* const scene) {
     if(!scene) return;
-    BoundingBox::setupRenderData(relFrame, data, scene);
+    BoundingBox::setupRenderData(relFrame, parentRelFrame, data, scene);
 
     bool currentEditPathCompatible = false;
     bool currentPathCompatible = false;

@@ -29,7 +29,7 @@ class CORE_EXPORT PaintBox : public BoundingBox {
 protected:
     PaintBox();
 public:
-    void setupRenderData(const qreal relFrame,
+    void setupRenderData(const qreal relFrame, const qreal parentRelFrame,
                          BoxRenderData * const data,
                          Canvas * const scene);
     stdsptr<BoxRenderData> createRenderData();
