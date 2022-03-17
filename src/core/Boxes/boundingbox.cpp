@@ -526,22 +526,17 @@ stdsptr<BoxRenderData> BoundingBox::queExternalRender(
     if(!renderData) return nullptr;
     renderData->fParentIsTarget = false;
     renderData->fForceRasterize = forceRasterize;
-    setupRenderData(relFrame, relFrame, renderData.get(), getParentScene());
+    const auto parentM = getInheritedTransformAtFrame(relFrame);
+    setupRenderData(relFrame, parentM, renderData.get(), getParentScene());
     renderData->queTask();
     return renderData;
 }
 
-stdsptr<BoxRenderData> BoundingBox::queRender(const qreal relFrame,
-                                              const qreal parentRelFrame) {
+stdsptr<BoxRenderData> BoundingBox::queRender(
+        const qreal relFrame, const QMatrix& parentM) {
     const auto renderData = updateCurrentRenderData(relFrame);
     if(!renderData) return nullptr;
-    if(isLink()) {
-        if(const auto sceneLink = getFirstAncestor<InternalLinkCanvas>()) {
-            renderData->fAncLinkScene = true;
-            renderData->fAncLinkSceneFrame = parentRelFrame;
-        }
-    }
-    setupRenderData(relFrame, parentRelFrame, renderData, getParentScene());
+    setupRenderData(relFrame, parentM, renderData, getParentScene());
     const auto renderDataSPtr = enve::shared(renderData);
     renderDataSPtr->queTask();
     return renderDataSPtr;
@@ -553,7 +548,8 @@ void BoundingBox::queTasks() {
     if(!shouldScheduleUpdate()) return;
     const int relFrame = anim_getCurrentRelFrame();
     if(hasCurrentRenderData(relFrame)) return;
-    queRender(relFrame, relFrame);
+    const auto parentM = getInheritedTransformAtFrame(relFrame);
+    queRender(relFrame, parentM);
 }
 
 stdsptr<BoxRenderData> BoundingBox::createRenderData(const qreal relFrame) {
@@ -856,14 +852,15 @@ void BoundingBox::finishTransform() {
 }
 
 void BoundingBox::setupRenderData(const qreal relFrame,
-                                  const qreal parentRelFrame,
+                                  const QMatrix& parentM,
                                   BoxRenderData * const data,
                                   Canvas* const scene) {
-    setupWithoutRasterEffects(relFrame, data, scene);
+    setupWithoutRasterEffects(relFrame, parentM, data, scene);
     setupRasterEffects(relFrame, data, scene);
 }
 
 void BoundingBox::setupWithoutRasterEffects(const qreal relFrame,
+                                            const QMatrix& parentM,
                                             BoxRenderData * const data,
                                             Canvas* const scene) {
     Q_ASSERT(scene);
@@ -871,27 +868,12 @@ void BoundingBox::setupWithoutRasterEffects(const qreal relFrame,
 
     data->fBoxStateId = mStateId;
     data->fRelFrame = relFrame;
-    data->fRelTransform = getRelativeTransformAtFrame(relFrame);
-    if(data->fAncLinkScene) {
-        const auto linkAncs = getFirstAncestorList<InternalLinkCanvas,
-                                                   BoundingBox>();
-        QMatrix inh;
-        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-        for(const auto anc : linkAncs) {
-            qreal frame;
-            if(anc == linkAncs.last()) {
-                frame = data->fAncLinkSceneFrame;
-            } else {
-                frame = anc->prp_absFrameToRelFrameF(absFrame);
-            }
-            inh = inh*anc->getRelativeTransformAtFrame(frame);
-        }
-        data->fInheritedTransform = inh;
-        data->fTotalTransform = data->fRelTransform*inh;
-    } else {
-        data->fInheritedTransform = getInheritedTransformAtFrame(relFrame);
-        data->fTotalTransform = getTotalTransformAtFrame(relFrame);
-    }
+
+    const auto thisRelM = getRelativeTransformAtFrame(relFrame);
+    data->fRelTransform = thisRelM;
+    data->fInheritedTransform = parentM;
+    data->fTotalTransform = thisRelM*parentM;
+
     data->fResolution = scene->getResolution();
     data->fResolutionScale.reset();
     data->fResolutionScale.scale(data->fResolution, data->fResolution);

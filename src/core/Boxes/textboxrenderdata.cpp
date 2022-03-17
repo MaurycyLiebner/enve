@@ -93,7 +93,9 @@ void LetterRenderData::initialize(const qreal relFrame,
                                   Canvas * const scene) {
     fOriginalPos = pos;
     fLetterPos = pos;
-    parent->BoundingBox::setupWithoutRasterEffects(relFrame, this, scene);
+    const auto parentM = parent->getInheritedTransformAtFrame(relFrame);
+    parent->BoundingBox::setupWithoutRasterEffects(
+                relFrame, parentM, this, scene);
     parent->setupPaintSettings(this, relFrame);
     parent->setupStrokerSettings(this, relFrame);
     SkPath textPath;
@@ -128,7 +130,9 @@ void WordRenderData::initialize(const qreal relFrame,
                                 const qreal letterSpacing,
                                 TextBox * const parent,
                                 Canvas * const scene) {
-    parent->BoundingBox::setupWithoutRasterEffects(relFrame, this, scene);
+    const auto parentM = parent->getInheritedTransformAtFrame(relFrame);
+    parent->BoundingBox::setupWithoutRasterEffects(
+                relFrame, parentM, this, scene);
 
     fOriginalPos = pos;
     fWordPos = pos;
@@ -181,7 +185,8 @@ void LineRenderData::initialize(const qreal relFrame,
     fOriginalPos = pos;
     fLinePos = pos;
     fString = line;
-    parent->BoundingBox::setupRenderData(relFrame, relFrame, this, scene);
+    const auto parentM = parent->getInheritedTransformAtFrame(relFrame);
+    parent->BoundingBox::setupRenderData(relFrame, parentM, this, scene);
 
     qreal xPos = pos.x();
     const qreal spaceX = horizontalAdvance(font, " ")*wordSpacing;

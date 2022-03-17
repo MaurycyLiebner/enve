@@ -34,13 +34,14 @@ InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget,
     mBoxTarget->setTarget(linkTarget);
 }
 
-void InternalLinkGroupBox::setupRenderData(const qreal relFrame, const qreal parentRelFrame,
+void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
+                                           const QMatrix& parentM,
                                            BoxRenderData * const data,
                                            Canvas* const scene) {
     const auto linkTarget = getLinkTarget();
     if(linkTarget) linkTarget->BoundingBox::setupRenderData(
-                relFrame, parentRelFrame, data, scene);
-    ContainerBox::setupRenderData(relFrame, parentRelFrame, data, scene);
+                relFrame, parentM, data, scene);
+    ContainerBox::setupRenderData(relFrame, parentM, data, scene);
 }
 
 bool InternalLinkGroupBox::localDifferenceInPathBetweenFrames(

@@ -54,13 +54,15 @@ void InternalLinkCanvas::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     InternalLinkGroupBox::prp_setupTreeViewMenu(menu);
 }
 
-void InternalLinkCanvas::setupRenderData(const qreal relFrame, const qreal parentRelFrame,
+void InternalLinkCanvas::setupRenderData(const qreal relFrame,
+                                         const QMatrix& parentM,
                                          BoxRenderData * const data,
                                          Canvas* const scene) {
     {
-        BoundingBox::setupRenderData(relFrame, parentRelFrame, data, scene);
+        BoundingBox::setupRenderData(relFrame, parentM, data, scene);
         const qreal remapped = mFrameRemapping->frame(relFrame);
-        processChildrenData(remapped, relFrame, data, scene);
+        const auto thisM = getTotalTransformAtFrame(relFrame);
+        processChildrenData(remapped, thisM, data, scene);
     }
 
     ContainerBox* finalTarget = getFinalTarget();

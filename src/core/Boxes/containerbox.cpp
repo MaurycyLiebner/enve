@@ -943,25 +943,26 @@ void ContainerBox::updateIfUsesProgram(
 void processChildData(BoundingBox * const child,
                       ContainerBoxRenderData * const parentData,
                       const qreal childRelFrame,
-                      const qreal parentRelFrame,
+                      const QMatrix& thisM,
                       const qreal absFrame,
                       QList<ChildRenderData>& delayed) {
     if(!child->isFrameFVisibleAndInDurationRect(childRelFrame)) return;
     if(child->isGroup()) {
         const auto childGroup = static_cast<ContainerBox*>(child);
+        const auto childM = childGroup->getInheritedTransformAtFrame(childRelFrame);
         const auto& descs = childGroup->getContainedBoxes();
         const auto minMax = childGroup->getContainedMinMax();
         for(int i = minMax.fMax; i >= minMax.fMin; i--) {
             const auto& desc = descs.at(i);
             const qreal descRelFrame = desc->prp_absFrameToRelFrameF(absFrame);
             processChildData(desc, parentData, descRelFrame,
-                             parentRelFrame, absFrame, delayed);
+                             childM, absFrame, delayed);
         }
         return;
     }
     auto boxRenderData = child->getCurrentRenderData(childRelFrame);
     if(!boxRenderData) {
-        boxRenderData = child->queRender(childRelFrame, parentRelFrame);
+        boxRenderData = child->queRender(childRelFrame, thisM);
     }
     if(!boxRenderData) return;
     boxRenderData->addDependent(parentData);
@@ -974,7 +975,7 @@ void processChildData(BoundingBox * const child,
 }
 
 void ContainerBox::processChildrenData(const qreal relFrame,
-                                       const qreal parentRelFrame,
+                                       const QMatrix& thisM,
                                        BoxRenderData * const data,
                                        Canvas* const scene) {
     const auto groupData = static_cast<ContainerBoxRenderData*>(data);
@@ -987,7 +988,7 @@ void ContainerBox::processChildrenData(const qreal relFrame,
         const auto& box = mContainedBoxes.at(i);
         const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
         processChildData(box, groupData, boxRelFrame,
-                         parentRelFrame, absFrame, delayed);
+                         thisM, absFrame, delayed);
     }
     for(auto& del : delayed) {
         auto& iClip = del.fClip;
@@ -1027,11 +1028,12 @@ stdsptr<BoxRenderData> ContainerBox::createRenderData() {
 }
 
 void ContainerBox::setupRenderData(const qreal relFrame,
-                                   const qreal parentRelFrame,
+                                   const QMatrix& parentM,
                                    BoxRenderData * const data,
                                    Canvas* const scene) {
-    BoundingBox::setupRenderData(relFrame, parentRelFrame, data, scene);
-    processChildrenData(relFrame, parentRelFrame, data, scene);
+    BoundingBox::setupRenderData(relFrame, parentM, data, scene);
+    const auto thisM = getInheritedTransformAtFrame(relFrame);
+    processChildrenData(relFrame, thisM, data, scene);
 }
 
 void ContainerBox::selectAllBoxesFromBoxesGroup() {

@@ -195,7 +195,7 @@ public:
 
     virtual void setupCanvasMenu(PropertyMenu * const menu);
 
-    virtual void setupRenderData(const qreal relFrame, const qreal parentRelFrame,
+    virtual void setupRenderData(const qreal relFrame, const QMatrix& parentM,
                                  BoxRenderData * const data,
                                  Canvas * const scene);
     virtual void renderDataFinished(BoxRenderData *renderData);
@@ -253,11 +253,12 @@ public:
 
     stdsptr<BoxRenderData> createRenderData(const qreal relFrame);
     stdsptr<BoxRenderData> queRender(const qreal relFrame,
-                                     const qreal parentRelFrame);
+                                     const QMatrix& parentM);
     stdsptr<BoxRenderData> queExternalRender(
             const qreal relFrame, const bool forceRasterize);
 
     void setupWithoutRasterEffects(const qreal relFrame,
+                                   const QMatrix& parentM,
                                    BoxRenderData * const data,
                                    Canvas* const scene);
     void setupRasterEffects(const qreal relFrame,
