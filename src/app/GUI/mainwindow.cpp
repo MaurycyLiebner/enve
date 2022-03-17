@@ -1434,7 +1434,9 @@ void MainWindow::saveFileAs(const bool setPath) {
 }
 
 void MainWindow::saveBackup() {
-    const QString backupPath = "backup/backup_%1.ev";
+    const QString defPath = mDocument.fEvFile.isEmpty() ?
+                QDir::homePath() : mDocument.fEvFile;
+    const QString backupPath = defPath + "backup/backup_%1.ev";
     int id = 1;
     QFile backupFile(backupPath.arg(id));
     while(backupFile.exists()) {
