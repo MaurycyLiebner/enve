@@ -949,7 +949,8 @@ void processChildData(BoundingBox * const child,
     if(!child->isFrameFVisibleAndInDurationRect(childRelFrame)) return;
     if(child->isGroup()) {
         const auto childGroup = static_cast<ContainerBox*>(child);
-        const auto childM = childGroup->getInheritedTransformAtFrame(childRelFrame);
+        const auto childRelM = child->getRelativeTransformAtFrame(childRelFrame);
+        const auto childM = childRelM*thisM;
         const auto& descs = childGroup->getContainedBoxes();
         const auto minMax = childGroup->getContainedMinMax();
         for(int i = minMax.fMax; i >= minMax.fMin; i--) {
@@ -960,11 +961,16 @@ void processChildData(BoundingBox * const child,
         }
         return;
     }
-    auto boxRenderData = child->getCurrentRenderData(childRelFrame);
+    stdsptr<BoxRenderData> boxRenderData;
+    if(parentData->fParentIsTarget) {
+        boxRenderData = child->getCurrentRenderData(childRelFrame);
+    }
     if(!boxRenderData) {
         boxRenderData = child->queRender(childRelFrame, thisM);
     }
     if(!boxRenderData) return;
+    boxRenderData->fParentIsTarget = parentData->fParentIsTarget;
+    boxRenderData->fForceRasterize = parentData->fForceRasterize;
     boxRenderData->addDependent(parentData);
     ChildRenderData cData = boxRenderData;
     cData.fIsMain = true;
@@ -978,6 +984,7 @@ void ContainerBox::processChildrenData(const qreal relFrame,
                                        const QMatrix& thisM,
                                        BoxRenderData * const data,
                                        Canvas* const scene) {
+    Q_UNUSED(scene);
     const auto groupData = static_cast<ContainerBoxRenderData*>(data);
     groupData->fChildrenRenderData.clear();
     groupData->fOtherGlobalRects.clear();
@@ -1032,8 +1039,7 @@ void ContainerBox::setupRenderData(const qreal relFrame,
                                    BoxRenderData * const data,
                                    Canvas* const scene) {
     BoundingBox::setupRenderData(relFrame, parentM, data, scene);
-    const auto thisM = getInheritedTransformAtFrame(relFrame);
-    processChildrenData(relFrame, thisM, data, scene);
+    processChildrenData(relFrame, data->fTotalTransform, data, scene);
 }
 
 void ContainerBox::selectAllBoxesFromBoxesGroup() {
