@@ -48,6 +48,7 @@ public:
     SkBlendMode getBlendMode() const override;
 
     QMatrix getRelativeTransformAtFrame(const qreal relFrame) const override;
+    QMatrix getInheritedTransformAtFrame(const qreal relFrame) const override;
     QMatrix getTotalTransformAtFrame(const qreal relFrame) const override;
 
     bool isFrameInDurationRect(const int relFrame) const override;
@@ -168,6 +169,17 @@ QMatrix ILBB::getRelativeTransformAtFrame(const qreal relFrame) const {
         return linkTarget->getRelativeTransformAtFrame(relFrame);
     } else {
         return BoundingBox::getRelativeTransformAtFrame(relFrame);
+    }
+}
+
+template <typename BoxT>
+QMatrix ILBB::getInheritedTransformAtFrame(const qreal relFrame) const {
+    if(mInnerLink) {
+        const auto parentGroup = this->getParentGroup();
+        if(!parentGroup) return QMatrix();
+        return parentGroup->getTotalTransformAtFrame(relFrame);
+    } else {
+        return BoundingBox::getInheritedTransformAtFrame(relFrame);
     }
 }
 
