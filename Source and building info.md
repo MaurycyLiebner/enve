@@ -215,7 +215,7 @@ sudo apt-get install libxkbcommon-x11-dev
 
 ### enve
 
-You can either build enve through QtCreator (open enve.pro and setup Relase/Debug Kits),
+You can either build enve through QtCreator (open enve.pro and setup Release/Debug Kits),
 or by running qmake and make directly.
 
 By default qmake is not installed in /usr/bin.
@@ -284,7 +284,7 @@ Create the AppImage using LinuxDeployQt:
 ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage
 ```
 
-You have successfuly created your own enve AppImage!
+You have successfully created your own enve AppImage!
 
 <h1 align="center">Building for Windows</h1>
 
@@ -300,13 +300,13 @@ Install Qt 5.12.4 Desktop MSVC 2017 64-bit.
 
 ### LLVM
 
-Download the latest stable LLVM relese from **https://github.com/llvm/llvm-project/releases**, e.g., **LLVM-10.0.0-win64.exe**.
+Download the latest stable LLVM release from **https://github.com/llvm/llvm-project/releases**, e.g., **LLVM-10.0.0-win64.exe**.
 Install LLVM.
 
 ### Environment
 
 Run all commands from **Qt 5.12.4 (MSVC 2017 64-bit)** command line.
-Remeber to call vcvarsall.bat to initialize MSVC environment, e.g.,
+Remember to call vcvarsall.bat to initialize MSVC environment, e.g.,
 `"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x64`.
 
 ### FFmpeg and Libmypaint
