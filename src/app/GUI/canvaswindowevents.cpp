@@ -46,7 +46,7 @@ void CanvasWindow::resizeEvent(QResizeEvent *e) {
             const QPointF trans{dSize.width()/div, dSize.height()/div};
             translateView(trans);
         }
-        // e->oldSize() returns {-1, -1} after chaning parent
+        // e->oldSize() returns {-1, -1} after chaining parent
         mOldSize = e->size();
     }
     GLWindow::resizeEvent(e);

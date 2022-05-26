@@ -369,7 +369,7 @@ void PaintSettingsAnimator::setCurrentColor(const QColor &color) {
     mColor->setColor(color);
 }
 
-void PaintSettingsAnimator::showHideChildrenBeforeChaningPaintType(
+void PaintSettingsAnimator::showHideChildrenBeforeChainingPaintType(
         const PaintType newPaintType) {
     if(mPaintType == GRADIENTPAINT)
         setGradient(nullptr);
@@ -394,7 +394,7 @@ void PaintSettingsAnimator::setPaintType(const PaintType paintType) {
         prp_addUndoRedo(ur);
     }
 
-    showHideChildrenBeforeChaningPaintType(paintType);
+    showHideChildrenBeforeChainingPaintType(paintType);
 
     mPaintType = paintType;
     updateGradientPoint();

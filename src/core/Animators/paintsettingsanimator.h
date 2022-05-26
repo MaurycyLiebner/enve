@@ -42,7 +42,7 @@ protected:
     PaintSettingsAnimator(const QString &name,
                           BoundingBox * const parent);
 
-    virtual void showHideChildrenBeforeChaningPaintType(
+    virtual void showHideChildrenBeforeChainingPaintType(
             const PaintType newPaintType);
 
     QDomElement prp_writePropertyXEV_impl(const XevExporter& exp) const;
