@@ -10,11 +10,11 @@ Enve was created with flexibility and expandability in mind.
 
 <p align="center">
 <a href="https://twitter.com/enve2d" target="_blank">
-  <img src="https://image.flaticon.com/icons/png/512/187/187187.png" alt="enve on Twitter" height="64" border="10" hspace="20"/>
+  <img src="https://cdn-icons-png.flaticon.com/512/187/187187.png" alt="enve on Twitter" height="64" border="10" hspace="20"/>
 </a>
 &nbsp;&nbsp;&nbsp;
 <a href="https://www.youtube.com/channel/UCjvNO3xdIQs-cpgwSf0mX5Q" target="_blank">
-  <img src="https://image.flaticon.com/icons/png/512/187/187209.png" alt="enve on YouTube" height="64" border="10" hspace="20"/>
+  <img src="https://cdn-icons-png.flaticon.com/512/187/187209.png" alt="enve on YouTube" height="64" border="10" hspace="20"/>
 </a>
 &nbsp;&nbsp;&nbsp;
 <a href="https://www.patreon.com/enve" target="_blank">
