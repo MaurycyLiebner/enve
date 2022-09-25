@@ -19,7 +19,7 @@
 #include "canvas.h"
 #include "CacheHandlers/soundcachecontainer.h"
 #include "soundmerger.h"
-#include "FileCacheHandlers/soundreader.h"
+#include "FileCacheHandlers/soundreaderformerger.h"
 
 SoundComposition::SoundComposition(Canvas * const parent) :
     QIODevice(parent), mParent(parent) {
@@ -120,7 +120,8 @@ SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
                 if(!reader) continue;
                 reader->addMerger(task.get());
                 reader->addDependent(task.get());
-                reader->addSingleSound(sound->getSampleShift(),
+                reader->addSingleSound(sound.get(),
+                                       sound->getSampleShift(),
                                        sound->absSampleRange(),
                                        sound->getVolumeSnap(),
                                        sound->getStretch());

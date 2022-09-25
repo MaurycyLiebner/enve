@@ -134,6 +134,7 @@ SOURCES += \
     FileCacheHandlers/imagecachehandler.cpp \
     FileCacheHandlers/imagesequencecachehandler.cpp \
     FileCacheHandlers/soundreader.cpp \
+    FileCacheHandlers/soundreaderformerger.cpp \
     FileCacheHandlers/svgfilecachehandler.cpp \
     FileCacheHandlers/videocachehandler.cpp \
     FileCacheHandlers/videoframeloader.cpp \
@@ -460,6 +461,7 @@ HEADERS += \
     FileCacheHandlers/imagecachehandler.h \
     FileCacheHandlers/imagesequencecachehandler.h \
     FileCacheHandlers/soundreader.h \
+    FileCacheHandlers/soundreaderformerger.h \
     FileCacheHandlers/svgfilecachehandler.h \
     FileCacheHandlers/videocachehandler.h \
     FileCacheHandlers/videoframeloader.h \

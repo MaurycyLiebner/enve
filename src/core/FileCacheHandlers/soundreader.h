@@ -62,35 +62,4 @@ private:
     stdsptr<Samples> mSamples;
 };
 
-#include "Sound/soundmerger.h"
-class CORE_EXPORT SoundReaderForMerger : public SoundReader {
-    e_OBJECT
-    struct SingleSound {
-        int fSampleShift;
-        SampleRange fSamplesRange;
-        QrealSnapshot fVolume;
-        qreal fSpeed;
-    };
-protected:
-    SoundReaderForMerger(SoundHandler * const cacheHandler,
-                         const stdsptr<AudioStreamsData>& openedAudio,
-                         const int secondId, const SampleRange& sampleRange) :
-        SoundReader(cacheHandler, openedAudio, secondId, sampleRange) {}
-
-    void afterProcessing();
-public:
-    void addSingleSound(const int sampleShift,
-                        const SampleRange& absRange,
-                        const QrealSnapshot& volume,
-                        const qreal speed) {
-        mSSAbsRanges.append({sampleShift, absRange, volume, speed});
-    }
-
-    void addMerger(SoundMerger * const merger) {
-        mMergers << merger;
-    }
-private:
-    QList<SingleSound> mSSAbsRanges;
-    QList<stdptr<SoundMerger>> mMergers;
-};
 #endif // SOUNDREADER_H

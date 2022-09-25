@@ -205,16 +205,3 @@ void SoundReader::readFrame() {
                                           dstSampleRate,
                                           dstSampleFormat, dstChLayout);
 }
-
-#include "Sound/soundmerger.h"
-void SoundReaderForMerger::afterProcessing() {
-    for(const auto& merger : mMergers) {
-        if(!merger) continue;
-        for(const auto& ss : mSSAbsRanges) {
-            merger->addSoundToMerge({ss.fSampleShift, ss.fSamplesRange,
-                                     ss.fVolume, ss.fSpeed,
-                                     enve::make_shared<Samples>(getSamples())});
-        }
-    }
-    SoundReader::afterProcessing();
-}

@@ -16,10 +16,14 @@
 
 #ifndef VIDEOCACHEHANDLER_H
 #define VIDEOCACHEHANDLER_H
+
 #include "animationcachehandler.h"
 #include "videostreamsdata.h"
-#include <set>
 #include "filecachehandler.h"
+#include "CacheHandlers/hddcachablecachehandler.h"
+
+#include <set>
+
 class VideoFrameLoader;
 class VideoFrameHandler;
 

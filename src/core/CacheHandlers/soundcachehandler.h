@@ -20,7 +20,7 @@
 #include "CacheHandlers/hddcachablecachehandler.h"
 #include "CacheHandlers/soundcachecontainer.h"
 #include "FileCacheHandlers/audiostreamsdata.h"
-#include "FileCacheHandlers/soundreader.h"
+#include "FileCacheHandlers/soundreaderformerger.h"
 
 class CORE_EXPORT SoundDataHandler : public FileDataCacheHandler {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
