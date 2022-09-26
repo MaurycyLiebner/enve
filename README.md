@@ -22,7 +22,7 @@ Enve was created with flexibility and expandability in mind.
 </a>
 &nbsp;&nbsp;&nbsp;
 <a href="https://liberapay.com/enve" target="_blank">
-  <img src="https://liberapay.com/assets/liberapay/icon-v2_white-on-yellow.svg?etag=.Z1LYSBJ8Z6GWUeLUUEf2XA~~" alt="enve on Liberapay" height="64" border="10" hspace="20"/>
+  <img src="https://liberapay.com/assets/liberapay/icon-v2_white-on-yellow.svg" alt="enve on Liberapay" height="64" border="10" hspace="20"/>
 </a>
 &nbsp;&nbsp;&nbsp;
 <a href="https://paypal.me/enve2d" target="_blank">
